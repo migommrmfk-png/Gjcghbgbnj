@@ -1,0 +1,9 @@
+{
+  "name": "Remix: هذا ديني",
+  "description": "تطبيق إسلامي شامل يحتوي على القرآن الكريم، مواقيت الصلاة، الأذكار، اتجاه القبلة، التقويم الهجري، السبحة الإلكترونية، والمزيد.",
+  "requestFramePermissions": [
+    "geolocation",
+    "microphone",
+    "notifications"
+  ]
+}
