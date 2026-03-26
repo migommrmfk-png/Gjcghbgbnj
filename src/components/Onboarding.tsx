@@ -126,7 +126,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
           <div className="absolute inset-0 bg-[var(--color-primary)]/30 rounded-full blur-3xl animate-pulse"></div>
           <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}>
             <div className="w-32 h-32 bg-gradient-to-br from-[var(--color-primary-light)] to-[var(--color-primary-dark)] rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(212,175,55,0.6)]">
-              <CheckCircle2 size={60} className="text-black" />
+              <CheckCircle2 size={60} className="text-white" />
             </div>
           </motion.div>
         </div>
@@ -195,7 +195,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
         className="w-full pt-12 pb-4 px-6 text-center relative z-20"
       >
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--color-primary-light)] to-[var(--color-primary-dark)] shadow-[0_0_20px_rgba(212,175,55,0.4)] mb-3">
-          <Moon size={28} className="text-black fill-black" />
+          <Moon size={28} className="text-white fill-white" />
         </div>
         <h1 className="text-3xl font-bold font-serif text-white mb-2 tracking-wide drop-shadow-md">
           هذا ديني
@@ -277,7 +277,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
               requestPermissions();
             }
           }}
-          className="w-full py-4 rounded-2xl bg-gradient-to-r from-[var(--color-primary-light)] to-[var(--color-primary-dark)] text-black font-bold text-lg shadow-[0_10px_20px_rgba(212,175,55,0.3)] flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all"
+          className="w-full py-4 rounded-2xl bg-gradient-to-r from-[var(--color-primary-light)] to-[var(--color-primary-dark)] text-white font-bold text-lg shadow-[0_10px_20px_rgba(212,175,55,0.3)] flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all"
         >
           {step < steps.length - 1 ? (
             <>التالي <ArrowLeft size={20} /></>

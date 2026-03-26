@@ -23,6 +23,9 @@ export default {
           light: 'var(--theme-gold-light)',
         },
         accent: 'var(--theme-accent)',
+        success: '#4CAF50',
+        warning: '#FF9800',
+        error: '#F44336',
       }
     },
   },

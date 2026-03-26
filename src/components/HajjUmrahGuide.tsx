@@ -23,25 +23,25 @@ export default function HajjUmrahGuide({ onBack }: { onBack: () => void }) {
   return (
     <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]" dir="rtl">
       {/* Header */}
-      <div className="sticky top-0 z-20 py-4 flex flex-col gap-4 bg-[var(--color-bg)]/80 backdrop-blur-xl border-b border-white/5">
+      <div className="sticky top-0 z-20 py-4 flex flex-col gap-4 bg-[var(--color-bg)]/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5">
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
-            className="p-2 hover:bg-white/5 rounded-full transition-colors"
+            className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors"
           >
             <ArrowRight size={24} className="text-[var(--color-primary)]" />
           </button>
-          <h1 className="text-xl font-bold font-serif text-white drop-shadow-md">
+          <h1 className="text-xl font-bold font-serif text-[var(--color-text)] drop-shadow-md">
             دليل الحج والعمرة
           </h1>
         </div>
 
         {/* Tabs */}
-        <div className="flex bg-black/40 rounded-2xl p-1 shadow-inner border border-white/5">
+        <div className="flex bg-black/5 dark:bg-white/5 rounded-2xl p-1 shadow-inner border border-black/10 dark:border-white/10">
           <button
             onClick={() => setActiveTab('umrah')}
             className={`flex-1 py-2 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
-              activeTab === 'umrah' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white shadow-lg shadow-[var(--color-primary)]/20' : 'text-white/50 hover:text-white hover:bg-white/5'
+              activeTab === 'umrah' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white shadow-lg shadow-[var(--color-primary)]/20' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-black/5 dark:hover:bg-white/5'
             }`}
           >
             <Navigation size={16} />
@@ -50,7 +50,7 @@ export default function HajjUmrahGuide({ onBack }: { onBack: () => void }) {
           <button
             onClick={() => setActiveTab('hajj')}
             className={`flex-1 py-2 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
-              activeTab === 'hajj' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white shadow-lg shadow-[var(--color-primary)]/20' : 'text-white/50 hover:text-white hover:bg-white/5'
+              activeTab === 'hajj' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white shadow-lg shadow-[var(--color-primary)]/20' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)] hover:bg-black/5 dark:hover:bg-white/5'
             }`}
           >
             <Map size={16} />

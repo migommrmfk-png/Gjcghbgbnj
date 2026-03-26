@@ -192,7 +192,7 @@ function AppContent() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
       >
-        <Sparkles size={28} className="text-black animate-pulse" />
+        <Sparkles size={28} className="text-white animate-pulse" />
         <span className="absolute -top-1 -right-1 flex h-4 w-4">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-primary-light)] opacity-75"></span>
           <span className="relative inline-flex rounded-full h-4 w-4 bg-[var(--color-primary)] border border-white/50"></span>

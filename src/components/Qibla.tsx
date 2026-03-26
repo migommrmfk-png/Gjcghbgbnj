@@ -161,7 +161,7 @@ export default function Qibla() {
             </div>
           </div>
           <div className="w-12 h-12 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-2xl flex items-center justify-center border border-[var(--color-primary-light)]/50 shadow-[0_0_15px_rgba(212,175,55,0.4)]">
-            <Compass size={24} className="text-black" />
+            <Compass size={24} className="text-white" />
           </div>
         </div>
       </div>
@@ -171,7 +171,7 @@ export default function Qibla() {
         <button
           onClick={() => setViewMode('map')}
           className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
-            viewMode === 'map' ? 'bg-[var(--color-primary)] text-black shadow-md' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
+            viewMode === 'map' ? 'bg-[var(--color-primary)] text-white shadow-md' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
           }`}
         >
           <MapPin size={18} />
@@ -180,7 +180,7 @@ export default function Qibla() {
         <button
           onClick={() => setViewMode('compass')}
           className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
-            viewMode === 'compass' ? 'bg-[var(--color-primary)] text-black shadow-md' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
+            viewMode === 'compass' ? 'bg-[var(--color-primary)] text-white shadow-md' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
           }`}
         >
           <Compass size={18} />
@@ -250,7 +250,7 @@ export default function Qibla() {
               {typeof (DeviceOrientationEvent as any).requestPermission === "function" && heading === null && (
                 <button 
                   onClick={requestCompassPermission}
-                  className="mb-8 px-6 py-3 bg-[var(--color-primary)] text-black font-bold rounded-xl shadow-lg"
+                  className="mb-8 px-6 py-3 bg-[var(--color-primary)] text-white font-bold rounded-xl shadow-lg"
                 >
                   تفعيل البوصلة
                 </button>

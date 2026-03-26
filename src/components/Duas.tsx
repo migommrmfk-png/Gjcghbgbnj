@@ -186,7 +186,7 @@ export default function Duas() {
             onClick={() => setActiveCategory(category.id)}
             className={`flex items-center gap-2 px-5 py-3 rounded-2xl whitespace-nowrap transition-all snap-center shadow-md border ${
               activeCategory === category.id
-                ? "bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black font-bold border-transparent"
+                ? "bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white font-bold border-transparent"
                 : "bg-[var(--color-surface)] text-[var(--color-text-muted)] hover:bg-white/5 border-white/5"
             }`}
           >

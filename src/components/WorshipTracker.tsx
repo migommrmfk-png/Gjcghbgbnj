@@ -196,7 +196,7 @@ export default function WorshipTracker({ onBack }: { onBack: () => void }) {
                 {LEVEL_NAMES[level as keyof typeof LEVEL_NAMES] || `مستوى ${level}`}
               </h2>
             </div>
-            <div className="w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-3xl flex items-center justify-center text-black border border-[var(--color-primary-light)]/50 shadow-[0_0_20px_rgba(212,175,55,0.5)] transform rotate-3">
+            <div className="w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-3xl flex items-center justify-center text-white border border-[var(--color-primary-light)]/50 shadow-[0_0_20px_rgba(212,175,55,0.5)] transform rotate-3">
               <Trophy size={40} />
             </div>
           </div>
@@ -247,7 +247,7 @@ export default function WorshipTracker({ onBack }: { onBack: () => void }) {
             const isLocked = level < lvl && lvl > 1; // Level 1 is always unlocked
 
             return (
-              <div key={lvl} className="bg-[var(--color-surface)] rounded-2xl border border-white/5 overflow-hidden shadow-lg">
+              <div key={lvl} className="bg-[var(--color-surface)] rounded-2xl border border-black/10 dark:border-white/10 overflow-hidden shadow-lg">
                 <button 
                   onClick={() => !isLocked && toggleLevelExpand(lvl)}
                   className={`w-full p-4 flex items-center justify-between ${isLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
@@ -284,7 +284,7 @@ export default function WorshipTracker({ onBack }: { onBack: () => void }) {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="p-4 pt-0 space-y-2 border-t border-white/5 mt-2">
+                      <div className="p-4 pt-0 space-y-2 border-t border-black/5 dark:border-white/5 mt-2">
                         {levelTasks.map((task, index) => {
                           const isCompleted = completedTaskIds.includes(task.id);
                           return (
@@ -297,13 +297,13 @@ export default function WorshipTracker({ onBack }: { onBack: () => void }) {
                               className={`p-3 rounded-xl flex items-center justify-between cursor-pointer transition-all ${
                                 isCompleted 
                                   ? 'bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30' 
-                                  : 'bg-black/20 border border-white/5 hover:border-[var(--color-primary)]/30'
+                                  : 'bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-[var(--color-primary)]/30'
                               }`}
                             >
                               <div className="flex items-center gap-3">
                                 <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
                                   isCompleted 
-                                    ? 'bg-[var(--color-primary)] border-[var(--color-primary)] text-black' 
+                                    ? 'bg-[var(--color-primary)] border-[var(--color-primary)] text-white' 
                                     : 'border-[var(--color-text-muted)] text-transparent'
                                 }`}>
                                   <CheckCircle2 size={14} />

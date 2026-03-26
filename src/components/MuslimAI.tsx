@@ -170,8 +170,8 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
   return (
     <div className="flex flex-col h-full bg-[var(--color-bg)] relative overflow-hidden pb-24" dir="rtl">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 z-10 mt-2 bg-[var(--color-bg)]/80 backdrop-blur-xl sticky top-0 border-b border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
-        <button onClick={onBack} className="p-2 hover:bg-white/5 rounded-full transition-colors border border-white/5 bg-[var(--color-surface)] shadow-[0_5px_15px_rgba(0,0,0,0.2)]">
+      <div className="flex items-center justify-between p-4 z-10 mt-2 bg-[var(--color-bg)]/80 backdrop-blur-xl sticky top-0 border-b border-black/5 dark:border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+        <button onClick={onBack} className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors border border-black/5 dark:border-white/5 bg-[var(--color-surface)] shadow-[0_5px_15px_rgba(0,0,0,0.2)]">
           <ArrowRight className="text-[var(--color-text-muted)] hover:text-[var(--color-primary-light)]" size={24} />
         </button>
         <div className="flex items-center gap-2">
@@ -200,7 +200,7 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-[var(--color-surface)] border border-white/10 rounded-2xl p-6 max-w-sm w-full shadow-2xl"
+              className="bg-[var(--color-surface)] border border-black/10 dark:border-white/10 rounded-2xl p-6 max-w-sm w-full shadow-2xl"
             >
               <h3 className="text-xl font-bold text-[var(--color-text)] mb-4 text-center">مسح المحادثة</h3>
               <p className="text-[var(--color-text-muted)] text-center mb-6">هل أنت متأكد من مسح سجل المحادثة بالكامل؟ لا يمكن التراجع عن هذا الإجراء.</p>
@@ -312,7 +312,7 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
             <button
               onClick={handleSend}
               disabled={!input.trim() || isLoading || isRecording}
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:shadow-[0_0_20px_rgba(212,175,55,0.5)] transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-[var(--color-primary-light)]/50"
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:shadow-[0_0_20px_rgba(212,175,55,0.5)] transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-[var(--color-primary-light)]/50"
             >
               <Send size={18} className="mr-1" />
             </button>

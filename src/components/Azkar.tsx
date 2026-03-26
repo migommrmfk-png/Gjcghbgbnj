@@ -515,7 +515,7 @@ export default function Azkar() {
                           onClick={(e) => toggleAudio(zikr, e)}
                           className={`p-3 rounded-full shadow-md transition-colors border ${
                             playingId === zikr.id
-                              ? "bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black border-transparent"
+                              ? "bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white border-transparent"
                               : "bg-[var(--color-bg)] text-[var(--color-primary)] hover:bg-[var(--color-surface-hover)] border-white/10"
                           }`}
                         >
@@ -540,7 +540,7 @@ export default function Azkar() {
                           animate={{ scale: 1, opacity: 1 }}
                           className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-xl transition-colors shadow-inner border-2 ${
                             isCompleted
-                              ? "bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black border-transparent shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+                              ? "bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white border-transparent shadow-[0_0_15px_rgba(212,175,55,0.3)]"
                               : "bg-[var(--color-bg)] text-[var(--color-primary)] border-[var(--color-primary)]/30"
                           }`}
                         >
@@ -570,7 +570,7 @@ export default function Azkar() {
         <div className="absolute left-0 bottom-0 w-32 h-32 bg-black/40 rounded-full -ml-10 -mb-10 blur-2xl"></div>
         <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
         <div className="relative z-10 flex flex-col items-center text-center">
-          <div className="w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-3xl flex items-center justify-center text-black mb-6 shadow-[0_0_20px_rgba(212,175,55,0.5)] transform rotate-3">
+          <div className="w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-3xl flex items-center justify-center text-white mb-6 shadow-[0_0_20px_rgba(212,175,55,0.5)] transform rotate-3">
             <Heart size={40} />
           </div>
           <h1 className="text-4xl font-bold font-serif mb-2 text-[var(--color-primary-light)] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">

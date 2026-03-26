@@ -570,7 +570,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                     key={prayer.id}
                     className={`flex flex-col items-center p-3 rounded-2xl transition-all ${
                       isNext
-                        ? "bg-white text-black shadow-lg scale-105"
+                        ? "bg-white text-[var(--color-bg)] shadow-lg scale-105"
                         : "bg-white/10 text-white hover:bg-white/20"
                     }`}
                   >
@@ -600,18 +600,18 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           <div className="relative z-10 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-black/20 rounded-2xl flex items-center justify-center backdrop-blur-md border border-black/10 shadow-inner group-hover:scale-110 transition-transform">
-                <Sparkles size={28} className="text-black animate-pulse" />
+                <Sparkles size={28} className="text-white animate-pulse" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-black mb-1 flex items-center gap-2">
+                <h3 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
                   المساعد الإسلامي
-                  <span className="bg-black/20 text-black text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">AI</span>
+                  <span className="bg-black/20 text-white text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">AI</span>
                 </h3>
-                <p className="text-black/80 text-sm font-medium">اسألني في أمور الدين، أو قيم تلاوتك</p>
+                <p className="text-white/80 text-sm font-medium">اسألني في أمور الدين، أو قيم تلاوتك</p>
               </div>
             </div>
             <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-black/10 group-hover:bg-black/20 transition-colors">
-              <ChevronLeft size={20} className="text-black" />
+              <ChevronLeft size={20} className="text-white" />
             </div>
           </div>
         </motion.div>
@@ -762,7 +762,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                     onClick={() => togglePrayer(p.id)}
                     className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold transition-all ${
                       prayedToday[p.id]
-                        ? "bg-[var(--color-primary)] text-black shadow-lg"
+                        ? "bg-[var(--color-primary)] text-white shadow-lg"
                         : "bg-black/5 dark:bg-white/5 text-[var(--color-text-muted)] hover:bg-black/10 dark:hover:bg-white/10"
                     }`}
                   >
@@ -815,7 +815,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                 القرآن
               </p>
               <div className="flex flex-col gap-1">
-                <span className="text-[10px] font-bold text-white truncate">
+                <span className="text-[10px] font-bold text-[var(--color-text)] truncate">
                   {lastReadQuran ? lastReadQuran.surahName : "ابدأ القراءة"}
                 </span>
                 <div className="w-full h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
@@ -830,7 +830,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                 الأذكار
               </p>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-white">
+                <span className="text-xs font-bold text-[var(--color-text)]">
                   {tasbeehProgress ? `${tasbeehProgress.count}/${tasbeehProgress.target}` : "0/100"}
                 </span>
                 <Activity size={14} className="text-[var(--color-primary)]" />

@@ -142,7 +142,7 @@ export default function QuranPlan({ onBack }: { onBack: () => void }) {
                   </div>
                 </div>
 
-                <button onClick={generatePlan} className="w-full py-4 rounded-xl font-bold text-black bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] shadow-[0_0_20px_rgba(212,175,55,0.4)] active:scale-95 transition-all">
+                <button onClick={generatePlan} className="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] shadow-[0_0_20px_rgba(212,175,55,0.4)] active:scale-95 transition-all">
                   إنشاء الخطة
                 </button>
               </motion.div>
@@ -191,7 +191,7 @@ export default function QuranPlan({ onBack }: { onBack: () => void }) {
                 <p className="text-white/80 text-sm font-medium">معدل الإنجاز: {Math.round(progress)}%</p>
               </div>
               <div className="w-12 h-12 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-2xl flex items-center justify-center border border-[var(--color-primary-light)]/50 shadow-[0_0_15px_rgba(212,175,55,0.4)] transform rotate-3">
-                <Flame size={24} className="text-black" />
+                <Flame size={24} className="text-white" />
               </div>
             </div>
             
@@ -223,7 +223,7 @@ export default function QuranPlan({ onBack }: { onBack: () => void }) {
                 className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active"
               >
                 <div className={`flex items-center justify-center w-10 h-10 rounded-full border-4 border-[var(--color-surface)] shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-[0_0_10px_rgba(0,0,0,0.5)] z-10 ${
-                  day.status === 'completed' ? 'bg-[var(--color-primary)] text-black' : 
+                  day.status === 'completed' ? 'bg-[var(--color-primary)] text-white' : 
                   day.status === 'current' ? 'bg-[var(--color-surface)] border-[var(--color-primary)] text-[var(--color-primary)]' : 
                   'bg-[var(--color-surface)] border-white/10 text-[var(--color-text-muted)]'
                 }`}>
@@ -241,7 +241,7 @@ export default function QuranPlan({ onBack }: { onBack: () => void }) {
                     <span className={`font-bold ${day.status === 'completed' ? 'text-[var(--color-primary-light)]' : 'text-white'}`}>اليوم {day.day}</span>
                     <span className={`text-xs px-2 py-1 rounded-lg ${
                       day.status === 'completed' ? 'bg-[var(--color-primary)]/20 text-[var(--color-primary-light)]' : 
-                      day.status === 'current' ? 'bg-[var(--color-primary)] text-black font-bold' : 
+                      day.status === 'current' ? 'bg-[var(--color-primary)] text-white font-bold' : 
                       'bg-white/5 text-[var(--color-text-muted)]'
                     }`}>
                       {day.status === 'completed' ? 'مكتمل' : day.status === 'current' ? 'اليوم' : 'قادم'}

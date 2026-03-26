@@ -114,7 +114,7 @@ export default function Hadith() {
           <div className="absolute bottom-0 right-0 w-32 h-32 bg-[var(--color-primary-dark)]/20 rounded-tl-full blur-2xl"></div>
 
           <div className="relative z-10 flex flex-col items-center text-center space-y-8">
-            <div className="w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-full flex items-center justify-center text-black shadow-[0_0_20px_rgba(212,175,55,0.5)] mb-4 border border-[var(--color-primary-light)]/50">
+            <div className="w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(212,175,55,0.5)] mb-4 border border-[var(--color-primary-light)]/50">
               <BookOpen size={40} />
             </div>
 
@@ -147,7 +147,7 @@ export default function Hadith() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-[var(--color-primary)] text-black px-6 py-3 rounded-full shadow-lg z-50 font-bold text-sm whitespace-nowrap"
+            className="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-[var(--color-primary)] text-white px-6 py-3 rounded-full shadow-lg z-50 font-bold text-sm whitespace-nowrap"
           >
             تم نسخ الحديث إلى الحافظة
           </motion.div>

@@ -148,11 +148,11 @@ export default function IslamicLibrary({ onBack }: { onBack: () => void }) {
   return (
     <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-[var(--color-bg)]" dir="rtl">
       {/* Header */}
-      <div className="sticky top-0 z-20 py-4 flex flex-col gap-4 bg-[var(--color-bg)]/80 backdrop-blur-xl border-b border-white/5">
+      <div className="sticky top-0 z-20 py-4 flex flex-col gap-4 bg-[var(--color-bg)]/80 backdrop-blur-xl border-b border-black/10 dark:border-white/10">
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
-            className="p-2 hover:bg-white/5 rounded-full transition-colors border border-white/5 bg-[var(--color-surface)] shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
+            className="p-2 hover:bg-black/5 dark:bg-white/5 rounded-full transition-colors border border-white/5 bg-[var(--color-surface)] shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
           >
             <ArrowRight size={24} className="text-[var(--color-text-muted)] hover:text-[var(--color-primary-light)]" />
           </button>
@@ -168,17 +168,17 @@ export default function IslamicLibrary({ onBack }: { onBack: () => void }) {
             placeholder="ابحث عن كتاب، درس، أو فيديو..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[var(--color-surface)] border border-white/5 rounded-2xl py-3 pr-12 pl-4 text-sm text-white placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-primary-light)]/50 focus:ring-1 focus:ring-[var(--color-primary-light)]/50 transition-all shadow-[0_5px_15px_rgba(0,0,0,0.3)]"
+            className="w-full bg-[var(--color-surface)] border border-black/5 dark:border-white/5 rounded-2xl py-3 pr-12 pl-4 text-sm text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-primary-light)]/50 focus:ring-1 focus:ring-[var(--color-primary-light)]/50 transition-all shadow-[0_5px_15px_rgba(0,0,0,0.3)]"
           />
           <Search size={20} className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]" />
         </div>
 
         {/* Tabs */}
-        <div className="flex bg-[var(--color-surface)] rounded-2xl p-1.5 shadow-[0_5px_15px_rgba(0,0,0,0.2)] border border-white/5">
+        <div className="flex bg-[var(--color-surface)] rounded-2xl p-1.5 shadow-[0_5px_15px_rgba(0,0,0,0.2)] border border-black/5 dark:border-white/5">
           <button
             onClick={() => setActiveTab('books')}
             className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-inner ${
-              activeTab === 'books' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-[var(--color-primary-light)]/50' : 'text-[var(--color-text-muted)] hover:bg-white/5 hover:text-[var(--color-primary-light)]'
+              activeTab === 'books' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-[var(--color-primary-light)]/50' : 'text-[var(--color-text-muted)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--color-primary-light)]'
             }`}
           >
             <Book size={18} />
@@ -187,7 +187,7 @@ export default function IslamicLibrary({ onBack }: { onBack: () => void }) {
           <button
             onClick={() => setActiveTab('audio')}
             className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-inner ${
-              activeTab === 'audio' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-[var(--color-primary-light)]/50' : 'text-[var(--color-text-muted)] hover:bg-white/5 hover:text-[var(--color-primary-light)]'
+              activeTab === 'audio' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-[var(--color-primary-light)]/50' : 'text-[var(--color-text-muted)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--color-primary-light)]'
             }`}
           >
             <Headphones size={18} />
@@ -196,7 +196,7 @@ export default function IslamicLibrary({ onBack }: { onBack: () => void }) {
           <button
             onClick={() => setActiveTab('video')}
             className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-inner ${
-              activeTab === 'video' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-[var(--color-primary-light)]/50' : 'text-[var(--color-text-muted)] hover:bg-white/5 hover:text-[var(--color-primary-light)]'
+              activeTab === 'video' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-[var(--color-primary-light)]/50' : 'text-[var(--color-text-muted)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--color-primary-light)]'
             }`}
           >
             <PlayCircle size={18} />
@@ -224,7 +224,7 @@ export default function IslamicLibrary({ onBack }: { onBack: () => void }) {
                   <div className="grid grid-cols-2 gap-4">
                     {categoryBooks.map((book) => (
                       <div key={book.id} className="card-3d bg-[var(--color-surface)] rounded-3xl p-4 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 flex flex-col items-center text-center hover:border-[var(--color-primary-light)]/30 transition-all cursor-pointer group">
-                        <div className="w-24 h-32 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-xl shadow-[0_10px_20px_rgba(212,175,55,0.3)] mb-4 flex items-center justify-center text-black/20 group-hover:shadow-[0_15px_30px_rgba(212,175,55,0.5)] transition-all relative overflow-hidden border border-[var(--color-primary-light)]/50 group-hover:scale-105">
+                        <div className="w-24 h-32 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-xl shadow-[0_10px_20px_rgba(212,175,55,0.3)] mb-4 flex items-center justify-center text-white/20 group-hover:shadow-[0_15px_30px_rgba(212,175,55,0.5)] transition-all relative overflow-hidden border border-[var(--color-primary-light)]/50 group-hover:scale-105">
                           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] opacity-10 mix-blend-overlay"></div>
                           <Book size={48} className="relative z-10" />
                         </div>
@@ -258,7 +258,7 @@ export default function IslamicLibrary({ onBack }: { onBack: () => void }) {
             >
               {audios.map((audio) => (
                 <div key={audio.id} className="card-3d bg-[var(--color-surface)] rounded-3xl p-4 shadow-[0_5px_15px_rgba(0,0,0,0.3)] border border-white/5 flex items-center gap-4 hover:bg-[var(--color-surface)]/80 hover:border-[var(--color-primary-light)]/30 transition-all cursor-pointer group">
-                  <button className="w-14 h-14 bg-black/40 text-[var(--color-primary-light)] rounded-full flex items-center justify-center shrink-0 group-hover:bg-gradient-to-br group-hover:from-[var(--color-primary)] group-hover:to-[var(--color-primary-dark)] group-hover:text-black transition-all border border-white/10 group-hover:border-[var(--color-primary-light)]/50 shadow-inner group-hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] group-hover:scale-110">
+                  <button className="w-14 h-14 bg-black/5 dark:bg-white/5 text-[var(--color-primary-light)] rounded-full flex items-center justify-center shrink-0 group-hover:bg-gradient-to-br group-hover:from-[var(--color-primary)] group-hover:to-[var(--color-primary-dark)] group-hover:text-white transition-all border border-white/10 group-hover:border-[var(--color-primary-light)]/50 shadow-inner group-hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] group-hover:scale-110">
                     <PlayCircle size={28} />
                   </button>
                   <div className="flex-1">
@@ -286,7 +286,7 @@ export default function IslamicLibrary({ onBack }: { onBack: () => void }) {
                   <div className="relative h-48 bg-black/40 overflow-hidden">
                     <img src={`https://picsum.photos/seed/video${video.id}/800/400`} alt={video.title} className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700" referrerPolicy="no-referrer" />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f0d] via-black/40 to-transparent group-hover:from-black/90 transition-colors flex items-center justify-center">
-                      <div className="w-16 h-16 bg-black/60 backdrop-blur-xl rounded-full flex items-center justify-center text-[var(--color-primary-light)] shadow-[0_5px_15px_rgba(0,0,0,0.5)] transform group-hover:scale-110 transition-all border border-white/20 group-hover:border-[var(--color-primary-light)]/50 group-hover:bg-gradient-to-br group-hover:from-[var(--color-primary)] group-hover:to-[var(--color-primary-dark)] group-hover:text-black group-hover:shadow-[0_0_25px_rgba(212,175,55,0.5)]">
+                      <div className="w-16 h-16 bg-black/60 backdrop-blur-xl rounded-full flex items-center justify-center text-[var(--color-primary-light)] shadow-[0_5px_15px_rgba(0,0,0,0.5)] transform group-hover:scale-110 transition-all border border-white/20 group-hover:border-[var(--color-primary-light)]/50 group-hover:bg-gradient-to-br group-hover:from-[var(--color-primary)] group-hover:to-[var(--color-primary-dark)] group-hover:text-white group-hover:shadow-[0_0_25px_rgba(212,175,55,0.5)]">
                         <PlayCircle size={36} className="ml-1" />
                       </div>
                     </div>

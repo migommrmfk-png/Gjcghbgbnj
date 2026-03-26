@@ -188,7 +188,7 @@ export default function Tasbeeh() {
 
           <div className="flex justify-center items-end gap-2 relative z-10" dir="ltr">
             {isEditingTarget ? (
-              <div className="flex items-center gap-2 bg-black/40 p-2 rounded-2xl border border-white/10">
+              <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 p-2 rounded-2xl border border-black/10 dark:border-white/10">
                 <input
                   type="number"
                   value={tempTarget}
@@ -198,20 +198,20 @@ export default function Tasbeeh() {
                 />
                 <button 
                   onClick={saveTarget}
-                  className="bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black px-4 py-2 rounded-xl text-sm font-bold shadow-[0_0_15px_rgba(212,175,55,0.3)]"
+                  className="bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white px-4 py-2 rounded-xl text-sm font-bold shadow-[0_0_15px_rgba(212,175,55,0.3)]"
                 >
                   حفظ
                 </button>
               </div>
             ) : (
               <div 
-                className="cursor-pointer group flex items-baseline bg-black/20 px-6 py-2 rounded-2xl border border-white/5 hover:bg-black/40 hover:border-[var(--color-primary)]/30 transition-all"
+                className="cursor-pointer group flex items-baseline bg-black/5 dark:bg-white/5 px-6 py-2 rounded-2xl border border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 hover:border-[var(--color-primary)]/30 transition-all"
                 onClick={() => {
                   setTempTarget(target.toString());
                   setIsEditingTarget(true);
                 }}
               >
-                <span className="text-6xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-b from-white to-[var(--color-primary-light)] drop-shadow-[0_0_10px_rgba(212,175,55,0.2)]">
+                <span className="text-6xl font-mono font-bold text-[var(--color-primary)] drop-shadow-[0_0_10px_rgba(212,175,55,0.2)]">
                   {count.toString().padStart(3, '0')}
                 </span>
                 <span className="text-xl font-mono text-[var(--color-text-muted)] ml-2 group-hover:text-[var(--color-primary)] transition-colors">

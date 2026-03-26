@@ -145,7 +145,7 @@ export default function PrayerGuide({ onBack }: { onBack: () => void }) {
             transition={{ delay: index * 0.1 }}
             className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active"
           >
-            <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-[var(--color-bg)] bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black font-bold shadow-[0_0_10px_rgba(212,175,55,0.5)] shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-[var(--color-bg)] bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white font-bold shadow-[0_0_10px_rgba(212,175,55,0.5)] shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
               {index + 1}
             </div>
             <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-[var(--color-surface)] p-5 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 relative">

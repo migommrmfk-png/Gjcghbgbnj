@@ -291,7 +291,7 @@ export default function Quran() {
                 
                 <div className="space-y-6">
                   <div className="p-4 bg-[var(--color-primary)]/10 rounded-2xl border border-[var(--color-primary)]/20">
-                    <p className="font-quran text-2xl leading-loose text-center text-white">
+                    <p className="font-quran text-2xl leading-loose text-center text-[var(--color-text)]">
                       {selectedAyahTafsir.text}
                     </p>
                   </div>
@@ -306,7 +306,7 @@ export default function Quran() {
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary)]"></div>
                       </div>
                     ) : (
-                      <p className="text-white/80 leading-relaxed text-justify font-sans">
+                      <p className="text-[var(--color-text)] leading-relaxed text-justify font-sans">
                         {selectedAyahTafsir.tafsir}
                       </p>
                     )}
@@ -429,7 +429,7 @@ export default function Quran() {
             <div className="flex items-center gap-3">
               <button
                 onClick={togglePlay}
-                className="w-12 h-12 shrink-0 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] transform active:scale-95 transition-all"
+                className="w-12 h-12 shrink-0 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] transform active:scale-95 transition-all"
               >
                 {isPlaying ? (
                   <PauseCircle size={28} />
@@ -438,11 +438,11 @@ export default function Quran() {
                 )}
               </button>
               <div className="flex flex-col flex-1 overflow-hidden">
-                <span className="text-sm font-bold text-white mb-1">
+                <span className="text-sm font-bold text-[var(--color-text)] mb-1">
                   القارئ
                 </span>
                 <select
-                  className="text-xs text-white bg-white/5 border border-white/10 rounded-xl p-2 outline-none font-bold w-full truncate shadow-inner focus:border-[var(--color-primary)]/50"
+                  className="text-xs text-[var(--color-text)] bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-2 outline-none font-bold w-full truncate shadow-inner focus:border-[var(--color-primary)]/50"
                   value={selectedReciterServer}
                   onChange={(e) => {
                     setSelectedReciterServer(e.target.value);
@@ -457,7 +457,7 @@ export default function Quran() {
                   }}
                 >
                   {reciters.map((r) => (
-                    <option key={r.id} value={r.server} className="bg-[var(--color-surface)] text-white">
+                    <option key={r.id} value={r.server} className="bg-[var(--color-surface)] text-[var(--color-text)]">
                       {r.name}
                     </option>
                   ))}
@@ -516,7 +516,7 @@ export default function Quran() {
         </div>
         <input
           type="text"
-          className="block w-full pl-4 pr-12 py-4 bg-black/40 border-none focus:ring-0 text-white font-bold placeholder:text-white/30 outline-none shadow-inner"
+          className="block w-full pl-4 pr-12 py-4 bg-black/5 dark:bg-white/5 border-none focus:ring-0 text-[var(--color-text)] font-bold placeholder-[var(--color-text-muted)] outline-none shadow-inner"
           placeholder="ابحث عن سورة..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -534,10 +534,10 @@ export default function Quran() {
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)]">
-              <Book size={20} className="text-black" />
+              <Book size={20} className="text-white" />
             </div>
             <div>
-              <h3 className="font-bold text-white text-sm">متابعة القراءة</h3>
+              <h3 className="font-bold text-[var(--color-text)] text-sm">متابعة القراءة</h3>
               <p className="text-xs text-[var(--color-primary-light)] font-bold">{lastRead.surahName}</p>
             </div>
           </div>
@@ -567,10 +567,10 @@ export default function Quran() {
                   <svg className="absolute inset-0 w-full h-full text-[var(--color-primary)] opacity-20 group-hover:opacity-40 transition-opacity" viewBox="0 0 36 36" fill="currentColor">
                     <path d="M18 0L21.5 6.5L29 4.5L28 12L34.5 16L29 21.5L32.5 28.5L25 27.5L22 34.5L16.5 29L10 33L10.5 25.5L3.5 22.5L8.5 17L3 11L10 9.5L12.5 2.5L18 7.5L18 0Z" />
                   </svg>
-                  <span className="relative z-10 font-bold text-white text-sm">{surah.number}</span>
+                  <span className="relative z-10 font-bold text-[var(--color-text)] text-sm">{surah.number}</span>
                 </div>
                 <div className="flex flex-col justify-center">
-                  <h3 className="font-bold text-white font-serif text-lg group-hover:text-[var(--color-primary-light)] transition-colors">
+                  <h3 className="font-bold text-[var(--color-text)] font-serif text-lg group-hover:text-[var(--color-primary-light)] transition-colors">
                     {surah.name}
                   </h3>
                   <p className="text-[11px] text-[var(--color-text-muted)] font-bold mt-0.5">
@@ -582,7 +582,7 @@ export default function Quran() {
                 <p className="font-bold text-[var(--color-text-muted)] text-sm font-sans">
                   {surah.englishName}
                 </p>
-                <p className="text-[10px] text-white/30 uppercase tracking-wider font-bold mt-0.5">
+                <p className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider font-bold mt-0.5">
                   {surah.englishNameTranslation}
                 </p>
               </div>

@@ -136,7 +136,7 @@ export default function HijriCalendar() {
       >
         <button
           onClick={handlePrevMonth}
-          className="p-2 hover:bg-white/5 rounded-full transition-colors border border-transparent hover:border-white/10 bg-black/20"
+          className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors border border-transparent hover:border-black/10 dark:hover:border-white/10 bg-black/5 dark:bg-white/5"
         >
           <ChevronRight
             size={24}
@@ -156,9 +156,9 @@ export default function HijriCalendar() {
         </div>
         <button
           onClick={handleNextMonth}
-          className="p-2 hover:bg-white/5 rounded-full transition-colors border border-transparent hover:border-white/10 bg-black/20"
+          className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors border border-transparent hover:border-black/10 dark:hover:border-white/10 bg-black/5 dark:bg-white/5"
         >
-          <ChevronLeft size={24} className="text-[var(--color-text-muted)] hover:text-white" />
+          <ChevronLeft size={24} className="text-[var(--color-text-muted)] hover:text-[var(--color-text)]" />
         </button>
       </motion.div>
 
@@ -200,10 +200,10 @@ export default function HijriCalendar() {
                 whileHover={{ scale: 1.1 }}
                 className={`aspect-square flex flex-col items-center justify-center rounded-xl relative cursor-pointer transition-colors ${
                   isToday
-                    ? "bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-[var(--color-primary-light)]/50"
+                    ? "bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-[var(--color-primary-light)]/50"
                     : event
                       ? "bg-[var(--color-primary)]/10 text-[var(--color-primary-light)] border border-[var(--color-primary)]/30 shadow-inner"
-                      : "bg-black/20 text-white hover:bg-white/5 border border-white/5"
+                      : "bg-black/5 dark:bg-white/5 text-[var(--color-text)] hover:bg-black/10 dark:hover:bg-white/10 border border-black/5 dark:border-white/5"
                 }`}
                 title={event?.title}
               >
@@ -211,7 +211,7 @@ export default function HijriCalendar() {
                   {parseInt(day.hijri.day)}
                 </span>
                 <span
-                  className={`text-[8px] ${isToday ? "text-black/70" : "text-[var(--color-text-muted)]"}`}
+                  className={`text-[8px] ${isToday ? "text-white/70" : "text-[var(--color-text-muted)]"}`}
                 >
                   {parseInt(day.gregorian.day)}
                 </span>

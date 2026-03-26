@@ -48,7 +48,7 @@ export default function KidsQuran({ onBack }: { onBack: () => void }) {
               <p className="text-white/80 font-medium">لقد جمعت 8 نجوم اليوم</p>
             </div>
             <div className="w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-full flex items-center justify-center border border-[var(--color-primary-light)]/50 shadow-[0_0_20px_rgba(212,175,55,0.5)]">
-              <Star size={40} className="text-black fill-black" />
+              <Star size={40} className="text-white fill-white" />
             </div>
           </div>
         </motion.div>
@@ -70,7 +70,7 @@ export default function KidsQuran({ onBack }: { onBack: () => void }) {
               </div>
               
               <div className="flex justify-between items-start mb-4 relative z-10">
-                <div className="bg-black/40 px-2.5 py-1.5 rounded-xl text-xs font-bold border border-white/10 shadow-inner">
+                <div className="bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded-xl text-xs font-bold border border-black/10 dark:border-white/10 shadow-inner">
                   {surah.ayahs} آيات
                 </div>
                 <PlayCircle size={28} className="text-[var(--color-primary-light)] drop-shadow-[0_0_10px_rgba(212,175,55,0.4)] group-hover:scale-110 transition-transform" />
@@ -83,7 +83,7 @@ export default function KidsQuran({ onBack }: { onBack: () => void }) {
                   <Star 
                     key={star} 
                     size={16} 
-                    className={star <= surah.stars ? "text-[var(--color-primary)] fill-[var(--color-primary)] drop-shadow-[0_0_5px_rgba(212,175,55,0.5)]" : "text-white/20"} 
+                    className={star <= surah.stars ? "text-[var(--color-primary)] fill-[var(--color-primary)] drop-shadow-[0_0_5px_rgba(212,175,55,0.5)]" : "text-black/20 dark:text-white/20"} 
                   />
                 ))}
               </div>
@@ -99,7 +99,7 @@ export default function KidsQuran({ onBack }: { onBack: () => void }) {
           className="card-3d bg-[var(--color-surface)] rounded-[2rem] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-[var(--color-primary)]/20 flex items-center gap-4 relative overflow-hidden"
         >
           <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
-          <div className="w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-2xl flex items-center justify-center text-black shrink-0 border border-[var(--color-primary-light)]/50 shadow-[0_0_15px_rgba(212,175,55,0.4)] relative z-10">
+          <div className="w-16 h-16 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-2xl flex items-center justify-center text-white shrink-0 border border-[var(--color-primary-light)]/50 shadow-[0_0_15px_rgba(212,175,55,0.4)] relative z-10">
             <Heart size={32} className="fill-current" />
           </div>
           <div className="relative z-10">

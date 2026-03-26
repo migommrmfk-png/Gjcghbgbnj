@@ -6,18 +6,18 @@
 @layer base {
   :root {
     /* 1. أخضر زمردي فاتح (Emerald Light) - Default */
-    --theme-bg: #F8FAFC;
+    --theme-bg: #FAFAFA;
     --theme-surface: #FFFFFF;
-    --theme-surface-hover: #F1F5F9;
-    --theme-primary: #059669;
-    --theme-primary-dark: #047857;
-    --theme-primary-light: #34D399;
-    --theme-text: #0F172A;
-    --theme-text-muted: #64748B;
-    --theme-gold: #D4AF37;
+    --theme-surface-hover: #F0F0F0;
+    --theme-primary: #2E7D32;
+    --theme-primary-dark: #1B5E20;
+    --theme-primary-light: #66BB6A;
+    --theme-text: #212121;
+    --theme-text-muted: #555555;
+    --theme-gold: #C9A227;
     --theme-gold-dark: #AA8C2C;
-    --theme-gold-light: #F3E5AB;
-    --theme-accent: #059669;
+    --theme-gold-light: #E6C35C;
+    --theme-accent: #C9A227;
     
     --color-bg: var(--theme-bg);
     --color-surface: var(--theme-surface);
@@ -40,18 +40,18 @@
 
   /* 2. أخضر زمردي داكن (Emerald Dark) */
   [data-theme="emerald-dark"] {
-    --theme-bg: #0F172A;
-    --theme-surface: #1E293B;
-    --theme-surface-hover: #334155;
-    --theme-primary: #10B981;
-    --theme-primary-dark: #059669;
-    --theme-primary-light: #34D399;
-    --theme-text: #F8FAFC;
-    --theme-text-muted: #94A3B8;
-    --theme-gold: #D4AF37;
+    --theme-bg: #121212;
+    --theme-surface: #1E1E1E;
+    --theme-surface-hover: #2C2C2C;
+    --theme-primary: #2E7D32;
+    --theme-primary-dark: #1B5E20;
+    --theme-primary-light: #66BB6A;
+    --theme-text: #FFFFFF;
+    --theme-text-muted: #B0B0B0;
+    --theme-gold: #C9A227;
     --theme-gold-dark: #AA8C2C;
-    --theme-gold-light: #F3E5AB;
-    --theme-accent: #10B981;
+    --theme-gold-light: #E6C35C;
+    --theme-accent: #C9A227;
   }
 
   /* 3. ذهبي فاتح (Gold Light) */

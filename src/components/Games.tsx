@@ -451,7 +451,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
           <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-md">أحسنت!</h2>
           <p className="text-[var(--color-text-muted)] font-bold mb-6">لقد قمت بتوصيل جميع الأنبياء بألقابهم</p>
           
-          <div className="bg-black/40 rounded-2xl p-6 mb-8 border border-white/5 shadow-inner">
+          <div className="bg-black/5 dark:bg-white/5 rounded-2xl p-6 mb-8 border border-black/10 dark:border-white/10 shadow-inner">
             <div className="text-sm text-[var(--color-text-muted)] font-bold mb-1">النتيجة النهائية</div>
             <div className="text-5xl font-bold text-[var(--color-primary-light)] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">{score}</div>
           </div>
@@ -459,14 +459,14 @@ export default function Games({ onBack }: { onBack: () => void }) {
           <div className="flex flex-col gap-3">
             <button 
               onClick={() => handleGameSelect(activeGame)}
-              className="w-full py-4 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black rounded-xl font-bold hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all shadow-[0_5px_15px_rgba(0,0,0,0.3)] flex items-center justify-center gap-2 border border-[var(--color-primary-light)]/50"
+              className="w-full py-4 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white rounded-xl font-bold hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all shadow-[0_5px_15px_rgba(0,0,0,0.3)] flex items-center justify-center gap-2 border border-[var(--color-primary-light)]/50"
             >
               <Sparkles size={20} />
               تحدي جديد
             </button>
             <button 
               onClick={() => setActiveGame('menu')}
-              className="w-full py-4 bg-white/5 text-white rounded-xl font-bold hover:bg-white/10 transition-colors border border-white/10"
+              className="w-full py-4 bg-black/5 dark:bg-white/5 text-[var(--color-text)] rounded-xl font-bold hover:bg-black/10 dark:hover:bg-white/10 transition-colors border border-black/10 dark:border-white/10"
             >
               العودة للقائمة
             </button>
@@ -482,7 +482,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
             <Star size={20} className="fill-current" />
             <span>{score} نقطة</span>
           </div>
-          <div className="text-sm font-bold text-black bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] px-4 py-1.5 rounded-full shadow-inner border border-[var(--color-primary-light)]/50">
+          <div className="text-sm font-bold text-white bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] px-4 py-1.5 rounded-full shadow-inner border border-[var(--color-primary-light)]/50">
             {matchedPairs.length} / {dynamicProphetsData.length}
           </div>
         </div>
@@ -501,7 +501,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
                   className={`w-full p-4 rounded-xl text-center font-bold transition-all border-2 shadow-[0_5px_15px_rgba(0,0,0,0.2)] ${
                     isMatched ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 opacity-50' :
                     isSelected ? 'bg-gradient-to-br from-[var(--color-primary)]/20 to-transparent border-[var(--color-primary)] text-[var(--color-primary-light)] shadow-[0_0_15px_rgba(212,175,55,0.3)]' :
-                    'bg-[var(--color-surface)] border-white/5 text-white hover:border-[var(--color-primary-light)]/30 hover:bg-white/5'
+                    'bg-[var(--color-surface)] border-black/10 dark:border-white/10 text-[var(--color-text)] hover:border-[var(--color-primary)]/50 hover:bg-black/5 dark:hover:bg-white/5'
                   }`}
                 >
                   {p.name}
@@ -549,7 +549,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
           <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-md">أحسنت!</h2>
           <p className="text-[var(--color-text-muted)] font-bold mb-6">لقد أكملت لعبة الذاكرة بنجاح</p>
           
-          <div className="bg-black/40 rounded-2xl p-6 mb-8 border border-white/5 shadow-inner">
+          <div className="bg-black/5 dark:bg-white/5 rounded-2xl p-6 mb-8 border border-black/10 dark:border-white/10 shadow-inner">
             <div className="text-sm text-[var(--color-text-muted)] font-bold mb-1">النتيجة النهائية</div>
             <div className="text-5xl font-bold text-[var(--color-primary-light)] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">{score}</div>
           </div>
@@ -557,7 +557,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
           <div className="flex flex-col gap-3">
             <button 
               onClick={() => handleGameSelect(activeGame)}
-              className="w-full py-4 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black rounded-xl font-bold hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all shadow-[0_5px_15px_rgba(0,0,0,0.3)] flex items-center justify-center gap-2 border border-[var(--color-primary-light)]/50"
+              className="w-full py-4 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white rounded-xl font-bold hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all shadow-[0_5px_15px_rgba(0,0,0,0.3)] flex items-center justify-center gap-2 border border-[var(--color-primary-light)]/50"
             >
               <Sparkles size={20} />
               تحدي جديد
@@ -580,7 +580,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
             <Star size={20} className="fill-current" />
             <span>{score} نقطة</span>
           </div>
-          <div className="text-sm font-bold text-black bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] px-4 py-1.5 rounded-full shadow-inner border border-[var(--color-primary-light)]/50">
+          <div className="text-sm font-bold text-white bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] px-4 py-1.5 rounded-full shadow-inner border border-[var(--color-primary-light)]/50">
             {matchedCards.length / 2} / {cards.length / 2}
           </div>
         </div>
@@ -643,7 +643,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
           <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-md">انتهى التحدي!</h2>
           <p className="text-[var(--color-text-muted)] font-bold mb-6">لقد أتممت جميع الأسئلة بنجاح</p>
           
-          <div className="bg-black/40 rounded-2xl p-6 mb-8 border border-white/5 shadow-inner">
+          <div className="bg-black/5 dark:bg-white/5 rounded-2xl p-6 mb-8 border border-black/10 dark:border-white/10 shadow-inner">
             <div className="text-sm text-[var(--color-text-muted)] font-bold mb-1">النتيجة النهائية</div>
             <div className="text-5xl font-bold text-[var(--color-primary-light)] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">{score}</div>
             <div className="text-sm text-white/40 font-bold mt-2">من {questionsList.length * 10} نقطة</div>
@@ -652,7 +652,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
           <div className="flex flex-col gap-3">
             <button 
               onClick={() => handleGameSelect(activeGame)}
-              className="w-full py-4 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black rounded-xl font-bold hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all shadow-[0_5px_15px_rgba(0,0,0,0.3)] flex items-center justify-center gap-2 border border-[var(--color-primary-light)]/50"
+              className="w-full py-4 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white rounded-xl font-bold hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all shadow-[0_5px_15px_rgba(0,0,0,0.3)] flex items-center justify-center gap-2 border border-[var(--color-primary-light)]/50"
             >
               <Sparkles size={20} />
               توليد أسئلة جديدة
@@ -675,7 +675,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
             <Star size={20} className="fill-current" />
             <span>{score} نقطة</span>
           </div>
-          <div className="text-sm font-bold text-black bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] px-4 py-1.5 rounded-full shadow-inner border border-[var(--color-primary-light)]/50">
+          <div className="text-sm font-bold text-white bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] px-4 py-1.5 rounded-full shadow-inner border border-[var(--color-primary-light)]/50">
             السؤال {currentQuestion + 1} / {questionsList.length}
           </div>
         </div>
@@ -701,14 +701,14 @@ export default function Games({ onBack }: { onBack: () => void }) {
               let btnClass = "w-full p-4 rounded-xl text-right font-bold transition-all border-2 shadow-[0_5px_15px_rgba(0,0,0,0.2)] ";
               
               if (!isAnswered) {
-                btnClass += "bg-black/20 border-white/5 hover:border-[var(--color-primary-light)]/30 hover:bg-white/5 text-white";
+                btnClass += "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 hover:border-[var(--color-primary)]/50 hover:bg-black/10 dark:hover:bg-white/10 text-[var(--color-text)]";
               } else {
                 if (index === currentQ.correct) {
                   btnClass += "bg-emerald-500/10 border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]";
                 } else if (index === selectedAnswer) {
                   btnClass += "bg-red-500/10 border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.2)]";
                 } else {
-                  btnClass += "bg-black/20 border-transparent text-white/30 opacity-50";
+                  btnClass += "bg-black/5 dark:bg-white/5 border-transparent text-[var(--color-text-muted)] opacity-50";
                 }
               }
 

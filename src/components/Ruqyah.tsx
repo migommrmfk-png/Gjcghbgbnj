@@ -63,11 +63,11 @@ export default function Ruqyah({ onBack }: { onBack: () => void }) {
         </div>
 
         {/* Tabs */}
-        <div className="flex bg-black/40 rounded-2xl p-1.5 shadow-inner border border-white/5">
+        <div className="flex bg-black/5 dark:bg-white/5 rounded-2xl p-1.5 shadow-inner border border-black/10 dark:border-white/10">
           <button
             onClick={() => setActiveTab('text')}
             className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-inner ${
-              activeTab === 'text' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black shadow-[0_0_15px_rgba(212,175,55,0.4)]' : 'text-[var(--color-text-muted)] hover:bg-white/5 hover:text-white'
+              activeTab === 'text' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white shadow-[0_0_15px_rgba(212,175,55,0.4)]' : 'text-[var(--color-text-muted)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--color-text)]'
             }`}
           >
             <BookOpen size={16} />
@@ -76,7 +76,7 @@ export default function Ruqyah({ onBack }: { onBack: () => void }) {
           <button
             onClick={() => setActiveTab('audio')}
             className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-inner ${
-              activeTab === 'audio' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black shadow-[0_0_15px_rgba(212,175,55,0.4)]' : 'text-[var(--color-text-muted)] hover:bg-white/5 hover:text-white'
+              activeTab === 'audio' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white shadow-[0_0_15px_rgba(212,175,55,0.4)]' : 'text-[var(--color-text-muted)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--color-text)]'
             }`}
           >
             <Volume2 size={16} />
@@ -121,7 +121,7 @@ export default function Ruqyah({ onBack }: { onBack: () => void }) {
               <div key={audio.id} className={`card-3d rounded-3xl p-4 shadow-lg border transition-all flex items-center gap-4 ${playingId === audio.id ? 'border-[var(--color-primary-light)]/50 bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] shadow-[0_0_20px_rgba(212,175,55,0.2)]' : 'border-black/5 dark:border-white/5 bg-[var(--color-surface)] hover:bg-black/5 dark:hover:bg-white/5 hover:border-black/10 dark:hover:border-white/10'}`}>
                 <button 
                   onClick={() => toggleAudio(audio)}
-                  className={`w-14 h-14 rounded-full flex items-center justify-center shrink-0 transition-all border shadow-lg ${playingId === audio.id ? 'bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black border-[var(--color-primary-light)]/50 shadow-[0_0_15px_rgba(212,175,55,0.4)]' : 'bg-black/40 text-[var(--color-primary-light)] border-white/10 hover:border-[var(--color-primary-light)]/50 hover:bg-[var(--color-primary)]/10'}`}
+                  className={`w-14 h-14 rounded-full flex items-center justify-center shrink-0 transition-all border shadow-lg ${playingId === audio.id ? 'bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white border-[var(--color-primary-light)]/50 shadow-[0_0_15px_rgba(212,175,55,0.4)]' : 'bg-black/5 dark:bg-white/5 text-[var(--color-primary)] dark:text-[var(--color-primary-light)] border-black/10 dark:border-white/10 hover:border-[var(--color-primary)]/50 hover:bg-[var(--color-primary)]/10'}`}
                 >
                   {playingId === audio.id ? <PauseCircle size={28} /> : <PlayCircle size={28} className="ml-1" />}
                 </button>
@@ -132,7 +132,7 @@ export default function Ruqyah({ onBack }: { onBack: () => void }) {
                   <p className="text-xs text-[var(--color-text-muted)] mb-2">بصوت {audio.reciter}</p>
                   
                   {playingId === audio.id && (
-                    <div className="w-full bg-black/40 rounded-full h-1.5 overflow-hidden border border-white/5 shadow-inner">
+                    <div className="w-full bg-black/10 dark:bg-white/10 rounded-full h-1.5 overflow-hidden border border-black/5 dark:border-white/5 shadow-inner">
                       <motion.div 
                         initial={{ width: 0 }}
                         animate={{ width: '100%' }}

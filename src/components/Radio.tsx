@@ -524,7 +524,7 @@ export default function IslamicRadio() {
           placeholder="ابحث عن إذاعة أو قارئ..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full bg-[var(--color-surface)] border border-white/5 rounded-2xl py-3 pr-10 pl-4 text-white focus:outline-none focus:border-[var(--color-primary-light)]/50 focus:ring-1 focus:ring-[var(--color-primary-light)]/50 transition-all shadow-[0_5px_15px_rgba(0,0,0,0.3)] placeholder:text-[var(--color-text-muted)]"
+          className="w-full bg-[var(--color-surface)] border border-black/5 dark:border-white/5 rounded-2xl py-3 pr-10 pl-4 text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary-light)]/50 focus:ring-1 focus:ring-[var(--color-primary-light)]/50 transition-all shadow-[0_5px_15px_rgba(0,0,0,0.3)] placeholder:text-[var(--color-text-muted)]"
         />
       </motion.div>
 
@@ -572,8 +572,8 @@ export default function IslamicRadio() {
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center shadow-inner transition-colors shrink-0 ${
                       isActive
-                        ? "bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-[var(--color-primary-light)]/50"
-                        : "bg-black/40 text-[var(--color-primary-light)] group-hover:bg-[var(--color-primary)]/20 group-hover:text-[var(--color-primary-light)] border border-white/5"
+                        ? "bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-[var(--color-primary-light)]/50"
+                        : "bg-black/5 dark:bg-white/5 text-[var(--color-primary)] dark:text-[var(--color-primary-light)] group-hover:bg-[var(--color-primary)]/20 group-hover:text-[var(--color-primary-dark)] dark:group-hover:text-[var(--color-primary-light)] border border-black/10 dark:border-white/10"
                     }`}
                   >
                     {isActive && isPlaying ? (
@@ -584,11 +584,11 @@ export default function IslamicRadio() {
                   </div>
                   <div className="text-right">
                     <h3
-                      className={`font-bold font-serif text-lg transition-colors ${isActive ? "text-[var(--color-primary-light)]" : "text-white"}`}
+                      className={`font-bold font-serif text-lg transition-colors ${isActive ? "text-[var(--color-primary-light)]" : "text-[var(--color-text)]"}`}
                     >
                       {station.name}
                     </h3>
-                    <span className="text-xs font-bold text-[var(--color-text-muted)] bg-black/20 px-2 py-1 rounded-md inline-block mt-1 border border-white/5">
+                    <span className="text-xs font-bold text-[var(--color-text-muted)] bg-black/5 dark:bg-white/5 px-2 py-1 rounded-md inline-block mt-1 border border-black/10 dark:border-white/10">
                       {station.type}
                     </span>
                   </div>
@@ -632,7 +632,7 @@ export default function IslamicRadio() {
             <div className="card-3d p-4 bg-[var(--color-surface)]/90 backdrop-blur-xl border border-[var(--color-primary-light)]/20 flex flex-col gap-4 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] rounded-3xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] animate-pulse shrink-0 border border-[var(--color-primary-light)]/50">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] animate-pulse shrink-0 border border-[var(--color-primary-light)]/50">
                     <RadioIcon size={20} />
                   </div>
                   <div>
@@ -647,7 +647,7 @@ export default function IslamicRadio() {
 
                 <button
                   onClick={togglePlay}
-                  className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] transform active:scale-95 transition-all shrink-0 border border-[var(--color-primary-light)]/50"
+                  className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] transform active:scale-95 transition-all shrink-0 border border-[var(--color-primary-light)]/50"
                 >
                   {isPlaying ? (
                     <PauseCircle size={28} />
@@ -678,7 +678,7 @@ export default function IslamicRadio() {
                     setVolume(parseFloat(e.target.value));
                     if (isMuted) setIsMuted(false);
                   }}
-                  className="w-full h-2 bg-black/40 rounded-lg appearance-none cursor-pointer accent-[var(--color-primary)] shadow-inner"
+                  className="w-full h-2 bg-black/10 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-[var(--color-primary)] shadow-inner"
                   dir="ltr"
                 />
               </div>

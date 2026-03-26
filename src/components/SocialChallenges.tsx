@@ -36,11 +36,11 @@ export default function SocialChallenges({ onBack }: { onBack: () => void }) {
         </div>
 
         {/* Tabs */}
-        <div className="flex bg-black/40 rounded-2xl p-1.5 shadow-inner border border-white/5">
+        <div className="flex bg-black/5 dark:bg-white/5 rounded-2xl p-1.5 shadow-inner border border-black/10 dark:border-white/10">
           <button
             onClick={() => setActiveTab('leaderboard')}
             className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
-              activeTab === 'leaderboard' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black shadow-[0_0_15px_rgba(212,175,55,0.3)]' : 'text-[var(--color-text-muted)] hover:bg-white/5 hover:text-white'
+              activeTab === 'leaderboard' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white shadow-[0_0_15px_rgba(212,175,55,0.3)]' : 'text-[var(--color-text-muted)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--color-text)]'
             }`}
           >
             <Trophy size={16} />
@@ -49,7 +49,7 @@ export default function SocialChallenges({ onBack }: { onBack: () => void }) {
           <button
             onClick={() => setActiveTab('friends')}
             className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${
-              activeTab === 'friends' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-black shadow-[0_0_15px_rgba(212,175,55,0.3)]' : 'text-[var(--color-text-muted)] hover:bg-white/5 hover:text-white'
+              activeTab === 'friends' ? 'bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white shadow-[0_0_15px_rgba(212,175,55,0.3)]' : 'text-[var(--color-text-muted)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--color-text)]'
             }`}
           >
             <Users size={16} />
@@ -67,15 +67,15 @@ export default function SocialChallenges({ onBack }: { onBack: () => void }) {
             className="space-y-4"
           >
             {/* Weekly Challenge Banner */}
-            <div className="bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-[2rem] p-6 text-black shadow-2xl relative overflow-hidden border border-[var(--color-primary)]/30">
+            <div className="bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-[2rem] p-6 text-white shadow-2xl relative overflow-hidden border border-[var(--color-primary)]/30">
               <div className="absolute left-0 top-0 w-32 h-32 bg-white/20 rounded-full -ml-10 -mt-10 blur-xl"></div>
               <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
               <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-2">
-                  <Flame size={24} className="text-black" />
+                  <Flame size={24} className="text-white" />
                   <h2 className="text-xl font-bold font-serif drop-shadow-sm">تحدي الأسبوع</h2>
                 </div>
-                <p className="text-black/80 font-bold mb-4">قراءة سورة الكهف يوم الجمعة</p>
+                <p className="text-white/80 font-bold mb-4">قراءة سورة الكهف يوم الجمعة</p>
                 <div className="flex justify-between items-center bg-black/10 rounded-xl p-3 backdrop-blur-sm border border-black/10">
                   <span className="text-sm font-bold">المشاركون: 1,245</span>
                   <button className="bg-black text-[var(--color-primary)] px-4 py-1.5 rounded-lg text-sm font-bold shadow-lg hover:bg-black/80 transition-colors">
@@ -100,7 +100,7 @@ export default function SocialChallenges({ onBack }: { onBack: () => void }) {
                       user.rank === 1 ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
                       user.rank === 2 ? 'bg-gray-400/20 text-gray-300 border-gray-400/30' :
                       user.rank === 3 ? 'bg-orange-500/20 text-orange-400 border-orange-500/30' :
-                      'bg-black/40 text-[var(--color-text-muted)] border-white/10'
+                      'bg-black/5 dark:bg-white/5 text-[var(--color-text-muted)] border-black/10 dark:border-white/10'
                     }`}>
                       {user.rank <= 3 ? <Medal size={20} /> : user.rank}
                     </div>
@@ -135,7 +135,7 @@ export default function SocialChallenges({ onBack }: { onBack: () => void }) {
                   </div>
                   قائمة الأصدقاء
                 </h3>
-                <button className="text-sm font-bold text-black bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] px-4 py-2 rounded-xl hover:opacity-90 transition-opacity shadow-[0_0_15px_rgba(212,175,55,0.3)] border border-[var(--color-primary)]/50">
+                <button className="text-sm font-bold text-white bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] px-4 py-2 rounded-xl hover:opacity-90 transition-opacity shadow-[0_0_15px_rgba(212,175,55,0.3)] border border-[var(--color-primary)]/50">
                   إضافة صديق
                 </button>
               </div>
