@@ -87,7 +87,7 @@ export default function SocialChallenges({ onBack }: { onBack: () => void }) {
 
             {/* Leaderboard List */}
             <div className="card-3d bg-[var(--color-surface)] rounded-[2rem] p-6 shadow-lg border border-white/5">
-              <h3 className="font-bold text-white text-xl font-serif mb-6 flex items-center gap-3">
+              <h3 className="font-bold text-[var(--color-text)] text-xl font-serif mb-6 flex items-center gap-3">
                 <div className="w-10 h-10 bg-[var(--color-primary)]/10 rounded-xl flex items-center justify-center text-[var(--color-primary-light)] border border-[var(--color-primary)]/20 shadow-inner">
                   <Trophy size={20} />
                 </div>
@@ -95,7 +95,7 @@ export default function SocialChallenges({ onBack }: { onBack: () => void }) {
               </h3>
               <div className="space-y-3">
                 {leaderboard.map((user, index) => (
-                  <div key={index} className={`flex items-center gap-4 p-4 rounded-2xl transition-all border ${user.name === 'أنت' ? 'bg-gradient-to-r from-[var(--color-primary)]/10 to-transparent border-[var(--color-primary)]/30 shadow-md' : 'bg-black/20 border-white/5 hover:border-white/10'}`}>
+                  <div key={index} className={`flex items-center gap-4 p-4 rounded-2xl transition-all border ${user.name === 'أنت' ? 'bg-gradient-to-r from-[var(--color-primary)]/10 to-transparent border-[var(--color-primary)]/30 shadow-md' : 'bg-black/5 dark:bg-white/5 border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/10'}`}>
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shadow-inner border ${
                       user.rank === 1 ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' :
                       user.rank === 2 ? 'bg-gray-400/20 text-gray-300 border-gray-400/30' :
@@ -110,7 +110,7 @@ export default function SocialChallenges({ onBack }: { onBack: () => void }) {
                     </div>
                     
                     <div className="flex-1">
-                      <h4 className={`font-bold text-sm mb-1 ${user.name === 'أنت' ? 'text-[var(--color-primary-light)]' : 'text-white'}`}>{user.name}</h4>
+                      <h4 className={`font-bold text-sm mb-1 ${user.name === 'أنت' ? 'text-[var(--color-primary-light)]' : 'text-[var(--color-text)]'}`}>{user.name}</h4>
                       <p className="text-xs text-[var(--color-text-muted)]">{user.points.toLocaleString()} نقطة</p>
                     </div>
                   </div>
@@ -129,7 +129,7 @@ export default function SocialChallenges({ onBack }: { onBack: () => void }) {
           >
             <div className="card-3d bg-[var(--color-surface)] rounded-[2rem] p-6 shadow-lg border border-white/5">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="font-bold text-white text-xl font-serif flex items-center gap-3">
+                <h3 className="font-bold text-[var(--color-text)] text-xl font-serif flex items-center gap-3">
                   <div className="w-10 h-10 bg-[var(--color-primary)]/10 rounded-xl flex items-center justify-center text-[var(--color-primary-light)] border border-[var(--color-primary)]/20 shadow-inner">
                     <Users size={20} />
                   </div>
@@ -142,7 +142,7 @@ export default function SocialChallenges({ onBack }: { onBack: () => void }) {
               
               <div className="space-y-4">
                 {friends.map((friend) => (
-                  <div key={friend.id} className="flex items-center justify-between p-4 rounded-2xl border border-white/5 bg-black/20 hover:border-white/10 transition-all">
+                  <div key={friend.id} className="flex items-center justify-between p-4 rounded-2xl border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 hover:border-black/10 dark:hover:border-white/10 transition-all">
                     <div className="flex items-center gap-4">
                       <div className="relative">
                         <div className="w-14 h-14 bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-inner border border-white/10">
@@ -151,7 +151,7 @@ export default function SocialChallenges({ onBack }: { onBack: () => void }) {
                         <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-[var(--color-surface)] shadow-sm ${friend.status === 'online' ? 'bg-emerald-500' : 'bg-gray-500'}`}></div>
                       </div>
                       <div>
-                        <h4 className="font-bold text-white text-sm mb-1">{friend.name}</h4>
+                        <h4 className="font-bold text-[var(--color-text)] text-sm mb-1">{friend.name}</h4>
                         <div className="flex items-center gap-1 text-xs text-orange-400 font-bold bg-orange-500/10 px-2 py-1 rounded-md border border-orange-500/20">
                           <Flame size={12} className="fill-current" />
                           {friend.streak} يوم متتالي

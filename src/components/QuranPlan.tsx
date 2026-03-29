@@ -77,7 +77,7 @@ export default function QuranPlan({ onBack }: { onBack: () => void }) {
 
   if (!hasPlan) {
     return (
-      <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-[var(--color-bg)] text-white" dir="rtl">
+      <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-[var(--color-bg)] text-[var(--color-text)]" dir="rtl">
         <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-[var(--color-bg)]/80 backdrop-blur-xl border-b border-white/5">
           <button onClick={onBack} className="p-2 hover:bg-white/5 rounded-full transition-colors border border-white/5 bg-[var(--color-surface)]">
             <ArrowRight size={24} className="text-[var(--color-text-muted)]" />
@@ -208,7 +208,7 @@ export default function QuranPlan({ onBack }: { onBack: () => void }) {
 
         {/* Timeline */}
         <div className="card-3d bg-[var(--color-surface)] rounded-[2rem] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5">
-          <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+          <h3 className="text-lg font-bold text-[var(--color-text)] mb-6 flex items-center gap-2">
             <Calendar className="text-[var(--color-primary)]" />
             الجدول اليومي
           </h3>
@@ -238,7 +238,7 @@ export default function QuranPlan({ onBack }: { onBack: () => void }) {
                   'bg-[var(--color-surface)] border-white/5 opacity-60'
                 }`}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className={`font-bold ${day.status === 'completed' ? 'text-[var(--color-primary-light)]' : 'text-white'}`}>اليوم {day.day}</span>
+                    <span className={`font-bold ${day.status === 'completed' ? 'text-[var(--color-primary-light)]' : 'text-[var(--color-text)]'}`}>اليوم {day.day}</span>
                     <span className={`text-xs px-2 py-1 rounded-lg ${
                       day.status === 'completed' ? 'bg-[var(--color-primary)]/20 text-[var(--color-primary-light)]' : 
                       day.status === 'current' ? 'bg-[var(--color-primary)] text-white font-bold' : 
@@ -247,7 +247,7 @@ export default function QuranPlan({ onBack }: { onBack: () => void }) {
                       {day.status === 'completed' ? 'مكتمل' : day.status === 'current' ? 'اليوم' : 'قادم'}
                     </span>
                   </div>
-                  <p className={`text-sm ${day.status === 'completed' ? 'text-white/70 line-through' : 'text-[var(--color-text-muted)]'}`}>
+                  <p className={`text-sm ${day.status === 'completed' ? 'text-[var(--color-text-muted)] line-through' : 'text-[var(--color-text-muted)]'}`}>
                     {day.target}
                   </p>
                 </div>

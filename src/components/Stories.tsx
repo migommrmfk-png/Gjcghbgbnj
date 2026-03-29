@@ -38,14 +38,14 @@ export default function Stories({ onBack }: { onBack: () => void }) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
                   onClick={() => setSelectedStory(story)}
-                  className="card-3d p-4 flex items-center justify-between bg-[var(--color-surface)] hover:bg-white/5 transition-colors text-right group border border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+                  className="card-3d p-4 flex items-center justify-between bg-[var(--color-surface)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-right group border border-black/5 dark:border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--color-primary)]/20 to-transparent text-[var(--color-primary-light)] flex items-center justify-center border border-[var(--color-primary)]/30 shadow-inner">
                       <BookOpen size={24} />
                     </div>
                     <div>
-                      <h3 className="font-bold text-white font-serif text-lg group-hover:text-[var(--color-primary-light)] transition-colors drop-shadow-md">
+                      <h3 className="font-bold text-[var(--color-text)] font-serif text-lg group-hover:text-[var(--color-primary-light)] transition-colors drop-shadow-md">
                         {story.name}
                       </h3>
                       <p className="text-xs text-[var(--color-text-muted)] font-bold mt-1">
@@ -81,7 +81,7 @@ export default function Stories({ onBack }: { onBack: () => void }) {
                   {/* Timeline dot */}
                   <div className="absolute right-0 top-3 w-6 h-6 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] border-4 border-[var(--color-bg)] shadow-[0_0_10px_rgba(212,175,55,0.5)]"></div>
                   
-                  <div className="bg-[var(--color-surface)] rounded-2xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 relative overflow-hidden">
+                  <div className="bg-[var(--color-surface)] rounded-2xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-black/5 dark:border-white/5 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--color-primary)]/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
                     <h4 className="font-bold text-[var(--color-primary-light)] text-xl mb-3 font-serif drop-shadow-md relative z-10">
                       {event.title}

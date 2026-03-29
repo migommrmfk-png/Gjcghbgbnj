@@ -228,7 +228,7 @@ export default function IslamicLibrary({ onBack }: { onBack: () => void }) {
                           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] opacity-10 mix-blend-overlay"></div>
                           <Book size={48} className="relative z-10" />
                         </div>
-                        <h3 className="font-bold text-white text-sm mb-1 line-clamp-2 group-hover:text-[var(--color-primary-light)] transition-colors">{book.title}</h3>
+                        <h3 className="font-bold text-[var(--color-text)] text-sm mb-1 line-clamp-2 group-hover:text-[var(--color-primary-light)] transition-colors">{book.title}</h3>
                         <p className="text-xs text-[var(--color-text-muted)] mb-3">{book.author}</p>
                         <div className="flex items-center gap-1 text-[var(--color-primary-light)] text-xs font-bold mt-auto bg-[var(--color-primary)]/10 px-3 py-1.5 rounded-lg border border-[var(--color-primary)]/20 shadow-inner">
                           <Star size={14} className="fill-current" />
@@ -262,7 +262,7 @@ export default function IslamicLibrary({ onBack }: { onBack: () => void }) {
                     <PlayCircle size={28} />
                   </button>
                   <div className="flex-1">
-                    <h3 className="font-bold text-white text-base mb-1 group-hover:text-[var(--color-primary-light)] transition-colors">{audio.title}</h3>
+                    <h3 className="font-bold text-[var(--color-text)] text-base mb-1 group-hover:text-[var(--color-primary-light)] transition-colors">{audio.title}</h3>
                     <p className="text-sm text-[var(--color-text-muted)]">{audio.speaker}</p>
                   </div>
                   <div className="text-xs text-[var(--color-primary-light)] font-mono bg-[var(--color-primary)]/10 px-3 py-2 rounded-xl border border-[var(--color-primary)]/20 shadow-inner">
@@ -295,7 +295,7 @@ export default function IslamicLibrary({ onBack }: { onBack: () => void }) {
                     </div>
                   </div>
                   <div className="p-5 bg-[var(--color-surface)]">
-                    <h3 className="font-bold text-white text-base mb-3 group-hover:text-[var(--color-primary-light)] transition-colors">{video.title}</h3>
+                    <h3 className="font-bold text-[var(--color-text)] text-base mb-3 group-hover:text-[var(--color-primary-light)] transition-colors">{video.title}</h3>
                     <div className="flex justify-between items-center text-sm text-[var(--color-text-muted)]">
                       <span className="bg-white/5 px-3 py-1.5 rounded-xl border border-white/5 shadow-inner">{video.channel}</span>
                       <span className="flex items-center gap-1.5"><Eye size={16} /> {video.views}</span>

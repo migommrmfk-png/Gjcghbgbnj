@@ -94,13 +94,13 @@ export default function Ruqyah({ onBack }: { onBack: () => void }) {
             className="space-y-4"
           >
             {ruqyahAyahs.map((ayah) => (
-              <div key={ayah.id} className="card-3d bg-[var(--color-surface)] rounded-3xl p-6 shadow-lg border border-white/5 relative overflow-hidden">
+              <div key={ayah.id} className="card-3d bg-[var(--color-surface)] rounded-3xl p-6 shadow-lg border border-black/5 dark:border-white/5 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
                 <div className="flex items-center gap-3 mb-6 relative z-10">
                   <div className="w-10 h-10 bg-[var(--color-primary)]/10 rounded-xl flex items-center justify-center text-[var(--color-primary-light)] border border-[var(--color-primary)]/20 shadow-inner">
                     <Shield size={20} />
                   </div>
-                  <h3 className="font-bold text-white text-lg font-serif">{ayah.title}</h3>
+                  <h3 className="font-bold text-[var(--color-text)] text-lg font-serif">{ayah.title}</h3>
                 </div>
                 <p className="text-2xl leading-loose font-serif text-[var(--color-primary-light)] text-center relative z-10 drop-shadow-[0_0_10px_rgba(212,175,55,0.2)]">
                   {ayah.text}
@@ -126,7 +126,7 @@ export default function Ruqyah({ onBack }: { onBack: () => void }) {
                   {playingId === audio.id ? <PauseCircle size={28} /> : <PlayCircle size={28} className="ml-1" />}
                 </button>
                 <div className="flex-1">
-                  <h3 className={`font-bold text-sm mb-1 transition-colors ${playingId === audio.id ? 'text-[var(--color-primary-light)]' : 'text-white'}`}>
+                  <h3 className={`font-bold text-sm mb-1 transition-colors ${playingId === audio.id ? 'text-[var(--color-primary-light)]' : 'text-[var(--color-text)]'}`}>
                     الرقية الشرعية الشاملة
                   </h3>
                   <p className="text-xs text-[var(--color-text-muted)] mb-2">بصوت {audio.reciter}</p>

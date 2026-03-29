@@ -15,7 +15,7 @@ export default function Splash({ onComplete }: SplashProps) {
   }, [onComplete]);
 
   return (
-    <div className="fixed inset-0 bg-primary flex flex-col items-center justify-center overflow-hidden z-50">
+    <div className="fixed inset-0 bg-[var(--color-primary)] flex flex-col items-center justify-center overflow-hidden z-50">
       {/* Animated Stars Background */}
       <div className="absolute inset-0 opacity-50">
         {[...Array(20)].map((_, i) => (
@@ -49,18 +49,18 @@ export default function Splash({ onComplete }: SplashProps) {
         <div className="relative mb-6">
           <Moon
             size={100}
-            className="text-gold drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]"
+            className="text-[var(--color-gold)] drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]"
             strokeWidth={1.5}
           />
           <motion.div
-            className="absolute inset-0 bg-gold blur-2xl opacity-20 rounded-full"
+            className="absolute inset-0 bg-[var(--color-gold)] blur-2xl opacity-20 rounded-full"
             animate={{ scale: [1, 1.2, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
           />
         </div>
 
         <motion.h1
-          className="text-5xl font-bold font-serif text-white drop-shadow-lg"
+          className="text-5xl font-bold font-serif text-[var(--color-primary-light)] drop-shadow-lg"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5, duration: 1 }}

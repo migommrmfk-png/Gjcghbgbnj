@@ -6,10 +6,6 @@ import { motion, AnimatePresence } from 'motion/react';
 const themes = [
   { id: 'emerald-light', name: 'أخضر زمردي', color: '#059669', mode: 'light' },
   { id: 'emerald-dark', name: 'أخضر ليلي', color: '#10B981', mode: 'dark' },
-  { id: 'gold-light', name: 'ذهبي فاتح', color: '#B45309', mode: 'light' },
-  { id: 'gold-dark', name: 'ذهبي داكن', color: '#F59E0B', mode: 'dark' },
-  { id: 'blue-light', name: 'أزرق سماوي', color: '#0284C7', mode: 'light' },
-  { id: 'blue-dark', name: 'أزرق ليلي', color: '#38BDF8', mode: 'dark' },
 ];
 
 export default function ThemeSelector({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
@@ -54,7 +50,7 @@ export default function ThemeSelector({ isOpen, onClose }: { isOpen: boolean; on
                   className={`relative flex flex-col items-center gap-3 p-4 rounded-2xl border-2 transition-all ${
                     theme === t.id
                       ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/10 scale-105 shadow-sm'
-                      : 'border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 bg-black/5 dark:bg-black/20'
+                      : 'border-black/5 dark:border-white/5 hover:border-black/10 dark:hover:border-white/20 hover:bg-black/5 dark:hover:bg-white/5 bg-black/5 dark:bg-white/5'
                   }`}
                 >
                   <div

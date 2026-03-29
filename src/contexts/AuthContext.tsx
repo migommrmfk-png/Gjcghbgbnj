@@ -12,6 +12,57 @@ import {
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 
+enum OperationType {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LIST = 'list',
+  GET = 'get',
+  WRITE = 'write',
+}
+
+interface FirestoreErrorInfo {
+  error: string;
+  operationType: OperationType;
+  path: string | null;
+  authInfo: {
+    userId: string | undefined;
+    email: string | null | undefined;
+    emailVerified: boolean | undefined;
+    isAnonymous: boolean | undefined;
+    tenantId: string | null | undefined;
+    providerInfo: {
+      providerId: string;
+      displayName: string | null;
+      email: string | null;
+      photoUrl: string | null;
+    }[];
+  }
+}
+
+function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errInfo: FirestoreErrorInfo = {
+    error: error instanceof Error ? error.message : String(error),
+    authInfo: {
+      userId: auth.currentUser?.uid,
+      email: auth.currentUser?.email,
+      emailVerified: auth.currentUser?.emailVerified,
+      isAnonymous: auth.currentUser?.isAnonymous,
+      tenantId: auth.currentUser?.tenantId,
+      providerInfo: auth.currentUser?.providerData.map(provider => ({
+        providerId: provider.providerId,
+        displayName: provider.displayName,
+        email: provider.email,
+        photoUrl: provider.photoURL
+      })) || []
+    },
+    operationType,
+    path
+  }
+  console.error('Firestore Error: ', JSON.stringify(errInfo));
+  throw new Error(JSON.stringify(errInfo));
+}
+
 interface AuthContextType {
   user: User | null;
   loading: boolean;
@@ -39,21 +90,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       
-      if (currentUser) {
+      if (currentUser && currentUser.email) {
         try {
           // Create or update user profile in Firestore
           const userRef = doc(db, 'users', currentUser.uid);
-          const userSnap = await getDoc(userRef);
+          let userSnap;
+          try {
+            userSnap = await getDoc(userRef);
+          } catch (e) {
+            handleFirestoreError(e, OperationType.GET, `users/${currentUser.uid}`);
+            return;
+          }
           
           if (!userSnap.exists()) {
-            await setDoc(userRef, {
+            const userData: any = {
               uid: currentUser.uid,
-              displayName: currentUser.displayName,
               email: currentUser.email,
-              photoURL: currentUser.photoURL,
               createdAt: new Date().toISOString(),
               role: 'user'
-            });
+            };
+            if (currentUser.displayName) userData.displayName = currentUser.displayName;
+            if (currentUser.photoURL) userData.photoURL = currentUser.photoURL;
+
+            try {
+              await setDoc(userRef, userData);
+            } catch (e) {
+              handleFirestoreError(e, OperationType.CREATE, `users/${currentUser.uid}`);
+            }
           }
         } catch (error) {
           console.error("Error fetching or creating user profile:", error);
@@ -73,14 +136,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       // Ensure the Firestore document gets the correct displayName
       const userRef = doc(db, 'users', userCredential.user.uid);
-      await setDoc(userRef, {
-        uid: userCredential.user.uid,
-        displayName: name,
-        email: userCredential.user.email,
-        photoURL: userCredential.user.photoURL,
-        createdAt: new Date().toISOString(),
-        role: 'user'
-      }, { merge: true });
+      let userSnap;
+      try {
+        userSnap = await getDoc(userRef);
+      } catch (e) {
+        handleFirestoreError(e, OperationType.GET, `users/${userCredential.user.uid}`);
+        return;
+      }
+      
+      if (!userSnap.exists()) {
+        const userData: any = {
+          uid: userCredential.user.uid,
+          email: userCredential.user.email,
+          createdAt: new Date().toISOString(),
+          role: 'user'
+        };
+        if (name) userData.displayName = name;
+        if (userCredential.user.photoURL) userData.photoURL = userCredential.user.photoURL;
+        try {
+          await setDoc(userRef, userData);
+        } catch (e) {
+          handleFirestoreError(e, OperationType.CREATE, `users/${userCredential.user.uid}`);
+        }
+      } else {
+        if (name) {
+          try {
+            await setDoc(userRef, { displayName: name }, { merge: true });
+          } catch (e) {
+            handleFirestoreError(e, OperationType.UPDATE, `users/${userCredential.user.uid}`);
+          }
+        }
+      }
 
       // Force a state update to reflect the new display name immediately
       setUser({ ...userCredential.user, displayName: name } as User);
@@ -106,17 +192,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       // Ensure the Firestore document gets the correct displayName
       const userRef = doc(db, 'users', userCredential.user.uid);
-      const userSnap = await getDoc(userRef);
+      let userSnap;
+      try {
+        userSnap = await getDoc(userRef);
+      } catch (e) {
+        handleFirestoreError(e, OperationType.GET, `users/${userCredential.user.uid}`);
+        return;
+      }
       
       if (!userSnap.exists()) {
-        await setDoc(userRef, {
+        const userData: any = {
           uid: userCredential.user.uid,
-          displayName: userCredential.user.displayName,
           email: userCredential.user.email,
-          photoURL: userCredential.user.photoURL,
           createdAt: new Date().toISOString(),
           role: 'user'
-        });
+        };
+        if (userCredential.user.displayName) userData.displayName = userCredential.user.displayName;
+        if (userCredential.user.photoURL) userData.photoURL = userCredential.user.photoURL;
+
+        try {
+          await setDoc(userRef, userData);
+        } catch (e) {
+          handleFirestoreError(e, OperationType.CREATE, `users/${userCredential.user.uid}`);
+        }
       }
     } catch (error) {
       console.error("Error signing in with Google", error);

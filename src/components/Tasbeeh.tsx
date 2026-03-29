@@ -281,7 +281,7 @@ export default function Tasbeeh() {
             className="w-52 h-52 rounded-full relative outline-none touch-manipulation z-20 group"
           >
             {/* Outer Bezel */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] shadow-[0_20px_50px_rgba(0,0,0,0.5),inset_0_2px_5px_rgba(255,255,255,0.2)] border border-white/5 flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] shadow-[0_20px_50px_rgba(0,0,0,0.5),inset_0_2px_5px_rgba(255,255,255,0.2)] border border-black/5 dark:border-white/5 flex items-center justify-center">
               
               {/* Inner Depression */}
               <div className="w-44 h-44 rounded-full bg-black/60 shadow-[inset_0_10px_20px_rgba(0,0,0,0.8)] flex items-center justify-center border border-black relative overflow-hidden">
@@ -359,7 +359,7 @@ export default function Tasbeeh() {
                   </div>
                   <button 
                     onClick={() => setSoundEnabled(!soundEnabled)}
-                    className={`w-12 h-6 rounded-full transition-colors relative ${soundEnabled ? 'bg-[var(--color-primary)]' : 'bg-white/20'}`}
+                    className={`w-12 h-6 rounded-full transition-colors relative ${soundEnabled ? 'bg-[var(--color-primary)]' : 'bg-black/20 dark:bg-white/20'}`}
                   >
                     <div className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-all ${soundEnabled ? 'left-1' : 'right-1'}`} />
                   </button>

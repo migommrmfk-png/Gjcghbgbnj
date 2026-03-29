@@ -155,7 +155,7 @@ export default function Qibla() {
         <div className="relative z-10 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold font-serif mb-1 text-[var(--color-primary-light)] drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">اتجاه القبلة</h2>
-            <div className="flex items-center gap-2 text-white/80 text-sm">
+            <div className="flex items-center gap-2 text-[var(--color-text)]/80 text-sm">
               <MapPin size={16} className="text-[var(--color-primary)]" />
               <span>{locationName}</span>
             </div>
@@ -167,7 +167,7 @@ export default function Qibla() {
       </div>
 
       {/* View Toggle */}
-      <div className="flex bg-[var(--color-surface)] p-1 rounded-xl border border-white/5">
+      <div className="flex bg-[var(--color-surface)] p-1 rounded-xl border border-black/5 dark:border-white/5">
         <button
           onClick={() => setViewMode('map')}
           className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${

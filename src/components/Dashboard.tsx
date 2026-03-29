@@ -127,7 +127,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
-    }, 1000);
+    }, 60000); // Update every minute instead of every second to improve performance
     return () => clearInterval(timer);
   }, []);
 
@@ -149,6 +149,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       try {
         const randomAyah = Math.floor(Math.random() * 6236) + 1;
         const res = await fetch(`https://api.alquran.cloud/v1/ayah/${randomAyah}`);
+        if (!res.ok) throw new Error("API response not ok");
         const data = await res.json();
         const ayahData = {
           text: data.data.text,
@@ -157,7 +158,12 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         setDailyAyah(ayahData);
         localStorage.setItem('dailyAyah', JSON.stringify({ date: today, data: ayahData }));
       } catch (e) {
-        console.error("Failed to fetch daily ayah", e);
+        console.warn("Using fallback daily ayah due to fetch error");
+        const fallbackAyah = {
+          text: "إِنَّ مَعَ الْعُسْرِ يُسْرًا",
+          surah: "سورة الشرح - آية 6"
+        };
+        setDailyAyah(fallbackAyah);
       }
     };
 
@@ -426,6 +432,13 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       bg: "bg-blue-500/10",
     },
     {
+      id: "mosques",
+      title: "المساجد القريبة",
+      icon: <MapPin size={28} />,
+      color: "text-teal-400",
+      bg: "bg-teal-500/10",
+    },
+    {
       id: "tasbeeh",
       title: "السبحة",
       icon: <Activity size={28} />,
@@ -445,6 +458,13 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       icon: <BookOpen size={28} />,
       color: "text-red-400",
       bg: "bg-red-500/10",
+    },
+    {
+      id: "stories",
+      title: "قصص الأنبياء",
+      icon: <BookOpen size={28} />,
+      color: "text-purple-400",
+      bg: "bg-purple-500/10",
     },
     {
       id: "duas",

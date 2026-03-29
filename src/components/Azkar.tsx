@@ -564,7 +564,7 @@ export default function Azkar() {
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-[2rem] p-8 text-white shadow-[0_15px_40px_rgba(0,0,0,0.6)] relative overflow-hidden border border-white/5"
+        className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-[2rem] p-8 text-white shadow-[0_15px_40px_rgba(0,0,0,0.6)] relative overflow-hidden border border-black/5 dark:border-white/5"
       >
         <div className="absolute right-0 top-0 w-40 h-40 bg-[var(--color-primary)]/20 rounded-full -mr-10 -mt-10 blur-3xl"></div>
         <div className="absolute left-0 bottom-0 w-32 h-32 bg-black/40 rounded-full -ml-10 -mb-10 blur-2xl"></div>
@@ -598,7 +598,7 @@ export default function Azkar() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
             onClick={() => setSelectedCategory(category)}
-            className="card-3d bg-[var(--color-surface)] rounded-[2rem] p-6 text-white flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden group border border-white/5 hover:border-[var(--color-primary)]/30 shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+            className="card-3d bg-[var(--color-surface)] rounded-[2rem] p-6 text-[var(--color-text)] flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden group border border-black/5 dark:border-white/5 hover:border-[var(--color-primary)]/30 shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-inner border border-white/10 group-hover:rotate-6 transition-transform bg-gradient-to-br ${category.bg} text-white`}>

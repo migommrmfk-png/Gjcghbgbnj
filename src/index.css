@@ -5,15 +5,15 @@
 
 @layer base {
   :root {
-    /* 1. أخضر زمردي فاتح (Emerald Light) - Default */
-    --theme-bg: #FAFAFA;
+    /* 1. أخضر عميق (Deep Teal) - Default */
+    --theme-bg: #F8F9FA;
     --theme-surface: #FFFFFF;
-    --theme-surface-hover: #F0F0F0;
-    --theme-primary: #2E7D32;
-    --theme-primary-dark: #1B5E20;
-    --theme-primary-light: #66BB6A;
-    --theme-text: #212121;
-    --theme-text-muted: #555555;
+    --theme-surface-hover: #E9ECEF;
+    --theme-primary: #1B4332;
+    --theme-primary-dark: #081C15;
+    --theme-primary-light: #2D6A4F;
+    --theme-text: #212529;
+    --theme-text-muted: #495057;
     --theme-gold: #C9A227;
     --theme-gold-dark: #AA8C2C;
     --theme-gold-light: #E6C35C;
@@ -38,16 +38,16 @@
     --font-mono: 'JetBrains Mono', monospace;
   }
 
-  /* 2. أخضر زمردي داكن (Emerald Dark) */
+  /* 2. أخضر عميق داكن (Deep Teal Dark) */
   [data-theme="emerald-dark"] {
-    --theme-bg: #121212;
-    --theme-surface: #1E1E1E;
-    --theme-surface-hover: #2C2C2C;
-    --theme-primary: #2E7D32;
-    --theme-primary-dark: #1B5E20;
-    --theme-primary-light: #66BB6A;
-    --theme-text: #FFFFFF;
-    --theme-text-muted: #B0B0B0;
+    --theme-bg: #081C15;
+    --theme-surface: #1B4332;
+    --theme-surface-hover: #2D6A4F;
+    --theme-primary: #40916C;
+    --theme-primary-dark: #2D6A4F;
+    --theme-primary-light: #52B788;
+    --theme-text: #F8F9FA;
+    --theme-text-muted: #ADB5BD;
     --theme-gold: #C9A227;
     --theme-gold-dark: #AA8C2C;
     --theme-gold-light: #E6C35C;

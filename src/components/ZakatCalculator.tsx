@@ -39,9 +39,9 @@ export default function ZakatCalculator({ onBack }: { onBack: () => void }) {
           onClick={onBack}
           className="p-2 hover:bg-white/5 rounded-full transition-colors border border-white/5 bg-[var(--color-surface)]"
         >
-          <ArrowRight size={24} className="text-[var(--color-text-muted)] hover:text-white" />
+          <ArrowRight size={24} className="text-[var(--color-text-muted)] hover:text-[var(--color-text)]" />
         </button>
-        <h1 className="text-xl font-bold font-serif text-white drop-shadow-md">
+        <h1 className="text-xl font-bold font-serif text-[var(--color-text)] drop-shadow-md">
           حاسبة الزكاة
         </h1>
       </div>
@@ -61,9 +61,9 @@ export default function ZakatCalculator({ onBack }: { onBack: () => void }) {
             <p className="text-sm text-emerald-500/80 leading-relaxed font-medium">
               تجب الزكاة (2.5%) إذا بلغ المال النصاب وحال عليه الحول.
               <br/>
-              <span className="text-white">نصاب الذهب:</span> 85 جرام
+              <span className="text-[var(--color-text)]">نصاب الذهب:</span> 85 جرام
               <br/>
-              <span className="text-white">نصاب الفضة:</span> 595 جرام
+              <span className="text-[var(--color-text)]">نصاب الفضة:</span> 595 جرام
             </p>
           </div>
         </motion.div>
@@ -73,10 +73,10 @@ export default function ZakatCalculator({ onBack }: { onBack: () => void }) {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
-          className="card-3d bg-[var(--color-surface)] rounded-[2rem] p-6 shadow-lg border border-white/5 space-y-5"
+          className="card-3d bg-[var(--color-surface)] rounded-[2rem] p-6 shadow-lg border border-black/5 dark:border-white/5 space-y-5"
         >
           <div>
-            <label className="block text-sm font-bold text-white mb-2 flex items-center gap-2">
+            <label className="block text-sm font-bold text-[var(--color-text)] mb-2 flex items-center gap-2">
               <CircleDollarSign size={18} className="text-emerald-400" />
               الأموال النقدية والمدخرات
             </label>
@@ -90,7 +90,7 @@ export default function ZakatCalculator({ onBack }: { onBack: () => void }) {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-white mb-2 flex items-center gap-2">
+            <label className="block text-sm font-bold text-[var(--color-text)] mb-2 flex items-center gap-2">
               <Coins size={18} className="text-[var(--color-primary)]" />
               الذهب (بالجرام)
             </label>
@@ -104,7 +104,7 @@ export default function ZakatCalculator({ onBack }: { onBack: () => void }) {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-white mb-2 flex items-center gap-2">
+            <label className="block text-sm font-bold text-[var(--color-text)] mb-2 flex items-center gap-2">
               <Coins size={18} className="text-slate-400" />
               الفضة (بالجرام)
             </label>

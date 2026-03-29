@@ -99,10 +99,10 @@ export default function PrayerGuide({ onBack }: { onBack: () => void }) {
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-3xl p-6 text-white shadow-[0_10px_30px_rgba(0,0,0,0.5)] relative overflow-hidden mb-6 border border-white/5"
+        className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-3xl p-6 text-[var(--color-text)] shadow-[0_10px_30px_rgba(0,0,0,0.5)] relative overflow-hidden mb-6 border border-black/5 dark:border-white/5"
       >
         <div className="absolute right-0 top-0 w-32 h-32 bg-[var(--color-primary)]/20 rounded-full -mr-10 -mt-10 blur-xl"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/40 rounded-full -ml-10 -mb-10 blur-2xl"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/10 dark:bg-black/40 rounded-full -ml-10 -mb-10 blur-2xl"></div>
         <div className="relative z-10">
           <h2 className="text-2xl font-bold font-serif mb-2 flex items-center gap-2 text-[var(--color-primary-light)] drop-shadow-md">
             <BookOpen size={24} className="text-[var(--color-primary)]" />
@@ -120,7 +120,7 @@ export default function PrayerGuide({ onBack }: { onBack: () => void }) {
           <CheckCircle2 size={20} className="text-emerald-500" />
           شروط صحة الصلاة (قبل البدء)
         </h3>
-        <div className="bg-[var(--color-surface)] rounded-2xl p-4 border border-white/5 shadow-lg space-y-3">
+        <div className="bg-[var(--color-surface)] rounded-2xl p-4 border border-black/5 dark:border-white/5 shadow-lg space-y-3">
           {conditions.map((condition, idx) => (
             <div key={idx} className="flex items-start gap-3">
               <div className="w-2 h-2 rounded-full bg-emerald-500 mt-2 shrink-0"></div>
@@ -148,7 +148,7 @@ export default function PrayerGuide({ onBack }: { onBack: () => void }) {
             <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-[var(--color-bg)] bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white font-bold shadow-[0_0_10px_rgba(212,175,55,0.5)] shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
               {index + 1}
             </div>
-            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-[var(--color-surface)] p-5 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 relative">
+            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-[var(--color-surface)] p-5 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-black/5 dark:border-white/5 relative">
               <h3 className="font-bold text-[var(--color-primary-light)] text-lg mb-2 font-serif drop-shadow-md">
                 {step.title}
               </h3>
@@ -156,7 +156,7 @@ export default function PrayerGuide({ onBack }: { onBack: () => void }) {
                 {step.description}
               </p>
               {step.dua && (
-                <div className="bg-black/30 p-4 rounded-xl border border-white/5">
+                <div className="bg-black/5 dark:bg-black/30 p-4 rounded-xl border border-black/5 dark:border-white/5">
                   <p className="text-[var(--color-primary)] text-sm font-bold leading-loose text-center">
                     "{step.dua}"
                   </p>
@@ -173,11 +173,11 @@ export default function PrayerGuide({ onBack }: { onBack: () => void }) {
           <XCircle size={20} className="text-red-500" />
           مبطلات الصلاة (متى لا تصح؟)
         </h3>
-        <div className="bg-red-950/20 rounded-2xl p-4 border border-red-500/20 shadow-lg space-y-3">
+        <div className="bg-red-50 dark:bg-red-950/20 rounded-2xl p-4 border border-red-200 dark:border-red-500/20 shadow-lg space-y-3">
           {invalidators.map((inv, idx) => (
             <div key={idx} className="flex items-start gap-3">
               <div className="w-2 h-2 rounded-full bg-red-500 mt-2 shrink-0 shadow-[0_0_5px_rgba(239,68,68,0.8)]"></div>
-              <p className="text-red-100/80 text-sm leading-relaxed">{inv}</p>
+              <p className="text-red-900 dark:text-red-100/80 text-sm leading-relaxed">{inv}</p>
             </div>
           ))}
         </div>

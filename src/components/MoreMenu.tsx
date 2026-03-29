@@ -54,6 +54,7 @@ export default function MoreMenu({
       title: 'أدوات ومواسم',
       image: 'https://i.pinimg.com/736x/3f/8b/77/3f8b77626915152a54b38d7c49b6b801.jpg',
       items: [
+        { id: 'mosques', label: 'المساجد القريبة', icon: <MapPin size={24} />, color: 'bg-teal-600' },
         { id: 'qibla', label: 'اتجاه القبلة', icon: <Compass size={24} />, color: 'bg-orange-500' },
         { id: 'calendar', label: 'التقويم الهجري', icon: <Calendar size={24} />, color: 'bg-blue-500' },
         { id: 'zakat', label: 'حاسبة الزكاة', icon: <Calculator size={24} />, color: 'bg-emerald-600' },
@@ -97,10 +98,10 @@ export default function MoreMenu({
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-[2rem] p-8 text-white shadow-[0_15px_40px_rgba(0,0,0,0.6)] relative overflow-hidden border border-white/10"
+        className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-[2rem] p-8 text-[var(--color-text)] shadow-[0_15px_40px_rgba(0,0,0,0.6)] relative overflow-hidden border border-black/5 dark:border-white/10"
       >
         <div className="absolute right-0 top-0 w-40 h-40 bg-white/10 rounded-full -mr-10 -mt-10 blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/20 rounded-full -ml-10 -mb-10 blur-2xl"></div>
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/10 dark:bg-black/20 rounded-full -ml-10 -mb-10 blur-2xl"></div>
         <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
         <div className="relative z-10 text-center">
           {user ? (

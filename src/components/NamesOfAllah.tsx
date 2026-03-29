@@ -168,7 +168,7 @@ export default function NamesOfAllah() {
             onClick={() => setSelectedName(name)}
             className="card-3d bg-[var(--color-surface)] p-6 text-center flex flex-col items-center justify-center gap-3 group hover:bg-[var(--color-primary)]/10 hover:border-[var(--color-primary)]/30 transition-colors border border-black/5 dark:border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
           >
-            <span className="text-3xl font-bold font-serif text-[var(--color-primary-light)] group-hover:text-white drop-shadow-[0_0_10px_rgba(212,175,55,0.3)] transition-colors">
+            <span className="text-3xl font-bold font-serif text-[var(--color-primary-light)] group-hover:text-[var(--color-text)] drop-shadow-[0_0_10px_rgba(212,175,55,0.3)] transition-colors">
               {name.name}
             </span>
             <span className="text-xs text-[var(--color-text-muted)] group-hover:text-[var(--color-primary-light)] font-bold transition-colors">

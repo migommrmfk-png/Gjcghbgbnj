@@ -114,12 +114,12 @@ export default function HijriCalendar() {
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-3xl p-6 text-white shadow-[0_10px_20px_rgba(0,0,0,0.5)] relative overflow-hidden border border-white/5"
+        className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-3xl p-6 text-[var(--color-text)] shadow-[0_10px_20px_rgba(0,0,0,0.5)] relative overflow-hidden border border-white/5"
       >
         <div className="absolute right-0 top-0 w-32 h-32 bg-[var(--color-primary)]/10 rounded-full -mr-10 -mt-10 blur-xl"></div>
         <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
         <div className="relative z-10">
-          <h1 className="text-2xl font-bold font-serif mb-2 flex items-center gap-2 drop-shadow-md text-white">
+          <h1 className="text-2xl font-bold font-serif mb-2 flex items-center gap-2 drop-shadow-md text-[var(--color-text)]">
             <CalendarIcon size={24} className="text-[var(--color-primary)]" />
             التقويم الهجري
           </h1>
@@ -132,7 +132,7 @@ export default function HijriCalendar() {
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.1 }}
-        className="card-3d p-4 flex items-center justify-between bg-[var(--color-surface)] border border-white/5 shadow-lg rounded-3xl"
+        className="card-3d p-4 flex items-center justify-between bg-[var(--color-surface)] border border-black/5 dark:border-white/5 shadow-lg rounded-3xl"
       >
         <button
           onClick={handlePrevMonth}
@@ -140,11 +140,11 @@ export default function HijriCalendar() {
         >
           <ChevronRight
             size={24}
-            className="text-[var(--color-text-muted)] hover:text-white"
+            className="text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
           />
         </button>
         <div className="text-center">
-          <h2 className="text-xl font-bold font-serif text-white">
+          <h2 className="text-xl font-bold font-serif text-[var(--color-text)]">
             {hijriMonthName} {hijriYear}
           </h2>
           <p className="text-xs text-[var(--color-text-muted)] font-bold">
@@ -167,7 +167,7 @@ export default function HijriCalendar() {
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="card-3d p-4 bg-[var(--color-surface)] border border-white/5 shadow-lg rounded-3xl"
+        className="card-3d p-4 bg-[var(--color-surface)] border border-black/5 dark:border-white/5 shadow-lg rounded-3xl"
       >
         <div className="grid grid-cols-7 gap-2 mb-2 text-center">
           {["ح", "ن", "ث", "ر", "خ", "ج", "س"].map((day, i) => (
@@ -242,7 +242,7 @@ export default function HijriCalendar() {
           return (
             <div
               key={day.hijri.date}
-              className="card-3d p-4 bg-[var(--color-surface)] flex items-center gap-4 border-r-4 border-[var(--color-primary)] rounded-2xl shadow-lg border-y border-l border-white/5"
+              className="card-3d p-4 bg-[var(--color-surface)] flex items-center gap-4 border-r-4 border-[var(--color-primary)] rounded-2xl shadow-lg border-y border-l border-black/5 dark:border-white/5"
             >
               <div className="w-12 h-12 rounded-xl bg-[var(--color-primary)]/10 flex flex-col items-center justify-center text-[var(--color-primary-light)] font-bold border border-[var(--color-primary)]/20 shadow-inner">
                 <span className="text-lg leading-none">
@@ -251,7 +251,7 @@ export default function HijriCalendar() {
                 <span className="text-[10px] text-[var(--color-text-muted)]">{day.hijri.month.ar}</span>
               </div>
               <div>
-                <h4 className="font-bold text-white text-sm">{event.title}</h4>
+                <h4 className="font-bold text-[var(--color-text)] text-sm">{event.title}</h4>
                 <p className="text-xs text-[var(--color-text-muted)]">{day.gregorian.date}</p>
               </div>
             </div>

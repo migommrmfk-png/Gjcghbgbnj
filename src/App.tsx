@@ -28,11 +28,12 @@ import MoreMenu from "./components/MoreMenu";
 // Lazy load secondary components
 const Qibla = lazy(() => import("./components/Qibla"));
 const NamesOfAllah = lazy(() => import("./components/NamesOfAllah"));
-const Hadith = lazy(() => import("./Hadith"));
+const Hadith = lazy(() => import("./components/Hadith"));
 const Duas = lazy(() => import("./components/Duas"));
 const HijriCalendar = lazy(() => import("./components/Calendar"));
 const IslamicRadio = lazy(() => import("./components/Radio"));
-const Stories = lazy(() => import("./components/Stories"));
+const ProphetStories = lazy(() => import("./components/ProphetStories"));
+const MosquesMap = lazy(() => import("./components/MosquesMap"));
 const MuslimAI = lazy(() => import("./components/MuslimAI"));
 const Games = lazy(() => import("./components/Games"));
 const PrayerGuide = lazy(() => import("./components/PrayerGuide"));
@@ -103,7 +104,9 @@ function AppContent() {
       case "radio":
         return <IslamicRadio />;
       case "stories":
-        return <Stories onBack={() => setActiveTab("more")} />;
+        return <ProphetStories onBack={() => setActiveTab("more")} />;
+      case "mosques":
+        return <MosquesMap onBack={() => setActiveTab("more")} />;
       case "muslim-ai":
         return <MuslimAI onBack={() => setActiveTab("more")} />;
       case "games":

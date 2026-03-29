@@ -383,6 +383,7 @@ export default function Quran() {
               ) : (
                 <div className="text-justify" dir="rtl" style={{ textAlignLast: 'center' }}>
                   {selectedSurah.ayahs.map((ayah) => {
+                    // Pre-process text to remove Bismillah if it's the first ayah of a surah (except Al-Fatiha and At-Tawba)
                     let text = ayah.text;
                     if (
                       selectedSurah.number !== 1 &&

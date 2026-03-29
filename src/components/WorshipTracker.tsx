@@ -165,10 +165,10 @@ export default function WorshipTracker({ onBack }: { onBack: () => void }) {
   return (
     <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-[var(--color-bg)]" dir="rtl">
       {/* Header */}
-      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-[var(--color-bg)]/80 backdrop-blur-xl border-b border-white/5">
+      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-[var(--color-bg)]/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5">
         <button
           onClick={onBack}
-          className="p-2 hover:bg-white/5 rounded-full transition-colors border border-white/5 bg-[var(--color-surface)] shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
+          className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors border border-black/5 dark:border-white/5 bg-[var(--color-surface)] shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
         >
           <ArrowRight size={24} className="text-[var(--color-text-muted)] hover:text-[var(--color-primary-light)]" />
         </button>
@@ -182,7 +182,7 @@ export default function WorshipTracker({ onBack }: { onBack: () => void }) {
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="rounded-[2rem] p-8 text-white shadow-[0_15px_40px_rgba(0,0,0,0.6)] relative overflow-hidden border border-white/5"
+          className="rounded-[2rem] p-8 text-white shadow-[0_15px_40px_rgba(0,0,0,0.6)] relative overflow-hidden border border-black/5 dark:border-white/5"
           style={{
             backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.9)), url('https://i.pinimg.com/736x/3f/8b/77/3f8b77626915152a54b38d7c49b6b801.jpg')`,
             backgroundSize: 'cover',
@@ -263,7 +263,7 @@ export default function WorshipTracker({ onBack }: { onBack: () => void }) {
                       <Star size={20} />
                     </div>
                     <div className="text-right">
-                      <h3 className="font-bold text-white">المستوى {lvl}: {LEVEL_NAMES[lvl as keyof typeof LEVEL_NAMES].split(' ')[0]}</h3>
+                      <h3 className="font-bold text-[var(--color-text)]">المستوى {lvl}: {LEVEL_NAMES[lvl as keyof typeof LEVEL_NAMES].split(' ')[0]}</h3>
                       <p className="text-xs text-[var(--color-text-muted)]">
                         {isLocked ? `يفتح عند الوصول للمستوى ${lvl}` : `${completedInLevel} من ${levelTasks.length} مهام منجزة`}
                       </p>
@@ -309,7 +309,7 @@ export default function WorshipTracker({ onBack }: { onBack: () => void }) {
                                   <CheckCircle2 size={14} />
                                 </div>
                                 <div>
-                                  <span className={`font-bold text-sm block ${isCompleted ? 'text-[var(--color-primary-light)] line-through opacity-80' : 'text-white'}`}>
+                                  <span className={`font-bold text-sm block ${isCompleted ? 'text-[var(--color-primary-light)] line-through opacity-80' : 'text-[var(--color-text)]'}`}>
                                     {task.title}
                                   </span>
                                   <span className="text-[10px] text-[var(--color-text-muted)]">{task.category}</span>

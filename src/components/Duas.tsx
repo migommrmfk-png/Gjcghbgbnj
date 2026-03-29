@@ -148,10 +148,10 @@ export default function Duas() {
   return (
     <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-[var(--color-bg)]" dir="rtl">
       {/* Header */}
-      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-[var(--color-bg)]/80 backdrop-blur-xl border-b border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)] px-4 -mx-4 mb-6">
+      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-[var(--color-bg)]/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)] px-4 -mx-4 mb-6">
         <button
           onClick={() => window.history.back()}
-          className="p-2 hover:bg-white/5 rounded-full transition-colors border border-white/5 bg-[var(--color-surface)] shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
+          className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors border border-black/5 dark:border-white/5 bg-[var(--color-surface)] shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
         >
           <ArrowRight size={24} className="text-[var(--color-text-muted)] hover:text-[var(--color-primary-light)]" />
         </button>
@@ -163,10 +163,10 @@ export default function Duas() {
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-3xl p-6 text-white shadow-[0_10px_30px_rgba(0,0,0,0.5)] relative overflow-hidden mb-6 border border-white/5"
+        className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-3xl p-6 text-[var(--color-text)] shadow-[0_10px_30px_rgba(0,0,0,0.5)] relative overflow-hidden mb-6 border border-white/5"
       >
         <div className="absolute right-0 top-0 w-32 h-32 bg-[var(--color-primary)]/20 rounded-full -mr-10 -mt-10 blur-xl"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/40 rounded-full -ml-10 -mb-10 blur-2xl"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/10 dark:bg-black/40 rounded-full -ml-10 -mb-10 blur-2xl"></div>
         <div className="relative z-10">
           <h2 className="text-2xl font-bold font-serif mb-2 flex items-center gap-2 text-[var(--color-primary-light)] drop-shadow-md">
             <Heart size={24} className="text-[var(--color-primary)]" />
@@ -187,7 +187,7 @@ export default function Duas() {
             className={`flex items-center gap-2 px-5 py-3 rounded-2xl whitespace-nowrap transition-all snap-center shadow-md border ${
               activeCategory === category.id
                 ? "bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white font-bold border-transparent"
-                : "bg-[var(--color-surface)] text-[var(--color-text-muted)] hover:bg-white/5 border-white/5"
+                : "bg-[var(--color-surface)] text-[var(--color-text-muted)] hover:bg-black/5 dark:hover:bg-white/5 border-black/5 dark:border-white/5"
             }`}
           >
             {category.icon}
@@ -215,7 +215,7 @@ export default function Duas() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="bg-[var(--color-surface)] p-5 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.3)] border border-white/5 relative overflow-hidden group"
+                    className="bg-[var(--color-surface)] p-5 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.3)] border border-black/5 dark:border-white/5 relative overflow-hidden group"
                   >
                     <div className="absolute top-0 right-0 w-1 h-full bg-gradient-to-b from-[var(--color-primary)] to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
                     <p className="text-[var(--color-text)] text-lg leading-loose font-serif drop-shadow-sm">

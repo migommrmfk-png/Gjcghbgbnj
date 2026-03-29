@@ -76,7 +76,8 @@ export const PrayerTimesProvider: React.FC<{ children: React.ReactNode }> = ({ c
               `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=ar`,
               {
                 headers: {
-                  'Accept': 'application/json'
+                  'Accept': 'application/json',
+                  'User-Agent': 'IslamicApp/1.0'
                 }
               }
             );
