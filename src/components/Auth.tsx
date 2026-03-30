@@ -10,7 +10,7 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, signUp, signInWithGoogle } = useAuth();
+  const { signIn, signUp, signInWithGoogle, signInWithFacebook, signInWithTwitter, signInAsGuest } = useAuth();
 
   const handleGoogleLogin = async () => {
     try {
@@ -21,6 +21,48 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
     } catch (err: any) {
       console.error(err);
       setError('حدث خطأ أثناء تسجيل الدخول باستخدام جوجل. يرجى المحاولة مرة أخرى.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFacebookLogin = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      await signInWithFacebook();
+      if (onBack) onBack();
+    } catch (err: any) {
+      console.error(err);
+      setError('حدث خطأ أثناء تسجيل الدخول باستخدام فيسبوك. يرجى المحاولة مرة أخرى.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTwitterLogin = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      await signInWithTwitter();
+      if (onBack) onBack();
+    } catch (err: any) {
+      console.error(err);
+      setError('حدث خطأ أثناء تسجيل الدخول باستخدام تويتر. يرجى المحاولة مرة أخرى.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      await signInAsGuest();
+      if (onBack) onBack();
+    } catch (err: any) {
+      console.error(err);
+      setError('حدث خطأ أثناء الدخول كزائر. يرجى المحاولة مرة أخرى.');
     } finally {
       setLoading(false);
     }
@@ -199,6 +241,40 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
                 </g>
               </svg>
               المتابعة باستخدام جوجل
+            </button>
+
+            <button
+              type="button"
+              onClick={handleFacebookLogin}
+              disabled={loading}
+              className="w-full mt-3 py-3.5 bg-[#1877F2] text-white rounded-xl font-bold shadow-sm flex items-center justify-center gap-3 hover:bg-[#1877F2]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.469h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+              المتابعة باستخدام فيسبوك
+            </button>
+
+            <button
+              type="button"
+              onClick={handleTwitterLogin}
+              disabled={loading}
+              className="w-full mt-3 py-3.5 bg-black text-white rounded-xl font-bold shadow-sm flex items-center justify-center gap-3 hover:bg-black/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+              المتابعة باستخدام X
+            </button>
+
+            <button
+              type="button"
+              onClick={handleGuestLogin}
+              disabled={loading}
+              className="w-full mt-3 py-3.5 bg-black/5 dark:bg-white/5 text-[var(--color-text)] border border-black/10 dark:border-white/10 rounded-xl font-bold shadow-sm flex items-center justify-center gap-3 hover:bg-black/10 dark:hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <User size={20} />
+              الدخول كزائر
             </button>
 
             <div className="mt-6 text-center">

@@ -5,19 +5,19 @@
 
 @layer base {
   :root {
-    /* 1. أخضر عميق (Deep Teal) - Default */
-    --theme-bg: #F8F9FA;
+    /* أخضر زمردي (Emerald Green) - Default & Only */
+    --theme-bg: #F0FDF4;
     --theme-surface: #FFFFFF;
-    --theme-surface-hover: #E9ECEF;
-    --theme-primary: #1B4332;
-    --theme-primary-dark: #081C15;
-    --theme-primary-light: #2D6A4F;
-    --theme-text: #212529;
-    --theme-text-muted: #495057;
-    --theme-gold: #C9A227;
-    --theme-gold-dark: #AA8C2C;
-    --theme-gold-light: #E6C35C;
-    --theme-accent: #C9A227;
+    --theme-surface-hover: #DCFCE7;
+    --theme-primary: #10B981;
+    --theme-primary-dark: #047857;
+    --theme-primary-light: #34D399;
+    --theme-text: #064E3B;
+    --theme-text-muted: #047857;
+    --theme-gold: #10B981;
+    --theme-gold-dark: #047857;
+    --theme-gold-light: #34D399;
+    --theme-accent: #10B981;
     
     --color-bg: var(--theme-bg);
     --color-surface: var(--theme-surface);
@@ -36,86 +36,6 @@
     --font-quran: 'Amiri Quran', 'Amiri', serif;
     --font-serif: 'Playfair Display', serif;
     --font-mono: 'JetBrains Mono', monospace;
-  }
-
-  /* 2. أخضر عميق داكن (Deep Teal Dark) */
-  [data-theme="emerald-dark"] {
-    --theme-bg: #081C15;
-    --theme-surface: #1B4332;
-    --theme-surface-hover: #2D6A4F;
-    --theme-primary: #40916C;
-    --theme-primary-dark: #2D6A4F;
-    --theme-primary-light: #52B788;
-    --theme-text: #F8F9FA;
-    --theme-text-muted: #ADB5BD;
-    --theme-gold: #C9A227;
-    --theme-gold-dark: #AA8C2C;
-    --theme-gold-light: #E6C35C;
-    --theme-accent: #C9A227;
-  }
-
-  /* 3. ذهبي فاتح (Gold Light) */
-  [data-theme="gold-light"] {
-    --theme-bg: #FAFAF9;
-    --theme-surface: #FFFFFF;
-    --theme-surface-hover: #F5F5F4;
-    --theme-primary: #B45309;
-    --theme-primary-dark: #92400E;
-    --theme-primary-light: #F59E0B;
-    --theme-text: #1C1917;
-    --theme-text-muted: #78716C;
-    --theme-gold: #D4AF37;
-    --theme-gold-dark: #AA8C2C;
-    --theme-gold-light: #F3E5AB;
-    --theme-accent: #B45309;
-  }
-
-  /* 4. ذهبي داكن (Gold Dark) */
-  [data-theme="gold-dark"] {
-    --theme-bg: #1C1917;
-    --theme-surface: #292524;
-    --theme-surface-hover: #44403C;
-    --theme-primary: #F59E0B;
-    --theme-primary-dark: #D97706;
-    --theme-primary-light: #FCD34D;
-    --theme-text: #FAFAF9;
-    --theme-text-muted: #A8A29E;
-    --theme-gold: #D4AF37;
-    --theme-gold-dark: #AA8C2C;
-    --theme-gold-light: #F3E5AB;
-    --theme-accent: #F59E0B;
-  }
-
-  /* 5. أزرق فاتح (Blue Light) */
-  [data-theme="blue-light"] {
-    --theme-bg: #F0F9FF;
-    --theme-surface: #FFFFFF;
-    --theme-surface-hover: #E0F2FE;
-    --theme-primary: #0284C7;
-    --theme-primary-dark: #0369A1;
-    --theme-primary-light: #38BDF8;
-    --theme-text: #0C4A6E;
-    --theme-text-muted: #475569;
-    --theme-gold: #D4AF37;
-    --theme-gold-dark: #AA8C2C;
-    --theme-gold-light: #F3E5AB;
-    --theme-accent: #0284C7;
-  }
-
-  /* 6. أزرق داكن (Blue Dark) */
-  [data-theme="blue-dark"] {
-    --theme-bg: #0B1120;
-    --theme-surface: #172033;
-    --theme-surface-hover: #1E293B;
-    --theme-primary: #38BDF8;
-    --theme-primary-dark: #0284C7;
-    --theme-primary-light: #7DD3FC;
-    --theme-text: #F8FAFC;
-    --theme-text-muted: #94A3B8;
-    --theme-gold: #D4AF37;
-    --theme-gold-dark: #AA8C2C;
-    --theme-gold-light: #F3E5AB;
-    --theme-accent: #38BDF8;
   }
 }
 

@@ -138,11 +138,27 @@ export default function Quran() {
   const fetchSurah = async (surahNumber: number, surahName?: string) => {
     setLoadingSurah(true);
     try {
-      const res = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}`);
-      const data = await res.json();
-      setSelectedSurah(data.data);
+      // Check cache first
+      const cacheKey = `quran_surah_${surahNumber}`;
+      const cachedSurah = localStorage.getItem(cacheKey);
+      let surahData;
+
+      if (cachedSurah) {
+        surahData = JSON.parse(cachedSurah);
+      } else {
+        const res = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}`);
+        const data = await res.json();
+        surahData = data.data;
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify(surahData));
+        } catch (e) {
+          console.warn("Could not cache surah, storage might be full");
+        }
+      }
+
+      setSelectedSurah(surahData);
       
-      const newLastRead = { surahNumber, surahName: surahName || data.data.name };
+      const newLastRead = { surahNumber, surahName: surahName || surahData.name };
       setLastRead(newLastRead);
       localStorage.setItem('quranLastRead', JSON.stringify(newLastRead));
       

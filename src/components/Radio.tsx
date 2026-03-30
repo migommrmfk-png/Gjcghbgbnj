@@ -6,6 +6,7 @@ import {
   Volume2,
   VolumeX,
   Search,
+  Tv
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -415,7 +416,21 @@ const STATIONS: RadioStation[] = [
   },
 ];
 
+const TV_CHANNELS = [
+  {
+    id: "tv1",
+    name: "قناة القرآن الكريم - مكة المكرمة",
+    videoId: "5qap5aO4i9A", // Makkah Live
+  },
+  {
+    id: "tv2",
+    name: "قناة السنة النبوية - المدينة المنورة",
+    videoId: "a1aB5m-c1O0", // Madinah Live
+  }
+];
+
 export default function IslamicRadio() {
+  const [activeTab, setActiveTab] = useState<"radio" | "tv">("radio");
   const [currentStation, setCurrentStation] = useState<RadioStation | null>(
     null,
   );
@@ -500,8 +515,8 @@ export default function IslamicRadio() {
         <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
         <div className="relative z-10">
           <h1 className="text-3xl font-bold font-serif mb-2 flex justify-center items-center gap-3 drop-shadow-[0_0_10px_rgba(212,175,55,0.3)] text-[var(--color-primary-light)]">
-            <RadioIcon size={32} className="text-[var(--color-primary)]" />
-            الإذاعة الإسلامية
+            {activeTab === "radio" ? <RadioIcon size={32} /> : <Tv size={32} />}
+            {activeTab === "radio" ? "الإذاعة الإسلامية" : "البث التلفزيوني"}
           </h1>
           <p className="text-[var(--color-text-muted)] text-sm font-medium">
             بث مباشر على مدار الساعة
@@ -509,7 +524,38 @@ export default function IslamicRadio() {
         </div>
       </motion.div>
 
-      {/* Search Bar */}
+      {/* Tabs */}
+      <div className="flex bg-[var(--color-surface)] p-1 rounded-2xl shadow-sm border border-black/5 dark:border-white/5">
+        <button
+          onClick={() => setActiveTab("radio")}
+          className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
+            activeTab === "radio"
+              ? "bg-[var(--color-primary)] text-white shadow-md"
+              : "text-[var(--color-text-muted)] hover:bg-black/5 dark:hover:bg-white/5"
+          }`}
+        >
+          <RadioIcon size={18} />
+          الإذاعة
+        </button>
+        <button
+          onClick={() => {
+            setActiveTab("tv");
+            if (isPlaying) togglePlay();
+          }}
+          className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
+            activeTab === "tv"
+              ? "bg-[var(--color-primary)] text-white shadow-md"
+              : "text-[var(--color-text-muted)] hover:bg-black/5 dark:hover:bg-white/5"
+          }`}
+        >
+          <Tv size={18} />
+          التلفزيون
+        </button>
+      </div>
+
+      {activeTab === "radio" ? (
+        <>
+          {/* Search Bar */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -686,6 +732,35 @@ export default function IslamicRadio() {
           </motion.div>
         )}
       </AnimatePresence>
+      </>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-6"
+        >
+          {TV_CHANNELS.map((channel) => (
+            <div key={channel.id} className="card-3d overflow-hidden rounded-3xl bg-[var(--color-surface)] border border-black/5 dark:border-white/5 shadow-lg">
+              <div className="p-4 border-b border-black/5 dark:border-white/5">
+                <h3 className="font-bold font-serif text-lg text-[var(--color-primary)] flex items-center gap-2">
+                  <Tv size={20} />
+                  {channel.name}
+                </h3>
+              </div>
+              <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                <iframe
+                  className="absolute top-0 left-0 w-full h-full"
+                  src={`https://www.youtube.com/embed/${channel.videoId}?autoplay=0&mute=0&controls=1&rel=0`}
+                  title={channel.name}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </div>
+          ))}
+        </motion.div>
+      )}
     </div>
   );
 }

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User } from 'lucide-react';
-import ThemeSelector from './ThemeSelector';
+import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe } from 'lucide-react';
 import { usePrayerTimes } from '../contexts/PrayerTimesContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 export default function MoreMenu({ 
   onNavigate, 
@@ -14,10 +14,12 @@ export default function MoreMenu({
   notificationsEnabled?: boolean,
   onToggleNotifications?: () => Promise<boolean> | void
 }) {
-  const [isThemeSelectorOpen, setIsThemeSelectorOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const { autoAdhanEnabled, setAutoAdhanEnabled } = usePrayerTimes();
   const { user, logout } = useAuth();
+  const { t, i18n } = useTranslation();
+
+  const [showLangModal, setShowLangModal] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -37,6 +39,22 @@ export default function MoreMenu({
     }
   };
 
+  const changeLanguage = (lng: string) => {
+    i18n.changeLanguage(lng);
+    setShowLangModal(false);
+  };
+
+  const languages = [
+    { code: 'ar', name: 'العربية', nativeName: 'العربية' },
+    { code: 'en', name: 'English', nativeName: 'English' },
+    { code: 'fr', name: 'French', nativeName: 'Français' },
+    { code: 'ur', name: 'Urdu', nativeName: 'اردو' },
+    { code: 'id', name: 'Indonesian', nativeName: 'Bahasa Indonesia' },
+    { code: 'es', name: 'Spanish', nativeName: 'Español' },
+    { code: 'tr', name: 'Turkish', nativeName: 'Türkçe' },
+    { code: 'bn', name: 'Bengali', nativeName: 'বাংলা' },
+  ];
+
   const categories = [
     {
       title: 'المكتبة والتعلم',
@@ -54,7 +72,6 @@ export default function MoreMenu({
       title: 'أدوات ومواسم',
       image: 'https://i.pinimg.com/736x/3f/8b/77/3f8b77626915152a54b38d7c49b6b801.jpg',
       items: [
-        { id: 'mosques', label: 'المساجد القريبة', icon: <MapPin size={24} />, color: 'bg-teal-600' },
         { id: 'qibla', label: 'اتجاه القبلة', icon: <Compass size={24} />, color: 'bg-orange-500' },
         { id: 'calendar', label: 'التقويم الهجري', icon: <Calendar size={24} />, color: 'bg-blue-500' },
         { id: 'zakat', label: 'حاسبة الزكاة', icon: <Calculator size={24} />, color: 'bg-emerald-600' },
@@ -76,16 +93,15 @@ export default function MoreMenu({
       image: 'https://i.pinimg.com/736x/f6/3c/65/f63c65c270d7406f52285188d8b2d423.jpg',
       items: [
         { id: 'radio', label: 'إذاعة القرآن', icon: <Radio size={24} />, color: 'bg-red-500' },
-        { id: 'ruqyah', label: 'الرقية الشرعية', icon: <Shield size={24} />, color: 'bg-teal-600' },
       ]
     },
     {
       title: 'إعدادات',
       image: 'https://i.pinimg.com/736x/d4/ec/c9/d4ecc94676a666d6911d5167e424458d.jpg',
       items: [
-        { id: 'theme', label: 'تخصيص الألوان', icon: <Palette size={24} />, color: 'bg-[var(--color-primary)]' },
         { id: 'notifications', label: notificationsEnabled ? 'إيقاف الإشعارات' : 'تفعيل الإشعارات', icon: notificationsEnabled ? <BellOff size={24} /> : <Bell size={24} />, color: notificationsEnabled ? 'bg-gray-500' : 'bg-yellow-500' },
         { id: 'auto-adhan', label: autoAdhanEnabled ? 'إيقاف الأذان التلقائي' : 'تفعيل الأذان التلقائي', icon: autoAdhanEnabled ? <VolumeX size={24} /> : <Volume2 size={24} />, color: autoAdhanEnabled ? 'bg-gray-500' : 'bg-emerald-500' },
+        { id: 'language', label: 'تغيير اللغة', icon: <Globe size={24} />, color: 'bg-indigo-600' },
         { id: 'support', label: 'ادعم التطبيق', icon: <HandHeart size={24} />, color: 'bg-rose-500' },
         { id: 'whatsapp', label: 'تواصل معنا', icon: <MessageCircle size={24} />, color: 'bg-[#25D366]' },
         { id: 'auth', label: user ? 'تسجيل الخروج' : 'تسجيل الدخول', icon: user ? <LogOut size={24} /> : <LogIn size={24} />, color: user ? 'bg-red-500' : 'bg-blue-500' },
@@ -150,14 +166,14 @@ export default function MoreMenu({
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => {
-                    if (item.id === 'theme') {
-                      setIsThemeSelectorOpen(true);
-                    } else if (item.id === 'whatsapp') {
+                    if (item.id === 'whatsapp') {
                       window.open('https://wa.me/201062082229', '_blank');
                     } else if (item.id === 'notifications') {
                       handleToggleNotifications();
                     } else if (item.id === 'auto-adhan') {
                       setAutoAdhanEnabled(!autoAdhanEnabled);
+                    } else if (item.id === 'language') {
+                      setShowLangModal(true);
                     } else if (item.id === 'auth') {
                       if (user) {
                         handleLogout();
@@ -188,16 +204,6 @@ export default function MoreMenu({
       </div>
 
       <div className="mt-8 text-center pb-8">
-        <p className="text-[var(--color-text-muted)] text-xs font-bold mb-1">تم التطوير بواسطة</p>
-        <p className="text-[var(--color-primary)] font-bold text-sm">محمد أحمد - التطبيق الإسلامي</p>
-      </div>
-
-      <ThemeSelector 
-        isOpen={isThemeSelectorOpen} 
-        onClose={() => setIsThemeSelectorOpen(false)} 
-      />
-
-      {/* Toast Notification */}
       <AnimatePresence>
         {showToast && (
           <motion.div
@@ -211,6 +217,50 @@ export default function MoreMenu({
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AnimatePresence>
+        {showLangModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowLangModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-[var(--color-surface)] border border-black/10 dark:border-white/10 rounded-2xl p-6 max-w-sm w-full shadow-2xl"
+              onClick={e => e.stopPropagation()}
+            >
+              <h3 className="text-xl font-bold text-[var(--color-text)] mb-4 text-center">اختر اللغة</h3>
+              <div className="space-y-2">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => changeLanguage(lang.code)}
+                    className={`w-full text-right px-4 py-3 rounded-xl font-bold transition-colors ${
+                      i18n.language === lang.code
+                        ? 'bg-[var(--color-primary)] text-white'
+                        : 'bg-black/5 dark:bg-white/5 text-[var(--color-text)] hover:bg-black/10 dark:hover:bg-white/10'
+                    }`}
+                  >
+                    {lang.nativeName}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => setShowLangModal(false)}
+                className="w-full mt-4 py-3 rounded-xl font-bold text-[var(--color-text-muted)] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+              >
+                إلغاء
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      </div>
     </div>
   );
 }

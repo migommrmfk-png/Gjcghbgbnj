@@ -15,6 +15,7 @@ import WelcomeModal from "./components/WelcomeModal";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { PrayerTimesProvider } from "./contexts/PrayerTimesContext";
 import { usePrayerNotifications } from "./hooks/usePrayerNotifications";
+import { useTranslation } from 'react-i18next';
 
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
@@ -33,7 +34,6 @@ const Duas = lazy(() => import("./components/Duas"));
 const HijriCalendar = lazy(() => import("./components/Calendar"));
 const IslamicRadio = lazy(() => import("./components/Radio"));
 const ProphetStories = lazy(() => import("./components/ProphetStories"));
-const MosquesMap = lazy(() => import("./components/MosquesMap"));
 const MuslimAI = lazy(() => import("./components/MuslimAI"));
 const Games = lazy(() => import("./components/Games"));
 const PrayerGuide = lazy(() => import("./components/PrayerGuide"));
@@ -42,7 +42,6 @@ const WorshipTracker = lazy(() => import("./components/WorshipTracker"));
 const QuranPlan = lazy(() => import("./components/QuranPlan"));
 const SocialChallenges = lazy(() => import("./components/SocialChallenges"));
 const ZakatCalculator = lazy(() => import("./components/ZakatCalculator"));
-const Ruqyah = lazy(() => import("./components/Ruqyah"));
 const HajjUmrahGuide = lazy(() => import("./components/HajjUmrahGuide"));
 const Auth = lazy(() => import("./components/Auth"));
 
@@ -66,6 +65,7 @@ function AppContent() {
 
   const { notificationsEnabled, toggleNotifications, setNotificationsEnabled } = usePrayerNotifications(handlePrayerTime);
   const { user, loading: authLoading } = useAuth();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const hasOnboarded = localStorage.getItem("hasOnboarded");
@@ -78,6 +78,8 @@ function AppContent() {
     localStorage.setItem("hasOnboarded", "true");
     setShowOnboarding(false);
   };
+
+  const isRTL = i18n.language === 'ar' || i18n.language === 'ur';
 
   const renderTab = () => {
     switch (activeTab) {
@@ -105,8 +107,6 @@ function AppContent() {
         return <IslamicRadio />;
       case "stories":
         return <ProphetStories onBack={() => setActiveTab("more")} />;
-      case "mosques":
-        return <MosquesMap onBack={() => setActiveTab("more")} />;
       case "muslim-ai":
         return <MuslimAI onBack={() => setActiveTab("more")} />;
       case "games":
@@ -123,8 +123,6 @@ function AppContent() {
         return <SocialChallenges onBack={() => setActiveTab("more")} />;
       case "zakat":
         return <ZakatCalculator onBack={() => setActiveTab("more")} />;
-      case "ruqyah":
-        return <Ruqyah onBack={() => setActiveTab("more")} />;
       case "hajj":
         return <HajjUmrahGuide onBack={() => setActiveTab("more")} />;
       case "auth":
@@ -145,7 +143,7 @@ function AppContent() {
   return (
     <div
       className="flex flex-col flex-1 h-full w-full bg-[var(--color-bg)] text-[var(--color-text)] font-sans overflow-hidden relative"
-      dir="rtl"
+      dir={isRTL ? "rtl" : "ltr"}
     >
       <WelcomeModal onEnableNotifications={() => setNotificationsEnabled(true)} />
       <AnimatePresence>
@@ -189,14 +187,14 @@ function AppContent() {
             setActiveTab("muslim-ai");
           }
         }}
-        className="fixed bottom-44 right-4 z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-full shadow-[0_0_20px_rgba(212,175,55,0.5)] hover:shadow-[0_0_30px_rgba(212,175,55,0.8)] transition-all cursor-grab active:cursor-grabbing border border-white/20"
-        initial={{ scale: 0, x: 100 }}
+        className={`fixed bottom-44 ${isRTL ? 'right-4' : 'left-4'} z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-full shadow-[0_0_20px_rgba(212,175,55,0.5)] hover:shadow-[0_0_30px_rgba(212,175,55,0.8)] transition-all cursor-grab active:cursor-grabbing border border-white/20`}
+        initial={{ scale: 0, x: isRTL ? 100 : -100 }}
         animate={{ scale: 1, x: 0 }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
       >
         <Sparkles size={28} className="text-white animate-pulse" />
-        <span className="absolute -top-1 -right-1 flex h-4 w-4">
+        <span className={`absolute -top-1 ${isRTL ? '-right-1' : '-left-1'} flex h-4 w-4`}>
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-primary-light)] opacity-75"></span>
           <span className="relative inline-flex rounded-full h-4 w-4 bg-[var(--color-primary)] border border-white/50"></span>
         </span>
@@ -215,8 +213,8 @@ function AppContent() {
             window.open('https://wa.me/201062082229', '_blank');
           }
         }}
-        className="fixed bottom-28 right-4 z-50 flex items-center justify-center w-14 h-14 bg-[#25D366] rounded-full shadow-lg hover:bg-[#20bd5a] transition-colors cursor-grab active:cursor-grabbing"
-        initial={{ scale: 0, x: 100 }}
+        className={`fixed bottom-28 ${isRTL ? 'right-4' : 'left-4'} z-50 flex items-center justify-center w-14 h-14 bg-[#25D366] rounded-full shadow-lg hover:bg-[#20bd5a] transition-colors cursor-grab active:cursor-grabbing`}
+        initial={{ scale: 0, x: isRTL ? 100 : -100 }}
         animate={{ scale: 1, x: 0 }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
@@ -244,31 +242,31 @@ function AppContent() {
         <div className="flex justify-around items-center h-16 max-w-md mx-auto px-2">
           <NavItem
             icon={<Home />}
-            label="الرئيسية"
+            label={t('app_name') === "هذا ديني" ? "الرئيسية" : "Home"}
             isActive={activeTab === "home"}
             onClick={() => setActiveTab("home")}
           />
           <NavItem
             icon={<BookOpen />}
-            label="القرآن"
+            label={t('quran')}
             isActive={activeTab === "quran"}
             onClick={() => setActiveTab("quran")}
           />
           <NavItem
             icon={<Heart />}
-            label="الأذكار"
+            label={t('azkar')}
             isActive={activeTab === "azkar"}
             onClick={() => setActiveTab("azkar")}
           />
           <NavItem
             icon={<Activity />}
-            label="السبحة"
+            label={t('tasbeeh')}
             isActive={activeTab === "tasbeeh"}
             onClick={() => setActiveTab("tasbeeh")}
           />
           <NavItem
             icon={<MoreHorizontal />}
-            label="المزيد"
+            label={t('more')}
             isActive={activeTab === "more"}
             onClick={() => setActiveTab("more")}
           />

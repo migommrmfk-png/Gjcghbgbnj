@@ -22,6 +22,7 @@ import {
 import { motion } from "motion/react";
 import { usePrayerTimes } from "../contexts/PrayerTimesContext";
 import DownloadAppBanner from "./DownloadAppBanner";
+import { useTranslation } from 'react-i18next';
 
 interface DashboardProps {
   onNavigate: (tab: string) => void;
@@ -29,6 +30,7 @@ interface DashboardProps {
 
 export default function Dashboard({ onNavigate }: DashboardProps) {
   const { prayerTimes, hijriDate, gregorianDate, locationName, loading, error } = usePrayerTimes();
+  const { t, i18n } = useTranslation();
   const [nextPrayerTime, setNextPrayerTime] = useState<string>("");
   const [currentTime, setCurrentTime] = useState(new Date());
   const [dailyAyah, setDailyAyah] = useState<{text: string, surah: string} | null>(null);
@@ -412,84 +414,77 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   const menuItems = [
     {
       id: "quran",
-      title: "القرآن الكريم",
+      title: t('quran'),
       icon: <BookOpen size={28} />,
       color: "text-[var(--color-primary)]",
       bg: "bg-[var(--color-primary)]/10",
     },
     {
       id: "azkar",
-      title: "الأذكار",
+      title: t('azkar'),
       icon: <Heart size={28} />,
       color: "text-rose-400",
       bg: "bg-rose-500/10",
     },
     {
       id: "qibla",
-      title: "اتجاه القبلة",
+      title: t('qibla'),
       icon: <Compass size={28} />,
       color: "text-blue-400",
       bg: "bg-blue-500/10",
     },
     {
-      id: "mosques",
-      title: "المساجد القريبة",
-      icon: <MapPin size={28} />,
-      color: "text-teal-400",
-      bg: "bg-teal-500/10",
-    },
-    {
       id: "tasbeeh",
-      title: "السبحة",
+      title: t('tasbeeh'),
       icon: <Activity size={28} />,
       color: "text-purple-400",
       bg: "bg-purple-500/10",
     },
     {
       id: "calendar",
-      title: "التقويم الهجري",
+      title: t('hijri_calendar'),
       icon: <Calendar size={28} />,
       color: "text-amber-400",
       bg: "bg-amber-500/10",
     },
     {
       id: "hadith",
-      title: "الأحاديث",
+      title: t('hadiths'),
       icon: <BookOpen size={28} />,
       color: "text-red-400",
       bg: "bg-red-500/10",
     },
     {
       id: "stories",
-      title: "قصص الأنبياء",
+      title: t('prophet_stories'),
       icon: <BookOpen size={28} />,
       color: "text-purple-400",
       bg: "bg-purple-500/10",
     },
     {
       id: "duas",
-      title: "الأدعية",
+      title: t('duas'),
       icon: <Heart size={28} />,
       color: "text-emerald-400",
       bg: "bg-emerald-500/10",
     },
     {
       id: "names",
-      title: "أسماء الله",
+      title: t('names_of_allah'),
       icon: <Info size={28} />,
       color: "text-teal-400",
       bg: "bg-teal-500/10",
     },
     {
       id: "radio",
-      title: "الإذاعة",
+      title: t('radio'),
       icon: <Radio size={28} />,
       color: "text-orange-400",
       bg: "bg-orange-500/10",
     },
     {
       id: "games",
-      title: "ألعاب وتحديات",
+      title: t('games_and_challenges'),
       icon: <Puzzle size={28} />,
       color: "text-teal-400",
       bg: "bg-teal-500/10",
@@ -498,10 +493,10 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
   const getGreeting = () => {
     const hour = currentTime.getHours();
-    if (hour >= 4 && hour < 12) return "صباح الخير";
-    if (hour >= 12 && hour < 17) return "مساء الخير";
-    if (hour >= 17 && hour < 20) return "مساء الخير";
-    return "طابت ليلتك";
+    if (hour >= 4 && hour < 12) return t('good_morning');
+    if (hour >= 12 && hour < 17) return t('good_afternoon');
+    if (hour >= 17 && hour < 20) return t('good_evening');
+    return t('good_night');
   };
 
   if (loading) {
@@ -512,8 +507,10 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     );
   }
 
+  const isRTL = i18n.language === 'ar' || i18n.language === 'ur';
+
   return (
-    <div className="max-w-md mx-auto p-4 space-y-6 pb-32" dir="rtl">
+    <div className="max-w-md mx-auto p-4 space-y-6 pb-32" dir={isRTL ? "rtl" : "ltr"}>
       {/* Header Card 3D - Dynamic Background */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
@@ -530,13 +527,13 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             {streak > 0 && (
               <div className="flex items-center gap-1.5 bg-orange-500/20 text-orange-300 px-3 py-1 rounded-full text-xs font-bold border border-orange-500/30 backdrop-blur-sm">
                 <span>🔥</span>
-                <span>{streak} أيام متتالية</span>
+                <span>{streak} {t('days_streak')}</span>
               </div>
             )}
           </div>
-          <div className="flex items-center space-x-2 space-x-reverse bg-black/40 px-5 py-2 rounded-full text-sm backdrop-blur-md border border-white/10 shadow-inner">
+          <div className={`flex items-center space-x-2 ${isRTL ? 'space-x-reverse' : ''} bg-black/40 px-5 py-2 rounded-full text-sm backdrop-blur-md border border-white/10 shadow-inner`}>
             <MapPin size={16} className="text-[var(--color-primary)]" />
-            <span className="font-medium">{locationName}</span>
+            <span className="font-medium">{locationName || t('locating')}</span>
           </div>
 
           {hijriDate && (
@@ -565,18 +562,18 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           <div className="relative z-10">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h2 className="text-3xl font-bold font-serif mb-1">أوقات الصلاة</h2>
+                <h2 className="text-3xl font-bold font-serif mb-1">{t('prayer_times')}</h2>
                 <div className="flex items-center gap-2 text-white/70 text-sm font-bold">
                   <MapPin size={14} />
-                  {locationName || "جاري تحديد الموقع..."}
+                  {locationName || t('locating')}
                 </div>
               </div>
-              <div className="text-right">
+              <div className={`text-${isRTL ? 'left' : 'right'}`}>
                 <p className="text-4xl font-bold font-mono tracking-tighter">
                   {nextPrayerTime}
                 </p>
                 <p className="text-xs font-bold uppercase tracking-widest opacity-60">
-                  الصلاة القادمة: {nextPrayerName}
+                  {t('next_prayer')}: {nextPrayerName}
                 </p>
               </div>
             </div>
@@ -624,14 +621,14 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
-                  المساعد الإسلامي
+                  {t('muslim_ai')}
                   <span className="bg-black/20 text-white text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">AI</span>
                 </h3>
-                <p className="text-white/80 text-sm font-medium">اسألني في أمور الدين، أو قيم تلاوتك</p>
+                <p className="text-white/80 text-sm font-medium">{t('ai_assistant_desc')}</p>
               </div>
             </div>
             <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-black/10 group-hover:bg-black/20 transition-colors">
-              <ChevronLeft size={20} className="text-white" />
+              <ChevronLeft size={20} className={`text-white ${isRTL ? '' : 'rotate-180'}`} />
             </div>
           </div>
         </motion.div>
@@ -643,16 +640,16 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
             className="bento-card bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200/50 dark:border-amber-700/30 cursor-pointer"
-            onClick={() => handleShare(`${dailyAyah.text}\n\n[${dailyAyah.surah}]`, "آية اليوم")}
+            onClick={() => handleShare(`${dailyAyah.text}\n\n[${dailyAyah.surah}]`, t('ayah_of_day'))}
           >
             <div className="flex items-center gap-2 mb-4 text-amber-600 dark:text-amber-400">
               <BookOpen size={18} />
-              <span className="text-xs font-bold uppercase tracking-widest">آية اليوم</span>
+              <span className="text-xs font-bold uppercase tracking-widest">{t('ayah_of_day')}</span>
             </div>
             <p className="text-quran text-xl text-gray-800 dark:text-amber-50 leading-loose mb-4 line-clamp-4">
               {dailyAyah.text}
             </p>
-            <p className="text-[10px] font-bold text-amber-600/60 dark:text-amber-400/60 text-left">
+            <p className={`text-[10px] font-bold text-amber-600/60 dark:text-amber-400/60 text-${isRTL ? 'left' : 'right'}`}>
               {dailyAyah.surah}
             </p>
           </motion.div>
@@ -665,16 +662,16 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
             className="bento-card bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border-amber-200/50 dark:border-amber-700/30 cursor-pointer"
-            onClick={() => handleShare(`${dailyHadith.text}\n\n[${dailyHadith.narrator}]`, "حديث اليوم")}
+            onClick={() => handleShare(`${dailyHadith.text}\n\n[${dailyHadith.narrator}]`, t('hadith_of_day'))}
           >
             <div className="flex items-center gap-2 mb-4 text-amber-600 dark:text-amber-400">
               <Quote size={18} />
-              <span className="text-xs font-bold uppercase tracking-widest">حديث اليوم</span>
+              <span className="text-xs font-bold uppercase tracking-widest">{t('hadith_of_day')}</span>
             </div>
             <p className="text-sm text-gray-800 dark:text-amber-50 leading-relaxed mb-4 line-clamp-5 font-medium">
               {dailyHadith.text}
             </p>
-            <p className="text-[10px] font-bold text-amber-600/60 dark:text-amber-400/60 text-left">
+            <p className={`text-[10px] font-bold text-amber-600/60 dark:text-amber-400/60 text-${isRTL ? 'left' : 'right'}`}>
               {dailyHadith.narrator}
             </p>
           </motion.div>
@@ -692,7 +689,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
                 <Sparkles size={18} className="animate-pulse" />
-                <span className="text-xs font-bold uppercase tracking-widest">اقتراح ذكي</span>
+                <span className="text-xs font-bold uppercase tracking-widest">{t('smart_suggestion')}</span>
               </div>
               <span className="text-2xl group-hover:scale-125 transition-transform duration-300">{smartAthkar.icon}</span>
             </div>
@@ -710,7 +707,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         >
           <div className="flex items-center gap-2 mb-4 px-2">
             <Bot size={20} className="text-[var(--color-primary)]" />
-            <h2 className="text-lg font-bold text-[var(--color-text)]">مميزات الذكاء الاصطناعي</h2>
+            <h2 className="text-lg font-bold text-[var(--color-text)]">{t('ai_features')}</h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div 
@@ -720,7 +717,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
               <div className="w-12 h-12 rounded-full bg-amber-500/10 text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <BookOpen size={24} />
               </div>
-              <span className="text-sm font-bold text-[var(--color-text)]">تفسير الأحلام</span>
+              <span className="text-sm font-bold text-[var(--color-text)]">{t('dream_interpretation')}</span>
             </div>
             <div 
               onClick={() => onNavigate("muslim-ai")}
@@ -729,7 +726,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
               <div className="w-12 h-12 rounded-full bg-yellow-500/10 text-yellow-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Mic size={24} />
               </div>
-              <span className="text-sm font-bold text-[var(--color-text)]">مصحح التلاوة</span>
+              <span className="text-sm font-bold text-[var(--color-text)]">{t('recitation_correction')}</span>
             </div>
             <div 
               onClick={() => onNavigate("muslim-ai")}
@@ -738,7 +735,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
               <div className="w-12 h-12 rounded-full bg-orange-500/10 text-orange-400 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Bot size={24} />
               </div>
-              <span className="text-sm font-bold text-[var(--color-text)]">فتاوى وأسئلة</span>
+              <span className="text-sm font-bold text-[var(--color-text)]">{t('fatwas_and_questions')}</span>
             </div>
             <div 
               onClick={() => onNavigate("muslim-ai")}
@@ -747,7 +744,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
               <div className="w-12 h-12 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)] flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Heart size={24} />
               </div>
-              <span className="text-sm font-bold text-[var(--color-text)]">مرشد روحي</span>
+              <span className="text-sm font-bold text-[var(--color-text)]">{t('spiritual_guide')}</span>
             </div>
           </div>
         </motion.div>
@@ -760,11 +757,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           className="bento-item-large bento-card bg-[var(--color-surface)]"
         >
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-bold font-serif">تتبع العبادات</h3>
+            <h3 className="text-lg font-bold font-serif">{t('worship_tracker')}</h3>
             <div className="flex items-center gap-2 px-3 py-1 bg-[var(--color-primary)]/10 rounded-full">
               <Flame size={14} className="text-orange-500" />
               <span className="text-xs font-bold text-[var(--color-primary)]">
-                {streak} يوم متواصل
+                {streak} {t('days_streak')}
               </span>
             </div>
           </div>
@@ -773,7 +770,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             {/* Prayer Tracker */}
             <div className="space-y-3">
               <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-widest">
-                الصلوات
+                {t('prayers')}
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {prayersList.filter(p => p.id !== "Sunrise").map((p) => (
@@ -807,13 +804,13 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                   }`}
                 >
                   <Moon size={14} />
-                  <span className="text-xs font-bold">صائم اليوم</span>
+                  <span className="text-xs font-bold">{isFasting ? t('fasting') : t('not_fasting')}</span>
                 </button>
               </div>
             ) : (
               <div className="space-y-3">
                 <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-widest truncate">
-                  صلاة الضحى
+                  {t('duha_prayer')}
                 </p>
                 <button
                   onClick={toggleDuha}
@@ -824,7 +821,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                   }`}
                 >
                   <Sun size={14} />
-                  <span className="text-xs font-bold">صليت الضحى</span>
+                  <span className="text-xs font-bold">{isDuhaPrayed ? t('prayed') : t('not_prayed')}</span>
                 </button>
               </div>
             )}
@@ -832,11 +829,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             {/* Quran Tracker */}
             <div className="space-y-3 cursor-pointer" onClick={() => onNavigate("quran")}>
               <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-widest">
-                القرآن
+                {t('quran')}
               </p>
               <div className="flex flex-col gap-1">
                 <span className="text-[10px] font-bold text-[var(--color-text)] truncate">
-                  {lastReadQuran ? lastReadQuran.surahName : "ابدأ القراءة"}
+                  {lastReadQuran ? lastReadQuran.surahName : t('start_reading')}
                 </span>
                 <div className="w-full h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                   <div className="h-full bg-[var(--color-primary)] w-1/3"></div>
@@ -847,7 +844,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             {/* Dhikr Tracker */}
             <div className="space-y-3 cursor-pointer" onClick={() => onNavigate("tasbeeh")}>
               <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-widest">
-                الأذكار
+                {t('azkar')}
               </p>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-[var(--color-text)]">

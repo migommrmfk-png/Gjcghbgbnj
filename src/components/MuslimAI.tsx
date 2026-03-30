@@ -14,7 +14,7 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
       }
     }
     return [
-      { role: 'model', text: 'السلام عليكم ورحمة الله وبركاته. أنا المساعد الإسلامي الذكي، كيف يمكنني مساعدتك اليوم؟ يمكنك سؤالي في أمور الدين، أو إرسال تسجيل صوتي لتلاوتك أو تكبيرات العيد وسأقوم بتقييمها وإعطائك نصائح لتحسين صوتك! 🎤✨' }
+      { role: 'model', text: 'السلام عليكم ورحمة الله وبركاته. أنا المساعد الإسلامي الذكي، كيف يمكنني مساعدتك اليوم؟ يمكنك سؤالي في أمور الدين، تفسير الأحلام، الفتاوى، أو حتى لعب ألعاب إسلامية تفاعلية! كما يمكنك إرسال تسجيل صوتي لتلاوتك وسأقوم بتقييمها. 🌙✨' }
     ];
   });
   const [input, setInput] = useState('');
@@ -47,7 +47,7 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const clearHistory = () => {
-    setMessages([{ role: 'model', text: 'السلام عليكم ورحمة الله وبركاته. أنا المساعد الإسلامي الذكي، كيف يمكنني مساعدتك اليوم؟ يمكنك سؤالي في أمور الدين، أو إرسال تسجيل صوتي لتلاوتك أو تكبيرات العيد وسأقوم بتقييمها وإعطائك نصائح لتحسين صوتك! 🎤✨' }]);
+    setMessages([{ role: 'model', text: 'السلام عليكم ورحمة الله وبركاته. أنا المساعد الإسلامي الذكي، كيف يمكنني مساعدتك اليوم؟ يمكنك سؤالي في أمور الدين، تفسير الأحلام، الفتاوى، أو حتى لعب ألعاب إسلامية تفاعلية! كما يمكنك إرسال تسجيل صوتي لتلاوتك وسأقوم بتقييمها. 🌙✨' }]);
     setShowClearConfirm(false);
   };
 
@@ -110,14 +110,14 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
       };
       
       const textPart = {
-        text: "استمع إلى هذا التسجيل الصوتي (تلاوة قرآن أو تكبيرات العيد أو أذان). قيم الصوت والتجويد، استخرج الأخطاء إن وجدت، وقدم نصائح عملية وتدريبات لتحسين الصوت والأداء استعداداً للعيد. اخلق أجواء إيمانية مبهجة في ردك، وكن مشجعاً وإيجابياً جداً.",
+        text: "استمع إلى هذا التسجيل الصوتي (تلاوة قرآن أو أذان). قيم الصوت والتجويد، استخرج الأخطاء إن وجدت، وقدم نصائح عملية وتدريبات لتحسين الصوت والأداء. اخلق أجواء إيمانية مبهجة في ردك، وكن مشجعاً وإيجابياً جداً.",
       };
 
       const response = await ai.models.generateContent({
         model: "gemini-3.1-pro-preview",
         contents: { parts: [audioPart, textPart] },
         config: {
-          systemInstruction: "أنت مساعد إسلامي ذكي وموثوق وخبير في المقامات والتجويد. هدفك هو تقييم تلاوة المستخدم أو تكبيراته للعيد، وتوجيهه لتحسين صوته وأدائه. كن إيجابياً، مشجعاً، وقدم نصائح عملية للتدريب الصوتي.",
+          systemInstruction: "أنت مساعد إسلامي ذكي وموثوق وخبير في المقامات والتجويد. هدفك هو تقييم تلاوة المستخدم، وتوجيهه لتحسين صوته وأدائه. كن إيجابياً، مشجعاً، وقدم نصائح عملية للتدريب الصوتي.",
         }
       });
       
@@ -144,7 +144,7 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
       const chat = ai.chats.create({
         model: "gemini-3-flash-preview",
         config: {
-          systemInstruction: "أنت مساعد إسلامي ذكي وموثوق. هدفك هو الإجابة على أسئلة المستخدمين المتعلقة بالإسلام، القرآن، السنة، الفقه، السيرة النبوية، والأخلاق الإسلامية. يجب أن تكون إجاباتك دقيقة، محترمة، ومبنية على مصادر موثوقة (القرآن الكريم والسنة النبوية الصحيحة). تجنب الفتاوى المعقدة أو المثيرة للجدل، وانصح المستخدم دائماً بالرجوع إلى العلماء المتخصصين في المسائل الفقهية الدقيقة. استخدم لغة عربية فصحى واضحة ومبسطة. كن دائماً مهذباً ولطيفاً.",
+          systemInstruction: "أنت مساعد إسلامي ذكي وموثوق. هدفك هو الإجابة على أسئلة المستخدمين المتعلقة بالإسلام، القرآن، السنة، الفقه، السيرة النبوية، والأخلاق الإسلامية. كما يمكنك تفسير الأحلام بناءً على كتب التفسير المعتمدة كابن سيرين، وتقديم فتاوى موثوقة (مع التنبيه على الرجوع للعلماء في المسائل المعقدة). يمكنك أيضاً لعب ألعاب إسلامية تفاعلية مع المستخدم (مثل مسابقات ثقافية إسلامية، أسئلة وأجوبة، ألغاز قرآنية). استخدم لغة عربية فصحى واضحة ومبسطة. كن دائماً مهذباً ولطيفاً.",
         },
       });
 
@@ -228,16 +228,22 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
         {messages.length === 1 && (
           <div className="flex flex-wrap gap-2 justify-center mb-6">
             <button
-              onClick={() => setInput("ما هي سنن العيد؟")}
+              onClick={() => setInput("أريد تفسير حلم رأيته")}
               className="bg-[var(--color-surface)] border border-[var(--color-primary)]/30 text-[var(--color-primary-light)] px-4 py-2 rounded-full text-sm font-bold hover:bg-[var(--color-primary)]/10 transition-colors shadow-sm"
             >
-              سنن العيد ✨
+              تفسير الأحلام 🌙
             </button>
             <button
-              onClick={() => setInput("كيف أستعد ليوم عرفة؟")}
+              onClick={() => setInput("لدي سؤال فقهي أو فتوى")}
               className="bg-[var(--color-surface)] border border-[var(--color-primary)]/30 text-[var(--color-primary-light)] px-4 py-2 rounded-full text-sm font-bold hover:bg-[var(--color-primary)]/10 transition-colors shadow-sm"
             >
-              يوم عرفة 🕋
+              فتاوى وأسئلة 📚
+            </button>
+            <button
+              onClick={() => setInput("هيا نلعب لعبة أسئلة ثقافية إسلامية")}
+              className="bg-[var(--color-surface)] border border-[var(--color-primary)]/30 text-[var(--color-primary-light)] px-4 py-2 rounded-full text-sm font-bold hover:bg-[var(--color-primary)]/10 transition-colors shadow-sm"
+            >
+              ألعاب تفاعلية 🎮
             </button>
             <button
               onClick={() => setInput("أريد تقييم تلاوتي")}

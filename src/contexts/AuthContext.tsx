@@ -7,7 +7,10 @@ import {
   signInWithEmailAndPassword,
   updateProfile,
   signInWithPopup,
-  GoogleAuthProvider
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  TwitterAuthProvider,
+  signInAnonymously
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
@@ -69,6 +72,9 @@ interface AuthContextType {
   signIn: (email: string, pass: string) => Promise<void>;
   signUp: (email: string, pass: string, name: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
+  signInWithFacebook: () => Promise<void>;
+  signInWithTwitter: () => Promise<void>;
+  signInAsGuest: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -90,7 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       
-      if (currentUser && currentUser.email) {
+      if (currentUser) {
         try {
           // Create or update user profile in Firestore
           const userRef = doc(db, 'users', currentUser.uid);
@@ -105,7 +111,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (!userSnap.exists()) {
             const userData: any = {
               uid: currentUser.uid,
-              email: currentUser.email,
+              email: currentUser.email || null,
+              isAnonymous: currentUser.isAnonymous,
               createdAt: new Date().toISOString(),
               role: 'user'
             };
@@ -209,7 +216,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
         if (userCredential.user.displayName) userData.displayName = userCredential.user.displayName;
         if (userCredential.user.photoURL) userData.photoURL = userCredential.user.photoURL;
-
         try {
           await setDoc(userRef, userData);
         } catch (e) {
@@ -218,6 +224,109 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch (error) {
       console.error("Error signing in with Google", error);
+      throw error;
+    }
+  };
+
+  const signInWithFacebook = async () => {
+    try {
+      const provider = new FacebookAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      
+      const userRef = doc(db, 'users', userCredential.user.uid);
+      let userSnap;
+      try {
+        userSnap = await getDoc(userRef);
+      } catch (e) {
+        handleFirestoreError(e, OperationType.GET, `users/${userCredential.user.uid}`);
+        return;
+      }
+      
+      if (!userSnap.exists()) {
+        const userData: any = {
+          uid: userCredential.user.uid,
+          email: userCredential.user.email,
+          createdAt: new Date().toISOString(),
+          role: 'user'
+        };
+        if (userCredential.user.displayName) userData.displayName = userCredential.user.displayName;
+        if (userCredential.user.photoURL) userData.photoURL = userCredential.user.photoURL;
+        try {
+          await setDoc(userRef, userData);
+        } catch (e) {
+          handleFirestoreError(e, OperationType.CREATE, `users/${userCredential.user.uid}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error signing in with Facebook", error);
+      throw error;
+    }
+  };
+
+  const signInWithTwitter = async () => {
+    try {
+      const provider = new TwitterAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      
+      const userRef = doc(db, 'users', userCredential.user.uid);
+      let userSnap;
+      try {
+        userSnap = await getDoc(userRef);
+      } catch (e) {
+        handleFirestoreError(e, OperationType.GET, `users/${userCredential.user.uid}`);
+        return;
+      }
+      
+      if (!userSnap.exists()) {
+        const userData: any = {
+          uid: userCredential.user.uid,
+          email: userCredential.user.email,
+          createdAt: new Date().toISOString(),
+          role: 'user'
+        };
+        if (userCredential.user.displayName) userData.displayName = userCredential.user.displayName;
+        if (userCredential.user.photoURL) userData.photoURL = userCredential.user.photoURL;
+        try {
+          await setDoc(userRef, userData);
+        } catch (e) {
+          handleFirestoreError(e, OperationType.CREATE, `users/${userCredential.user.uid}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error signing in with Twitter", error);
+      throw error;
+    }
+  };
+
+  const signInAsGuest = async () => {
+    try {
+      const userCredential = await signInAnonymously(auth);
+      
+      const userRef = doc(db, 'users', userCredential.user.uid);
+      let userSnap;
+      try {
+        userSnap = await getDoc(userRef);
+      } catch (e) {
+        handleFirestoreError(e, OperationType.GET, `users/${userCredential.user.uid}`);
+        return;
+      }
+      
+      if (!userSnap.exists()) {
+        const userData: any = {
+          uid: userCredential.user.uid,
+          isAnonymous: true,
+          createdAt: new Date().toISOString(),
+          role: 'user'
+        };
+
+        try {
+          await setDoc(userRef, userData);
+        } catch (e) {
+          handleFirestoreError(e, OperationType.CREATE, `users/${userCredential.user.uid}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error signing in anonymously", error);
       throw error;
     }
   };
@@ -237,6 +346,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signIn,
     signUp,
     signInWithGoogle,
+    signInWithFacebook,
+    signInWithTwitter,
+    signInAsGuest,
     logout
   };
 

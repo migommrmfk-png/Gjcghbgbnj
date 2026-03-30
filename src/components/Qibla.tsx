@@ -1,39 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Compass, MapPin, Navigation } from "lucide-react";
 import { motion } from "motion/react";
-import { MapContainer, TileLayer, Marker, Polyline, useMap } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-
-// Fix for default marker icon in react-leaflet
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
 
 const makkahCoords: [number, number] = [21.422487, 39.826206];
-
-const kaabaIcon = new L.Icon({
-  iconUrl: 'https://cdn-icons-png.flaticon.com/512/1000/1000141.png',
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-});
-
-const userIcon = new L.Icon({
-  iconUrl: 'https://cdn-icons-png.flaticon.com/512/149/149059.png',
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-});
-
-function MapUpdater({ center }: { center: [number, number] }) {
-  const map = useMap();
-  useEffect(() => {
-    map.setView(center, map.getZoom());
-  }, [center, map]);
-  return null;
-}
 
 export default function Qibla() {
   const [heading, setHeading] = useState<number | null>(null);
@@ -41,7 +10,6 @@ export default function Qibla() {
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
   const [locationName, setLocationName] = useState("جاري تحديد الموقع...");
   const [error, setError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'compass' | 'map'>('map');
 
   useEffect(() => {
     const calculateQibla = (lat: number, lng: number) => {
@@ -105,7 +73,6 @@ export default function Qibla() {
     if (window.DeviceOrientationEvent) {
       if (typeof (DeviceOrientationEvent as any).requestPermission === "function") {
         // iOS 13+ requires user interaction to request permission
-        // We will handle this with a button if needed, but for now we try to listen
       } else {
         window.addEventListener("deviceorientation", handleOrientation, true);
       }
@@ -166,28 +133,6 @@ export default function Qibla() {
         </div>
       </div>
 
-      {/* View Toggle */}
-      <div className="flex bg-[var(--color-surface)] p-1 rounded-xl border border-black/5 dark:border-white/5">
-        <button
-          onClick={() => setViewMode('map')}
-          className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
-            viewMode === 'map' ? 'bg-[var(--color-primary)] text-white shadow-md' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
-          }`}
-        >
-          <MapPin size={18} />
-          الخريطة
-        </button>
-        <button
-          onClick={() => setViewMode('compass')}
-          className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
-            viewMode === 'compass' ? 'bg-[var(--color-primary)] text-white shadow-md' : 'text-[var(--color-text-muted)] hover:text-[var(--color-text)]'
-          }`}
-        >
-          <Compass size={18} />
-          البوصلة
-        </button>
-      </div>
-
       {/* Instructions */}
       <div className="bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/20 p-4 rounded-2xl">
         <h3 className="text-[var(--color-primary-light)] font-bold mb-2 text-sm flex items-center gap-2">
@@ -198,7 +143,6 @@ export default function Qibla() {
           <li>ضع هاتفك بشكل مسطح (أفقي) تماماً.</li>
           <li>ابتعد عن الأجهزة الإلكترونية والمعادن لتجنب التشويش.</li>
           <li>قم بتحريك الهاتف على شكل رقم 8 باللغة الإنجليزية لمعايرة البوصلة.</li>
-          <li>في حال عدم عمل البوصلة، استخدم "الخريطة" لتحديد الاتجاه بدقة.</li>
         </ul>
       </div>
 
@@ -208,119 +152,96 @@ export default function Qibla() {
         </div>
       ) : (
         <div className="relative">
-          {viewMode === 'map' && userLocation ? (
-            <div className="h-[400px] rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl relative z-0">
-              <MapContainer 
-                center={userLocation} 
-                zoom={4} 
-                style={{ height: '100%', width: '100%', backgroundColor: '#1a1a1a' }}
-                zoomControl={false}
-              >
-                <TileLayer
-                  url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                />
-                <Marker position={userLocation} icon={userIcon} />
-                <Marker position={makkahCoords} icon={kaabaIcon} />
-                <Polyline 
-                  positions={[userLocation, makkahCoords]} 
-                  color="var(--color-primary)" 
-                  weight={3} 
-                  dashArray="10, 10" 
-                  opacity={0.8}
-                />
-                <MapUpdater center={userLocation} />
-              </MapContainer>
-              <div className="absolute bottom-4 left-4 right-4 z-[1000] bg-black/80 backdrop-blur-md p-4 rounded-xl border border-white/10 text-center">
-                <p className="text-white text-sm">
-                  المسافة إلى مكة: <span className="text-[var(--color-primary)] font-bold">
-                    {Math.round(L.latLng(userLocation).distanceTo(makkahCoords) / 1000)} كم
-                  </span>
-                </p>
-              </div>
+          <div className="card-3d bg-[var(--color-surface)] rounded-[2rem] p-8 flex flex-col items-center justify-center min-h-[450px] border border-black/5 dark:border-white/5 relative overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+            {/* Compass UI */}
+            <div className={`absolute inset-0 transition-opacity duration-1000 ${isQiblaAligned ? 'opacity-100' : 'opacity-0'}`}>
+              <div className="absolute inset-0 bg-[var(--color-primary)]/10"></div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-[var(--color-primary)]/20 rounded-full blur-3xl"></div>
             </div>
-          ) : viewMode === 'compass' ? (
-            <div className="card-3d bg-[var(--color-surface)] rounded-[2rem] p-8 flex flex-col items-center justify-center min-h-[400px] border border-white/5 relative overflow-hidden">
-              {/* Compass UI */}
-              <div className={`absolute inset-0 transition-opacity duration-1000 ${isQiblaAligned ? 'opacity-100' : 'opacity-0'}`}>
-                <div className="absolute inset-0 bg-[var(--color-primary)]/5"></div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[var(--color-primary)]/20 rounded-full blur-3xl"></div>
-              </div>
 
-              {typeof (DeviceOrientationEvent as any).requestPermission === "function" && heading === null && (
-                <button 
-                  onClick={requestCompassPermission}
-                  className="mb-8 px-6 py-3 bg-[var(--color-primary)] text-white font-bold rounded-xl shadow-lg"
-                >
-                  تفعيل البوصلة
-                </button>
-              )}
+            {typeof (DeviceOrientationEvent as any).requestPermission === "function" && heading === null && (
+              <button 
+                onClick={requestCompassPermission}
+                className="mb-8 px-6 py-3 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white font-bold rounded-xl shadow-[0_0_15px_rgba(212,175,55,0.4)]"
+              >
+                تفعيل البوصلة
+              </button>
+            )}
 
-              <div className="relative w-64 h-64 flex items-center justify-center">
-                {/* Outer Ring */}
-                <div className="absolute inset-0 rounded-full border-4 border-white/10 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)]"></div>
+            <div className="relative w-72 h-72 flex items-center justify-center">
+              {/* Outer Ring */}
+              <div className="absolute inset-0 rounded-full border-[12px] border-[var(--color-primary)]/20 shadow-[inset_0_0_40px_rgba(0,0,0,0.5),0_10px_30px_rgba(0,0,0,0.3)] bg-gradient-to-br from-[var(--color-surface)] to-[var(--color-bg)]"></div>
+              <div className="absolute inset-3 rounded-full border-2 border-[var(--color-primary)]/40"></div>
+              
+              {/* Degree Marks */}
+              {[...Array(72)].map((_, i) => (
+                <div 
+                  key={i}
+                  className={`absolute rounded-full ${i % 6 === 0 ? 'w-1.5 h-4 bg-[var(--color-primary)]/80' : 'w-0.5 h-2 bg-[var(--color-text-muted)]/40'}`}
+                  style={{
+                    top: 12,
+                    transformOrigin: '50% 132px',
+                    transform: `rotate(${i * 5}deg)`
+                  }}
+                ></div>
+              ))}
+
+              {/* Compass Dial */}
+              <motion.div
+                className="absolute inset-8 rounded-full flex items-center justify-center bg-black/5 dark:bg-white/5 shadow-inner"
+                animate={{ rotate: heading ? -heading : 0 }}
+                transition={{ type: "spring", stiffness: 40, damping: 20 }}
+              >
+                {/* Compass Rose */}
+                <div className="absolute inset-0 bg-[url('https://cdn-icons-png.flaticon.com/512/3253/3253138.png')] bg-contain bg-center bg-no-repeat opacity-30 dark:invert"></div>
                 
-                {/* Degree Marks */}
-                {[...Array(12)].map((_, i) => (
+                <div className="absolute top-2 text-red-500 font-bold text-xl drop-shadow-md font-serif">N</div>
+                <div className="absolute bottom-2 text-[var(--color-text)]/60 font-bold text-xl font-serif">S</div>
+                <div className="absolute right-2 text-[var(--color-text)]/60 font-bold text-xl font-serif">E</div>
+                <div className="absolute left-2 text-[var(--color-text)]/60 font-bold text-xl font-serif">W</div>
+                
+                {/* Qibla Indicator on Dial */}
+                {qiblaDirection !== null && (
                   <div 
-                    key={i}
-                    className="absolute w-1 h-3 bg-white/20 rounded-full"
-                    style={{
-                      top: 4,
-                      transformOrigin: '50% 124px',
-                      transform: `rotate(${i * 30}deg)`
-                    }}
-                  ></div>
-                ))}
-
-                {/* Compass Dial */}
-                <motion.div
-                  className="absolute inset-4 rounded-full border-2 border-white/20 bg-gradient-to-br from-black/80 to-black/40 backdrop-blur-sm flex items-center justify-center shadow-2xl"
-                  animate={{ rotate: heading ? -heading : 0 }}
-                  transition={{ type: "spring", stiffness: 50, damping: 20 }}
-                >
-                  <div className="absolute top-2 text-red-500 font-bold text-sm">N</div>
-                  <div className="absolute bottom-2 text-white/50 font-bold text-sm">S</div>
-                  <div className="absolute right-2 text-white/50 font-bold text-sm">E</div>
-                  <div className="absolute left-2 text-white/50 font-bold text-sm">W</div>
-                  
-                  {/* Qibla Indicator on Dial */}
-                  {qiblaDirection !== null && (
-                    <div 
-                      className="absolute w-full h-full"
-                      style={{ transform: `rotate(${qiblaDirection}deg)` }}
-                    >
-                      <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-[var(--color-primary)] rounded-full shadow-[0_0_10px_rgba(212,175,55,0.8)]"></div>
-                    </div>
-                  )}
-                </motion.div>
-
-                {/* Center Needle */}
-                <div className="absolute z-10 w-2 h-32 bg-gradient-to-b from-red-500 to-white rounded-full shadow-lg"></div>
-                <div className="absolute z-20 w-4 h-4 bg-black border-2 border-[var(--color-primary)] rounded-full"></div>
-              </div>
-
-              <div className="mt-8 text-center relative z-10">
-                {isQiblaAligned ? (
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="text-[var(--color-primary)] font-bold text-xl drop-shadow-[0_0_10px_rgba(212,175,55,0.5)]"
+                    className="absolute w-full h-full"
+                    style={{ transform: `rotate(${qiblaDirection}deg)` }}
                   >
-                    أنت متجه نحو القبلة
-                  </motion.div>
-                ) : (
-                  <div className="text-[var(--color-text-muted)]">
-                    قم بتدوير الجهاز حتى يتطابق المؤشر مع نقطة القبلة
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                      <div className="w-10 h-10 bg-[url('https://cdn-icons-png.flaticon.com/512/1000/1000141.png')] bg-contain bg-center bg-no-repeat drop-shadow-[0_0_15px_rgba(212,175,55,1)]"></div>
+                      <div className="w-1.5 h-4 bg-gradient-to-b from-[var(--color-primary)] to-transparent mt-1 rounded-full"></div>
+                    </div>
                   </div>
                 )}
+              </motion.div>
+
+              {/* Center Needle */}
+              <div className="absolute z-10 w-6 h-48 flex flex-col items-center justify-center">
+                <div className="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[100px] border-b-red-600 drop-shadow-[0_5px_5px_rgba(0,0,0,0.5)]"></div>
+                <div className="w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[100px] border-t-white drop-shadow-[0_5px_5px_rgba(0,0,0,0.5)]"></div>
               </div>
+              
+              {/* Center Pin */}
+              <div className="absolute z-20 w-8 h-8 bg-gradient-to-br from-gray-200 to-gray-600 border-4 border-[var(--color-primary)]/50 rounded-full shadow-[0_5px_10px_rgba(0,0,0,0.5)]"></div>
+              <div className="absolute z-30 w-3 h-3 bg-[var(--color-primary-light)] rounded-full shadow-inner"></div>
             </div>
-          ) : (
-            <div className="h-[400px] flex items-center justify-center bg-[var(--color-surface)] rounded-[2rem] border border-white/5">
-              <div className="w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin"></div>
+
+            <div className="mt-10 text-center relative z-10">
+              {isQiblaAligned ? (
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="text-[var(--color-primary)] font-bold text-2xl drop-shadow-[0_0_10px_rgba(212,175,55,0.5)] flex items-center justify-center gap-2"
+                >
+                  <Compass className="animate-pulse" />
+                  أنت متجه نحو القبلة
+                </motion.div>
+              ) : (
+                <div className="text-[var(--color-text-muted)] font-bold text-lg">
+                  قم بتدوير الجهاز حتى يتطابق المؤشر مع الكعبة
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       )}
     </div>
