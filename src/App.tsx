@@ -44,6 +44,7 @@ const SocialChallenges = lazy(() => import("./components/SocialChallenges"));
 const ZakatCalculator = lazy(() => import("./components/ZakatCalculator"));
 const HajjUmrahGuide = lazy(() => import("./components/HajjUmrahGuide"));
 const Auth = lazy(() => import("./components/Auth"));
+const SmartPlan = lazy(() => import("./components/SmartPlan"));
 
 // Loading fallback for Suspense
 const LoadingFallback = () => (
@@ -125,6 +126,8 @@ function AppContent() {
         return <ZakatCalculator onBack={() => setActiveTab("more")} />;
       case "hajj":
         return <HajjUmrahGuide onBack={() => setActiveTab("more")} />;
+      case "smart-plan":
+        return <SmartPlan />;
       case "auth":
         return <Auth onBack={() => setActiveTab("more")} />;
       default:

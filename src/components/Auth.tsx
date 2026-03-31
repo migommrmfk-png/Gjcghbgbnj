@@ -128,13 +128,12 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
         animate={{ opacity: 1, y: 0 }}
         className="flex-1 flex flex-col justify-center"
       >
-        <div className="card-3d bg-[var(--color-surface)] rounded-3xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-black/10 dark:border-white/10 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] opacity-5 mix-blend-overlay"></div>
+        <div className="bg-[var(--color-surface)] rounded-3xl p-6 shadow-xl border border-black/5 dark:border-white/5 relative overflow-hidden">
           
           <div className="relative z-10">
             <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-3xl flex items-center justify-center text-white mx-auto mb-4 shadow-[0_0_20px_rgba(212,175,55,0.5)] transform rotate-3">
-                {isLogin ? <LogIn size={40} /> : <UserPlus size={40} />}
+              <div className="w-16 h-16 bg-[var(--color-primary)]/10 rounded-2xl flex items-center justify-center text-[var(--color-primary)] mx-auto mb-4">
+                {isLogin ? <LogIn size={32} /> : <UserPlus size={32} />}
               </div>
               <h2 className="text-2xl font-bold text-[var(--color-text)] mb-2">أهلاً بك في مسلم</h2>
               <p className="text-[var(--color-text-muted)] text-sm">
@@ -271,10 +270,10 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
               type="button"
               onClick={handleGuestLogin}
               disabled={loading}
-              className="w-full mt-3 py-3.5 bg-black/5 dark:bg-white/5 text-[var(--color-text)] border border-black/10 dark:border-white/10 rounded-xl font-bold shadow-sm flex items-center justify-center gap-3 hover:bg-black/10 dark:hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full mt-4 py-3.5 bg-[var(--color-primary)]/10 text-[var(--color-primary)] rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-[var(--color-primary)]/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <User size={20} />
-              الدخول كزائر
+              المتابعة كزائر (بدون تسجيل)
             </button>
 
             <div className="mt-6 text-center">

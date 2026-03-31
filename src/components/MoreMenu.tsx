@@ -82,8 +82,9 @@ export default function MoreMenu({
       title: 'مجتمع وتحديات',
       image: 'https://i.pinimg.com/736x/60/76/8b/60768b598b049d53c7a36e1c94411d73.jpg',
       items: [
+        { id: 'smart-plan', label: 'الخطة الذكية', icon: <Target size={24} />, color: 'bg-emerald-600' },
         { id: 'worship-tracker', label: 'متابعة العبادات', icon: <Trophy size={24} />, color: 'bg-amber-500' },
-        { id: 'quran-plan', label: 'خطة القرآن', icon: <Target size={24} />, color: 'bg-emerald-500' },
+        { id: 'quran-plan', label: 'خطة القرآن', icon: <BookOpen size={24} />, color: 'bg-emerald-500' },
         { id: 'social', label: 'المجتمع والتحديات', icon: <Users size={24} />, color: 'bg-rose-500' },
         { id: 'games', label: 'ألعاب وتحديات', icon: <Puzzle size={24} />, color: 'bg-teal-500' },
       ]

@@ -10,7 +10,7 @@ export default function Splash({ onComplete }: SplashProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       onComplete();
-    }, 3000);
+    }, 1500); // Reduced from 3000ms to 1500ms
     return () => clearTimeout(timer);
   }, [onComplete]);
 
@@ -41,40 +41,35 @@ export default function Splash({ onComplete }: SplashProps) {
 
       {/* Main Content */}
       <motion.div
-        initial={{ scale: 0.5, opacity: 0 }}
+        initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 1.5, ease: "easeOut" }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
         className="relative z-10 flex flex-col items-center"
       >
         <div className="relative mb-6">
           <Moon
-            size={100}
-            className="text-[var(--color-gold)] drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]"
+            size={80}
+            className="text-[var(--color-gold)] drop-shadow-md"
             strokeWidth={1.5}
-          />
-          <motion.div
-            className="absolute inset-0 bg-[var(--color-gold)] blur-2xl opacity-20 rounded-full"
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
           />
         </div>
 
         <motion.h1
-          className="text-5xl font-bold font-serif text-[var(--color-primary-light)] drop-shadow-lg"
-          initial={{ y: 20, opacity: 0 }}
+          className="text-4xl font-bold font-serif text-[var(--color-primary-light)]"
+          initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5, duration: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
         >
           هذا ديني
         </motion.h1>
       </motion.div>
 
-      {/* Bottom Mosque Silhouette */}
+      {/* Bottom Pattern */}
       <motion.div
-        className="absolute bottom-0 w-full h-48 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat-x"
-        initial={{ y: 50, opacity: 0 }}
-        animate={{ y: 0, opacity: 0.2 }}
-        transition={{ delay: 0.8, duration: 1 }}
+        className="absolute bottom-0 w-full h-32 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat-x"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.1 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
       />
     </div>
   );

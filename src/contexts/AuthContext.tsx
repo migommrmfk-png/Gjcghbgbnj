@@ -114,7 +114,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               email: currentUser.email || null,
               isAnonymous: currentUser.isAnonymous,
               createdAt: new Date().toISOString(),
-              role: 'user'
+              role: 'user',
+              xp: 0,
+              level: 1,
+              streak: 0,
+              badges: []
             };
             if (currentUser.displayName) userData.displayName = currentUser.displayName;
             if (currentUser.photoURL) userData.photoURL = currentUser.photoURL;
@@ -156,7 +160,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           uid: userCredential.user.uid,
           email: userCredential.user.email,
           createdAt: new Date().toISOString(),
-          role: 'user'
+          role: 'user',
+          xp: 0,
+          level: 1,
+          streak: 0,
+          badges: []
         };
         if (name) userData.displayName = name;
         if (userCredential.user.photoURL) userData.photoURL = userCredential.user.photoURL;
@@ -212,7 +220,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           uid: userCredential.user.uid,
           email: userCredential.user.email,
           createdAt: new Date().toISOString(),
-          role: 'user'
+          role: 'user',
+          xp: 0,
+          level: 1,
+          streak: 0,
+          badges: []
         };
         if (userCredential.user.displayName) userData.displayName = userCredential.user.displayName;
         if (userCredential.user.photoURL) userData.photoURL = userCredential.user.photoURL;
@@ -247,7 +259,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           uid: userCredential.user.uid,
           email: userCredential.user.email,
           createdAt: new Date().toISOString(),
-          role: 'user'
+          role: 'user',
+          xp: 0,
+          level: 1,
+          streak: 0,
+          badges: []
         };
         if (userCredential.user.displayName) userData.displayName = userCredential.user.displayName;
         if (userCredential.user.photoURL) userData.photoURL = userCredential.user.photoURL;
@@ -282,7 +298,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           uid: userCredential.user.uid,
           email: userCredential.user.email,
           createdAt: new Date().toISOString(),
-          role: 'user'
+          role: 'user',
+          xp: 0,
+          level: 1,
+          streak: 0,
+          badges: []
         };
         if (userCredential.user.displayName) userData.displayName = userCredential.user.displayName;
         if (userCredential.user.photoURL) userData.photoURL = userCredential.user.photoURL;
@@ -316,7 +336,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           uid: userCredential.user.uid,
           isAnonymous: true,
           createdAt: new Date().toISOString(),
-          role: 'user'
+          role: 'user',
+          xp: 0,
+          level: 1,
+          streak: 0,
+          badges: []
         };
 
         try {

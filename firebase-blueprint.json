@@ -32,9 +32,77 @@
           "type": "string",
           "enum": ["user", "admin"],
           "description": "The role of the user."
+        },
+        "xp": {
+          "type": "number",
+          "description": "User's experience points."
+        },
+        "level": {
+          "type": "number",
+          "description": "User's current level."
+        },
+        "streak": {
+          "type": "number",
+          "description": "User's current daily streak."
+        },
+        "badges": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of badge IDs earned by the user."
         }
       },
-      "required": ["uid", "email", "createdAt", "role"]
+      "required": ["uid", "email", "createdAt", "role", "xp", "level", "streak"]
+    },
+    "DailyPlan": {
+      "title": "Daily Plan",
+      "description": "AI generated daily plan for the user.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user this plan belongs to."
+        },
+        "date": {
+          "type": "string",
+          "description": "The date of the plan (YYYY-MM-DD)."
+        },
+        "tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" },
+              "completed": { "type": "boolean" },
+              "xpReward": { "type": "number" },
+              "type": { "type": "string" }
+            },
+            "required": ["id", "title", "completed", "xpReward", "type"]
+          }
+        }
+      },
+      "required": ["userId", "date", "tasks"]
+    },
+    "MoodLog": {
+      "title": "Mood Log",
+      "description": "User's mood tracking for dynamic content.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string"
+        },
+        "mood": {
+          "type": "string",
+          "enum": ["happy", "sad", "anxious", "tired", "grateful", "stressed"]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["userId", "mood", "timestamp"]
     }
   },
   "firestore": {
@@ -43,6 +111,18 @@
         "$ref": "#/entities/User"
       },
       "description": "Stores user profiles."
+    },
+    "/plans/{planId}": {
+      "schema": {
+        "$ref": "#/entities/DailyPlan"
+      },
+      "description": "Stores daily AI plans for users."
+    },
+    "/moods/{moodId}": {
+      "schema": {
+        "$ref": "#/entities/MoodLog"
+      },
+      "description": "Stores user mood logs."
     }
   }
 }

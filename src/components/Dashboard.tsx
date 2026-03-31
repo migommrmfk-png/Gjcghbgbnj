@@ -17,11 +17,16 @@ import {
   Sparkles,
   Sun,
   Bot,
-  Mic
+  Mic,
+  Target
 } from "lucide-react";
 import { motion } from "motion/react";
 import { usePrayerTimes } from "../contexts/PrayerTimesContext";
+import { useAuth } from "../contexts/AuthContext";
+import { db } from "../firebase";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import DownloadAppBanner from "./DownloadAppBanner";
+import MoodTracker from "./MoodTracker";
 import { useTranslation } from 'react-i18next';
 
 interface DashboardProps {
@@ -30,6 +35,7 @@ interface DashboardProps {
 
 export default function Dashboard({ onNavigate }: DashboardProps) {
   const { prayerTimes, hijriDate, gregorianDate, locationName, loading, error } = usePrayerTimes();
+  const { user } = useAuth();
   const { t, i18n } = useTranslation();
   const [nextPrayerTime, setNextPrayerTime] = useState<string>("");
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -86,6 +92,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
     const lastVisit = localStorage.getItem('lastVisitDate');
     let currentStreak = parseInt(localStorage.getItem('appStreak') || '0', 10);
+    let streakUpdated = false;
 
     if (lastVisit !== today) {
       if (lastVisit) {
@@ -102,11 +109,50 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       }
       localStorage.setItem('lastVisitDate', today);
       localStorage.setItem('appStreak', currentStreak.toString());
+      streakUpdated = true;
     } else if (currentStreak === 0) {
       currentStreak = 1;
       localStorage.setItem('appStreak', '1');
+      streakUpdated = true;
     }
     setStreak(currentStreak);
+
+    // Sync with Firestore if logged in
+    if (user && streakUpdated) {
+      const syncStreak = async () => {
+        try {
+          const userRef = doc(db, 'users', user.uid);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            const data = userSnap.data();
+            if (data.streak !== currentStreak) {
+              await updateDoc(userRef, { streak: currentStreak });
+            }
+          }
+        } catch (err) {
+          console.error("Error syncing streak:", err);
+        }
+      };
+      syncStreak();
+    } else if (user && !streakUpdated) {
+      // Just fetch it to make sure it matches
+      const fetchStreak = async () => {
+        try {
+          const userRef = doc(db, 'users', user.uid);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            const data = userSnap.data();
+            if (data.streak && data.streak > currentStreak) {
+              setStreak(data.streak);
+              localStorage.setItem('appStreak', data.streak.toString());
+            }
+          }
+        } catch (err) {
+          console.error("Error fetching streak:", err);
+        }
+      };
+      fetchStreak();
+    }
 
     const quranSaved = localStorage.getItem('quranLastRead');
     if (quranSaved) {
@@ -420,6 +466,13 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       bg: "bg-[var(--color-primary)]/10",
     },
     {
+      id: "smart-plan",
+      title: t('smartPlan', 'AI Smart Plan'),
+      icon: <Target size={28} />,
+      color: "text-emerald-500",
+      bg: "bg-emerald-500/10",
+    },
+    {
       id: "azkar",
       title: t('azkar'),
       icon: <Heart size={28} />,
@@ -511,15 +564,14 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
   return (
     <div className="max-w-md mx-auto p-4 space-y-6 pb-32" dir={isRTL ? "rtl" : "ltr"}>
-      {/* Header Card 3D - Dynamic Background */}
+      {/* Header Card - Dynamic Background */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className={`relative overflow-hidden rounded-[2rem] bg-gradient-to-br ${getBackgroundStyle()} text-white shadow-2xl transition-all duration-1000 border border-white/10`}
+        className={`relative overflow-hidden rounded-[2rem] bg-gradient-to-br ${getBackgroundStyle()} text-white shadow-xl transition-all duration-1000 border border-white/5`}
       >
         <div className="absolute top-0 right-0 w-40 h-40 bg-[var(--color-primary)]/20 rounded-full -mr-10 -mt-10 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/40 rounded-full -ml-10 -mb-10 blur-2xl"></div>
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
 
         <div className="relative z-10 p-8 flex flex-col items-center text-center space-y-6 mt-4">
           <div className="flex flex-col items-center gap-2">
@@ -698,6 +750,16 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           </motion.div>
         )}
 
+        {/* Mood Tracker Bento */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.45 }}
+          className="col-span-1 sm:col-span-2 md:col-span-3 mt-4"
+        >
+          <MoodTracker />
+        </motion.div>
+
         {/* AI Features Section */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
@@ -857,7 +919,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         </motion.div>
       </div>
 
-      {/* Main Features Grid 3D */}
+      {/* Main Features Grid */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -867,13 +929,13 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         {menuItems.map((item, index) => (
           <motion.button
             key={item.id}
-            whileHover={{ scale: 1.05, y: -5 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => onNavigate(item.id)}
-            className="card-3d flex flex-col items-center justify-center p-5 gap-3 aspect-square group"
+            className="bg-[var(--color-surface)] border border-black/5 dark:border-white/5 rounded-3xl flex flex-col items-center justify-center p-5 gap-3 aspect-square group shadow-sm hover:shadow-md transition-shadow"
           >
             <div
-              className={`w-14 h-14 rounded-full ${item.bg} ${item.color} flex items-center justify-center shadow-inner group-hover:shadow-[0_0_15px_rgba(212,175,55,0.2)] transition-all`}
+              className={`w-14 h-14 rounded-full ${item.bg} ${item.color} flex items-center justify-center group-hover:scale-110 transition-transform`}
             >
               {item.icon}
             </div>

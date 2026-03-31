@@ -29,6 +29,7 @@ export default function Tasbeeh() {
   const [tempTarget, setTempTarget] = useState(target.toString());
   const [isPressed, setIsPressed] = useState(false);
   const [isResetPressed, setIsResetPressed] = useState(false);
+  const audioCtxRef = React.useRef<AudioContext | null>(null);
 
   useEffect(() => {
     localStorage.setItem('tasbeehCount', count.toString());
@@ -57,7 +58,13 @@ export default function Tasbeeh() {
 
     if (soundEnabled) {
       try {
-        const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+        if (!audioCtxRef.current) {
+          audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        }
+        const audioCtx = audioCtxRef.current;
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
         const oscillator = audioCtx.createOscillator();
         const gainNode = audioCtx.createGain();
         oscillator.connect(gainNode);
@@ -151,7 +158,7 @@ export default function Tasbeeh() {
 
       {/* Digital Counter Device */}
       <div className="flex-1 flex items-center justify-center mt-8 relative z-10 px-4">
-        <div className="relative w-full max-w-[340px] aspect-square bg-[var(--color-surface)] rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.3),inset_0_2px_5px_rgba(255,255,255,0.1)] border border-black/5 dark:border-white/5 flex flex-col items-center justify-center p-6">
+        <div className="relative w-full max-w-[340px] aspect-square bg-[var(--color-surface)] rounded-full shadow-[0_30px_60px_rgba(0,0,0,0.4),inset_0_4px_10px_rgba(255,255,255,0.2),inset_0_-4px_10px_rgba(0,0,0,0.1)] border border-black/10 dark:border-white/10 flex flex-col items-center justify-center p-6">
           
           {/* Progress Ring */}
           <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 100 100">
@@ -221,23 +228,21 @@ export default function Tasbeeh() {
           </div>
 
           {/* Main Count Button */}
-          <div className="absolute bottom-12">
-            <motion.button
-              whileTap={{ scale: 0.92 }}
+          <div className="absolute bottom-10">
+            <button
               onPointerDown={handlePress}
-              className="w-28 h-28 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] shadow-[0_10px_25px_rgba(0,0,0,0.4),inset_0_4px_10px_rgba(255,255,255,0.3)] border-4 border-[var(--color-surface)] flex items-center justify-center relative overflow-hidden group"
-              style={{ touchAction: 'manipulation' }}
+              className={`w-32 h-32 rounded-full flex items-center justify-center relative outline-none select-none transition-all duration-75 ${
+                isPressed 
+                  ? 'bg-gradient-to-b from-[var(--color-primary-dark)] to-[var(--color-primary)] shadow-[inset_0_10px_20px_rgba(0,0,0,0.8),0_2px_4px_rgba(0,0,0,0.3)] translate-y-[8px]' 
+                  : 'bg-gradient-to-b from-[var(--color-primary-light)] to-[var(--color-primary-dark)] shadow-[0_10px_0_#064e3b,0_20px_30px_rgba(0,0,0,0.6),inset_0_4px_8px_rgba(255,255,255,0.5)]'
+              }`}
+              style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
             >
-              {/* Button Inner Depression */}
-              <div className={`absolute inset-1 rounded-full bg-gradient-to-br from-[var(--color-primary-light)] to-[var(--color-primary)] transition-all duration-100 ${isPressed ? 'shadow-[inset_0_8px_15px_rgba(0,0,0,0.4)] opacity-80' : 'shadow-[inset_0_2px_5px_rgba(255,255,255,0.4)] opacity-100'}`}></div>
-              
-              {/* Ripple Effect Container */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className={`w-full h-full rounded-full border-4 border-white/30 transition-transform duration-300 ${isPressed ? 'scale-110 opacity-0' : 'scale-50 opacity-100'}`}></div>
-              </div>
-              
-              <span className="relative z-10 text-white font-bold text-2xl drop-shadow-md">سبّح</span>
-            </motion.button>
+              <div className={`absolute inset-2 rounded-full border-2 transition-all duration-75 ${isPressed ? 'border-black/30 bg-black/10' : 'border-white/30 bg-white/5'}`}></div>
+              <span className={`relative z-10 font-bold text-3xl transition-all duration-75 ${isPressed ? 'text-white/70 scale-95 drop-shadow-none' : 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]'}`}>
+                سبّح
+              </span>
+            </button>
           </div>
 
           {/* Reset Button */}
