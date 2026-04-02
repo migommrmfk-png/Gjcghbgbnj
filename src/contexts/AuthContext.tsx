@@ -10,7 +10,10 @@ import {
   GoogleAuthProvider,
   FacebookAuthProvider,
   TwitterAuthProvider,
-  signInAnonymously
+  signInAnonymously,
+  linkWithPopup,
+  linkWithCredential,
+  EmailAuthProvider
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
@@ -75,6 +78,8 @@ interface AuthContextType {
   signInWithFacebook: () => Promise<void>;
   signInWithTwitter: () => Promise<void>;
   signInAsGuest: () => Promise<void>;
+  linkWithGoogle: () => Promise<void>;
+  linkWithEmail: (email: string, pass: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -132,6 +137,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch (error) {
           console.error("Error fetching or creating user profile:", error);
         }
+      } else {
+        // Auto sign in as guest if no user and no explicit logout flag
+        const hasLoggedOut = localStorage.getItem('hasLoggedOut');
+        if (!hasLoggedOut) {
+          try {
+            await signInAnonymously(auth);
+            // The onAuthStateChanged will fire again with the new user
+            return;
+          } catch (e) {
+            console.error("Error auto-signing in as guest:", e);
+          }
+        }
       }
       
       setLoading(false);
@@ -142,6 +159,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, pass: string, name: string) => {
     try {
+      localStorage.removeItem('hasLoggedOut');
       const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
       await updateProfile(userCredential.user, { displayName: name });
       
@@ -193,6 +211,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, pass: string) => {
     try {
+      localStorage.removeItem('hasLoggedOut');
       await signInWithEmailAndPassword(auth, email, pass);
     } catch (error) {
       console.error("Error signing in", error);
@@ -202,6 +221,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     try {
+      localStorage.removeItem('hasLoggedOut');
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
       
@@ -242,6 +262,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithFacebook = async () => {
     try {
+      localStorage.removeItem('hasLoggedOut');
       const provider = new FacebookAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
       
@@ -281,6 +302,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithTwitter = async () => {
     try {
+      localStorage.removeItem('hasLoggedOut');
       const provider = new TwitterAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
       
@@ -320,6 +342,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInAsGuest = async () => {
     try {
+      localStorage.removeItem('hasLoggedOut');
       const userCredential = await signInAnonymously(auth);
       
       const userRef = doc(db, 'users', userCredential.user.uid);
@@ -355,8 +378,63 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const linkWithGoogle = async () => {
+    if (!auth.currentUser) return;
+    try {
+      const provider = new GoogleAuthProvider();
+      const userCredential = await linkWithPopup(auth.currentUser, provider);
+      
+      const userRef = doc(db, 'users', userCredential.user.uid);
+      const userData: any = {
+        isAnonymous: false,
+      };
+      if (userCredential.user.displayName) userData.displayName = userCredential.user.displayName;
+      if (userCredential.user.email) userData.email = userCredential.user.email;
+      if (userCredential.user.photoURL) userData.photoURL = userCredential.user.photoURL;
+      
+      try {
+        await setDoc(userRef, userData, { merge: true });
+      } catch (e) {
+        handleFirestoreError(e, OperationType.UPDATE, `users/${userCredential.user.uid}`);
+      }
+      
+      setUser({ ...userCredential.user } as User);
+    } catch (error) {
+      console.error("Error linking with Google", error);
+      throw error;
+    }
+  };
+
+  const linkWithEmail = async (email: string, pass: string, name: string) => {
+    if (!auth.currentUser) return;
+    try {
+      const credential = EmailAuthProvider.credential(email, pass);
+      const userCredential = await linkWithCredential(auth.currentUser, credential);
+      await updateProfile(userCredential.user, { displayName: name });
+      
+      const userRef = doc(db, 'users', userCredential.user.uid);
+      const userData: any = {
+        isAnonymous: false,
+        email: userCredential.user.email,
+        displayName: name
+      };
+      
+      try {
+        await setDoc(userRef, userData, { merge: true });
+      } catch (e) {
+        handleFirestoreError(e, OperationType.UPDATE, `users/${userCredential.user.uid}`);
+      }
+      
+      setUser({ ...userCredential.user, displayName: name } as User);
+    } catch (error) {
+      console.error("Error linking with Email", error);
+      throw error;
+    }
+  };
+
   const logout = async () => {
     try {
+      localStorage.setItem('hasLoggedOut', 'true');
       await signOut(auth);
     } catch (error) {
       console.error("Error signing out", error);
@@ -373,6 +451,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signInWithFacebook,
     signInWithTwitter,
     signInAsGuest,
+    linkWithGoogle,
+    linkWithEmail,
     logout
   };
 

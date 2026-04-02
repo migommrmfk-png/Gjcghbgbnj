@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { RotateCcw, ChevronRight, Sparkles, Settings as SettingsIcon, X, Volume2, VolumeX, Vibrate } from 'lucide-react';
 
-export default function Tasbeeh() {
+export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
   const [count, setCount] = useState(() => {
     const saved = localStorage.getItem('tasbeehCount');
     return saved ? parseInt(saved) : 0;
@@ -126,12 +126,19 @@ export default function Tasbeeh() {
 
       {/* Header */}
       <div className="flex items-center justify-between p-4 z-10 mt-2">
-        <button onClick={() => setIsSettingsOpen(true)} className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-colors backdrop-blur-md bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
-          <SettingsIcon className="text-[var(--color-text)]" size={24} />
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setIsSettingsOpen(true)} className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-colors backdrop-blur-md bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
+            <SettingsIcon className="text-[var(--color-text)]" size={24} />
+          </button>
+        </div>
         <div className="flex items-center gap-2">
           <span className="font-bold text-[var(--color-text)] text-lg tracking-wide">المسبحة الإلكترونية</span>
           <Sparkles className="text-[var(--color-primary)]" size={24} />
+          {onBack && (
+            <button onClick={onBack} className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-colors backdrop-blur-md bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 mr-2">
+              <ChevronRight size={24} className="text-[var(--color-text)]" />
+            </button>
+          )}
         </div>
       </div>
 

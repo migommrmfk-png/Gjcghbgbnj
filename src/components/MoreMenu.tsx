@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe } from 'lucide-react';
+import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe, TrendingUp, Play, Circle } from 'lucide-react';
 import { usePrayerTimes } from '../contexts/PrayerTimesContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -16,14 +16,29 @@ export default function MoreMenu({
 }) {
   const [showToast, setShowToast] = useState(false);
   const { autoAdhanEnabled, setAutoAdhanEnabled } = usePrayerTimes();
-  const { user, logout } = useAuth();
+  const { user, logout, linkWithGoogle } = useAuth();
   const { t, i18n } = useTranslation();
+  const [linking, setLinking] = useState(false);
 
   const [showLangModal, setShowLangModal] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const handleLogout = async () => {
+    if (user?.isAnonymous) {
+      setShowLogoutConfirm(true);
+      return;
+    }
     try {
       await logout();
+    } catch (error) {
+      console.error("Failed to log out", error);
+    }
+  };
+
+  const confirmLogout = async () => {
+    try {
+      await logout();
+      setShowLogoutConfirm(false);
     } catch (error) {
       console.error("Failed to log out", error);
     }
@@ -55,12 +70,24 @@ export default function MoreMenu({
     { code: 'bn', name: 'Bengali', nativeName: 'বাংলা' },
   ];
 
+  const handleLinkGoogle = async () => {
+    setLinking(true);
+    try {
+      await linkWithGoogle();
+    } catch (error) {
+      console.error("Failed to link account", error);
+    } finally {
+      setLinking(false);
+    }
+  };
+
   const categories = [
     {
       title: 'المكتبة والتعلم',
       image: 'https://i.pinimg.com/736x/87/1b/2f/871b2f81152a51f801a61327111b1511.jpg',
       items: [
         { id: 'muslim-ai', label: 'الذكاء الاصطناعي', icon: <Bot size={24} />, color: 'bg-indigo-500' },
+        { id: 'dreams', label: 'تفسير الأحلام', icon: <Moon size={24} />, color: 'bg-indigo-700' },
         { id: 'stories', label: 'قصص الأنبياء', icon: <BookOpen size={24} />, color: 'bg-purple-500' },
         { id: 'prayer-guide', label: 'كيفية الصلاة', icon: <BookOpen size={24} />, color: 'bg-amber-600' },
         { id: 'names', label: 'أسماء الله الحسنى', icon: <Heart size={24} />, color: 'bg-pink-500' },
@@ -72,9 +99,12 @@ export default function MoreMenu({
       title: 'أدوات ومواسم',
       image: 'https://i.pinimg.com/736x/3f/8b/77/3f8b77626915152a54b38d7c49b6b801.jpg',
       items: [
+        { id: 'tasbeeh', label: 'السبحة الإلكترونية', icon: <Circle size={24} />, color: 'bg-indigo-500' },
+        { id: 'ruqyah', label: 'الرقية الشرعية', icon: <Shield size={24} />, color: 'bg-teal-500' },
         { id: 'qibla', label: 'اتجاه القبلة', icon: <Compass size={24} />, color: 'bg-orange-500' },
         { id: 'calendar', label: 'التقويم الهجري', icon: <Calendar size={24} />, color: 'bg-blue-500' },
         { id: 'zakat', label: 'حاسبة الزكاة', icon: <Calculator size={24} />, color: 'bg-emerald-600' },
+        { id: 'inheritance', label: 'حاسبة المواريث', icon: <Calculator size={24} />, color: 'bg-emerald-800' },
         { id: 'hajj', label: 'دليل الحج والعمرة', icon: <Map size={24} />, color: 'bg-amber-700' },
       ]
     },
@@ -82,6 +112,8 @@ export default function MoreMenu({
       title: 'مجتمع وتحديات',
       image: 'https://i.pinimg.com/736x/60/76/8b/60768b598b049d53c7a36e1c94411d73.jpg',
       items: [
+        { id: 'dua-wall', label: 'حائط الدعاء', icon: <HandHeart size={24} />, color: 'bg-rose-500' },
+        { id: 'accounting', label: 'ورد المحاسبة', icon: <TrendingUp size={24} />, color: 'bg-teal-600' },
         { id: 'smart-plan', label: 'الخطة الذكية', icon: <Target size={24} />, color: 'bg-emerald-600' },
         { id: 'worship-tracker', label: 'متابعة العبادات', icon: <Trophy size={24} />, color: 'bg-amber-500' },
         { id: 'quran-plan', label: 'خطة القرآن', icon: <BookOpen size={24} />, color: 'bg-emerald-500' },
@@ -93,6 +125,7 @@ export default function MoreMenu({
       title: 'صوتيات',
       image: 'https://i.pinimg.com/736x/f6/3c/65/f63c65c270d7406f52285188d8b2d423.jpg',
       items: [
+        { id: 'reels', label: 'تلاوات خاشعة', icon: <Play size={24} />, color: 'bg-purple-600' },
         { id: 'radio', label: 'إذاعة القرآن', icon: <Radio size={24} />, color: 'bg-red-500' },
       ]
     },
@@ -131,8 +164,27 @@ export default function MoreMenu({
                 </div>
               )}
               <div>
-                <h1 className="text-2xl font-bold font-serif mb-1 text-[var(--color-primary-light)] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">{user.displayName || 'مستخدم'}</h1>
-                <p className="text-[var(--color-text-muted)] text-sm">{user.email}</p>
+                <h1 className="text-2xl font-bold font-serif mb-1 text-[var(--color-primary-light)] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">
+                  {user.isAnonymous ? 'حساب زائر' : (user.displayName || 'مستخدم')}
+                </h1>
+                {!user.isAnonymous && <p className="text-[var(--color-text-muted)] text-sm">{user.email}</p>}
+                
+                {user.isAnonymous && (
+                  <button
+                    onClick={handleLinkGoogle}
+                    disabled={linking}
+                    className="mt-3 bg-white text-emerald-700 text-sm font-bold py-1.5 px-4 rounded-full shadow-sm hover:bg-emerald-50 transition-colors flex items-center justify-center gap-2 mx-auto disabled:opacity-70"
+                  >
+                    {linking ? (
+                      <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <>
+                        <Shield size={14} />
+                        <span>اربط حسابك لحفظ تقدمك</span>
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           ) : (
@@ -215,6 +267,51 @@ export default function MoreMenu({
           >
             <BellOff size={20} />
             <span className="font-bold">يرجى تفعيل الإشعارات من إعدادات المتصفح</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showLogoutConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setShowLogoutConfirm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-[var(--color-surface)] rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-black/5 dark:border-white/5"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-center mb-2 text-[var(--color-text)]">
+                {t('warning', 'تحذير')}
+              </h3>
+              <p className="text-center text-[var(--color-text-muted)] mb-6 text-sm leading-relaxed">
+                {t('logout_warning_desc', 'أنت تستخدم حساب زائر. إذا قمت بتسجيل الخروج الآن، ستفقد جميع بياناتك (النقاط، المستوى، الإنجازات) ولن تتمكن من استعادتها. هل أنت متأكد؟')}
+              </p>
+              
+              <div className="space-y-3">
+                <button
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="w-full py-3 bg-[var(--color-primary)] text-white rounded-xl font-bold hover:bg-[var(--color-primary-dark)] transition-colors"
+                >
+                  {t('cancel_and_stay', 'إلغاء والبقاء')}
+                </button>
+                <button
+                  onClick={confirmLogout}
+                  className="w-full py-3 bg-red-500/10 text-red-500 rounded-xl font-bold hover:bg-red-500/20 transition-colors"
+                >
+                  {t('logout_anyway', 'تسجيل الخروج على أي حال')}
+                </button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

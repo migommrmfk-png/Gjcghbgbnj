@@ -35,6 +35,16 @@ service cloud.firestore {
     //   - mood: string (required)
     //   - timestamp: string (required)
     //
+    // Collection: duaWall
+    // Document ID: {duaId}
+    // Fields:
+    //   - text: string (required, max 500 chars)
+    //   - authorName: string (required, max 100 chars)
+    //   - authorId: string (required, immutable)
+    //   - createdAt: timestamp (required, immutable)
+    //   - ameenCount: number (required, >= 0)
+    //   - isAnonymous: boolean (required)
+    //
     // ===============================================================
 
     // ===============================================================
@@ -161,6 +171,17 @@ service cloud.firestore {
              isValidDateString(data.timestamp);
     }
 
+    function isValidDua(data) {
+      return hasOnlyAllowedFields(['text', 'authorName', 'authorId', 'createdAt', 'ameenCount', 'isAnonymous']) &&
+             hasRequiredFields(['text', 'authorName', 'authorId', 'createdAt', 'ameenCount', 'isAnonymous']) &&
+             data.text is string && data.text.size() > 0 && data.text.size() <= 500 &&
+             data.authorName is string && data.authorName.size() > 0 && data.authorName.size() <= 100 &&
+             data.authorId == request.auth.uid &&
+             data.createdAt is timestamp &&
+             data.ameenCount is number && data.ameenCount >= 0 &&
+             data.isAnonymous is bool;
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
@@ -210,6 +231,17 @@ service cloud.firestore {
                        isValidMood(request.resource.data) &&
                        request.resource.data.userId == resource.data.userId;
       allow delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+
+    match /duaWall/{duaId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() &&
+                       isValidDua(request.resource.data) &&
+                       request.resource.data.ameenCount == 0;
+      allow update: if isAuthenticated() &&
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ameenCount']) &&
+                       request.resource.data.ameenCount == resource.data.ameenCount + 1;
+      allow delete: if isAuthenticated() && (resource.data.authorId == request.auth.uid || isAdmin());
     }
   }
 }

@@ -9,7 +9,7 @@ interface NameOfAllah {
   ar: { meaning: string };
 }
 
-export default function NamesOfAllah() {
+export default function NamesOfAllah({ onBack }: { onBack?: () => void }) {
   const [names, setNames] = useState<NameOfAllah[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -115,6 +115,14 @@ export default function NamesOfAllah() {
         animate={{ y: 0, opacity: 1 }}
         className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-[2rem] p-8 text-white shadow-[0_15px_40px_rgba(0,0,0,0.6)] relative overflow-hidden border border-white/10"
       >
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-full transition-colors z-20"
+          >
+            <ArrowRight size={24} className="text-white" />
+          </button>
+        )}
         <div className="absolute right-0 top-0 w-40 h-40 bg-white/10 rounded-full -mr-10 -mt-10 blur-3xl"></div>
         <div className="absolute left-0 bottom-0 w-32 h-32 bg-black/20 rounded-full -ml-10 -mb-10 blur-2xl"></div>
         <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>

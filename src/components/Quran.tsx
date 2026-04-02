@@ -39,6 +39,7 @@ interface ReciterOption {
   id: string;
   name: string;
   server: string;
+  surahList: number[];
 }
 
 export default function Quran() {
@@ -88,7 +89,7 @@ export default function Quran() {
     }
 
     // Check reciters cache
-    const cachedReciters = localStorage.getItem('quran_reciters');
+    const cachedReciters = localStorage.getItem('quran_reciters_v2');
     if (cachedReciters) {
       const parsed = JSON.parse(cachedReciters);
       setReciters(parsed);
@@ -104,9 +105,10 @@ export default function Quran() {
           const options: ReciterOption[] = [];
           data.reciters.forEach((reciter: any) => {
             reciter.moshaf.forEach((m: any) => {
-              // Only include reciters who have all 114 surahs to avoid missing audio
-              const surahCount = m.surah_total || (m.surah_list ? m.surah_list.split(',').length : 0);
-              if (surahCount === 114) {
+              const surahListStr = m.surah_list || "";
+              const surahList = surahListStr.split(',').filter(Boolean).map(Number);
+              
+              if (surahList.length > 0) {
                 let serverUrl = m.server;
                 if (serverUrl.startsWith('http://')) {
                   serverUrl = serverUrl.replace('http://', 'https://');
@@ -118,12 +120,13 @@ export default function Quran() {
                   id: `${reciter.id}-${m.id}`,
                   name: `${reciter.name} (${m.name.split('-')[0].trim()})`,
                   server: serverUrl,
+                  surahList,
                 });
               }
             });
           });
           setReciters(options);
-          localStorage.setItem('quran_reciters', JSON.stringify(options));
+          localStorage.setItem('quran_reciters_v2', JSON.stringify(options));
           
           // Find a default reciter (e.g., Mishary Alafasy)
           const defaultReciter = options.find(r => r.name.includes("مشاري العفاسي")) || options[0];
@@ -166,10 +169,21 @@ export default function Quran() {
       setCurrentTime(0);
       setDuration(0);
       
-      if (audioRef.current && selectedReciterServer) {
+      let activeReciterServer = selectedReciterServer;
+      const currentReciter = reciters.find(r => r.server === selectedReciterServer);
+      if (!currentReciter || !currentReciter.surahList.includes(surahNumber)) {
+        // Find a fallback reciter
+        const fallback = reciters.find(r => r.surahList.includes(surahNumber));
+        if (fallback) {
+          activeReciterServer = fallback.server;
+          setSelectedReciterServer(fallback.server);
+        }
+      }
+
+      if (audioRef.current && activeReciterServer) {
         audioRef.current.pause();
         const paddedNumber = String(surahNumber).padStart(3, '0');
-        audioRef.current.src = `${selectedReciterServer}${paddedNumber}.mp3`;
+        audioRef.current.src = `${activeReciterServer}${paddedNumber}.mp3`;
       }
     } catch (err) {
       console.error(err);
@@ -473,7 +487,9 @@ export default function Quran() {
                     }
                   }}
                 >
-                  {reciters.map((r) => (
+                  {reciters
+                    .filter(r => r.surahList.includes(selectedSurah.number))
+                    .map((r) => (
                     <option key={r.id} value={r.server} className="bg-[var(--color-surface)] text-[var(--color-text)]">
                       {r.name}
                     </option>

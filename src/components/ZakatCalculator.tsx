@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowRight, Calculator, Coins, CircleDollarSign, Info } from 'lucide-react';
 
-export default function ZakatCalculator({ onBack }: { onBack: () => void }) {
+export default function ZakatCalculator({ onBack }: { onBack?: () => void }) {
   const [cash, setCash] = useState<string>('');
   const [gold, setGold] = useState<string>(''); // in grams
   const [silver, setSilver] = useState<string>(''); // in grams
@@ -35,12 +35,14 @@ export default function ZakatCalculator({ onBack }: { onBack: () => void }) {
     <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-[var(--color-bg)]" dir="rtl">
       {/* Header */}
       <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-[var(--color-bg)]/90 backdrop-blur-md border-b border-white/5">
-        <button
-          onClick={onBack}
-          className="p-2 hover:bg-white/5 rounded-full transition-colors border border-white/5 bg-[var(--color-surface)]"
-        >
-          <ArrowRight size={24} className="text-[var(--color-text-muted)] hover:text-[var(--color-text)]" />
-        </button>
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="p-2 hover:bg-white/5 rounded-full transition-colors border border-white/5 bg-[var(--color-surface)]"
+          >
+            <ArrowRight size={24} className="text-[var(--color-text-muted)] hover:text-[var(--color-text)]" />
+          </button>
+        )}
         <h1 className="text-xl font-bold font-serif text-[var(--color-text)] drop-shadow-md">
           حاسبة الزكاة
         </h1>

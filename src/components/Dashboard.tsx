@@ -27,6 +27,7 @@ import { db } from "../firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import DownloadAppBanner from "./DownloadAppBanner";
 import MoodTracker from "./MoodTracker";
+import LinkAccountPrompt from "./LinkAccountPrompt";
 import { useTranslation } from 'react-i18next';
 
 interface DashboardProps {
@@ -600,6 +601,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           )}
         </div>
       </motion.div>
+
+      <LinkAccountPrompt />
 
       {/* Main Bento Grid */}
       <div className="bento-grid">

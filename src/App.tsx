@@ -41,10 +41,17 @@ const SupportApp = lazy(() => import("./components/SupportApp"));
 const WorshipTracker = lazy(() => import("./components/WorshipTracker"));
 const QuranPlan = lazy(() => import("./components/QuranPlan"));
 const SocialChallenges = lazy(() => import("./components/SocialChallenges"));
+const DuaWall = lazy(() => import("./components/DuaWall"));
 const ZakatCalculator = lazy(() => import("./components/ZakatCalculator"));
 const HajjUmrahGuide = lazy(() => import("./components/HajjUmrahGuide"));
 const Auth = lazy(() => import("./components/Auth"));
 const SmartPlan = lazy(() => import("./components/SmartPlan"));
+const Ruqyah = lazy(() => import("./components/Ruqyah"));
+const InheritanceCalculator = lazy(() => import("./components/InheritanceCalculator"));
+const DreamInterpretation = lazy(() => import("./components/DreamInterpretation"));
+const QuranReels = lazy(() => import("./components/QuranReels"));
+const SelfAccounting = lazy(() => import("./components/SelfAccounting"));
+const Tasbeeh = lazy(() => import("./components/Tasbeeh"));
 
 // Loading fallback for Suspense
 const LoadingFallback = () => (
@@ -122,14 +129,32 @@ function AppContent() {
         return <QuranPlan onBack={() => setActiveTab("more")} />;
       case "social":
         return <SocialChallenges onBack={() => setActiveTab("more")} />;
+      case "dua-wall":
+        return <DuaWall onBack={() => setActiveTab("more")} />;
       case "zakat":
         return <ZakatCalculator onBack={() => setActiveTab("more")} />;
       case "hajj":
         return <HajjUmrahGuide onBack={() => setActiveTab("more")} />;
       case "smart-plan":
-        return <SmartPlan />;
+        return <SmartPlan onBack={() => setActiveTab("more")} />;
       case "auth":
         return <Auth onBack={() => setActiveTab("more")} />;
+      case "ruqyah":
+        return <Ruqyah />;
+      case "inheritance":
+        return <InheritanceCalculator onBack={() => setActiveTab("more")} />;
+      case "dreams":
+        return <DreamInterpretation onBack={() => setActiveTab("more")} />;
+      case "reels":
+        return <QuranReels onBack={() => setActiveTab("more")} />;
+      case "accounting":
+        return <SelfAccounting onBack={() => setActiveTab("more")} />;
+      case "tasbeeh":
+        return <Tasbeeh onBack={() => setActiveTab("more")} />;
+      case "zakat":
+        return <ZakatCalculator onBack={() => setActiveTab("more")} />;
+      case "names":
+        return <NamesOfAllah onBack={() => setActiveTab("more")} />;
       default:
         return <Dashboard onNavigate={setActiveTab} />;
     }

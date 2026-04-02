@@ -1,0 +1,215 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Shield, Play, Pause, Volume2, ArrowRight, BookOpen, Heart, Info } from 'lucide-react';
+
+interface RuqyahSection {
+  id: string;
+  title: string;
+  content: string[];
+}
+
+const ruqyahText: RuqyahSection[] = [
+  {
+    id: 'fatihah',
+    title: 'سورة الفاتحة',
+    content: [
+      'بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ (1) الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ (2) الرَّحْمَنِ الرَّحِيمِ (3) مَالِكِ يَوْمِ الدِّينِ (4) إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ (5) اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ (6) صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ (7)'
+    ]
+  },
+  {
+    id: 'baqarah_start',
+    title: 'أوائل سورة البقرة',
+    content: [
+      'الم (1) ذَلِكَ الْكِتَابُ لَا رَيْبَ فِيهِ هُدًى لِلْمُتَّقِينَ (2) الَّذِينَ يُؤْمِنُونَ بِالْغَيْبِ وَيُقِيمُونَ الصَّلَاةَ وَمِمَّا رَزَقْنَاهُمْ يُنْفِقُونَ (3) وَالَّذِينَ يُؤْمِنُونَ بِمَا أُنْزِلَ إِلَيْكَ وَمَا أُنْزِلَ مِنْ قَبْلِكَ وَبِالْآخِرَةِ هُمْ يُوقِنُونَ (4) أُولَئِكَ عَلَى هُدًى مِنْ رَبِّهِمْ وَأُولَئِكَ هُمُ الْمُفْلِحُونَ (5)'
+    ]
+  },
+  {
+    id: 'ayat_alkursi',
+    title: 'آية الكرسي',
+    content: [
+      'اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ وَلَا يَئُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ (255)'
+    ]
+  },
+  {
+    id: 'baqarah_end',
+    title: 'خواتيم سورة البقرة',
+    content: [
+      'آمَنَ الرَّسُولُ بِمَا أُنْزِلَ إِلَيْهِ مِنْ رَبِّهِ وَالْمُؤْمِنُونَ كُلٌّ آمَنَ بِاللَّهِ وَمَلَائِكَتِهِ وَكُتُبِهِ وَرُسُلِهِ لَا نُفَرِّقُ بَيْنَ أَحَدٍ مِنْ رُسُلِهِ وَقَالُوا سَمِعْنَا وَأَطَعْنَا غُفْرَانَكَ رَبَّنَا وَإِلَيْكَ الْمَصِيرُ (285) لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا لَهَا مَا كَسَبَتْ وَعَلَيْهَا مَا اكْتَسَبَتْ رَبَّنَا لَا تُؤَاخِذْنَا إِنْ نَسِينَا أَوْ أَخْطَأْنَا رَبَّنَا وَلَا تَحْمِلْ عَلَيْنَا إِصْرًا كَمَا حَمَلْتَهُ عَلَى الَّذِينَ مِنْ قَبْلِنَا رَبَّنَا وَلَا تُحَمِّلْنَا مَا لَا طَاقَةَ لَنَا بِهِ وَاعْفُ عَنَّا وَاغْفِرْ لَنَا وَارْحَمْنَا أَنْتَ مَوْلَانَا فَانْصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ (286)'
+    ]
+  },
+  {
+    id: 'ikhlas_muawwidhat',
+    title: 'الإخلاص والمعوذتين (3 مرات)',
+    content: [
+      'قُلْ هُوَ اللَّهُ أَحَدٌ (1) اللَّهُ الصَّمَدُ (2) لَمْ يَلِدْ وَلَمْ يُولَدْ (3) وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ (4)',
+      'قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ (1) مِنْ شَرِّ مَا خَلَقَ (2) وَمِنْ شَرِّ غَاسِقٍ إِذَا وَقَبَ (3) وَمِنْ شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ (4) وَمِنْ شَرِّ حَاسِدٍ إِذَا حَسَدَ (5)',
+      'قُلْ أَعُوذُ بِرَبِّ النَّاسِ (1) مَلِكِ النَّاسِ (2) إِلَهِ النَّاسِ (3) مِنْ شَرِّ الْوَسْوَاسِ الْخَنَّاسِ (4) الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ (5) مِنَ الْجِنَّةِ وَالنَّاسِ (6)'
+    ]
+  },
+  {
+    id: 'duas',
+    title: 'أدعية الرقية',
+    content: [
+      'أعوذ بكلمات الله التامات من شر ما خلق.',
+      'بسم الله الذي لا يضر مع اسمه شيء في الأرض ولا في السماء وهو السميع العليم.',
+      'أعوذ بكلمات الله التامة، من كل شيطان وهامة، ومن كل عين لامة.',
+      'اللهم رب الناس أذهب البأس، اشفِ أنت الشافي، لا شفاء إلا شفاؤك، شفاءً لا يغادر سقماً.',
+      'بسم الله أرقيك، من كل شيء يؤذيك، من شر كل نفس أو عين حاسد، الله يشفيك، بسم الله أرقيك.'
+    ]
+  }
+];
+
+export default function Ruqyah() {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [activeTab, setActiveTab] = useState<'text' | 'audio'>('text');
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      const handleEnded = () => setIsPlaying(false);
+      audio.addEventListener('ended', handleEnded);
+      return () => audio.removeEventListener('ended', handleEnded);
+    }
+  }, []);
+
+  return (
+    <div className="h-full flex flex-col bg-[var(--color-bg)] text-[var(--color-text)] overflow-hidden" dir="rtl">
+      {/* Header */}
+      <div className="pt-12 pb-6 px-6 bg-gradient-to-b from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white rounded-b-[2.5rem] shadow-lg shrink-0 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] opacity-10"></div>
+        <div className="relative z-10 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold font-serif mb-2">الرقية الشرعية</h1>
+            <p className="text-white/80 text-sm">حصن نفسك وأهل بيتك بآيات الله</p>
+          </div>
+          <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-inner">
+            <Shield size={32} className="text-[var(--color-gold-light)]" />
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-4 mt-8">
+          <button
+            onClick={() => setActiveTab('text')}
+            className={`flex-1 py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
+              activeTab === 'text'
+                ? 'bg-white text-[var(--color-primary)] shadow-md'
+                : 'bg-white/20 text-white hover:bg-white/30'
+            }`}
+          >
+            <BookOpen size={20} />
+            <span>قراءة</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('audio')}
+            className={`flex-1 py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
+              activeTab === 'audio'
+                ? 'bg-white text-[var(--color-primary)] shadow-md'
+                : 'bg-white/20 text-white hover:bg-white/30'
+            }`}
+          >
+            <Volume2 size={20} />
+            <span>استماع</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto p-6 pb-32">
+        <AnimatePresence mode="wait">
+          {activeTab === 'text' ? (
+            <motion.div
+              key="text"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="space-y-6"
+            >
+              <div className="bg-[var(--color-surface)] p-4 rounded-2xl border border-[var(--color-border)] flex items-start gap-3 shadow-sm">
+                <Info className="text-[var(--color-primary)] shrink-0 mt-1" size={20} />
+                <p className="text-sm leading-relaxed opacity-80">
+                  يُستحب قراءة الرقية الشرعية مع النفث (النفخ الخفيف مع ريق يسير) على النفس أو المريض، أو القراءة في ماء والشرب منه.
+                </p>
+              </div>
+
+              {ruqyahText.map((section, index) => (
+                <motion.div
+                  key={section.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-[var(--color-surface)] rounded-2xl p-6 shadow-sm border border-[var(--color-border)]"
+                >
+                  <h3 className="text-xl font-bold text-[var(--color-primary)] mb-4 flex items-center gap-2">
+                    <span className="w-8 h-8 rounded-full bg-[var(--color-primary-light)] text-[var(--color-primary)] flex items-center justify-center text-sm">
+                      {index + 1}
+                    </span>
+                    {section.title}
+                  </h3>
+                  <div className="space-y-4">
+                    {section.content.map((text, i) => (
+                      <p key={i} className="text-xl leading-loose font-serif text-center">
+                        {text}
+                      </p>
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="audio"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="flex flex-col items-center justify-center h-full min-h-[50vh] space-y-8"
+            >
+              <div className="w-48 h-48 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] flex items-center justify-center shadow-2xl relative">
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] opacity-20 rounded-full"></div>
+                <Shield size={80} className="text-white relative z-10" />
+                {isPlaying && (
+                  <motion.div
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                    className="absolute inset-0 border-4 border-[var(--color-gold)] rounded-full opacity-50"
+                  />
+                )}
+              </div>
+
+              <div className="text-center">
+                <h2 className="text-2xl font-bold mb-2">الرقية الشرعية الشاملة</h2>
+                <p className="opacity-70">بصوت الشيخ مشاري العفاسي</p>
+              </div>
+
+              <button
+                onClick={togglePlay}
+                className="w-20 h-20 rounded-full bg-[var(--color-primary)] text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
+              >
+                {isPlaying ? <Pause size={32} /> : <Play size={32} className="ml-2" />}
+              </button>
+
+              {/* Audio Element */}
+              <audio
+                ref={audioRef}
+                src="https://server8.mp3quran.net/afs/roqia.mp3"
+                preload="none"
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
