@@ -496,4 +496,14 @@ i18n
     },
   });
 
+i18n.on('languageChanged', (lng) => {
+  document.documentElement.dir = (lng === 'ar' || lng === 'ur') ? 'rtl' : 'ltr';
+  document.documentElement.lang = lng;
+});
+
+// Set initial direction
+const currentLng = i18n.language || 'ar';
+document.documentElement.dir = (currentLng === 'ar' || currentLng === 'ur') ? 'rtl' : 'ltr';
+document.documentElement.lang = currentLng;
+
 export default i18n;

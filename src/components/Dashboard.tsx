@@ -413,21 +413,21 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   };
 
   const getBackgroundStyle = () => {
-    if (!nextPrayer) return "from-emerald-600 via-emerald-700 to-teal-900";
+    if (!nextPrayer) return "bg-emerald-600";
     switch (nextPrayer.id) {
       case "Fajr":
       case "Sunrise":
-        return "from-slate-900 via-indigo-900 to-violet-900";
+        return "bg-indigo-600";
       case "Dhuhr":
-        return "from-sky-400 via-blue-500 to-indigo-600";
+        return "bg-teal-600";
       case "Asr":
-        return "from-amber-400 via-orange-500 to-rose-500";
+        return "bg-amber-600";
       case "Maghrib":
-        return "from-rose-500 via-purple-600 to-indigo-800";
+        return "bg-rose-600";
       case "Isha":
-        return "from-slate-900 via-indigo-950 to-black";
+        return "bg-slate-800";
       default:
-        return "from-emerald-600 via-emerald-700 to-teal-900";
+        return "bg-emerald-600";
     }
   };
 
@@ -569,12 +569,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className={`relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br ${getBackgroundStyle()} text-white shadow-xl transition-all duration-1000 border border-white/20`}
+        className={`relative overflow-hidden rounded-[2rem] ${getBackgroundStyle()} text-white shadow-[0_8px_32px_-8px_rgba(0,0,0,0.15)] transition-colors duration-1000 border border-white/10`}
       >
-        <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-12 -mt-12 blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/20 rounded-full -ml-12 -mb-12 blur-2xl"></div>
-
-        <div className="relative z-10 p-8 flex flex-col items-center text-center space-y-6 mt-2">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-2xl"></div>
+        
+        <div className="relative z-10 p-6 flex flex-col items-center text-center space-y-4">
           <div className="flex flex-col items-center gap-2">
             <h2 className="text-xl font-medium text-white/90 tracking-wide">{getGreeting()}</h2>
             {streak > 0 && (
@@ -609,46 +608,44 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         transition={{ delay: 0.1 }}
         className="grid grid-cols-3 gap-3"
       >
-        <button onClick={() => onNavigate("quran")} className="flex flex-col items-center gap-2 group">
-          <div className="w-16 h-16 rounded-[1.25rem] card-3d bg-white dark:bg-slate-900 flex items-center justify-center text-emerald-500 shadow-sm group-hover:-translate-y-1 transition-all group-hover:border-emerald-500/30">
-            <BookOpen size={26} className="group-hover:scale-110 transition-transform" />
+        <button onClick={() => onNavigate("quran")} className="flex flex-col items-center justify-center gap-2 group bg-white dark:bg-slate-900 rounded-[20px] p-4 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-100 active:scale-95 transition-all">
+          <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform">
+            <BookOpen size={20} />
           </div>
-          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-emerald-500 transition-colors">القرآن</span>
+          <span className="text-xs font-medium text-slate-600 dark:text-slate-300 group-hover:text-emerald-600">القرآن</span>
         </button>
-        <button onClick={() => onNavigate("quran-plan")} className="flex flex-col items-center gap-2 group">
-          <div className="w-16 h-16 rounded-[1.25rem] card-3d bg-white dark:bg-slate-900 flex items-center justify-center text-teal-500 shadow-sm group-hover:-translate-y-1 transition-all group-hover:border-teal-500/30">
-            <Target size={26} className="group-hover:scale-110 transition-transform" />
+        <button onClick={() => onNavigate("quran-plan")} className="flex flex-col items-center justify-center gap-2 group bg-white dark:bg-slate-900 rounded-[20px] p-4 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-teal-100 active:scale-95 transition-all">
+          <div className="w-10 h-10 rounded-full bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center text-teal-500 group-hover:scale-110 transition-transform">
+            <Target size={20} />
           </div>
-          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-teal-500 transition-colors">ختمة</span>
+          <span className="text-xs font-medium text-slate-600 dark:text-slate-300 group-hover:text-teal-600">ختمة</span>
         </button>
-        <button onClick={() => onNavigate("azkar")} className="flex flex-col items-center gap-2 group">
-          <div className="w-16 h-16 rounded-[1.25rem] card-3d bg-white dark:bg-slate-900 flex items-center justify-center text-rose-500 shadow-sm group-hover:-translate-y-1 transition-all group-hover:border-rose-500/30">
-            <Heart size={26} className="group-hover:scale-110 transition-transform" />
+        <button onClick={() => onNavigate("azkar")} className="flex flex-col items-center justify-center gap-2 group bg-white dark:bg-slate-900 rounded-[20px] p-4 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-rose-100 active:scale-95 transition-all">
+          <div className="w-10 h-10 rounded-full bg-rose-50 dark:bg-rose-900/30 flex items-center justify-center text-rose-500 group-hover:scale-110 transition-transform">
+            <Heart size={20} />
           </div>
-          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-rose-500 transition-colors">الأذكار</span>
+          <span className="text-xs font-medium text-slate-600 dark:text-slate-300 group-hover:text-rose-600">الأذكار</span>
         </button>
-        <button onClick={() => onNavigate("tasbeeh")} className="flex flex-col items-center gap-2 group">
-          <div className="w-16 h-16 rounded-[1.25rem] card-3d bg-white dark:bg-slate-900 flex items-center justify-center text-indigo-500 shadow-sm group-hover:-translate-y-1 transition-all group-hover:border-indigo-500/30">
-            <Activity size={26} className="group-hover:scale-110 transition-transform" />
+        <button onClick={() => onNavigate("tasbeeh")} className="flex flex-col items-center justify-center gap-2 group bg-white dark:bg-slate-900 rounded-[20px] p-4 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-indigo-100 active:scale-95 transition-all">
+          <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-500 group-hover:scale-110 transition-transform">
+            <Activity size={20} />
           </div>
-          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-indigo-500 transition-colors">السبحة</span>
+          <span className="text-xs font-medium text-slate-600 dark:text-slate-300 group-hover:text-indigo-600">السبحة</span>
         </button>
-        <button onClick={() => onNavigate("qibla")} className="flex flex-col items-center gap-2 group">
-          <div className="w-16 h-16 rounded-[1.25rem] card-3d bg-white dark:bg-slate-900 flex items-center justify-center text-amber-500 shadow-sm group-hover:-translate-y-1 transition-all group-hover:border-amber-500/30">
-            <Compass size={26} className="group-hover:scale-110 transition-transform" />
+        <button onClick={() => onNavigate("qibla")} className="flex flex-col items-center justify-center gap-2 group bg-white dark:bg-slate-900 rounded-[20px] p-4 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-amber-100 active:scale-95 transition-all">
+          <div className="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-500 group-hover:scale-110 transition-transform">
+            <Compass size={20} />
           </div>
-          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-amber-500 transition-colors">القبلة</span>
+          <span className="text-xs font-medium text-slate-600 dark:text-slate-300 group-hover:text-amber-600">القبلة</span>
         </button>
-        <button onClick={() => onNavigate("worship-tracker")} className="flex flex-col items-center gap-2 group">
-          <div className="w-16 h-16 rounded-[1.25rem] card-3d bg-white dark:bg-slate-900 flex items-center justify-center text-purple-500 shadow-sm group-hover:-translate-y-1 transition-all group-hover:border-purple-500/30">
-            <Activity size={26} className="group-hover:scale-110 transition-transform" />
+        <button onClick={() => onNavigate("worship-tracker")} className="flex flex-col items-center justify-center gap-2 group bg-white dark:bg-slate-900 rounded-[20px] p-4 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-purple-100 active:scale-95 transition-all">
+          <div className="w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform">
+            <Calendar size={20} />
           </div>
-          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-purple-500 transition-colors">العبادات</span>
+          <span className="text-xs font-medium text-slate-600 dark:text-slate-300 group-hover:text-purple-600">العبادات</span>
         </button>
       </motion.div>
-
-      <LinkAccountPrompt />
-
+      
       {/* Main Bento Grid */}
       <div className="bento-grid">
         {/* Prayer Times Bento */}

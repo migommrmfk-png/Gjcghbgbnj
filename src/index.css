@@ -48,54 +48,47 @@ input, textarea {
   flex-direction: column;
 }
 
-/* Premium Glassmorphism Cards */
+/* Minimalist Calm Cards */
 .card-3d {
-  @apply bg-white/90 dark:bg-slate-900/90 backdrop-blur-md;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 28px;
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  @apply bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[24px];
+  box-shadow: 0 4px 24px -12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .dark .card-3d {
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 24px -12px rgba(0, 0, 0, 0.2);
 }
 
 .card-3d:active {
-  transform: scale(0.97);
-  @apply bg-slate-100/90 dark:bg-slate-800/90;
+  transform: scale(0.98);
+  @apply bg-slate-50 dark:bg-slate-800;
 }
 
-/* Premium Button */
+/* Minimalist Button */
 .btn-3d-primary {
-  @apply bg-gradient-to-r from-emerald-500 to-emerald-600;
-  color: #fff;
-  border-radius: 50%;
-  box-shadow: 0 8px 20px -6px rgba(5, 150, 105, 0.5);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  @apply bg-emerald-500 text-white rounded-full;
+  box-shadow: 0 4px 16px -6px rgba(16, 185, 129, 0.3);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-3d-primary:active {
-  transform: scale(0.92);
-  box-shadow: 0 4px 10px -4px rgba(5, 150, 105, 0.4);
+  transform: scale(0.96);
+  @apply bg-emerald-600;
 }
 
-/* Glassmorphism */
+/* Calm Glassmorphism */
 .glass {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .glass-dark {
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 /* Bento Grid Utilities */
@@ -110,14 +103,14 @@ input, textarea {
 }
 
 .bento-card {
-  @apply relative overflow-hidden rounded-[2rem] p-6 transition-all duration-500 active:scale-[0.97] bg-white dark:bg-slate-900;
-  border: 1px solid rgba(0, 0, 0, 0.04);
-  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.06);
+  @apply relative overflow-hidden rounded-[24px] p-6 transition-all duration-300 active:scale-[0.98] bg-white dark:bg-slate-900;
+  border: 1px solid rgba(0, 0, 0, 0.02);
+  box-shadow: 0 4px 20px -8px rgba(0, 0, 0, 0.04);
 }
 
 .dark .bento-card {
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  box-shadow: none;
 }
 
 .bento-card-primary {

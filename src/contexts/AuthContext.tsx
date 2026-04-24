@@ -145,8 +145,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             await signInAnonymously(auth);
             // The onAuthStateChanged will fire again with the new user
             return;
-          } catch (e) {
-            console.error("Error auto-signing in as guest:", e);
+          } catch (e: any) {
+            if (e?.code === 'auth/admin-restricted-operation') {
+              console.warn("Firebase Anonymous Auth is not enabled. To use guest mode, please go to your Firebase Console -> Authentication -> Sign-in method, and enable 'Anonymous'.");
+            } else {
+              console.error("Error auto-signing in as guest:", e);
+            }
           }
         }
       }
@@ -372,7 +376,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           handleFirestoreError(e, OperationType.CREATE, `users/${userCredential.user.uid}`);
         }
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.code === 'auth/admin-restricted-operation') {
+        const errorMsg = "Firebase Anonymous Auth is not enabled. Please go to your Firebase Console -> Authentication -> Sign-in method, and enable 'Anonymous'.";
+        console.warn(errorMsg);
+        throw new Error(errorMsg);
+      }
       console.error("Error signing in anonymously", error);
       throw error;
     }

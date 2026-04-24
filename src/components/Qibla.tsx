@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Compass, MapPin, Navigation } from "lucide-react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 
 const makkahCoords: [number, number] = [21.422487, 39.826206];
 
@@ -136,7 +136,11 @@ export default function Qibla() {
         </h3>
         <ul className="text-sm text-slate-700 dark:text-slate-300 space-y-2 list-none p-0">
           <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>ضع هاتفك بشكل مسطح (أفقي) تماماً.</li>
-          <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>ابتعد عن الأجهزة الإلكترونية والمعادن لتجنب التشويش.</      {error ? (
+          <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>ابتعد عن الأجهزة الإلكترونية والمعادن لتجنب التشويش.</li>
+        </ul>
+      </div>
+
+      {error ? (
         <div className="card-3d bg-red-50 dark:bg-red-500/10 border-red-100 dark:border-red-500/20 text-red-600 dark:text-red-400 p-6 text-center font-medium rounded-[1.5rem] shadow-sm">
           {error}
         </div>
@@ -145,32 +149,31 @@ export default function Qibla() {
           <div className="card-3d bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 rounded-[2.5rem] p-8 flex flex-col items-center justify-center min-h-[480px] shadow-xl overflow-hidden">
             {/* Compass UI Background Effects */}
             <div className={`absolute inset-0 transition-opacity duration-1000 ${isQiblaAligned ? 'opacity-100' : 'opacity-0'}`}>
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 rounded-[2.5rem]"></div>
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-emerald-400/20 rounded-full blur-[60px] animate-pulse"></div>
+              <div className="absolute inset-0 bg-emerald-50/50 dark:bg-emerald-900/10 rounded-[2.5rem]"></div>
             </div>
 
             {typeof (DeviceOrientationEvent as any).requestPermission === "function" && heading === null && (
               <button 
                 onClick={requestCompassPermission}
-                className="mb-8 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:shadow-[0_10px_30px_rgba(16,185,129,0.3)] hover:-translate-y-1 text-white font-bold rounded-[1.5rem] shadow-md transition-all relative z-10"
+                className="mb-8 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-full shadow-sm transition-colors relative z-10"
               >
                 تفعيل البوصلة
               </button>
             )}
 
-            <div className="relative w-80 h-80 flex items-center justify-center">
+            <div className="relative w-72 h-72 flex items-center justify-center">
               {/* Outer Ring */}
-              <div className="absolute inset-0 rounded-full border-[12px] border-slate-50 dark:border-slate-800 shadow-[0_10px_30px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_30px_rgba(0,0,0,0.5)] bg-white dark:bg-slate-900 border-opacity-70 dark:border-opacity-50"></div>
-              <div className="absolute inset-3 rounded-full border border-emerald-500/20 shadow-inner"></div>
+              <div className="absolute inset-0 rounded-full border-[8px] border-slate-50 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900 border-opacity-70 dark:border-opacity-50"></div>
+              <div className="absolute inset-4 rounded-full border border-slate-100 dark:border-slate-800"></div>
               
               {/* Degree Marks */}
               {[...Array(72)].map((_, i) => (
                 <div 
                   key={i}
-                  className={`absolute rounded-full ${i % 6 === 0 ? 'w-1.5 h-4 bg-emerald-500/80 drop-shadow-[0_0_2px_rgba(16,185,129,0.8)]' : 'w-0.5 h-2 bg-slate-200 dark:bg-slate-700'}`}
+                  className={`absolute rounded-full w-0.5 ${i % 6 === 0 ? 'h-3 bg-emerald-500' : 'h-1.5 bg-slate-200 dark:bg-slate-700'}`}
                   style={{
-                    top: 16,
-                    transformOrigin: '50% 144px', // 160 (half w-80) - 16 = 144
+                    top: 20,
+                    transformOrigin: '50% 124px', // 144 (half w-72) - 20 = 124
                     transform: `rotate(${i * 5}deg)`
                   }}
                 ></div>
@@ -178,18 +181,15 @@ export default function Qibla() {
 
               {/* Compass Dial */}
               <motion.div
-                className="absolute inset-[32px] rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 shadow-inner overflow-hidden border border-slate-100 dark:border-slate-700"
+                className="absolute inset-[32px] rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 overflow-hidden border border-slate-100 dark:border-slate-700"
                 animate={{ rotate: heading ? -heading : 0 }}
                 transition={{ type: "spring", stiffness: 40, damping: 20 }}
               >
-                {/* Compass Rose */}
-                <div className="absolute inset-0 opacity-5 dark:opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
-                <div className="absolute inset-4 bg-[url('https://cdn-icons-png.flaticon.com/512/3253/3253138.png')] bg-contain bg-center bg-no-repeat opacity-10 dark:invert"></div>
                 
-                <div className="absolute top-4 text-rose-500 font-bold text-2xl drop-shadow-sm font-serif px-2 bg-slate-50/50 dark:bg-slate-800/50 backdrop-blur-sm rounded-full">N</div>
-                <div className="absolute bottom-4 text-slate-400 font-bold text-xl font-serif">S</div>
-                <div className="absolute right-4 text-slate-400 font-bold text-xl font-serif">E</div>
-                <div className="absolute left-4 text-slate-400 font-bold text-xl font-serif">W</div>
+                <div className="absolute top-4 text-emerald-600 dark:text-emerald-500 font-bold text-xl font-serif">N</div>
+                <div className="absolute bottom-4 text-slate-400 font-bold text-lg font-serif">S</div>
+                <div className="absolute right-4 text-slate-400 font-bold text-lg font-serif">E</div>
+                <div className="absolute left-4 text-slate-400 font-bold text-lg font-serif">W</div>
                 
                 {/* Qibla Indicator on Dial */}
                 {qiblaDirection !== null && (
@@ -197,23 +197,23 @@ export default function Qibla() {
                     className="absolute w-full h-full"
                     style={{ transform: `rotate(${qiblaDirection}deg)` }}
                   >
-                     <div className="absolute top-1 left-1/2 -translate-x-1/2 flex flex-col items-center">
-                       <div className="w-12 h-12 bg-[url('https://cdn-icons-png.flaticon.com/512/1000/1000141.png')] bg-contain bg-center bg-no-repeat drop-shadow-[0_5px_15px_rgba(16,185,129,0.8)] z-10 transition-transform hover:scale-110"></div>
-                       <div className="w-1.5 h-6 bg-gradient-to-b from-emerald-500 to-transparent -mt-1 rounded-full drop-shadow-md"></div>
+                     <div className="absolute top-2 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                       <div className="w-10 h-10 bg-[url('https://cdn-icons-png.flaticon.com/512/1000/1000141.png')] bg-contain bg-center bg-no-repeat transition-transform hover:scale-105 opacity-80 mix-blend-multiply dark:mix-blend-normal"></div>
+                       <div className="w-1 h-6 bg-emerald-500 -mt-1 rounded-full"></div>
                      </div>
                   </div>
                 )}
               </motion.div>
 
               {/* Center Needle */}
-              <div className="absolute z-10 w-6 h-[200px] flex flex-col items-center justify-center pointer-events-none">
-                <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[85px] border-b-rose-600 drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]"></div>
-                <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[85px] border-t-white drop-shadow-[0_5px_10px_rgba(0,0,0,0.5)]"></div>
+              <div className="absolute z-10 w-4 h-[180px] flex flex-col items-center justify-center pointer-events-none">
+                <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[80px] border-b-rose-500"></div>
+                <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[80px] border-t-slate-700 dark:border-t-slate-300"></div>
               </div>
               
                {/* Center Pin */}
-               <div className="absolute z-20 w-10 h-10 bg-gradient-to-br from-slate-100 to-slate-400 dark:from-slate-600 dark:to-slate-800 border-4 border-emerald-500/50 rounded-full shadow-[0_5px_15px_rgba(0,0,0,0.5)] flex items-center justify-center">
-                  <div className="w-3 h-3 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full shadow-inner"></div>
+               <div className="absolute z-20 w-6 h-6 bg-white dark:bg-slate-800 border-2 border-emerald-500 rounded-full shadow-sm flex items-center justify-center">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
                </div>
             </div>
 
@@ -222,35 +222,26 @@ export default function Qibla() {
                 {isQiblaAligned ? (
                   <motion.div
                     key="aligned"
-                    initial={{ scale: 0.8, opacity: 0, y: 10 }}
+                    initial={{ scale: 0.9, opacity: 0, y: 5 }}
                     animate={{ scale: 1, opacity: 1, y: 0 }}
-                    exit={{ scale: 0.8, opacity: 0, y: -10 }}
-                    className="text-emerald-500 font-bold text-2xl drop-shadow-[0_0_15px_rgba(16,185,129,0.6)] flex items-center justify-center gap-3 bg-emerald-50 dark:bg-emerald-500/10 px-6 py-3 rounded-full border border-emerald-200 dark:border-emerald-500/30"
+                    exit={{ scale: 0.9, opacity: 0, y: -5 }}
+                    className="text-emerald-600 dark:text-emerald-400 font-bold text-xl flex items-center justify-center gap-2 bg-emerald-50 dark:bg-emerald-900/20 px-6 py-3 rounded-full border border-emerald-100 dark:border-emerald-800/50"
                   >
-                    <Compass className="animate-pulse" size={28} />
+                    <Compass size={24} />
                     أنت متجه نحو القبلة
                   </motion.div>
                 ) : (
                   <motion.div
                     key="not-aligned"
-                     initial={{ opacity: 0, y: 10 }}
+                     initial={{ opacity: 0, y: 5 }}
                      animate={{ opacity: 1, y: 0 }}
-                     exit={{ opacity: 0, y: -10 }}
-                    className="text-slate-500 dark:text-slate-400 font-bold text-lg px-6 py-3 bg-slate-50 dark:bg-slate-800/50 rounded-full border border-slate-100 dark:border-slate-800"
+                     exit={{ opacity: 0, y: -5 }}
+                    className="text-slate-500 dark:text-slate-400 font-medium text-sm px-6 py-3 bg-slate-50 dark:bg-slate-800/50 rounded-full border border-slate-100 dark:border-slate-800"
                   >
                     قم بتدوير الجهاز حتى يتطابق المؤشر مع الكعبة
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-                </div>
-              )}
             </div>
           </div>
         </div>

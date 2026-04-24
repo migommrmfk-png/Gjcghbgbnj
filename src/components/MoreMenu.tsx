@@ -103,104 +103,105 @@ export default function MoreMenu({
 
   const categories = [
     {
-      title: 'المكتبة والتعلم',
+      title: t('library_and_learning', 'المكتبة والتعلم'),
       image: 'https://i.pinimg.com/736x/87/1b/2f/871b2f81152a51f801a61327111b1511.jpg',
       items: [
-        { id: 'muslim-ai', label: 'الذكاء الاصطناعي', icon: <Bot size={24} />, color: 'bg-indigo-500' },
-        { id: 'dreams', label: 'تفسير الأحلام', icon: <Moon size={24} />, color: 'bg-indigo-700' },
-        { id: 'stories', label: 'قصص الأنبياء', icon: <BookOpen size={24} />, color: 'bg-purple-500' },
-        { id: 'prayer-guide', label: 'كيفية الصلاة', icon: <BookOpen size={24} />, color: 'bg-amber-600' },
-        { id: 'names', label: 'أسماء الله الحسنى', icon: <Heart size={24} />, color: 'bg-pink-500' },
-        { id: 'hadith', label: 'الأحاديث', icon: <BookOpen size={24} />, color: 'bg-red-400' },
-        { id: 'duas', label: 'الأدعية', icon: <Heart size={24} />, color: 'bg-emerald-400' },
+        { id: 'muslim-ai', label: t('muslim_ai', 'الذكاء الاصطناعي'), icon: <Bot size={24} />, color: 'bg-indigo-500' },
+        { id: 'dreams', label: t('dream_interpretation', 'تفسير الأحلام'), icon: <Moon size={24} />, color: 'bg-indigo-700' },
+        { id: 'stories', label: t('prophet_stories', 'قصص الأنبياء'), icon: <BookOpen size={24} />, color: 'bg-purple-500' },
+        { id: 'prayer-guide', label: t('prayer_guide', 'كيفية الصلاة'), icon: <BookOpen size={24} />, color: 'bg-amber-600' },
+        { id: 'names', label: t('names_of_allah', 'أسماء الله الحسنى'), icon: <Heart size={24} />, color: 'bg-pink-500' },
+        { id: 'hadith', label: t('hadiths', 'الأحاديث'), icon: <BookOpen size={24} />, color: 'bg-red-400' },
+        { id: 'duas', label: t('duas', 'الأدعية'), icon: <Heart size={24} />, color: 'bg-emerald-400' },
       ]
     },
     {
-      title: 'أدوات ومواسم',
+      title: t('tools_and_seasons', 'أدوات ومواسم'),
       image: 'https://i.pinimg.com/736x/3f/8b/77/3f8b77626915152a54b38d7c49b6b801.jpg',
       items: [
-        { id: 'tasbeeh', label: 'السبحة الإلكترونية', icon: <Circle size={24} />, color: 'bg-indigo-500' },
-        { id: 'ruqyah', label: 'الرقية الشرعية', icon: <Shield size={24} />, color: 'bg-teal-500' },
-        { id: 'qibla', label: 'اتجاه القبلة', icon: <Compass size={24} />, color: 'bg-orange-500' },
-        { id: 'calendar', label: 'التقويم الهجري', icon: <Calendar size={24} />, color: 'bg-blue-500' },
-        { id: 'zakat', label: 'حاسبة الزكاة', icon: <Calculator size={24} />, color: 'bg-emerald-600' },
-        { id: 'inheritance', label: 'حاسبة المواريث', icon: <Calculator size={24} />, color: 'bg-emerald-800' },
-        { id: 'hajj', label: 'دليل الحج والعمرة', icon: <Map size={24} />, color: 'bg-amber-700' },
+        { id: 'tasbeeh', label: t('tasbeeh', 'السبحة الإلكترونية'), icon: <Circle size={24} />, color: 'bg-indigo-500' },
+        { id: 'ruqyah', label: t('ruqyah', 'الرقية الشرعية'), icon: <Shield size={24} />, color: 'bg-teal-500' },
+        { id: 'qibla', label: t('qibla', 'اتجاه القبلة'), icon: <Compass size={24} />, color: 'bg-orange-500' },
+        { id: 'calendar', label: t('hijri_calendar', 'التقويم الهجري'), icon: <Calendar size={24} />, color: 'bg-blue-500' },
+        { id: 'zakat', label: t('zakat_calculator', 'حاسبة الزكاة'), icon: <Calculator size={24} />, color: 'bg-emerald-600' },
+        { id: 'inheritance', label: t('inheritance_calculator', 'حاسبة المواريث'), icon: <Calculator size={24} />, color: 'bg-emerald-800' },
+        { id: 'hajj', label: t('hajj_guide', 'دليل الحج والعمرة'), icon: <Map size={24} />, color: 'bg-amber-700' },
       ]
     },
     {
-      title: 'مجتمع وتحديات',
+      title: t('community_and_challenges', 'مجتمع وتحديات'),
       image: 'https://i.pinimg.com/736x/60/76/8b/60768b598b049d53c7a36e1c94411d73.jpg',
       items: [
-        { id: 'dua-wall', label: 'حائط الدعاء', icon: <HandHeart size={24} />, color: 'bg-rose-500' },
-        { id: 'accounting', label: 'ورد المحاسبة', icon: <TrendingUp size={24} />, color: 'bg-teal-600' },
-        { id: 'smart-plan', label: 'الخطة الذكية', icon: <Target size={24} />, color: 'bg-emerald-600' },
-        { id: 'worship-tracker', label: 'متابعة العبادات', icon: <Trophy size={24} />, color: 'bg-amber-500' },
-        { id: 'quran-plan', label: 'خطة القرآن', icon: <BookOpen size={24} />, color: 'bg-emerald-500' },
-        { id: 'social', label: 'المجتمع والتحديات', icon: <Users size={24} />, color: 'bg-rose-500' },
-        { id: 'games', label: 'ألعاب وتحديات', icon: <Puzzle size={24} />, color: 'bg-teal-500' },
+        { id: 'dua-wall', label: t('dua_wall', 'حائط الدعاء'), icon: <HandHeart size={24} />, color: 'bg-rose-500' },
+        { id: 'accounting', label: t('self_accounting', 'ورد المحاسبة'), icon: <TrendingUp size={24} />, color: 'bg-teal-600' },
+        { id: 'smart-plan', label: t('smart_plan', 'الخطة الذكية'), icon: <Target size={24} />, color: 'bg-emerald-600' },
+        { id: 'worship-tracker', label: t('worship_tracker', 'متابعة العبادات'), icon: <Trophy size={24} />, color: 'bg-amber-500' },
+        { id: 'quran-plan', label: t('quran_plan', 'خطة القرآن'), icon: <BookOpen size={24} />, color: 'bg-emerald-500' },
+        { id: 'social', label: t('social_and_challenges', 'المجتمع والتحديات'), icon: <Users size={24} />, color: 'bg-rose-500' },
+        { id: 'games', label: t('games_and_challenges', 'ألعاب وتحديات'), icon: <Puzzle size={24} />, color: 'bg-teal-500' },
       ]
     },
     {
-      title: 'صوتيات',
+      title: t('audios', 'صوتيات'),
       image: 'https://i.pinimg.com/736x/f6/3c/65/f63c65c270d7406f52285188d8b2d423.jpg',
       items: [
-        { id: 'reels', label: 'تلاوات خاشعة', icon: <Play size={24} />, color: 'bg-purple-600' },
-        { id: 'radio', label: 'إذاعة القرآن', icon: <Radio size={24} />, color: 'bg-red-500' },
+        { id: 'reels', label: t('quran_reels', 'تلاوات خاشعة'), icon: <Play size={24} />, color: 'bg-purple-600' },
+        { id: 'radio', label: t('quran_radio', 'إذاعة القرآن'), icon: <Radio size={24} />, color: 'bg-red-500' },
       ]
     },
     {
-      title: 'إعدادات',
+      title: t('settings', 'إعدادات'),
       image: 'https://i.pinimg.com/736x/d4/ec/c9/d4ecc94676a666d6911d5167e424458d.jpg',
       items: [
-        { id: 'theme', label: theme === 'dark' ? 'الوضع النهاري' : 'الوضع الليلي', icon: theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />, color: 'bg-slate-700' },
-        { id: 'prayer-settings', label: 'إعدادات الصلاة', icon: <Settings size={24} />, color: 'bg-emerald-600' },
-        { id: 'notifications', label: notificationsEnabled ? 'إيقاف الإشعارات' : 'تفعيل الإشعارات', icon: notificationsEnabled ? <BellOff size={24} /> : <Bell size={24} />, color: notificationsEnabled ? 'bg-gray-500' : 'bg-yellow-500' },
-        { id: 'auto-adhan', label: autoAdhanEnabled ? 'إيقاف الأذان التلقائي' : 'تفعيل الأذان التلقائي', icon: autoAdhanEnabled ? <VolumeX size={24} /> : <Volume2 size={24} />, color: autoAdhanEnabled ? 'bg-gray-500' : 'bg-emerald-500' },
-        { id: 'language', label: 'تغيير اللغة', icon: <Globe size={24} />, color: 'bg-indigo-600' },
-        { id: 'support', label: 'ادعم التطبيق', icon: <HandHeart size={24} />, color: 'bg-rose-500' },
-        { id: 'whatsapp', label: 'تواصل معنا', icon: <MessageCircle size={24} />, color: 'bg-[#25D366]' },
-        { id: 'auth', label: user ? 'تسجيل الخروج' : 'تسجيل الدخول', icon: user ? <LogOut size={24} /> : <LogIn size={24} />, color: user ? 'bg-red-500' : 'bg-blue-500' },
+        { id: 'theme', label: theme === 'dark' ? t('light_mode', 'الوضع النهاري') : t('dark_mode', 'الوضع الليلي'), icon: theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />, color: 'bg-slate-700' },
+        { id: 'prayer-settings', label: t('prayer_settings', 'إعدادات الصلاة'), icon: <Settings size={24} />, color: 'bg-emerald-600' },
+        { id: 'notifications', label: notificationsEnabled ? t('disable_notifications', 'إيقاف الإشعارات') : t('enable_notifications', 'تفعيل الإشعارات'), icon: notificationsEnabled ? <BellOff size={24} /> : <Bell size={24} />, color: notificationsEnabled ? 'bg-gray-500' : 'bg-yellow-500' },
+        { id: 'auto-adhan', label: autoAdhanEnabled ? t('disable_auto_adhan', 'إيقاف الأذان التلقائي') : t('enable_auto_adhan', 'تفعيل الأذان التلقائي'), icon: autoAdhanEnabled ? <VolumeX size={24} /> : <Volume2 size={24} />, color: autoAdhanEnabled ? 'bg-gray-500' : 'bg-emerald-500' },
+        { id: 'language', label: t('change_language', 'تغيير اللغة'), icon: <Globe size={24} />, color: 'bg-indigo-600' },
+        { id: 'support', label: t('support_app', 'ادعم التطبيق'), icon: <HandHeart size={24} />, color: 'bg-rose-500' },
+        { id: 'whatsapp', label: t('contact_us', 'تواصل معنا'), icon: <MessageCircle size={24} />, color: 'bg-[#25D366]' },
+        { id: 'auth', label: user ? t('logout', 'تسجيل الخروج') : t('login', 'تسجيل الدخول'), icon: user ? <LogOut size={24} /> : <LogIn size={24} />, color: user ? 'bg-red-500' : 'bg-blue-500' },
       ]
     }
   ];
 
+  const isRTL = i18n.language === 'ar' || i18n.language === 'ur';
+
   return (
-    <div className="max-w-md mx-auto p-4 space-y-6 pb-32" dir="rtl">
+    <div className="max-w-md mx-auto p-4 space-y-6 pb-32" dir={isRTL ? 'rtl' : 'ltr'}>
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-emerald-500 rounded-3xl p-8 text-white shadow-sm relative overflow-hidden border border-emerald-600"
+        className="bg-emerald-600 rounded-[2rem] p-8 text-white shadow-[0_8px_32px_-8px_rgba(16,185,129,0.3)] relative overflow-hidden text-center border border-white/10"
       >
-        <div className="absolute right-0 top-0 w-40 h-40 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full -ml-10 -mb-10 blur-2xl"></div>
-        <div className="relative z-10 text-center">
+        <div className="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-2xl"></div>
+        <div className="relative z-10 text-center flex flex-col items-center">
           {user ? (
-            <div className="flex flex-col items-center gap-3">
+            <div className="flex flex-col items-center gap-3 w-full">
               {user.photoURL ? (
-                <img src={user.photoURL} alt="Profile" className="w-20 h-20 rounded-full border-2 border-white/20" referrerPolicy="no-referrer" loading="lazy" />
+                <img src={user.photoURL} alt="Profile" className="w-20 h-20 rounded-full border-2 border-white/30 shadow-md object-cover mb-2" referrerPolicy="no-referrer" loading="lazy" />
               ) : (
-                <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center border-2 border-white/20">
-                  <User size={40} className="text-emerald-100" />
+                <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/30 shadow-md mb-2">
+                  <User size={40} className="text-emerald-50" />
                 </div>
               )}
               <div>
-                <h1 className="text-2xl font-bold font-serif mb-1 text-white">
+                <h1 className="text-2xl font-bold font-serif text-white mb-1">
                   {user.isAnonymous ? 'حساب زائر' : (user.displayName || 'مستخدم')}
                 </h1>
-                {!user.isAnonymous && <p className="text-emerald-100 text-sm">{user.email}</p>}
+                {!user.isAnonymous && <p className="text-emerald-100/90 text-xs font-mono bg-black/10 px-3 py-1 rounded-full">{user.email}</p>}
                 
                 {user.isAnonymous && (
                   <button
                     onClick={handleLinkGoogle}
                     disabled={linking}
-                    className="mt-3 bg-white text-emerald-600 text-sm font-bold py-1.5 px-4 rounded-full shadow-sm hover:bg-emerald-50 transition-colors flex items-center justify-center gap-2 mx-auto disabled:opacity-70"
+                    className="mt-4 bg-white text-emerald-700 text-sm font-bold py-2 px-5 rounded-full shadow-sm hover:bg-emerald-50 transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto disabled:opacity-70 disabled:scale-100"
                   >
                     {linking ? (
-                      <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-5 h-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
                     ) : (
                       <>
-                        <Shield size={14} />
+                        <Shield size={16} />
                         <span>اربط حسابك لحفظ تقدمك</span>
                       </>
                     )}
@@ -210,8 +211,11 @@ export default function MoreMenu({
             </div>
           ) : (
             <>
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center border border-white/30 shadow-md mb-4">
+                 <Settings size={32} className="text-white" />
+              </div>
               <h1 className="text-4xl font-bold font-serif mb-2 text-white">المزيد</h1>
-              <p className="text-emerald-100 text-sm font-bold">اكتشف المزيد من الخدمات الإسلامية</p>
+              <p className="text-emerald-50 text-sm font-medium bg-black/10 px-4 py-2 rounded-full mt-2">اكتشف الخدمات والميزات الإضافية</p>
             </>
           )}
         </div>
@@ -227,7 +231,7 @@ export default function MoreMenu({
             className="space-y-4"
           >
             <div className="flex items-center gap-3 px-2">
-              <div className="w-1 h-6 bg-emerald-500 rounded-full"></div>
+              <div className="w-1.5 h-6 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(52,211,153,0.5)]"></div>
               <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 font-serif">
                 {category.title}
               </h2>
@@ -237,8 +241,11 @@ export default function MoreMenu({
               {category.items.map((item, index) => (
                 <motion.button
                   key={item.id}
-                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileHover={{ scale: 1.02, y: -4 }}
                   whileTap={{ scale: 0.98 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
                   onClick={() => {
                     if (item.id === 'whatsapp') {
                       window.open('https://wa.me/201062082229', '_blank');
@@ -262,17 +269,16 @@ export default function MoreMenu({
                       onNavigate(item.id);
                     }
                   }}
-                  className="relative group overflow-hidden rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 flex flex-col items-start gap-4 shadow-sm hover:border-emerald-500/30 transition-all"
+                  className="card-3d relative overflow-hidden rounded-[20px] p-4 flex flex-col items-center gap-3 text-center group hover:border-emerald-500/30"
                 >
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50 dark:bg-slate-800 rounded-full -mr-12 -mt-12 blur-2xl group-hover:bg-emerald-500/5 transition-colors"></div>
+                  <div className="absolute inset-0 bg-white/10 dark:bg-slate-800/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   
-                  <div className={`w-12 h-12 rounded-2xl ${item.color} text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform`}>
-                    {React.cloneElement(item.icon as React.ReactElement, { size: 24 })}
+                  <div className={`w-12 h-12 rounded-full ${item.color} text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform relative z-10 border border-white/20`}>
+                    {React.cloneElement(item.icon as React.ReactElement, { size: 22 })}
                   </div>
                   
-                  <div className="relative z-10 text-right w-full">
-                    <span className="font-bold text-slate-800 dark:text-slate-100 text-sm block">{item.label}</span>
-                    <div className="w-6 h-1 bg-emerald-500/30 rounded-full mt-2 group-hover:w-12 transition-all"></div>
+                  <div className="relative z-10 w-full flex flex-col items-center">
+                    <span className="font-semibold text-slate-700 dark:text-slate-200 text-sm block group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">{item.label}</span>
                   </div>
                 </motion.button>
               ))}

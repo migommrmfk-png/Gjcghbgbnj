@@ -62,6 +62,8 @@ export default function Quran() {
   const [selectedReciterServer, setSelectedReciterServer] = useState("");
   
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isAudioLoading, setIsAudioLoading] = useState(false);
+  const [audioError, setAudioError] = useState("");
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   
@@ -176,6 +178,8 @@ export default function Quran() {
       localStorage.setItem('quranLastRead', JSON.stringify(newLastRead));
       
       setIsPlaying(false);
+      setIsAudioLoading(false);
+      setAudioError("");
       setCurrentTime(0);
       setDuration(0);
       
@@ -250,12 +254,15 @@ export default function Quran() {
   const togglePlay = () => {
     if (!audioRef.current || !selectedSurah) return;
     
+    setAudioError("");
+
     // Ensure src is set before playing
     if (!audioRef.current.src || audioRef.current.src === window.location.href) {
       if (selectedReciterServer) {
         const paddedNumber = String(selectedSurah.number).padStart(3, '0');
         audioRef.current.src = `${selectedReciterServer}${paddedNumber}.mp3`;
       } else {
+        setAudioError("يرجى اختيار قارئ أولاً");
         return; // Cannot play without a server
       }
     }
@@ -264,11 +271,17 @@ export default function Quran() {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
+      setIsAudioLoading(true);
       audioRef.current.play()
-        .then(() => setIsPlaying(true))
+        .then(() => {
+          setIsPlaying(true);
+          setIsAudioLoading(false);
+        })
         .catch(e => {
           console.error("Audio play failed", e);
           setIsPlaying(false);
+          setIsAudioLoading(false);
+          setAudioError("عذراً، لا يمكن تشغيل هذا القارئ حالياً. جرب قارئاً آخر.");
         });
     }
   };
@@ -329,6 +342,14 @@ export default function Quran() {
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}
           onEnded={() => setIsPlaying(false)}
+          onPlaying={() => { setIsAudioLoading(false); setIsPlaying(true); }}
+          onWaiting={() => setIsAudioLoading(true)}
+          onError={(e) => {
+            console.error("Audio error", e);
+            setIsAudioLoading(false);
+            setIsPlaying(false);
+            setAudioError("حدث خطأ في الصوت. يرجى تجربة قارئ آخر.");
+          }}
         />
 
         {/* Tafsir Modal */}
@@ -515,13 +536,21 @@ export default function Quran() {
           animate={{ y: 0 }}
           className="fixed bottom-20 left-0 right-0 max-w-md mx-auto p-4 z-30"
         >
-          <div className="p-4 flex flex-col gap-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 shadow-lg rounded-3xl">
+          {audioError && (
+            <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-2 rounded-t-2xl text-center text-xs font-bold -mb-4 pt-3 pb-5 border border-red-200 dark:border-red-800/50 relative z-20 shadow-[-0_4px_10px_rgba(0,0,0,0.1)]">
+              {audioError}
+            </div>
+          )}
+          <div className="p-4 flex flex-col gap-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 shadow-lg rounded-3xl relative z-30">
             <div className="flex items-center gap-3">
               <button
                 onClick={togglePlay}
-                className="w-12 h-12 shrink-0 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center shadow-sm transform active:scale-95 transition-all"
+                disabled={isAudioLoading}
+                className={`w-12 h-12 shrink-0 rounded-full text-white flex items-center justify-center shadow-sm transform active:scale-95 transition-all outline-none ${isAudioLoading ? 'bg-slate-300 dark:bg-slate-700' : 'bg-emerald-500 hover:bg-emerald-600'}`}
               >
-                {isPlaying ? (
+                {isAudioLoading ? (
+                  <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                ) : isPlaying ? (
                   <PauseCircle size={28} />
                 ) : (
                   <PlayCircle size={28} />
@@ -536,12 +565,18 @@ export default function Quran() {
                   value={selectedReciterServer}
                   onChange={(e) => {
                     setSelectedReciterServer(e.target.value);
+                    setAudioError("");
                     if (selectedSurah && audioRef.current) {
                        const paddedNumber = String(selectedSurah.number).padStart(3, '0');
                        const wasPlaying = isPlaying;
                        audioRef.current.src = `${e.target.value}${paddedNumber}.mp3`;
                        if (wasPlaying) {
-                         audioRef.current.play();
+                         setIsAudioLoading(true);
+                         audioRef.current.play().catch(() => {
+                           setIsPlaying(false);
+                           setIsAudioLoading(false);
+                           setAudioError("لا يمكن تشغيل التلاوة. جرب قارئ آخر.");
+                         });
                        }
                     }
                   }}
