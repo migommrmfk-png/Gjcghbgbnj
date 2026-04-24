@@ -6,6 +6,17 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom'],
+            motion: ['motion/react'],
+            firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+          }
+        }
+      }
+    },
     plugins: [
       react(),
       VitePWA({
@@ -33,7 +44,53 @@ export default defineConfig(({mode}) => {
               purpose: 'any maskable'
             }
           ]
-        }
+        },
+        workbox: {
+          runtimeCaching: [
+            {
+              urlPattern: /^https:\/\/api\.alquran\.cloud\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'quran-api-cache',
+                expiration: {
+                  maxEntries: 200,
+                  maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            {
+              urlPattern: /^https:\/\/api\.aladhan\.com\/.*/i,
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'aladhan-api-cache',
+                expiration: {
+                  maxEntries: 50,
+                  maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            {
+              urlPattern: /^https:\/\/.*\.mp3quran\.net\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'quran-audio-cache',
+                expiration: {
+                  maxEntries: 50, // Limit audio files to avoid filling up storage
+                  maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+          ],
+        },
       })
     ],
     define: {

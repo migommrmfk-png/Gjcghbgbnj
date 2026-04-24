@@ -413,21 +413,21 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   };
 
   const getBackgroundStyle = () => {
-    if (!nextPrayer) return "from-[var(--color-primary-dark)] to-[var(--color-primary)]";
+    if (!nextPrayer) return "from-emerald-600 via-emerald-700 to-teal-900";
     switch (nextPrayer.id) {
       case "Fajr":
       case "Sunrise":
-        return "from-[#0a1118] to-[#1a2b3c] bg-[url('https://images.unsplash.com/photo-1519817914152-2a241f6d54f6?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center bg-blend-overlay";
+        return "from-slate-900 via-indigo-900 to-violet-900";
       case "Dhuhr":
-        return "from-[#0d1b2a] to-[#1b263b] bg-[url('https://images.unsplash.com/photo-1564121211835-e88c852648ab?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center bg-blend-overlay";
+        return "from-sky-400 via-blue-500 to-indigo-600";
       case "Asr":
-        return "from-[#1a221d] to-[#2d3a33] bg-[url('https://images.unsplash.com/photo-1584551246679-0daf3d275d0f?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center bg-blend-overlay";
+        return "from-amber-400 via-orange-500 to-rose-500";
       case "Maghrib":
-        return "from-[#2a1a1a] to-[#3d2626] bg-[url('https://images.unsplash.com/photo-1551041777-ed277b8dd348?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center bg-blend-overlay";
+        return "from-rose-500 via-purple-600 to-indigo-800";
       case "Isha":
-        return "from-[#0a0f0d] to-[#141c18] bg-[url('https://images.unsplash.com/photo-1507676184212-d0330a15233c?q=80&w=1000&auto=format&fit=crop')] bg-cover bg-center bg-blend-overlay";
+        return "from-slate-900 via-indigo-950 to-black";
       default:
-        return "from-[var(--color-primary-dark)] to-[var(--color-primary)]";
+        return "from-emerald-600 via-emerald-700 to-teal-900";
     }
   };
 
@@ -463,8 +463,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       id: "quran",
       title: t('quran'),
       icon: <BookOpen size={28} />,
-      color: "text-[var(--color-primary)]",
-      bg: "bg-[var(--color-primary)]/10",
+      color: "text-emerald-500",
+      bg: "bg-emerald-500/10",
     },
     {
       id: "smart-plan",
@@ -556,7 +556,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full min-h-[50vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary)]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -564,42 +564,87 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   const isRTL = i18n.language === 'ar' || i18n.language === 'ur';
 
   return (
-    <div className="max-w-md mx-auto p-4 space-y-6 pb-32" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="max-w-md mx-auto p-4 space-y-6 pb-28" dir={isRTL ? "rtl" : "ltr"}>
       {/* Header Card - Dynamic Background */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className={`relative overflow-hidden rounded-[2rem] bg-gradient-to-br ${getBackgroundStyle()} text-white shadow-xl transition-all duration-1000 border border-white/5`}
+        className={`relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br ${getBackgroundStyle()} text-white shadow-xl transition-all duration-1000 border border-white/20`}
       >
-        <div className="absolute top-0 right-0 w-40 h-40 bg-[var(--color-primary)]/20 rounded-full -mr-10 -mt-10 blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/40 rounded-full -ml-10 -mb-10 blur-2xl"></div>
+        <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-12 -mt-12 blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/20 rounded-full -ml-12 -mb-12 blur-2xl"></div>
 
-        <div className="relative z-10 p-8 flex flex-col items-center text-center space-y-6 mt-4">
+        <div className="relative z-10 p-8 flex flex-col items-center text-center space-y-6 mt-2">
           <div className="flex flex-col items-center gap-2">
-            <h2 className="text-2xl font-bold text-white drop-shadow-md">{getGreeting()}</h2>
+            <h2 className="text-xl font-medium text-white/90 tracking-wide">{getGreeting()}</h2>
             {streak > 0 && (
-              <div className="flex items-center gap-1.5 bg-orange-500/20 text-orange-300 px-3 py-1 rounded-full text-xs font-bold border border-orange-500/30 backdrop-blur-sm">
+              <div className="flex items-center gap-1.5 bg-white/10 text-white px-3 py-1 rounded-full text-xs font-medium border border-white/20 backdrop-blur-sm">
                 <span>🔥</span>
                 <span>{streak} {t('days_streak')}</span>
               </div>
             )}
           </div>
-          <div className={`flex items-center space-x-2 ${isRTL ? 'space-x-reverse' : ''} bg-black/40 px-5 py-2 rounded-full text-sm backdrop-blur-md border border-white/10 shadow-inner`}>
-            <MapPin size={16} className="text-[var(--color-primary)]" />
-            <span className="font-medium">{locationName || t('locating')}</span>
+          <div className={`flex items-center space-x-2 ${isRTL ? 'space-x-reverse' : ''} bg-black/20 px-4 py-1.5 rounded-full text-xs backdrop-blur-md border border-white/10`}>
+            <MapPin size={14} className="text-white/80" />
+            <span className="font-medium text-white/90">{locationName || t('locating')}</span>
           </div>
 
           {hijriDate && (
             <div className="mt-2">
-              <h1 className="text-4xl font-bold font-serif mb-2 drop-shadow-lg text-[var(--color-primary-light)]">
+              <h1 className="text-4xl font-bold font-serif mb-1 text-white">
                 {hijriDate.day} {hijriDate.month.ar} {hijriDate.year}
               </h1>
-              <p className="text-white/80 text-lg font-medium drop-shadow-md">
+              <p className="text-white/70 text-sm font-medium">
                 {hijriDate.weekday.ar} • {gregorianDate}
               </p>
             </div>
           )}
         </div>
+      </motion.div>
+
+      {/* Quick Access Row */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.1 }}
+        className="grid grid-cols-3 gap-3"
+      >
+        <button onClick={() => onNavigate("quran")} className="flex flex-col items-center gap-2 group">
+          <div className="w-16 h-16 rounded-[1.25rem] card-3d bg-white dark:bg-slate-900 flex items-center justify-center text-emerald-500 shadow-sm group-hover:-translate-y-1 transition-all group-hover:border-emerald-500/30">
+            <BookOpen size={26} className="group-hover:scale-110 transition-transform" />
+          </div>
+          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-emerald-500 transition-colors">القرآن</span>
+        </button>
+        <button onClick={() => onNavigate("quran-plan")} className="flex flex-col items-center gap-2 group">
+          <div className="w-16 h-16 rounded-[1.25rem] card-3d bg-white dark:bg-slate-900 flex items-center justify-center text-teal-500 shadow-sm group-hover:-translate-y-1 transition-all group-hover:border-teal-500/30">
+            <Target size={26} className="group-hover:scale-110 transition-transform" />
+          </div>
+          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-teal-500 transition-colors">ختمة</span>
+        </button>
+        <button onClick={() => onNavigate("azkar")} className="flex flex-col items-center gap-2 group">
+          <div className="w-16 h-16 rounded-[1.25rem] card-3d bg-white dark:bg-slate-900 flex items-center justify-center text-rose-500 shadow-sm group-hover:-translate-y-1 transition-all group-hover:border-rose-500/30">
+            <Heart size={26} className="group-hover:scale-110 transition-transform" />
+          </div>
+          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-rose-500 transition-colors">الأذكار</span>
+        </button>
+        <button onClick={() => onNavigate("tasbeeh")} className="flex flex-col items-center gap-2 group">
+          <div className="w-16 h-16 rounded-[1.25rem] card-3d bg-white dark:bg-slate-900 flex items-center justify-center text-indigo-500 shadow-sm group-hover:-translate-y-1 transition-all group-hover:border-indigo-500/30">
+            <Activity size={26} className="group-hover:scale-110 transition-transform" />
+          </div>
+          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-indigo-500 transition-colors">السبحة</span>
+        </button>
+        <button onClick={() => onNavigate("qibla")} className="flex flex-col items-center gap-2 group">
+          <div className="w-16 h-16 rounded-[1.25rem] card-3d bg-white dark:bg-slate-900 flex items-center justify-center text-amber-500 shadow-sm group-hover:-translate-y-1 transition-all group-hover:border-amber-500/30">
+            <Compass size={26} className="group-hover:scale-110 transition-transform" />
+          </div>
+          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-amber-500 transition-colors">القبلة</span>
+        </button>
+        <button onClick={() => onNavigate("worship-tracker")} className="flex flex-col items-center gap-2 group">
+          <div className="w-16 h-16 rounded-[1.25rem] card-3d bg-white dark:bg-slate-900 flex items-center justify-center text-purple-500 shadow-sm group-hover:-translate-y-1 transition-all group-hover:border-purple-500/30">
+            <Activity size={26} className="group-hover:scale-110 transition-transform" />
+          </div>
+          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 group-hover:text-purple-500 transition-colors">العبادات</span>
+        </button>
       </motion.div>
 
       <LinkAccountPrompt />
@@ -611,23 +656,22 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="bento-item-large bento-card bento-card-primary"
+          className="bento-item-large bento-card bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800"
         >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
           <div className="relative z-10">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h2 className="text-3xl font-bold font-serif mb-1">{t('prayer_times')}</h2>
-                <div className="flex items-center gap-2 text-white/70 text-sm font-bold">
-                  <MapPin size={14} />
+                <h2 className="text-2xl font-bold font-serif mb-1 text-slate-800 dark:text-slate-100">{t('prayer_times')}</h2>
+                <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-xs font-medium">
+                  <MapPin size={12} />
                   {locationName || t('locating')}
                 </div>
               </div>
               <div className={`text-${isRTL ? 'left' : 'right'}`}>
-                <p className="text-4xl font-bold font-mono tracking-tighter">
+                <p className="text-3xl font-bold font-mono tracking-tighter text-emerald-500">
                   {nextPrayerTime}
                 </p>
-                <p className="text-xs font-bold uppercase tracking-widest opacity-60">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
                   {t('next_prayer')}: {nextPrayerName}
                 </p>
               </div>
@@ -642,11 +686,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                     key={prayer.id}
                     className={`flex flex-col items-center p-3 rounded-2xl transition-all ${
                       isNext
-                        ? "bg-white text-[var(--color-bg)] shadow-lg scale-105"
-                        : "bg-white/10 text-white hover:bg-white/20"
+                        ? "bg-emerald-500 text-white shadow-md scale-105"
+                        : "bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 border border-slate-100 dark:border-slate-800"
                     }`}
                   >
-                    <span className="text-[10px] font-bold uppercase mb-1 opacity-60">
+                    <span className={`text-[10px] font-bold uppercase mb-1 ${isNext ? 'opacity-90' : 'opacity-60'}`}>
                       {prayer.name}
                     </span>
                     <span className="text-sm font-bold font-mono">{formatTime(time)}</span>
@@ -662,28 +706,27 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.25 }}
-          className="bento-item-large bento-card cursor-pointer group relative overflow-hidden"
+          className="bento-item-large bento-card cursor-pointer group relative overflow-hidden bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 border-indigo-100 dark:border-indigo-800/30"
           onClick={() => onNavigate("muslim-ai")}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] opacity-90 transition-opacity group-hover:opacity-100"></div>
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/20 rounded-full -ml-10 -mb-10 blur-xl"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-500/10 rounded-full -ml-10 -mb-10 blur-xl"></div>
           
           <div className="relative z-10 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-black/20 rounded-2xl flex items-center justify-center backdrop-blur-md border border-black/10 shadow-inner group-hover:scale-110 transition-transform">
-                <Sparkles size={28} className="text-white animate-pulse" />
+              <div className="w-14 h-14 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center shadow-sm border border-indigo-100 dark:border-indigo-800/50 group-hover:scale-110 transition-transform">
+                <Sparkles size={28} className="text-indigo-500 animate-pulse" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white mb-1 flex items-center gap-2">
+                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2">
                   {t('muslim_ai')}
-                  <span className="bg-black/20 text-white text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">AI</span>
+                  <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">AI</span>
                 </h3>
-                <p className="text-white/80 text-sm font-medium">{t('ai_assistant_desc')}</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">{t('ai_assistant_desc')}</p>
               </div>
             </div>
-            <div className="w-10 h-10 bg-black/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-black/10 group-hover:bg-black/20 transition-colors">
-              <ChevronLeft size={20} className={`text-white ${isRTL ? '' : 'rotate-180'}`} />
+            <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center shadow-sm border border-indigo-100 dark:border-indigo-800/50 group-hover:bg-indigo-50 dark:group-hover:bg-slate-700 transition-colors">
+              <ChevronLeft size={20} className={`text-indigo-500 ${isRTL ? '' : 'rotate-180'}`} />
             </div>
           </div>
         </motion.div>
@@ -694,17 +737,17 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
-            className="bento-card bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200/50 dark:border-amber-700/30 cursor-pointer"
+            className="bento-card bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 cursor-pointer"
             onClick={() => handleShare(`${dailyAyah.text}\n\n[${dailyAyah.surah}]`, t('ayah_of_day'))}
           >
-            <div className="flex items-center gap-2 mb-4 text-amber-600 dark:text-amber-400">
+            <div className="flex items-center gap-2 mb-4 text-emerald-500">
               <BookOpen size={18} />
               <span className="text-xs font-bold uppercase tracking-widest">{t('ayah_of_day')}</span>
             </div>
-            <p className="text-quran text-xl text-gray-800 dark:text-amber-50 leading-loose mb-4 line-clamp-4">
+            <p className="text-quran text-xl text-slate-800 dark:text-slate-100 leading-loose mb-4 line-clamp-4">
               {dailyAyah.text}
             </p>
-            <p className={`text-[10px] font-bold text-amber-600/60 dark:text-amber-400/60 text-${isRTL ? 'left' : 'right'}`}>
+            <p className={`text-[10px] font-bold text-slate-400 text-${isRTL ? 'left' : 'right'}`}>
               {dailyAyah.surah}
             </p>
           </motion.div>
@@ -716,17 +759,17 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             initial={{ x: 20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="bento-card bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 border-amber-200/50 dark:border-amber-700/30 cursor-pointer"
+            className="bento-card bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 cursor-pointer"
             onClick={() => handleShare(`${dailyHadith.text}\n\n[${dailyHadith.narrator}]`, t('hadith_of_day'))}
           >
-            <div className="flex items-center gap-2 mb-4 text-amber-600 dark:text-amber-400">
+            <div className="flex items-center gap-2 mb-4 text-amber-500">
               <Quote size={18} />
               <span className="text-xs font-bold uppercase tracking-widest">{t('hadith_of_day')}</span>
             </div>
-            <p className="text-sm text-gray-800 dark:text-amber-50 leading-relaxed mb-4 line-clamp-5 font-medium">
+            <p className="text-sm text-slate-800 dark:text-slate-100 leading-relaxed mb-4 line-clamp-5 font-medium">
               {dailyHadith.text}
             </p>
-            <p className={`text-[10px] font-bold text-amber-600/60 dark:text-amber-400/60 text-${isRTL ? 'left' : 'right'}`}>
+            <p className={`text-[10px] font-bold text-slate-400 text-${isRTL ? 'left' : 'right'}`}>
               {dailyHadith.narrator}
             </p>
           </motion.div>
@@ -738,18 +781,18 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.45 }}
-            className="bento-card bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-200/50 dark:border-indigo-700/30 cursor-pointer group"
+            className="bento-card bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 cursor-pointer group"
             onClick={() => onNavigate(smartAthkar.id)}
           >
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+              <div className="flex items-center gap-2 text-indigo-500">
                 <Sparkles size={18} className="animate-pulse" />
                 <span className="text-xs font-bold uppercase tracking-widest">{t('smart_suggestion')}</span>
               </div>
               <span className="text-2xl group-hover:scale-125 transition-transform duration-300">{smartAthkar.icon}</span>
             </div>
-            <h3 className="text-lg font-bold text-[var(--color-text)] mb-1">{smartAthkar.title}</h3>
-            <p className="text-xs text-[var(--color-text-muted)] font-medium">{smartAthkar.desc}</p>
+            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-1">{smartAthkar.title}</h3>
+            <p className="text-xs text-slate-500 font-medium">{smartAthkar.desc}</p>
           </motion.div>
         )}
 
@@ -763,6 +806,97 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           <MoodTracker />
         </motion.div>
 
+        {/* Daily Muslim Tracker Bento */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.48 }}
+          className="col-span-1 sm:col-span-2 md:col-span-3 mt-4"
+        >
+          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-500">
+                  <Target size={20} />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">المسلم اليومي</h2>
+                  <p className="text-xs text-slate-500">مهامك اليومية للتقرب إلى الله</p>
+                </div>
+              </div>
+              <div className="text-xs font-bold bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded-full">
+                {Object.values(prayedToday).filter(Boolean).length + (isDuhaPrayed ? 1 : 0)} / 6 منجزة
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {/* Prayers */}
+              <div className="grid grid-cols-5 gap-2">
+                {prayersList.filter(p => p.id !== 'Sunrise').map((prayer) => (
+                  <button
+                    key={prayer.id}
+                    onClick={() => togglePrayer(prayer.id)}
+                    className={`flex flex-col items-center justify-center py-3 rounded-2xl transition-all border ${
+                      prayedToday[prayer.id]
+                        ? 'bg-emerald-500 border-emerald-500 text-white shadow-md'
+                        : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <span className="text-sm mb-1">{prayer.icon}</span>
+                    <span className="text-[10px] font-bold">{prayer.name}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Sunnah & Extra */}
+              <div className="grid grid-cols-2 gap-3 mt-4">
+                <button
+                  onClick={toggleDuha}
+                  className={`flex items-center justify-between p-4 rounded-2xl transition-all border ${
+                    isDuhaPrayed
+                      ? 'bg-amber-500 border-amber-500 text-white shadow-md'
+                      : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Sun size={20} className={isDuhaPrayed ? 'text-white' : 'text-amber-500'} />
+                    <span className="text-sm font-bold">صلاة الضحى</span>
+                  </div>
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                    isDuhaPrayed ? 'border-white bg-white/20' : 'border-slate-200 dark:border-slate-700'
+                  }`}>
+                    {isDuhaPrayed && <div className="w-3 h-3 bg-white rounded-full" />}
+                  </div>
+                </button>
+
+                <button
+                  onClick={toggleFasting}
+                  className={`flex items-center justify-between p-4 rounded-2xl transition-all border ${
+                    isFasting
+                      ? 'bg-emerald-500 border-emerald-500 text-white shadow-md'
+                      : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Moon size={20} className={isFasting ? 'text-white' : 'text-emerald-500'} />
+                    <div className="flex flex-col items-start">
+                      <span className="text-sm font-bold">الصيام</span>
+                      {fastingOccasion && !isFasting && (
+                        <span className="text-[9px] text-emerald-500 font-bold">{fastingOccasion}</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                    isFasting ? 'border-white bg-white/20' : 'border-slate-200 dark:border-slate-700'
+                  }`}>
+                    {isFasting && <div className="w-3 h-3 bg-white rounded-full" />}
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
         {/* AI Features Section */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
@@ -771,183 +905,82 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           className="col-span-1 sm:col-span-2 md:col-span-3 mt-4"
         >
           <div className="flex items-center gap-2 mb-4 px-2">
-            <Bot size={20} className="text-[var(--color-primary)]" />
-            <h2 className="text-lg font-bold text-[var(--color-text)]">{t('ai_features')}</h2>
+            <Bot size={20} className="text-emerald-500" />
+            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">{t('ai_features')}</h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div 
               onClick={() => onNavigate("muslim-ai")}
-              className="bg-[var(--color-surface)] border border-black/5 dark:border-white/5 p-4 rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-center group shadow-sm"
+              className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-center group shadow-sm"
             >
-              <div className="w-12 h-12 rounded-full bg-amber-500/10 text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-full bg-amber-50 dark:bg-amber-500/10 text-amber-500 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <BookOpen size={24} />
               </div>
-              <span className="text-sm font-bold text-[var(--color-text)]">{t('dream_interpretation')}</span>
+              <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{t('dream_interpretation')}</span>
             </div>
             <div 
               onClick={() => onNavigate("muslim-ai")}
-              className="bg-[var(--color-surface)] border border-black/5 dark:border-white/5 p-4 rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-center group shadow-sm"
+              className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-center group shadow-sm"
             >
-              <div className="w-12 h-12 rounded-full bg-yellow-500/10 text-yellow-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-full bg-yellow-50 dark:bg-yellow-500/10 text-yellow-500 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Mic size={24} />
               </div>
-              <span className="text-sm font-bold text-[var(--color-text)]">{t('recitation_correction')}</span>
+              <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{t('recitation_correction')}</span>
             </div>
             <div 
               onClick={() => onNavigate("muslim-ai")}
-              className="bg-[var(--color-surface)] border border-black/5 dark:border-white/5 p-4 rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-center group shadow-sm"
+              className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-center group shadow-sm"
             >
-              <div className="w-12 h-12 rounded-full bg-orange-500/10 text-orange-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-full bg-orange-50 dark:bg-orange-500/10 text-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Bot size={24} />
               </div>
-              <span className="text-sm font-bold text-[var(--color-text)]">{t('fatwas_and_questions')}</span>
+              <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{t('fatwas_and_questions')}</span>
             </div>
             <div 
               onClick={() => onNavigate("muslim-ai")}
-              className="bg-[var(--color-surface)] border border-black/5 dark:border-white/5 p-4 rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-center group shadow-sm"
+              className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-center group shadow-sm"
             >
-              <div className="w-12 h-12 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)] flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 flex items-center justify-center group-hover:scale-110 transition-transform">
                 <Heart size={24} />
               </div>
-              <span className="text-sm font-bold text-[var(--color-text)]">{t('spiritual_guide')}</span>
+              <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{t('spiritual_guide')}</span>
             </div>
           </div>
         </motion.div>
 
-        {/* Progress Tracking Bento */}
+        {/* Main Features Grid */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="bento-item-large bento-card bg-[var(--color-surface)]"
+          transition={{ delay: 0.4 }}
+          className="col-span-1 sm:col-span-2 md:col-span-3 mt-4"
         >
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-bold font-serif">{t('worship_tracker')}</h3>
-            <div className="flex items-center gap-2 px-3 py-1 bg-[var(--color-primary)]/10 rounded-full">
-              <Flame size={14} className="text-orange-500" />
-              <span className="text-xs font-bold text-[var(--color-primary)]">
-                {streak} {t('days_streak')}
-              </span>
-            </div>
+          <div className="flex items-center gap-2 mb-4 px-2">
+            <Compass size={20} className="text-emerald-500" />
+            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">{t('explore_more')}</h2>
           </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {/* Prayer Tracker */}
-            <div className="space-y-3">
-              <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-widest">
-                {t('prayers')}
-              </p>
-              <div className="flex flex-wrap gap-1.5">
-                {prayersList.filter(p => p.id !== "Sunrise").map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => togglePrayer(p.id)}
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold transition-all ${
-                      prayedToday[p.id]
-                        ? "bg-[var(--color-primary)] text-white shadow-lg"
-                        : "bg-black/5 dark:bg-white/5 text-[var(--color-text-muted)] hover:bg-black/10 dark:hover:bg-white/10"
-                    }`}
-                  >
-                    {p.name[0]}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Dynamic Tracker: Fasting or Duha */}
-            {fastingOccasion ? (
-              <div className="space-y-3">
-                <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-widest truncate">
-                  {fastingOccasion}
-                </p>
-                <button
-                  onClick={toggleFasting}
-                  className={`w-full py-2 rounded-xl flex items-center justify-center gap-2 transition-all ${
-                    isFasting
-                      ? "bg-orange-500 text-white shadow-lg"
-                      : "bg-black/5 dark:bg-white/5 text-[var(--color-text-muted)]"
-                  }`}
+          <div className="grid grid-cols-3 gap-4">
+            {menuItems.map((item, index) => (
+              <motion.button
+                key={item.id}
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => onNavigate(item.id)}
+                className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] flex flex-col items-center justify-center p-5 gap-3 aspect-square group shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div
+                  className={`w-14 h-14 rounded-2xl ${item.bg} ${item.color} flex items-center justify-center group-hover:scale-110 transition-transform`}
                 >
-                  <Moon size={14} />
-                  <span className="text-xs font-bold">{isFasting ? t('fasting') : t('not_fasting')}</span>
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-widest truncate">
-                  {t('duha_prayer')}
-                </p>
-                <button
-                  onClick={toggleDuha}
-                  className={`w-full py-2 rounded-xl flex items-center justify-center gap-2 transition-all ${
-                    isDuhaPrayed
-                      ? "bg-amber-500 text-white shadow-lg"
-                      : "bg-black/5 dark:bg-white/5 text-[var(--color-text-muted)]"
-                  }`}
-                >
-                  <Sun size={14} />
-                  <span className="text-xs font-bold">{isDuhaPrayed ? t('prayed') : t('not_prayed')}</span>
-                </button>
-              </div>
-            )}
-
-            {/* Quran Tracker */}
-            <div className="space-y-3 cursor-pointer" onClick={() => onNavigate("quran")}>
-              <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-widest">
-                {t('quran')}
-              </p>
-              <div className="flex flex-col gap-1">
-                <span className="text-[10px] font-bold text-[var(--color-text)] truncate">
-                  {lastReadQuran ? lastReadQuran.surahName : t('start_reading')}
-                </span>
-                <div className="w-full h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
-                  <div className="h-full bg-[var(--color-primary)] w-1/3"></div>
+                  {item.icon}
                 </div>
-              </div>
-            </div>
-
-            {/* Dhikr Tracker */}
-            <div className="space-y-3 cursor-pointer" onClick={() => onNavigate("tasbeeh")}>
-              <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-widest">
-                {t('azkar')}
-              </p>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-[var(--color-text)]">
-                  {tasbeehProgress ? `${tasbeehProgress.count}/${tasbeehProgress.target}` : "0/100"}
+                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200 text-center leading-tight">
+                  {item.title}
                 </span>
-                <Activity size={14} className="text-[var(--color-primary)]" />
-              </div>
-            </div>
+              </motion.button>
+            ))}
           </div>
         </motion.div>
       </div>
-
-      {/* Main Features Grid */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.4 }}
-        className="grid grid-cols-3 gap-4"
-      >
-        {menuItems.map((item, index) => (
-          <motion.button
-            key={item.id}
-            whileHover={{ scale: 1.02, y: -2 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => onNavigate(item.id)}
-            className="bg-[var(--color-surface)] border border-black/5 dark:border-white/5 rounded-3xl flex flex-col items-center justify-center p-5 gap-3 aspect-square group shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div
-              className={`w-14 h-14 rounded-full ${item.bg} ${item.color} flex items-center justify-center group-hover:scale-110 transition-transform`}
-            >
-              {item.icon}
-            </div>
-            <span className="text-xs font-bold text-[var(--color-text)] text-center leading-tight">
-              {item.title}
-            </span>
-          </motion.button>
-        ))}
-      </motion.div>
     </div>
   );
 }

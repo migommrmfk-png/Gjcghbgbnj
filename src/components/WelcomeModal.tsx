@@ -54,7 +54,7 @@ export default function WelcomeModal({ onEnableNotifications }: WelcomeModalProp
             className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-[var(--color-primary-light)] to-[var(--color-primary-dark)] opacity-10"></div>
+            <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-emerald-400 to-emerald-600 opacity-10"></div>
             
             <button 
               onClick={handleClose} 
@@ -64,11 +64,11 @@ export default function WelcomeModal({ onEnableNotifications }: WelcomeModalProp
             </button>
 
             <div className="flex flex-col items-center text-center mt-4 relative z-10">
-              <div className="w-20 h-20 bg-gradient-to-br from-[var(--color-primary-light)] to-[var(--color-primary-dark)] rounded-full flex items-center justify-center shadow-lg mb-6">
-                <Heart size={40} className="text-[var(--color-gold)]" />
+              <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-lg mb-6">
+                <Heart size={40} className="text-amber-500" />
               </div>
               
-              <h2 className="text-2xl font-bold text-[var(--color-primary-dark)] font-serif mb-2">
+              <h2 className="text-2xl font-bold text-emerald-600 font-serif mb-2">
                 مرحباً بك في هذا ديني
               </h2>
               
@@ -78,7 +78,7 @@ export default function WelcomeModal({ onEnableNotifications }: WelcomeModalProp
               
               <div className="bg-gray-50 p-4 rounded-2xl w-full mb-6 border border-gray-100">
                 <p className="text-sm text-gray-500 font-bold mb-1">تم التطوير بواسطة</p>
-                <p className="text-lg font-bold text-[var(--color-primary)]">محمد أحمد</p>
+                <p className="text-lg font-bold text-emerald-500">محمد أحمد</p>
               </div>
               
               <div className="flex flex-col gap-3 w-full">
@@ -93,7 +93,7 @@ export default function WelcomeModal({ onEnableNotifications }: WelcomeModalProp
                 )}
                 <button
                   onClick={handleClose}
-                  className="w-full py-3 bg-gradient-to-r from-[var(--color-primary-light)] to-[var(--color-primary-dark)] text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all active:scale-95"
+                  className="w-full py-3 bg-gradient-to-r from-emerald-400 to-emerald-600 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all active:scale-95"
                 >
                   ابدأ التصفح
                 </button>

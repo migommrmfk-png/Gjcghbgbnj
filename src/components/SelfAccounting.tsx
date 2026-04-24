@@ -83,7 +83,7 @@ export default function SelfAccounting({ onBack }: { onBack?: () => void }) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-[var(--color-bg)] text-[var(--color-text)] overflow-hidden" dir="rtl">
+    <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 overflow-hidden" dir="rtl">
       <div className="pt-12 pb-6 px-6 bg-gradient-to-b from-teal-700 to-teal-900 text-white rounded-b-[2.5rem] shadow-lg shrink-0 relative">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] opacity-10"></div>
         <div className="relative z-10 flex items-center gap-4">
@@ -102,7 +102,7 @@ export default function SelfAccounting({ onBack }: { onBack?: () => void }) {
       <div className="flex-1 overflow-y-auto p-4 space-y-6 pb-32">
         
         {/* Score Card */}
-        <div className="bg-[var(--color-surface)] p-6 rounded-3xl shadow-sm border border-[var(--color-border)] flex flex-col items-center justify-center relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-emerald-500/10 rounded-full -ml-12 -mb-12 blur-xl"></div>
           
@@ -111,7 +111,7 @@ export default function SelfAccounting({ onBack }: { onBack?: () => void }) {
           <div className="relative w-32 h-32 flex items-center justify-center mb-4">
             <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
               <path
-                className="text-[var(--color-border)]"
+                className="text-slate-200 dark:text-slate-800"
                 d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 fill="none"
                 stroke="currentColor"
@@ -151,18 +151,18 @@ export default function SelfAccounting({ onBack }: { onBack?: () => void }) {
             };
             
             return (
-              <div key={category} className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-border)] overflow-hidden">
-                <div className="bg-[var(--color-bg)] px-4 py-2 font-bold text-sm opacity-70 border-b border-[var(--color-border)]">
+              <div key={category} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <div className="bg-slate-50 dark:bg-slate-950 px-4 py-2 font-bold text-sm opacity-70 border-b border-slate-200 dark:border-slate-800">
                   {categoryTitles[category as keyof typeof categoryTitles]}
                 </div>
-                <div className="divide-y divide-[var(--color-border)]">
+                <div className="divide-y divide-slate-200 dark:divide-slate-800">
                   {categoryTasks.map(task => {
                     const isCompleted = completedTasks.includes(task.id);
                     return (
                       <button
                         key={task.id}
                         onClick={() => toggleTask(task.id)}
-                        className="w-full flex items-center justify-between p-4 hover:bg-[var(--color-bg)] transition-colors text-right"
+                        className="w-full flex items-center justify-between p-4 hover:bg-slate-50 dark:bg-slate-950 transition-colors text-right"
                       >
                         <span className={`font-medium ${isCompleted ? 'opacity-50 line-through' : ''}`}>
                           {task.title}
@@ -174,7 +174,7 @@ export default function SelfAccounting({ onBack }: { onBack?: () => void }) {
                           {isCompleted ? (
                             <CheckCircle2 className="text-emerald-500" size={24} />
                           ) : (
-                            <Circle className="text-[var(--color-border)]" size={24} />
+                            <Circle className="text-slate-200 dark:text-slate-800" size={24} />
                           )}
                         </div>
                       </button>

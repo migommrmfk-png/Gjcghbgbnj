@@ -223,56 +223,57 @@ export default function Hadith() {
 
   return (
     <div
-      className="max-w-md mx-auto p-4 space-y-6 pb-24 min-h-screen bg-[var(--color-bg)] flex flex-col"
+      className="max-w-md mx-auto p-4 space-y-6 pb-28 min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col"
       dir="rtl"
     >
-      {/* Header 3D */}
+      {/* Header */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-gradient-to-br from-[var(--color-surface)] to-[#1a221d] rounded-[2rem] p-8 text-white shadow-2xl relative overflow-hidden text-center border border-white/5"
+        className="bg-gradient-to-bl from-emerald-600 via-emerald-700 to-teal-900 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden text-center border border-white/20"
       >
-        <div className="absolute right-0 top-0 w-40 h-40 bg-[var(--color-primary)]/20 rounded-full -mr-10 -mt-10 blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/40 rounded-full -ml-10 -mb-10 blur-2xl"></div>
-        <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
-        <div className="relative z-10">
-          <h1 className="text-3xl font-bold font-serif mb-2 flex justify-center items-center gap-3 drop-shadow-[0_0_10px_rgba(212,175,55,0.3)] text-[var(--color-primary-light)]">
-            <BookOpen size={32} className="text-[var(--color-primary)]" />
+        <div className="absolute right-0 top-0 w-48 h-48 bg-white/10 rounded-full -mr-12 -mt-12 blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/20 rounded-full -ml-12 -mb-12 blur-2xl"></div>
+        <div className="relative z-10 flex flex-col items-center">
+          <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.2)] mb-4 transform rotate-3">
+             <BookOpen size={32} className="text-white drop-shadow-md" />
+          </div>
+          <h1 className="text-4xl font-bold font-serif mb-2 drop-shadow-md">
             الحديث اليومي
           </h1>
-          <p className="text-[var(--color-text-muted)] text-sm font-medium">بلغوا عني ولو آية</p>
+          <p className="text-emerald-50 text-sm font-bold bg-black/20 px-4 py-2 rounded-full backdrop-blur-md border border-white/10 mt-2">بلغوا عني ولو آية</p>
         </div>
       </motion.div>
 
-      {/* Hadith Card 3D */}
+      {/* Hadith Card */}
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2, type: "spring" }}
         className="flex-1 flex flex-col justify-center"
       >
-        <div className="card-3d p-8 relative overflow-hidden bg-[var(--color-surface)] border border-[var(--color-primary-light)]/20 shadow-[0_10px_30px_rgba(0,0,0,0.5)] rounded-[2rem]">
+        <div className="card-3d bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 relative overflow-hidden shadow-xl border border-black/5 dark:border-white/5">
           {/* Decorative Elements */}
-          <div className="absolute top-0 left-0 w-32 h-32 bg-[var(--color-primary)]/20 rounded-br-full blur-2xl"></div>
-          <div className="absolute bottom-0 right-0 w-32 h-32 bg-[var(--color-primary-dark)]/20 rounded-tl-full blur-2xl"></div>
+          <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-teal-500/10 rounded-full -ml-20 -mb-20 blur-3xl"></div>
 
           <div className="relative z-10 flex flex-col items-center text-center space-y-8">
-            <div className="w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(212,175,55,0.5)] mb-4 border border-[var(--color-primary-light)]/50">
-              <BookOpen size={40} />
+            <div className="w-20 h-20 rounded-[1.5rem] bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-4xl shadow-[0_10px_30px_rgba(16,185,129,0.3)] border border-white/20 text-white mb-4">
+              <BookOpen size={36} className="drop-shadow-sm" />
             </div>
 
-            <p className="text-2xl leading-loose font-serif text-[var(--color-primary-light)] font-bold drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">
+            <p className="text-2xl leading-[2.2] font-serif text-slate-800 dark:text-slate-100 font-bold drop-shadow-sm">
               "{hadith.text}"
             </p>
 
-            <div className="w-full border-t border-white/10 pt-6 flex flex-col items-center gap-4">
-              <span className="text-sm font-bold text-[var(--color-primary-light)] bg-[var(--color-primary)]/10 px-4 py-2 rounded-full border border-[var(--color-primary)]/20 shadow-inner">
+            <div className="w-full border-t border-slate-100 dark:border-slate-800/50 pt-6 flex flex-col items-center gap-5">
+              <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 glass dark:glass-dark px-5 py-2.5 rounded-full shadow-sm">
                 {hadith.source}
               </span>
 
               <button
                 onClick={() => setShowExplanation(!showExplanation)}
-                className="flex items-center gap-2 text-[var(--color-primary)] hover:text-[var(--color-primary-light)] transition-colors mt-2 font-bold bg-[var(--color-primary)]/10 px-4 py-2 rounded-full"
+                className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors mt-2 font-bold glass dark:glass-dark px-5 py-2.5 rounded-full hover:scale-105 active:scale-95"
               >
                 <Info size={18} />
                 <span>{showExplanation ? "إخفاء الشرح" : "شرح الحديث"}</span>
@@ -286,27 +287,29 @@ export default function Hadith() {
                     exit={{ opacity: 0, height: 0 }}
                     className="overflow-hidden w-full"
                   >
-                    <div className="bg-black/5 dark:bg-white/5 p-4 rounded-xl border border-black/5 dark:border-white/5 mt-2 text-right space-y-4">
+                    <div className="bg-gradient-to-br from-slate-50 to-emerald-50/30 dark:from-slate-800/50 dark:to-emerald-900/10 p-5 rounded-2xl border border-slate-100 dark:border-slate-700/50 mt-2 text-right space-y-5 shadow-inner">
                       <div>
-                        <h4 className="text-[var(--color-primary)] font-bold mb-2 flex items-center gap-2">
-                          <Info size={16} />
+                        <h4 className="text-emerald-600 dark:text-emerald-400 font-bold mb-3 flex items-center gap-2 text-lg">
+                          <Info size={20} />
                           المعنى:
                         </h4>
-                        <p className="text-[var(--color-text)] leading-relaxed text-sm">
+                        <p className="text-slate-700 dark:text-slate-300 leading-loose text-[15px] font-medium">
                           {hadith.explanation}
                         </p>
                       </div>
                       
-                      <div className="border-t border-black/5 dark:border-white/5 pt-4">
-                        <h4 className="text-amber-500 font-bold mb-3 flex items-center gap-2">
-                          <Star size={16} />
+                      <div className="border-t border-emerald-100/50 dark:border-emerald-900/30 pt-5">
+                        <h4 className="text-amber-500 font-bold mb-4 flex items-center gap-2 text-lg">
+                          <Star size={20} />
                           الفوائد المستفادة:
                         </h4>
-                        <ul className="space-y-2">
+                        <ul className="space-y-3">
                           {hadith.benefits.map((benefit, index) => (
-                            <li key={index} className="flex items-start gap-2">
-                              <CheckCircle2 size={14} className="text-[var(--color-primary)] mt-1 shrink-0" />
-                              <span className="text-[var(--color-text-muted)] text-sm leading-relaxed">{benefit}</span>
+                            <li key={index} className="flex items-start gap-3 bg-white/50 dark:bg-slate-900/50 p-3 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
+                              <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                                <CheckCircle2 size={16} />
+                              </div>
+                              <span className="text-slate-700 dark:text-slate-300 text-[15px] leading-relaxed font-medium">{benefit}</span>
                             </li>
                           ))}
                         </ul>
@@ -320,10 +323,10 @@ export default function Hadith() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleShare}
-                className="flex items-center gap-2 text-[var(--color-text-muted)] hover:text-[var(--color-primary-light)] transition-colors mt-4 font-bold"
+                className="flex items-center gap-2 text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 px-6 py-3 rounded-full transition-all shadow-[0_4px_15px_rgba(16,185,129,0.3)] mt-2 font-bold w-full justify-center"
               >
                 <Share2 size={20} />
-                <span>مشاركة الحديث</span>
+                <span>مشاركة الحديث و كسب أجر</span>
               </motion.button>
             </div>
           </div>
@@ -336,9 +339,12 @@ export default function Hadith() {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-[var(--color-primary)] text-white px-6 py-3 rounded-full shadow-lg z-50 font-bold text-sm whitespace-nowrap"
+            className="fixed bottom-28 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-8 py-4 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.2)] z-50 font-bold text-sm whitespace-nowrap flex items-center gap-3 border border-slate-800"
           >
-            تم نسخ الحديث إلى الحافظة
+            <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center">
+              <CheckCircle2 size={18} className="text-white" />
+            </div>
+            تم نسخ الحديث للمشاركة 
           </motion.div>
         )}
       </AnimatePresence>

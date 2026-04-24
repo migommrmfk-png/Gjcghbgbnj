@@ -45,7 +45,7 @@ export default function DreamInterpretation({ onBack }: { onBack?: () => void })
   };
 
   return (
-    <div className="h-full flex flex-col bg-[var(--color-bg)] text-[var(--color-text)] overflow-hidden" dir="rtl">
+    <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 overflow-hidden" dir="rtl">
       <div className="pt-12 pb-6 px-6 bg-gradient-to-b from-indigo-800 to-indigo-950 text-white rounded-b-[2.5rem] shadow-lg shrink-0 relative">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20"></div>
         <div className="relative z-10 flex items-center gap-4">
@@ -86,7 +86,7 @@ export default function DreamInterpretation({ onBack }: { onBack?: () => void })
             <div className={`max-w-[85%] p-4 rounded-2xl ${
               msg.role === 'user' 
                 ? 'bg-indigo-600 text-white rounded-tl-none' 
-                : 'bg-[var(--color-surface)] border border-[var(--color-border)] rounded-tr-none'
+                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-tr-none'
             }`}>
               <p className="whitespace-pre-wrap leading-relaxed">{msg.text}</p>
             </div>
@@ -94,7 +94,7 @@ export default function DreamInterpretation({ onBack }: { onBack?: () => void })
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-[var(--color-surface)] border border-[var(--color-border)] p-4 rounded-2xl rounded-tr-none flex items-center gap-2">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl rounded-tr-none flex items-center gap-2">
               <Loader2 className="animate-spin text-indigo-600" size={20} />
               <span className="text-sm opacity-70">يتم التفسير...</span>
             </div>
@@ -103,7 +103,7 @@ export default function DreamInterpretation({ onBack }: { onBack?: () => void })
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="absolute bottom-[80px] left-0 right-0 p-4 bg-[var(--color-surface)] border-t border-[var(--color-border)]">
+      <div className="absolute bottom-[80px] left-0 right-0 p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
         <div className="flex gap-2 max-w-md mx-auto">
           <input
             type="text"
@@ -111,7 +111,7 @@ export default function DreamInterpretation({ onBack }: { onBack?: () => void })
             onChange={(e) => setQuery(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
             placeholder="رأيت في المنام أنني..."
-            className="flex-1 p-4 rounded-2xl bg-[var(--color-bg)] border border-[var(--color-border)] focus:outline-none focus:border-indigo-500"
+            className="flex-1 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-indigo-500"
           />
           <button
             onClick={handleSend}

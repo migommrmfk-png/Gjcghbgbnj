@@ -325,16 +325,16 @@ export default function ProphetStories({ onBack }: { onBack: () => void }) {
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
 
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-[var(--color-bg)] flex flex-col" dir="rtl">
+    <div className="max-w-md mx-auto min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col" dir="rtl">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-[var(--color-bg)]/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5 px-4 py-4 flex items-center gap-4">
+      <div className="sticky top-0 z-20 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5 px-4 py-4 flex items-center gap-4">
         <button
           onClick={onBack}
-          className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors bg-[var(--color-surface)] shadow-sm border border-black/5 dark:border-white/5"
+          className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors bg-white dark:bg-slate-900 shadow-sm border border-black/5 dark:border-white/5"
         >
-          <ArrowRight size={24} className="text-[var(--color-text-muted)]" />
+          <ArrowRight size={24} className="text-slate-500 dark:text-slate-400" />
         </button>
-        <h1 className="text-2xl font-bold font-serif text-[var(--color-primary)]">قصص الأنبياء</h1>
+        <h1 className="text-2xl font-bold font-serif text-emerald-500">قصص الأنبياء</h1>
       </div>
 
       <div className="p-4 flex-1">
@@ -347,7 +347,7 @@ export default function ProphetStories({ onBack }: { onBack: () => void }) {
               exit={{ opacity: 0, x: 20 }}
               className="grid grid-cols-1 gap-4 pb-20"
             >
-              <div className="bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] p-6 rounded-3xl text-white mb-4 shadow-lg relative overflow-hidden">
+              <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-6 rounded-3xl text-white mb-4 shadow-lg relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full -ml-10 -mt-10 blur-2xl"></div>
                 <h2 className="text-xl font-bold mb-2">أحسن القصص</h2>
                 <p className="text-white/80 text-sm leading-relaxed">
@@ -362,22 +362,22 @@ export default function ProphetStories({ onBack }: { onBack: () => void }) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                   onClick={() => setSelectedStory(story)}
-                  className="bg-[var(--color-surface)] rounded-3xl p-5 cursor-pointer hover:scale-[1.02] transition-all shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-black/5 dark:border-white/5 relative overflow-hidden group"
+                  className="bg-white dark:bg-slate-900 rounded-3xl p-5 cursor-pointer hover:scale-[1.02] transition-all shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-black/5 dark:border-white/5 relative overflow-hidden group"
                 >
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-[var(--color-primary)] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] flex items-center justify-center text-3xl shadow-[inset_0_2px_4px_rgba(255,255,255,0.3),0_10px_20px_rgba(27,67,50,0.4)] transform group-hover:rotate-6 group-hover:scale-110 transition-all border border-white/10 relative overflow-hidden">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-3xl shadow-[inset_0_2px_4px_rgba(255,255,255,0.3),0_10px_20px_rgba(27,67,50,0.4)] transform group-hover:rotate-6 group-hover:scale-110 transition-all border border-white/10 relative overflow-hidden">
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                       <span className="relative z-10 drop-shadow-md">{story.icon}</span>
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-[var(--color-text)] mb-1">{story.prophet}</h3>
-                      <p className="text-xs text-[var(--color-primary-light)] font-bold mb-2">{story.title}</p>
-                      <p className="text-sm text-[var(--color-text-muted)] line-clamp-2 leading-relaxed">
+                      <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-1">{story.prophet}</h3>
+                      <p className="text-xs text-emerald-400 font-bold mb-2">{story.title}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
                         {story.brief}
                       </p>
                     </div>
-                    <div className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:bg-[var(--color-primary)] group-hover:text-white transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors">
                       <ChevronLeft size={18} />
                     </div>
                   </div>
@@ -390,38 +390,38 @@ export default function ProphetStories({ onBack }: { onBack: () => void }) {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="pb-20"
+              className="pb-28"
             >
               <button
                 onClick={() => setSelectedStory(null)}
-                className="flex items-center gap-2 text-[var(--color-primary)] font-bold mb-6 hover:opacity-80 transition-opacity"
+                className="flex items-center gap-2 text-emerald-500 font-bold mb-6 hover:opacity-80 transition-opacity"
               >
                 <ArrowRight size={20} />
                 <span>العودة للقائمة</span>
               </button>
 
-              <div className="bg-[var(--color-surface)] rounded-[2rem] p-6 shadow-xl border border-black/5 dark:border-white/5 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-[var(--color-primary)]/5 rounded-full -mr-20 -mt-20 blur-3xl"></div>
+              <div className="card-3d bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
                 
                 <div className="flex items-center gap-4 mb-8 relative z-10">
-                  <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] flex items-center justify-center text-4xl shadow-[0_10px_20px_rgba(27,67,50,0.3)]">
+                  <div className="w-20 h-20 rounded-[1.5rem] bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-4xl shadow-[0_10px_30px_rgba(16,185,129,0.3)] border border-white/20">
                     {selectedStory.icon}
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-[var(--color-text)] mb-1">{selectedStory.prophet}</h2>
-                    <p className="text-[var(--color-primary)] font-bold">{selectedStory.title}</p>
+                    <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">{selectedStory.prophet}</h2>
+                    <p className="text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-500/10 px-4 py-1.5 inline-block rounded-full text-sm border border-emerald-100 dark:border-emerald-500/20">{selectedStory.title}</p>
                   </div>
                 </div>
 
                 <div className="space-y-8 relative z-10">
                   <section>
-                    <div className="flex items-center gap-2 mb-4 text-[var(--color-primary)]">
+                    <div className="flex items-center gap-2 mb-4 text-emerald-500">
                       <BookOpen size={20} />
-                      <h3 className="text-lg font-bold">القصة</h3>
+                      <h3 className="text-xl font-bold">القصة</h3>
                     </div>
                     <div className="space-y-4">
                       {selectedStory.fullStory.map((paragraph, idx) => (
-                        <p key={idx} className="text-[var(--color-text)] leading-loose text-justify bg-black/5 dark:bg-white/5 p-4 rounded-2xl">
+                        <p key={idx} className="text-slate-800 dark:text-slate-200 leading-loose text-justify glass dark:glass-dark p-5 rounded-2xl text-[15px] shadow-sm">
                           {paragraph}
                         </p>
                       ))}
@@ -429,17 +429,17 @@ export default function ProphetStories({ onBack }: { onBack: () => void }) {
                   </section>
 
                   <section>
-                    <div className="flex items-center gap-2 mb-4 text-[var(--color-gold)]">
+                    <div className="flex items-center gap-2 mb-4 text-amber-500">
                       <Star size={20} />
-                      <h3 className="text-lg font-bold">الدروس المستفادة</h3>
+                      <h3 className="text-xl font-bold">الدروس المستفادة</h3>
                     </div>
                     <ul className="space-y-3">
                       {selectedStory.lessons.map((lesson, idx) => (
-                        <li key={idx} className="flex items-start gap-3 bg-[var(--color-gold)]/10 p-4 rounded-2xl">
-                          <div className="w-6 h-6 rounded-full bg-[var(--color-gold)] text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                        <li key={idx} className="flex items-start gap-3 bg-gradient-to-l from-amber-50/50 to-transparent dark:from-amber-900/10 p-4 rounded-2xl border border-amber-100/50 dark:border-amber-900/30">
+                          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 shadow-sm">
                             {idx + 1}
                           </div>
-                          <span className="text-[var(--color-text)] font-medium leading-relaxed">{lesson}</span>
+                          <span className="text-slate-800 dark:text-slate-100 font-medium leading-relaxed">{lesson}</span>
                         </li>
                       ))}
                     </ul>

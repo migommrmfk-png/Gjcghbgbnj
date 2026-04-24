@@ -107,18 +107,18 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 min-h-screen bg-[var(--color-bg)] flex flex-col" dir="rtl">
+    <div className="max-w-md mx-auto p-4 min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col" dir="rtl">
       {/* Header */}
       <div className="py-4 flex items-center gap-4 mb-8">
         {onBack && (
           <button
             onClick={onBack}
-            className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors border border-black/5 dark:border-white/5 bg-[var(--color-surface)] shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
+            className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors border border-black/5 dark:border-white/5 bg-white dark:bg-slate-900 shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
           >
-            <ArrowRight size={24} className="text-[var(--color-text-muted)] hover:text-[var(--color-primary-light)]" />
+            <ArrowRight size={24} className="text-slate-500 dark:text-slate-400 hover:text-emerald-400" />
           </button>
         )}
-        <h1 className="text-2xl font-bold font-serif text-[var(--color-primary-light)] drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">
+        <h1 className="text-2xl font-bold font-serif text-emerald-400 drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">
           {isLogin ? 'تسجيل الدخول' : 'إنشاء حساب جديد'}
         </h1>
       </div>
@@ -128,15 +128,15 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
         animate={{ opacity: 1, y: 0 }}
         className="flex-1 flex flex-col justify-center"
       >
-        <div className="bg-[var(--color-surface)] rounded-3xl p-6 shadow-xl border border-black/5 dark:border-white/5 relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-xl border border-black/5 dark:border-white/5 relative overflow-hidden">
           
           <div className="relative z-10">
             <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-[var(--color-primary)]/10 rounded-2xl flex items-center justify-center text-[var(--color-primary)] mx-auto mb-4">
+              <div className="w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-500 mx-auto mb-4">
                 {isLogin ? <LogIn size={32} /> : <UserPlus size={32} />}
               </div>
-              <h2 className="text-2xl font-bold text-[var(--color-text)] mb-2">أهلاً بك في مسلم</h2>
-              <p className="text-[var(--color-text-muted)] text-sm">
+              <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">أهلاً بك في مسلم</h2>
+              <p className="text-slate-500 dark:text-slate-400 text-sm">
                 {isLogin ? 'سجل دخولك لمتابعة تقدمك وحفظ بياناتك' : 'أنشئ حساباً جديداً للانضمام لمجتمعنا'}
               </p>
             </div>
@@ -155,16 +155,16 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
             <form onSubmit={handleSubmit} className="space-y-4">
               {!isLogin && (
                 <div>
-                  <label className="block text-sm font-medium text-[var(--color-text-muted)] mb-1">الاسم</label>
+                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">الاسم</label>
                   <div className="relative">
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <User size={18} className="text-[var(--color-primary)]" />
+                      <User size={18} className="text-emerald-500" />
                     </div>
                     <input
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl py-3 pl-4 pr-10 text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all"
+                      className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl py-3 pl-4 pr-10 text-slate-800 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:border-transparent transition-all"
                       placeholder="أدخل اسمك"
                       dir="rtl"
                     />
@@ -173,16 +173,16 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-[var(--color-text-muted)] mb-1">البريد الإلكتروني</label>
+                <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">البريد الإلكتروني</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <Mail size={18} className="text-[var(--color-primary)]" />
+                    <Mail size={18} className="text-emerald-500" />
                   </div>
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl py-3 pl-4 pr-10 text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all text-left"
+                    className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl py-3 pl-4 pr-10 text-slate-800 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:border-transparent transition-all text-left"
                     placeholder="example@email.com"
                     dir="ltr"
                   />
@@ -190,16 +190,16 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-[var(--color-text-muted)] mb-1">كلمة المرور</label>
+                <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">كلمة المرور</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <Lock size={18} className="text-[var(--color-primary)]" />
+                    <Lock size={18} className="text-emerald-500" />
                   </div>
                   <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl py-3 pl-4 pr-10 text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all text-left"
+                    className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl py-3 pl-4 pr-10 text-slate-800 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:border-transparent transition-all text-left"
                     placeholder="••••••••"
                     dir="ltr"
                   />
@@ -209,7 +209,7 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -221,7 +221,7 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
 
             <div className="mt-6 flex items-center justify-center gap-4">
               <div className="h-px bg-black/10 dark:bg-white/10 flex-1"></div>
-              <span className="text-[var(--color-text-muted)] text-sm">أو</span>
+              <span className="text-slate-500 dark:text-slate-400 text-sm">أو</span>
               <div className="h-px bg-black/10 dark:bg-white/10 flex-1"></div>
             </div>
 
@@ -229,7 +229,7 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
               type="button"
               onClick={handleGuestLogin}
               disabled={loading}
-              className="w-full mt-6 py-3.5 bg-[var(--color-primary)]/10 text-[var(--color-primary)] rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-[var(--color-primary)]/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full mt-6 py-3.5 bg-emerald-500/10 text-emerald-500 rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-emerald-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <User size={20} />
               المتابعة كزائر (بدون تسجيل)
@@ -283,7 +283,7 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
                   setIsLogin(!isLogin);
                   setError('');
                 }}
-                className="text-[var(--color-primary)] hover:text-[var(--color-primary-dark)] transition-colors text-sm font-bold"
+                className="text-emerald-500 hover:text-emerald-600 transition-colors text-sm font-bold"
               >
                 {isLogin ? 'ليس لديك حساب؟ أنشئ حساباً جديداً' : 'لديك حساب بالفعل؟ سجل دخولك'}
               </button>

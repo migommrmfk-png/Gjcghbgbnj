@@ -32,18 +32,18 @@ export default function ZakatCalculator({ onBack }: { onBack?: () => void }) {
   const totalZakat = calculateZakat();
 
   return (
-    <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-[var(--color-bg)]" dir="rtl">
+    <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-slate-50 dark:bg-slate-950" dir="rtl">
       {/* Header */}
-      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-[var(--color-bg)]/90 backdrop-blur-md border-b border-white/5">
+      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800">
         {onBack && (
           <button
             onClick={onBack}
-            className="p-2 hover:bg-white/5 rounded-full transition-colors border border-white/5 bg-[var(--color-surface)]"
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm"
           >
-            <ArrowRight size={24} className="text-[var(--color-text-muted)] hover:text-[var(--color-text)]" />
+            <ArrowRight size={24} className="text-slate-500 hover:text-emerald-500" />
           </button>
         )}
-        <h1 className="text-xl font-bold font-serif text-[var(--color-text)] drop-shadow-md">
+        <h1 className="text-xl font-bold font-serif text-slate-800 dark:text-slate-100">
           حاسبة الزكاة
         </h1>
       </div>
@@ -63,9 +63,9 @@ export default function ZakatCalculator({ onBack }: { onBack?: () => void }) {
             <p className="text-sm text-emerald-500/80 leading-relaxed font-medium">
               تجب الزكاة (2.5%) إذا بلغ المال النصاب وحال عليه الحول.
               <br/>
-              <span className="text-[var(--color-text)]">نصاب الذهب:</span> 85 جرام
+              <span className="text-slate-800 dark:text-slate-100">نصاب الذهب:</span> 85 جرام
               <br/>
-              <span className="text-[var(--color-text)]">نصاب الفضة:</span> 595 جرام
+              <span className="text-slate-800 dark:text-slate-100">نصاب الفضة:</span> 595 جرام
             </p>
           </div>
         </motion.div>
@@ -75,10 +75,10 @@ export default function ZakatCalculator({ onBack }: { onBack?: () => void }) {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
-          className="card-3d bg-[var(--color-surface)] rounded-[2rem] p-6 shadow-lg border border-black/5 dark:border-white/5 space-y-5"
+          className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 shadow-sm border border-slate-100 dark:border-slate-800 space-y-5"
         >
           <div>
-            <label className="block text-sm font-bold text-[var(--color-text)] mb-2 flex items-center gap-2">
+            <label className="block text-sm font-bold text-slate-800 dark:text-slate-100 mb-2 flex items-center gap-2">
               <CircleDollarSign size={18} className="text-emerald-400" />
               الأموال النقدية والمدخرات
             </label>
@@ -87,13 +87,13 @@ export default function ZakatCalculator({ onBack }: { onBack?: () => void }) {
               value={cash}
               onChange={(e) => setCash(e.target.value)}
               placeholder="أدخل المبلغ..."
-              className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl py-3 px-4 text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all shadow-inner"
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl py-3 px-4 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all shadow-sm"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-[var(--color-text)] mb-2 flex items-center gap-2">
-              <Coins size={18} className="text-[var(--color-primary)]" />
+            <label className="block text-sm font-bold text-slate-800 dark:text-slate-100 mb-2 flex items-center gap-2">
+              <Coins size={18} className="text-emerald-500" />
               الذهب (بالجرام)
             </label>
             <input
@@ -101,12 +101,12 @@ export default function ZakatCalculator({ onBack }: { onBack?: () => void }) {
               value={gold}
               onChange={(e) => setGold(e.target.value)}
               placeholder="وزن الذهب عيار 24..."
-              className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl py-3 px-4 text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 transition-all shadow-inner"
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl py-3 px-4 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all shadow-sm"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-[var(--color-text)] mb-2 flex items-center gap-2">
+            <label className="block text-sm font-bold text-slate-800 dark:text-slate-100 mb-2 flex items-center gap-2">
               <Coins size={18} className="text-slate-400" />
               الفضة (بالجرام)
             </label>
@@ -115,7 +115,7 @@ export default function ZakatCalculator({ onBack }: { onBack?: () => void }) {
               value={silver}
               onChange={(e) => setSilver(e.target.value)}
               placeholder="وزن الفضة..."
-              className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl py-3 px-4 text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-slate-400/50 transition-all shadow-inner"
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl py-3 px-4 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400/50 transition-all shadow-sm"
             />
           </div>
         </motion.div>
@@ -125,7 +125,7 @@ export default function ZakatCalculator({ onBack }: { onBack?: () => void }) {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-[2rem] p-8 text-white shadow-2xl text-center relative overflow-hidden border border-[var(--color-primary)]/30"
+          className="bg-emerald-500 rounded-[2rem] p-8 text-white shadow-sm text-center relative overflow-hidden border border-emerald-600"
         >
           <div className="absolute right-0 top-0 w-40 h-40 bg-white/20 rounded-full -mr-10 -mt-10 blur-2xl"></div>
           <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>

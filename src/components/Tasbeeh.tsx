@@ -120,42 +120,46 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[var(--color-bg)] relative overflow-hidden pb-24" dir="rtl">
+    <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 relative overflow-hidden pb-24" dir="rtl">
       {/* Background Glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-[var(--color-primary)]/20 blur-[100px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-emerald-500/5 blur-[100px] rounded-full pointer-events-none" />
 
       {/* Header */}
       <div className="flex items-center justify-between p-4 z-10 mt-2">
         <div className="flex items-center gap-2">
-          <button onClick={() => setIsSettingsOpen(true)} className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-colors backdrop-blur-md bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
-            <SettingsIcon className="text-[var(--color-text)]" size={24} />
+          <button onClick={() => setIsSettingsOpen(true)} className="p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors bg-white dark:bg-slate-900 border border-slate-200/50 dark:border-slate-700/50 shadow-sm backdrop-blur-md">
+            <SettingsIcon className="text-slate-600 dark:text-slate-400" size={24} />
           </button>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="font-bold text-[var(--color-text)] text-lg tracking-wide">المسبحة الإلكترونية</span>
-          <Sparkles className="text-[var(--color-primary)]" size={24} />
+        <div className="flex items-center gap-3">
+          <span className="font-bold text-slate-800 dark:text-slate-100 text-xl tracking-wide">المسبحة الإلكترونية</span>
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-[0_5px_15px_rgba(16,185,129,0.3)] border border-white/20">
+            <Sparkles className="text-white" size={20} />
+          </div>
           {onBack && (
-            <button onClick={onBack} className="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-colors backdrop-blur-md bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 mr-2">
-              <ChevronRight size={24} className="text-[var(--color-text)]" />
+            <button onClick={onBack} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm mr-2 block">
+              <ChevronRight size={24} className="text-slate-600 dark:text-slate-400" />
             </button>
           )}
         </div>
       </div>
 
       {/* Zikr Display */}
-      <div className="px-6 mt-2 z-10">
-        <div className="bg-[var(--color-surface)] border border-black/5 dark:border-white/5 rounded-3xl p-6 shadow-lg relative overflow-hidden text-center">
-          <button onClick={changeZikr} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] hover:text-[var(--color-primary)] transition-colors p-2 bg-black/5 dark:bg-white/5 rounded-full">
-            <ChevronRight className="rotate-180" size={24} />
+      <div className="px-6 mt-4 z-10">
+        <div className="card-3d bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 shadow-xl relative overflow-hidden text-center min-h-[140px] flex items-center justify-center border border-black/5 dark:border-white/5">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+          
+          <button onClick={changeZikr} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-500 transition-colors p-3 bg-white dark:bg-slate-800 rounded-[1rem] shadow-sm border border-slate-100 dark:border-slate-700 hover:-translate-x-1 active:scale-95 z-20">
+            <ChevronRight className="rotate-180" size={22} />
           </button>
           
           <AnimatePresence mode="wait">
             <motion.h2 
               key={currentZikr}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="text-2xl md:text-3xl font-serif font-bold text-[var(--color-text)] my-2 leading-relaxed"
+              initial={{ opacity: 0, scale: 0.9, filter: "blur(4px)" }}
+              animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, scale: 1.1, filter: "blur(4px)" }}
+              className="text-3xl md:text-5xl font-serif font-bold bg-gradient-to-l from-emerald-600 to-teal-800 dark:from-emerald-400 dark:to-teal-200 bg-clip-text text-transparent my-2 leading-[1.6] drop-shadow-sm px-8 relative z-10"
             >
               {currentZikr}
             </motion.h2>
@@ -164,58 +168,71 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
       </div>
 
       {/* Digital Counter Device */}
-      <div className="flex-1 flex items-center justify-center mt-8 relative z-10 px-4">
-        <div className="relative w-full max-w-[340px] aspect-square bg-[var(--color-surface)] rounded-full shadow-[0_30px_60px_rgba(0,0,0,0.4),inset_0_4px_10px_rgba(255,255,255,0.2),inset_0_-4px_10px_rgba(0,0,0,0.1)] border border-black/10 dark:border-white/10 flex flex-col items-center justify-center p-6">
+      <div className="flex-1 flex items-center justify-center mt-6 relative z-10 px-4">
+        <div className="relative w-full max-w-[340px] aspect-square rounded-[3rem] flex flex-col items-center justify-center p-6 card-3d bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 shadow-2xl overflow-hidden group">
           
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 opacity-50"></div>
+          <div className="absolute inset-2 rounded-[2.5rem] border border-slate-100/50 dark:border-slate-800/50 shadow-inner"></div>
+
           {/* Progress Ring */}
-          <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 100 100">
-            <circle
-              cx="50"
-              cy="50"
-              r="46"
+          <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none drop-shadow-md z-10" viewBox="0 0 100 100">
+            <rect
+              x="4"
+              y="4"
+              width="92"
+              height="92"
+              rx="46"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
-              className="text-black/5 dark:text-white/5"
+              className="text-slate-100 dark:text-slate-800/50"
             />
-            <motion.circle
-              cx="50"
-              cy="50"
-              r="46"
+            <motion.rect
+              x="4"
+              y="4"
+              width="92"
+              height="92"
+              rx="46"
               fill="none"
-              stroke="currentColor"
+              stroke="url(#emeraldGradient)"
               strokeWidth="4"
               strokeLinecap="round"
-              className="text-[var(--color-primary)] drop-shadow-[0_0_8px_rgba(var(--color-primary-rgb),0.5)]"
               initial={{ strokeDasharray: "0 289" }}
               animate={{ strokeDasharray: `${(count / target) * 289} 289` }}
               transition={{ duration: 0.3, ease: "easeOut" }}
             />
+            <defs>
+              <linearGradient id="emeraldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#10b981" />
+                <stop offset="100%" stopColor="#14b8a6" />
+              </linearGradient>
+            </defs>
           </svg>
 
           {/* Screen Area */}
-          <div className="absolute top-12 flex flex-col items-center">
-            <div className="text-[var(--color-text-muted)] text-xs font-bold uppercase tracking-widest mb-1">
+          <div className="absolute top-12 flex flex-col items-center glass dark:glass-dark px-8 py-4 rounded-[2rem] border border-slate-100 dark:border-slate-700 shadow-inner z-20">
+            <div className="text-emerald-500 dark:text-emerald-400 text-xs font-bold uppercase tracking-widest mb-1.5 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse drop-shadow-[0_0_5px_rgba(16,185,129,0.5)]"></span>
               الدورة {rounds}
             </div>
-            <div className="text-5xl font-bold text-[var(--color-text)] tracking-tight drop-shadow-sm font-serif">
+            <div className="text-6xl font-bold bg-gradient-to-br from-slate-800 to-slate-500 dark:from-white dark:to-slate-300 bg-clip-text text-transparent tracking-tight drop-shadow-sm font-serif">
               {count}
             </div>
             
             {/* Target Edit */}
-            <div className="mt-2">
+            <div className="mt-3">
               {isEditingTarget ? (
-                <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 p-1.5 rounded-full border border-black/10 dark:border-white/10">
+                <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/80 p-1.5 rounded-[1rem] border border-slate-200 dark:border-slate-700 shadow-inner">
                   <input
                     type="number"
                     value={tempTarget}
                     onChange={(e) => setTempTarget(e.target.value)}
-                    className="w-12 text-center text-sm font-bold bg-transparent text-[var(--color-text)] outline-none"
+                    className="w-16 text-center text-sm font-bold bg-transparent text-slate-800 dark:text-slate-100 outline-none"
                     autoFocus
                   />
                   <button 
                     onClick={saveTarget}
-                    className="bg-[var(--color-primary)] text-white px-2 py-1 rounded-full text-xs font-bold"
+                    className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-4 py-1.5 rounded-[0.8rem] text-xs font-bold shadow-md hover:shadow-lg transition-shadow"
                   >
                     حفظ
                   </button>
@@ -226,7 +243,7 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
                     setTempTarget(target.toString());
                     setIsEditingTarget(true);
                   }}
-                  className="text-[var(--color-text-muted)] hover:text-[var(--color-primary)] text-xs font-medium transition-colors bg-black/5 dark:bg-white/5 px-3 py-1 rounded-full"
+                  className="text-slate-500 hover:text-emerald-600 dark:text-slate-400 dark:hover:text-emerald-400 text-xs font-bold transition-colors bg-slate-50 dark:bg-slate-800/80 px-5 py-2 rounded-[1rem] border border-slate-200 dark:border-slate-700 shadow-sm"
                 >
                   الهدف: {target}
                 </button>
@@ -235,31 +252,32 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
           </div>
 
           {/* Main Count Button */}
-          <div className="absolute bottom-10">
+          <div className="absolute bottom-8 z-30">
             <button
               onPointerDown={handlePress}
-              className={`w-32 h-32 rounded-full flex items-center justify-center relative outline-none select-none transition-all duration-75 ${
+              className={`w-36 h-36 rounded-full flex items-center justify-center relative outline-none select-none transition-all duration-100 ${
                 isPressed 
-                  ? 'bg-gradient-to-b from-[var(--color-primary-dark)] to-[var(--color-primary)] shadow-[inset_0_10px_20px_rgba(0,0,0,0.8),0_2px_4px_rgba(0,0,0,0.3)] translate-y-[8px]' 
-                  : 'bg-gradient-to-b from-[var(--color-primary-light)] to-[var(--color-primary-dark)] shadow-[0_10px_0_#064e3b,0_20px_30px_rgba(0,0,0,0.6),inset_0_4px_8px_rgba(255,255,255,0.5)]'
+                  ? 'bg-gradient-to-br from-emerald-600 to-teal-700 shadow-[inset_0_10px_20px_rgba(0,0,0,0.4),0_2px_5px_rgba(16,185,129,0.3)] translate-y-[8px]' 
+                  : 'bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 shadow-[0_15px_0_#065f46,0_25px_35px_rgba(16,185,129,0.4),inset_0_2px_5px_rgba(255,255,255,0.4)] hover:-translate-y-1 hover:shadow-[0_18px_0_#065f46,0_30px_40px_rgba(16,185,129,0.5),inset_0_2px_5px_rgba(255,255,255,0.4)]'
               }`}
               style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
             >
-              <div className={`absolute inset-2 rounded-full border-2 transition-all duration-75 ${isPressed ? 'border-black/30 bg-black/10' : 'border-white/30 bg-white/5'}`}></div>
-              <span className={`relative z-10 font-bold text-3xl transition-all duration-75 ${isPressed ? 'text-white/70 scale-95 drop-shadow-none' : 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]'}`}>
+              <div className={`absolute inset-0 rounded-full border border-white/20 transition-all ${isPressed ? 'opacity-0' : 'opacity-100'}`}></div>
+              <div className={`absolute inset-2 rounded-full transition-all duration-75 ${isPressed ? 'bg-black/10' : 'bg-gradient-to-tl from-black/10 to-transparent'}`}></div>
+              <span className={`relative z-10 font-bold text-4xl font-serif tracking-wide transition-all duration-75 drop-shadow-md ${isPressed ? 'text-white/80 scale-95' : 'text-white text-shadow-sm'}`}>
                 سبّح
               </span>
             </button>
           </div>
 
           {/* Reset Button */}
-          <div className="absolute right-6 top-1/2 -translate-y-1/2">
+          <div className="absolute right-6 top-1/2 -translate-y-1/2 z-30">
             <motion.button
               whileTap={{ scale: 0.8 }}
               onClick={reset}
-              className="w-10 h-10 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 shadow-sm border border-black/10 dark:border-white/10 flex items-center justify-center transition-colors"
+              className="w-12 h-12 rounded-[1.2rem] bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 shadow-md border border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:-translate-y-1"
             >
-              <RotateCcw size={18} className="text-[var(--color-text-muted)]" />
+              <RotateCcw size={20} className="text-slate-500 hover:text-emerald-500 transition-colors" />
             </motion.button>
           </div>
 
@@ -273,31 +291,31 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
           >
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="bg-[var(--color-surface)] border border-black/10 dark:border-white/10 rounded-3xl p-6 w-full max-w-sm shadow-2xl"
+              className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] p-6 w-full max-w-sm shadow-xl"
             >
               <div className="flex justify-between items-center mb-6">
-                <button onClick={() => setIsSettingsOpen(false)} className="text-[var(--color-text-muted)] hover:text-[var(--color-text)]">
+                <button onClick={() => setIsSettingsOpen(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                   <X size={24} />
                 </button>
-                <h3 className="text-xl font-bold text-[var(--color-text)]">إعدادات المسبحة</h3>
+                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">إعدادات المسبحة</h3>
               </div>
 
               <div className="space-y-6">
                 {/* Sound Setting */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 text-[var(--color-text)]">
-                    {soundEnabled ? <Volume2 size={20} className="text-[var(--color-primary)]" /> : <VolumeX size={20} className="text-[var(--color-text-muted)]" />}
+                  <div className="flex items-center gap-3 text-slate-700 dark:text-slate-200">
+                    {soundEnabled ? <Volume2 size={20} className="text-emerald-500" /> : <VolumeX size={20} className="text-slate-400" />}
                     <span className="font-medium">الصوت</span>
                   </div>
                   <button 
                     onClick={() => setSoundEnabled(!soundEnabled)}
-                    className={`w-12 h-6 rounded-full transition-colors relative ${soundEnabled ? 'bg-[var(--color-primary)]' : 'bg-black/20 dark:bg-white/20'}`}
+                    className={`w-12 h-6 rounded-full transition-colors relative ${soundEnabled ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`}
                   >
                     <div className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-all ${soundEnabled ? 'left-1' : 'right-1'}`} />
                   </button>
@@ -305,8 +323,8 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
 
                 {/* Vibration Setting */}
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 text-[var(--color-text)] mb-2">
-                    <Vibrate size={20} className="text-[var(--color-primary)]" />
+                  <div className="flex items-center gap-3 text-slate-700 dark:text-slate-200 mb-2">
+                    <Vibrate size={20} className="text-emerald-500" />
                     <span className="font-medium">نمط الاهتزاز</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
@@ -321,8 +339,8 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
                         onClick={() => setVibrationPattern(pattern.id as any)}
                         className={`py-2 px-3 rounded-xl text-sm font-medium transition-colors border ${
                           vibrationPattern === pattern.id 
-                            ? 'bg-[var(--color-primary)]/20 border-[var(--color-primary)] text-[var(--color-primary)]' 
-                            : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-[var(--color-text-muted)] hover:bg-black/10 dark:hover:bg-white/10'
+                            ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400' 
+                            : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
                         }`}
                       >
                         {pattern.label}

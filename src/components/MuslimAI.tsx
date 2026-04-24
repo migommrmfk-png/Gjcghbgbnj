@@ -168,21 +168,21 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[var(--color-bg)] relative overflow-hidden pb-24" dir="rtl">
+    <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 relative overflow-hidden pb-24" dir="rtl">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 z-10 mt-2 bg-[var(--color-bg)]/80 backdrop-blur-xl sticky top-0 border-b border-black/5 dark:border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
-        <button onClick={onBack} className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors border border-black/5 dark:border-white/5 bg-[var(--color-surface)] shadow-[0_5px_15px_rgba(0,0,0,0.2)]">
-          <ArrowRight className="text-[var(--color-text-muted)] hover:text-[var(--color-primary-light)]" size={24} />
+      <div className="flex items-center justify-between p-4 z-10 mt-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl sticky top-0 border-b border-slate-100 dark:border-slate-800 shadow-sm">
+        <button onClick={onBack} className="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full transition-colors border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+          <ArrowRight className="text-slate-500 hover:text-emerald-500" size={24} />
         </button>
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--color-primary)]/20 to-transparent flex items-center justify-center border border-[var(--color-primary)]/30 shadow-inner">
-            <Bot size={20} className="text-[var(--color-primary-light)]" />
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center border border-emerald-100 dark:border-emerald-500/20">
+            <Bot size={20} className="text-emerald-500" />
           </div>
-          <span className="font-bold text-[var(--color-primary-light)] text-xl font-serif drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">
+          <span className="font-bold text-slate-800 dark:text-slate-100 text-xl font-serif">
             المساعد الإسلامي
           </span>
         </div>
-        <button onClick={() => setShowClearConfirm(true)} className="p-2 hover:bg-red-500/10 text-red-400 rounded-full transition-colors border border-transparent hover:border-red-500/20" title="مسح المحادثة">
+        <button onClick={() => setShowClearConfirm(true)} className="p-2 hover:bg-red-50 dark:hover:bg-red-500/10 text-red-400 rounded-full transition-colors border border-transparent hover:border-red-100 dark:hover:border-red-500/20" title="مسح المحادثة">
           <Trash2 size={20} />
         </button>
       </div>
@@ -194,26 +194,26 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-[var(--color-surface)] border border-black/10 dark:border-white/10 rounded-2xl p-6 max-w-sm w-full shadow-2xl"
+              className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 max-w-sm w-full shadow-xl"
             >
-              <h3 className="text-xl font-bold text-[var(--color-text)] mb-4 text-center">مسح المحادثة</h3>
-              <p className="text-[var(--color-text-muted)] text-center mb-6">هل أنت متأكد من مسح سجل المحادثة بالكامل؟ لا يمكن التراجع عن هذا الإجراء.</p>
+              <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-4 text-center">مسح المحادثة</h3>
+              <p className="text-slate-500 text-center mb-6">هل أنت متأكد من مسح سجل المحادثة بالكامل؟ لا يمكن التراجع عن هذا الإجراء.</p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowClearConfirm(false)}
-                  className="flex-1 py-3 rounded-xl font-bold text-[var(--color-text)] bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+                  className="flex-1 py-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                 >
                   إلغاء
                 </button>
                 <button
                   onClick={clearHistory}
-                  className="flex-1 py-3 rounded-xl font-bold text-red-600 dark:text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-colors"
+                  className="flex-1 py-3 rounded-xl font-bold text-white bg-red-500 hover:bg-red-600 transition-colors"
                 >
                   مسح
                 </button>
@@ -229,25 +229,25 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
           <div className="flex flex-wrap gap-2 justify-center mb-6">
             <button
               onClick={() => setInput("أريد تفسير حلم رأيته")}
-              className="bg-[var(--color-surface)] border border-[var(--color-primary)]/30 text-[var(--color-primary-light)] px-4 py-2 rounded-full text-sm font-bold hover:bg-[var(--color-primary)]/10 transition-colors shadow-sm"
+              className="bg-white dark:bg-slate-900 border border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-full text-sm font-bold hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors shadow-sm"
             >
               تفسير الأحلام 🌙
             </button>
             <button
               onClick={() => setInput("لدي سؤال فقهي أو فتوى")}
-              className="bg-[var(--color-surface)] border border-[var(--color-primary)]/30 text-[var(--color-primary-light)] px-4 py-2 rounded-full text-sm font-bold hover:bg-[var(--color-primary)]/10 transition-colors shadow-sm"
+              className="bg-white dark:bg-slate-900 border border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-full text-sm font-bold hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors shadow-sm"
             >
               فتاوى وأسئلة 📚
             </button>
             <button
               onClick={() => setInput("هيا نلعب لعبة أسئلة ثقافية إسلامية")}
-              className="bg-[var(--color-surface)] border border-[var(--color-primary)]/30 text-[var(--color-primary-light)] px-4 py-2 rounded-full text-sm font-bold hover:bg-[var(--color-primary)]/10 transition-colors shadow-sm"
+              className="bg-white dark:bg-slate-900 border border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-full text-sm font-bold hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors shadow-sm"
             >
               ألعاب تفاعلية 🎮
             </button>
             <button
               onClick={() => setInput("أريد تقييم تلاوتي")}
-              className="bg-[var(--color-surface)] border border-[var(--color-primary)]/30 text-[var(--color-primary-light)] px-4 py-2 rounded-full text-sm font-bold hover:bg-[var(--color-primary)]/10 transition-colors shadow-sm"
+              className="bg-white dark:bg-slate-900 border border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-2 rounded-full text-sm font-bold hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors shadow-sm"
             >
               تقييم التلاوة 🎤
             </button>
@@ -262,19 +262,19 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div className={`flex gap-3 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center shadow-inner border ${
+                <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center border ${
                   msg.role === 'user' 
-                    ? 'bg-[var(--color-surface)] text-[var(--color-primary-light)] border-black/5 dark:border-white/10' 
-                    : 'bg-gradient-to-br from-[var(--color-primary)]/20 to-transparent text-[var(--color-primary-light)] border-[var(--color-primary)]/30'
+                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700' 
+                    : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 border-emerald-100 dark:border-emerald-500/20'
                 }`}>
                   {msg.role === 'user' ? <User size={16} /> : <Bot size={16} />}
                 </div>
-                <div className={`p-4 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.3)] border ${
+                <div className={`p-4 rounded-2xl shadow-sm border ${
                   msg.role === 'user'
-                    ? 'bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white rounded-tr-none border-[var(--color-primary-light)]/50'
-                    : 'bg-[var(--color-surface)] border-black/5 dark:border-white/5 text-[var(--color-text)] rounded-tl-none'
+                    ? 'bg-emerald-500 text-white rounded-tr-none border-emerald-600'
+                    : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-100 rounded-tl-none'
                 }`}>
-                  <p className={`text-sm leading-relaxed whitespace-pre-wrap font-medium ${msg.role === 'user' ? 'text-white' : 'text-[var(--color-text)]'}`}>
+                  <p className={`text-sm leading-relaxed whitespace-pre-wrap font-medium ${msg.role === 'user' ? 'text-white' : 'text-slate-800 dark:text-slate-100'}`}>
                     {msg.text}
                   </p>
                 </div>
@@ -288,12 +288,12 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
               className="flex justify-start"
             >
               <div className="flex gap-3 max-w-[85%] flex-row">
-                <div className="w-8 h-8 shrink-0 rounded-full bg-gradient-to-br from-[var(--color-primary)]/20 to-transparent text-[var(--color-primary-light)] flex items-center justify-center shadow-inner border border-[var(--color-primary)]/30">
+                <div className="w-8 h-8 shrink-0 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-100 dark:border-emerald-500/20">
                   <Bot size={16} />
                 </div>
-                <div className="p-4 rounded-2xl bg-[var(--color-surface)] border border-black/5 dark:border-white/5 rounded-tl-none shadow-[0_5px_15px_rgba(0,0,0,0.3)] flex items-center gap-2">
-                  <Loader2 size={16} className="animate-spin text-[var(--color-primary)]" />
-                  <span className="text-xs text-[var(--color-text-muted)] font-bold">جاري التفكير...</span>
+                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-tl-none shadow-sm flex items-center gap-2">
+                  <Loader2 size={16} className="animate-spin text-emerald-500" />
+                  <span className="text-xs text-slate-500 font-bold">جاري التفكير...</span>
                 </div>
               </div>
             </motion.div>
@@ -303,7 +303,7 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
       </div>
 
       {/* Input Area */}
-      <div className="fixed bottom-20 left-0 right-0 max-w-md mx-auto p-4 bg-gradient-to-t from-[var(--color-bg)] via-[var(--color-bg)] to-transparent z-20">
+      <div className="fixed bottom-20 left-0 right-0 max-w-md mx-auto p-4 bg-gradient-to-t from-slate-50 dark:from-slate-950 via-slate-50 dark:via-slate-950 to-transparent z-20">
         <div className="relative flex items-center gap-2">
           <div className="relative flex-1">
             <input
@@ -312,13 +312,13 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder={isRecording ? `جاري التسجيل... ${formatTime(recordingTime)}` : "اسألني أو سجل تلاوتك..."}
-              className={`w-full bg-[var(--color-surface)] border border-black/10 dark:border-white/10 rounded-2xl py-3 pr-4 pl-14 shadow-[0_10px_30px_rgba(0,0,0,0.5)] focus:outline-none focus:border-[var(--color-primary-light)]/50 focus:ring-1 focus:ring-[var(--color-primary-light)]/50 transition-all text-sm font-bold text-[var(--color-text)] placeholder:text-[var(--color-text-muted)] ${isRecording ? 'text-red-500 placeholder:text-red-500/70 border-red-500/50' : ''}`}
+              className={`w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl py-3 pr-4 pl-14 shadow-sm focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all text-sm font-bold text-slate-800 dark:text-slate-100 placeholder:text-slate-400 ${isRecording ? 'text-red-500 placeholder:text-red-500/70 border-red-500/50' : ''}`}
               disabled={isLoading || isRecording}
             />
             <button
               onClick={handleSend}
               disabled={!input.trim() || isLoading || isRecording}
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:shadow-[0_0_20px_rgba(212,175,55,0.5)] transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-[var(--color-primary-light)]/50"
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-sm hover:bg-emerald-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-emerald-600"
             >
               <Send size={18} className="mr-1" />
             </button>
@@ -328,18 +328,18 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
           <button
             onClick={isRecording ? stopRecording : startRecording}
             disabled={isLoading}
-            className={`w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center transition-all shadow-[0_0_15px_rgba(0,0,0,0.3)] border ${
+            className={`w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center transition-all shadow-sm border ${
               isRecording 
-                ? 'bg-red-500 text-white border-red-400 animate-pulse shadow-[0_0_20px_rgba(239,68,68,0.5)]' 
-                : 'bg-[var(--color-surface)] text-[var(--color-primary-light)] border-black/10 dark:border-white/10 hover:border-[var(--color-primary)]/50'
+                ? 'bg-red-500 text-white border-red-600 animate-pulse' 
+                : 'bg-white dark:bg-slate-900 text-emerald-500 border-slate-200 dark:border-slate-700 hover:border-emerald-500/50'
             } disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {isRecording ? <Square size={20} className="fill-current" /> : <Mic size={20} />}
           </button>
         </div>
         <div className="text-center mt-3">
-          <span className="text-[10px] text-[var(--color-text-muted)] font-bold flex items-center justify-center gap-1">
-            <Sparkles size={10} className="text-[var(--color-primary)]" />
+          <span className="text-[10px] text-slate-400 font-bold flex items-center justify-center gap-1">
+            <Sparkles size={10} className="text-emerald-500" />
             الذكاء الاصطناعي قد يخطئ، يرجى مراجعة العلماء في الفتاوى
           </span>
         </div>

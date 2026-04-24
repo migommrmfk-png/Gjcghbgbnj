@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-type Theme = 'emerald-light';
+type Theme = 'light' | 'dark' | 'system';
 
 interface ThemeContextType {
   theme: Theme;
@@ -10,11 +10,25 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('emerald-light');
+  const [theme, setTheme] = useState<Theme>(() => {
+    return (localStorage.getItem('app-theme') as Theme) || 'system';
+  });
 
   useEffect(() => {
-    localStorage.setItem('app-theme', 'emerald-light');
-    document.documentElement.setAttribute('data-theme', 'emerald-light');
+    const root = window.document.documentElement;
+    
+    root.classList.remove('light', 'dark');
+
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light';
+      root.classList.add(systemTheme);
+      return;
+    }
+
+    root.classList.add(theme);
+    localStorage.setItem('app-theme', theme);
   }, [theme]);
 
   return (

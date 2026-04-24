@@ -135,41 +135,41 @@ export default function DuaWall({ onBack }: { onBack: () => void }) {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-[var(--color-bg)]" dir="rtl">
+    <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-slate-50 dark:bg-slate-950" dir="rtl">
       {/* Header */}
-      <div className="sticky top-0 z-20 py-4 flex flex-col gap-4 bg-[var(--color-bg)]/90 backdrop-blur-md border-b border-black/5 dark:border-white/5">
+      <div className="sticky top-0 z-20 py-4 flex flex-col gap-4 bg-slate-50 dark:bg-slate-950/90 backdrop-blur-md border-b border-black/5 dark:border-white/5">
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
-            className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors border border-black/5 dark:border-white/5 bg-[var(--color-surface)] shadow-sm"
+            className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors border border-black/5 dark:border-white/5 bg-white dark:bg-slate-900 shadow-sm"
           >
-            <ArrowRight size={24} className="text-[var(--color-text-muted)] hover:text-[var(--color-primary-light)]" />
+            <ArrowRight size={24} className="text-slate-500 dark:text-slate-400 hover:text-emerald-400" />
           </button>
-          <h1 className="text-2xl font-bold font-serif text-[var(--color-primary-light)] drop-shadow-sm">
+          <h1 className="text-2xl font-bold font-serif text-emerald-400 drop-shadow-sm">
             حائط الدعاء
           </h1>
         </div>
-        <p className="text-sm text-[var(--color-text-muted)] px-2">
+        <p className="text-sm text-slate-500 dark:text-slate-400 px-2">
           شارك دعاءك ليؤمن عليه إخوانك، أو ادعُ لمن طلب الدعاء.
         </p>
       </div>
 
       {/* Write Dua Form */}
-      <div className="mt-6 bg-[var(--color-surface)] rounded-[2rem] p-5 shadow-lg border border-black/5 dark:border-white/5 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-[var(--color-primary)]/5 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+      <div className="mt-6 bg-white dark:bg-slate-900 rounded-[2rem] p-5 shadow-lg border border-black/5 dark:border-white/5 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-10 -mt-10 blur-2xl"></div>
         
         <form onSubmit={handleSubmit} className="relative z-10">
           <textarea
             value={newDua}
             onChange={(e) => setNewDua(e.target.value)}
             placeholder="اكتب دعاءك هنا... (مثال: ادعوا لوالدي بالشفاء)"
-            className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-4 text-[var(--color-text)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/50 resize-none h-28 text-sm leading-relaxed"
+            className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl p-4 text-slate-800 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#10b981]/50 resize-none h-28 text-sm leading-relaxed"
             maxLength={300}
           />
           
           <div className="flex items-center justify-between mt-4">
             <label className="flex items-center gap-2 cursor-pointer group">
-              <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${isAnonymous ? 'bg-[var(--color-primary)] border-[var(--color-primary)]' : 'border-[var(--color-text-muted)] group-hover:border-[var(--color-primary)]'}`}>
+              <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${isAnonymous ? 'bg-emerald-500 border-emerald-500' : 'border-slate-500 dark:border-slate-400 group-hover:border-emerald-500'}`}>
                 {isAnonymous && <User size={12} className="text-white" />}
               </div>
               <input 
@@ -178,13 +178,13 @@ export default function DuaWall({ onBack }: { onBack: () => void }) {
                 checked={isAnonymous}
                 onChange={(e) => setIsAnonymous(e.target.checked)}
               />
-              <span className="text-sm text-[var(--color-text-muted)] group-hover:text-[var(--color-text)] transition-colors">نشر كمجهول</span>
+              <span className="text-sm text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:text-slate-100 transition-colors">نشر كمجهول</span>
             </label>
             
             <button
               type="submit"
               disabled={!newDua.trim() || isSubmitting}
-              className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {isSubmitting ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -203,10 +203,10 @@ export default function DuaWall({ onBack }: { onBack: () => void }) {
       <div className="mt-8 space-y-4">
         {loading ? (
           <div className="flex justify-center py-10">
-            <div className="w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
         ) : duas.length === 0 ? (
-          <div className="text-center py-10 text-[var(--color-text-muted)]">
+          <div className="text-center py-10 text-slate-500 dark:text-slate-400">
             <Heart size={48} className="mx-auto mb-4 opacity-20" />
             <p>لا توجد أدعية بعد. كن أول من يشارك دعاءه!</p>
           </div>
@@ -220,16 +220,16 @@ export default function DuaWall({ onBack }: { onBack: () => void }) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="bg-[var(--color-surface)] rounded-2xl p-5 shadow-md border border-black/5 dark:border-white/5"
+                  className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-md border border-black/5 dark:border-white/5"
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-inner ${dua.isAnonymous ? 'bg-gray-500' : 'bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)]'}`}>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-inner ${dua.isAnonymous ? 'bg-gray-500' : 'bg-gradient-to-br from-emerald-500 to-emerald-600'}`}>
                         {dua.isAnonymous ? <User size={20} /> : dua.authorName.charAt(0)}
                       </div>
                       <div>
-                        <h3 className="font-bold text-[var(--color-text)] text-sm">{dua.authorName}</h3>
-                        <div className="flex items-center gap-1 text-[10px] text-[var(--color-text-muted)] mt-0.5">
+                        <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm">{dua.authorName}</h3>
+                        <div className="flex items-center gap-1 text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
                           <Clock size={10} />
                           <span>{formatDate(dua.createdAt)}</span>
                         </div>
@@ -237,12 +237,12 @@ export default function DuaWall({ onBack }: { onBack: () => void }) {
                     </div>
                   </div>
                   
-                  <p className="text-[var(--color-text)] text-sm leading-relaxed mb-4 bg-black/5 dark:bg-white/5 p-4 rounded-xl border border-black/5 dark:border-white/5">
+                  <p className="text-slate-800 dark:text-slate-100 text-sm leading-relaxed mb-4 bg-black/5 dark:bg-white/5 p-4 rounded-xl border border-black/5 dark:border-white/5">
                     "{dua.text}"
                   </p>
                   
                   <div className="flex items-center justify-between border-t border-black/5 dark:border-white/5 pt-3">
-                    <div className="flex items-center gap-1.5 text-[var(--color-text-muted)] text-xs font-bold">
+                    <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-xs font-bold">
                       <Heart size={14} className={dua.ameenCount > 0 ? 'text-rose-500 fill-rose-500' : ''} />
                       <span>{dua.ameenCount} شخص أمّن على الدعاء</span>
                     </div>
@@ -253,7 +253,7 @@ export default function DuaWall({ onBack }: { onBack: () => void }) {
                       className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
                         hasAmeened 
                           ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20' 
-                          : 'bg-black/5 dark:bg-white/5 text-[var(--color-text)] hover:bg-[var(--color-primary)]/10 hover:text-[var(--color-primary)] border border-transparent'
+                          : 'bg-black/5 dark:bg-white/5 text-slate-800 dark:text-slate-100 hover:bg-emerald-500/10 hover:text-emerald-500 border border-transparent'
                       }`}
                     >
                       <Heart size={16} className={hasAmeened ? 'fill-rose-500' : ''} />

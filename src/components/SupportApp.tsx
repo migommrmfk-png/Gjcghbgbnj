@@ -67,18 +67,18 @@ export default function SupportApp({ onBack }: { onBack?: () => void }) {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-[var(--color-bg)] pb-24 relative" dir="rtl">
+    <div className="max-w-md mx-auto min-h-screen bg-slate-50 dark:bg-slate-950 pb-24 relative" dir="rtl">
       {/* Header */}
-      <div className="sticky top-0 bg-[var(--color-bg)]/90 backdrop-blur-md shadow-sm z-20 px-4 py-3 flex items-center border-b-2 border-[var(--color-gold)]/30">
+      <div className="sticky top-0 bg-slate-50 dark:bg-slate-950/90 backdrop-blur-md shadow-sm z-20 px-4 py-3 flex items-center border-b-2 border-amber-500/30">
         {onBack && (
           <button
             onClick={onBack}
-            className="p-2 hover:bg-[var(--color-gold)]/10 rounded-full transition-colors ml-2"
+            className="p-2 hover:bg-amber-500/10 rounded-full transition-colors ml-2"
           >
-            <ArrowRight size={24} className="text-[var(--color-text)]" />
+            <ArrowRight size={24} className="text-slate-800 dark:text-slate-100" />
           </button>
         )}
-        <h1 className="text-xl font-bold font-serif text-[var(--color-primary-dark)] flex-1 text-center pr-8">
+        <h1 className="text-xl font-bold font-serif text-emerald-600 flex-1 text-center pr-8">
           ادعم التطبيق
         </h1>
       </div>
@@ -88,19 +88,19 @@ export default function SupportApp({ onBack }: { onBack?: () => void }) {
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="bg-gradient-to-br from-[var(--color-primary-light)] to-[var(--color-primary-dark)] rounded-3xl p-6 text-white shadow-lg relative overflow-hidden text-center"
+          className="bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden text-center"
         >
           <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-xl"></div>
           <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
           
           <div className="relative z-10 flex flex-col items-center">
-            <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-4 border-2 border-[var(--color-gold)]/50 shadow-inner">
-              <HandHeart size={40} className="text-[var(--color-gold-light)]" />
+            <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-4 border-2 border-amber-500/50 shadow-inner">
+              <HandHeart size={40} className="text-amber-400" />
             </div>
-            <h2 className="text-2xl font-bold font-serif mb-3 text-[var(--color-gold-light)]">
+            <h2 className="text-2xl font-bold font-serif mb-3 text-amber-400">
               ادعم تطبيق "هذا ديني"
             </h2>
-            <p className="text-[var(--color-text)]/90 text-sm leading-relaxed font-medium">
+            <p className="text-slate-800 dark:text-slate-100/90 text-sm leading-relaxed font-medium">
               هذا التطبيق صُمم لخدمة المسلمين ومساعدتهم في حياتهم اليومية من خلال القرآن الكريم والأذكار ومواقيت الصلاة.
             </p>
           </div>
@@ -111,12 +111,12 @@ export default function SupportApp({ onBack }: { onBack?: () => void }) {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.1 }}
-          className="bg-[var(--color-surface)] rounded-2xl p-5 shadow-sm border border-black/5 dark:border-white/5 text-center"
+          className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-black/5 dark:border-white/5 text-center"
         >
-          <p className="text-[var(--color-text-muted)] text-sm leading-relaxed mb-3">
+          <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-3">
             إذا أعجبك التطبيق وساعدك في حياتك اليومية يمكنك دعم تطويره حتى نستمر في إضافة ميزات جديدة وتحسين التجربة للجميع.
           </p>
-          <div className="inline-block bg-[var(--color-gold)]/10 text-[var(--color-gold-dark)] px-4 py-2 rounded-full text-xs font-bold">
+          <div className="inline-block bg-amber-500/10 text-amber-600 px-4 py-2 rounded-full text-xs font-bold">
             {encouragement}
           </div>
         </motion.div>
@@ -126,15 +126,15 @@ export default function SupportApp({ onBack }: { onBack?: () => void }) {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="card-3d bg-[var(--color-surface)] p-6 relative overflow-hidden border-2 border-[var(--color-gold)]/20"
+          className="card-3d bg-white dark:bg-slate-900 p-6 relative overflow-hidden border-2 border-amber-500/20"
         >
-          <div className="absolute -right-6 -top-6 w-24 h-24 bg-[var(--color-gold)]/10 rounded-full blur-2xl"></div>
+          <div className="absolute -right-6 -top-6 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl"></div>
           
           <div className="text-center mb-6 relative z-10">
             <span className="inline-block bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-bold mb-3 border border-red-100">
               فودافون كاش (Vodafone Cash)
             </span>
-            <div className="text-3xl font-bold tracking-wider text-[var(--color-text)] font-mono bg-gray-50 dark:bg-black/20 py-3 rounded-xl border border-gray-200 dark:border-white/10 shadow-inner">
+            <div className="text-3xl font-bold tracking-wider text-slate-800 dark:text-slate-100 font-mono bg-gray-50 dark:bg-black/20 py-3 rounded-xl border border-gray-200 dark:border-white/10 shadow-inner">
               {vFashNumber}
             </div>
           </div>
@@ -142,17 +142,17 @@ export default function SupportApp({ onBack }: { onBack?: () => void }) {
           <div className="grid grid-cols-2 gap-3 relative z-10">
             <button
               onClick={handleCopy}
-              className="flex flex-col items-center justify-center gap-2 bg-gray-50 dark:bg-black/20 hover:bg-gray-100 dark:hover:bg-black/40 active:bg-gray-200 dark:active:bg-black/60 text-[var(--color-text-muted)] p-3 rounded-xl transition-colors border border-gray-200 dark:border-white/10"
+              className="flex flex-col items-center justify-center gap-2 bg-gray-50 dark:bg-black/20 hover:bg-gray-100 dark:hover:bg-black/40 active:bg-gray-200 dark:active:bg-black/60 text-slate-500 dark:text-slate-400 p-3 rounded-xl transition-colors border border-gray-200 dark:border-white/10"
             >
-              {copied ? <CheckCircle size={24} className="text-green-500" /> : <Copy size={24} className="text-[var(--color-primary)]" />}
+              {copied ? <CheckCircle size={24} className="text-green-500" /> : <Copy size={24} className="text-emerald-500" />}
               <span className="text-xs font-bold">{copied ? 'تم النسخ' : 'نسخ الرقم'}</span>
             </button>
             
             <button
               onClick={handleCall}
-              className="flex flex-col items-center justify-center gap-2 bg-gray-50 dark:bg-black/20 hover:bg-gray-100 dark:hover:bg-black/40 active:bg-gray-200 dark:active:bg-black/60 text-[var(--color-text-muted)] p-3 rounded-xl transition-colors border border-gray-200 dark:border-white/10"
+              className="flex flex-col items-center justify-center gap-2 bg-gray-50 dark:bg-black/20 hover:bg-gray-100 dark:hover:bg-black/40 active:bg-gray-200 dark:active:bg-black/60 text-slate-500 dark:text-slate-400 p-3 rounded-xl transition-colors border border-gray-200 dark:border-white/10"
             >
-              <Phone size={24} className="text-[var(--color-primary)]" />
+              <Phone size={24} className="text-emerald-500" />
               <span className="text-xs font-bold">فتح الاتصال</span>
             </button>
           </div>
@@ -169,13 +169,13 @@ export default function SupportApp({ onBack }: { onBack?: () => void }) {
             onClick={handleDonated}
             className="w-full btn-3d-primary py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-2"
           >
-            <Heart size={24} className="text-[var(--color-gold-light)] fill-[var(--color-gold-light)]" />
+            <Heart size={24} className="text-amber-400 fill-amber-400" />
             تم التبرع، شكراً لكم
           </button>
 
           <button
             onClick={handleShare}
-            className="w-full bg-[var(--color-surface)] hover:bg-black/5 dark:hover:bg-white/5 text-[var(--color-primary)] border-2 border-[var(--color-primary)]/20 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-colors shadow-sm"
+            className="w-full bg-white dark:bg-slate-900 hover:bg-black/5 dark:hover:bg-white/5 text-emerald-500 border-2 border-emerald-500/20 py-3 rounded-2xl font-bold flex items-center justify-center gap-2 transition-colors shadow-sm"
           >
             <Share2 size={20} />
             مشاركة التطبيق
@@ -197,26 +197,26 @@ export default function SupportApp({ onBack }: { onBack?: () => void }) {
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="bg-[var(--color-surface)] rounded-3xl p-8 w-full max-w-sm shadow-2xl text-center relative overflow-hidden border border-black/5 dark:border-white/10"
+              className="bg-white dark:bg-slate-900 rounded-3xl p-8 w-full max-w-sm shadow-2xl text-center relative overflow-hidden border border-black/5 dark:border-white/10"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[var(--color-gold)] to-[var(--color-primary)]"></div>
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-500 to-emerald-500"></div>
               
               <div className="w-20 h-20 bg-green-50 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-green-100 dark:border-green-800/30">
                 <CheckCircle size={40} className="text-green-500" />
               </div>
               
-              <h3 className="text-2xl font-bold text-[var(--color-text)] font-serif mb-3">
+              <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-100 font-serif mb-3">
                 جزاك الله خيراً
               </h3>
               
-              <p className="text-[var(--color-text-muted)] leading-relaxed font-medium mb-6">
+              <p className="text-slate-500 dark:text-slate-400 leading-relaxed font-medium mb-6">
                 {thankYouMessage}
               </p>
               
               <button
                 onClick={() => setShowThankYou(false)}
-                className="w-full py-3 bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-[var(--color-text)] rounded-xl font-bold transition-colors"
+                className="w-full py-3 bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-slate-800 dark:text-slate-100 rounded-xl font-bold transition-colors"
               >
                 إغلاق
               </button>
@@ -231,7 +231,7 @@ export default function SupportApp({ onBack }: { onBack?: () => void }) {
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-[var(--color-primary)] text-white px-6 py-3 rounded-full shadow-lg z-50 font-bold text-sm whitespace-nowrap"
+            className="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-emerald-500 text-white px-6 py-3 rounded-full shadow-lg z-50 font-bold text-sm whitespace-nowrap"
           >
             تم نسخ رابط التطبيق للمشاركة
           </motion.div>

@@ -37,7 +37,7 @@ export default function NamesOfAllah({ onBack }: { onBack?: () => void }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full min-h-[50vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary)]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
       </div>
     );
   }
@@ -48,19 +48,19 @@ export default function NamesOfAllah({ onBack }: { onBack?: () => void }) {
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: -100, opacity: 0 }}
-        className="max-w-md mx-auto bg-[var(--color-bg)] min-h-screen pb-24"
+        className="max-w-md mx-auto bg-white dark:bg-slate-950 min-h-screen pb-24"
         dir="rtl"
       >
-        {/* Header 3D */}
-        <div className="sticky top-0 bg-[var(--color-bg)]/80 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] z-20 px-4 py-4 flex items-center gap-4 border-b border-black/5 dark:border-white/5">
+        {/* Header */}
+        <div className="sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-sm z-20 px-4 py-4 flex items-center gap-4 border-b border-slate-100 dark:border-slate-800">
           <button
             onClick={() => setSelectedName(null)}
-            className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors border border-black/5 dark:border-white/5 bg-[var(--color-surface)] shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
+            className="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full transition-colors border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm"
           >
-            <ArrowRight size={24} className="text-[var(--color-text-muted)] hover:text-[var(--color-primary-light)]" />
+            <ArrowRight size={24} className="text-slate-500 hover:text-emerald-500" />
           </button>
           <div className="flex-1 text-center">
-            <h1 className="text-2xl font-bold font-serif text-[var(--color-primary-light)] drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">
+            <h1 className="text-2xl font-bold font-serif text-slate-800 dark:text-slate-100">
               أسماء الله الحسنى
             </h1>
           </div>
@@ -72,17 +72,16 @@ export default function NamesOfAllah({ onBack }: { onBack?: () => void }) {
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="card-3d p-8 text-center bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] text-white relative overflow-hidden border border-[var(--color-primary)]/20 shadow-[0_15px_40px_rgba(0,0,0,0.6)]"
+            className="rounded-3xl p-8 text-center bg-emerald-500 text-white relative overflow-hidden border border-emerald-600 shadow-sm"
           >
-            <div className="absolute right-0 top-0 w-40 h-40 bg-white/10 rounded-full -mr-10 -mt-10 blur-3xl"></div>
-            <div className="absolute left-0 bottom-0 w-32 h-32 bg-black/20 rounded-full -ml-10 -mb-10 blur-2xl"></div>
-            <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
+            <div className="absolute right-0 top-0 w-40 h-40 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+            <div className="absolute left-0 bottom-0 w-32 h-32 bg-black/10 rounded-full -ml-10 -mb-10 blur-2xl"></div>
 
             <div className="relative z-10">
-              <h2 className="text-6xl font-bold font-serif mb-4 drop-shadow-[0_0_15px_rgba(212,175,55,0.4)] text-[var(--color-primary-light)]">
+              <h2 className="text-6xl font-bold font-serif mb-4 text-white">
                 {selectedName.name}
               </h2>
-              <p className="text-xl font-bold mb-2 text-[var(--color-text-muted)]">
+              <p className="text-xl font-bold mb-2 text-emerald-100">
                 {selectedName.transliteration}
               </p>
             </div>
@@ -92,12 +91,12 @@ export default function NamesOfAllah({ onBack }: { onBack?: () => void }) {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className="card-3d p-6 bg-[var(--color-surface)] border border-black/5 dark:border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+            className="rounded-3xl p-6 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm"
           >
-            <h3 className="text-lg font-bold text-[var(--color-primary)] mb-4 border-b border-black/5 dark:border-white/10 pb-2">
+            <h3 className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mb-4 border-b border-slate-100 dark:border-slate-800 pb-2">
               المعنى
             </h3>
-            <p className="text-[var(--color-text)] leading-loose text-justify font-serif text-lg">
+            <p className="text-slate-700 dark:text-slate-300 leading-loose text-justify font-serif text-lg">
               {/* Fallback to English meaning if Arabic isn't available in API */}
               {selectedName.en.meaning}
             </p>
@@ -109,11 +108,11 @@ export default function NamesOfAllah({ onBack }: { onBack?: () => void }) {
 
   return (
     <div className="max-w-md mx-auto p-4 space-y-6 pb-24" dir="rtl">
-      {/* Header 3D */}
+      {/* Header */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-[2rem] p-8 text-white shadow-[0_15px_40px_rgba(0,0,0,0.6)] relative overflow-hidden border border-white/10"
+        className="bg-emerald-500 rounded-3xl p-8 text-white shadow-sm relative overflow-hidden border border-emerald-600"
       >
         {onBack && (
           <button
@@ -123,42 +122,41 @@ export default function NamesOfAllah({ onBack }: { onBack?: () => void }) {
             <ArrowRight size={24} className="text-white" />
           </button>
         )}
-        <div className="absolute right-0 top-0 w-40 h-40 bg-white/10 rounded-full -mr-10 -mt-10 blur-3xl"></div>
-        <div className="absolute left-0 bottom-0 w-32 h-32 bg-black/20 rounded-full -ml-10 -mb-10 blur-2xl"></div>
-        <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
+        <div className="absolute right-0 top-0 w-40 h-40 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+        <div className="absolute left-0 bottom-0 w-32 h-32 bg-black/10 rounded-full -ml-10 -mb-10 blur-2xl"></div>
         <div className="relative z-10 flex flex-col items-center text-center">
-          <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center text-white mb-6 shadow-[0_0_20px_rgba(255,255,255,0.2)] transform rotate-3 border border-white/30">
+          <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center text-white mb-6 shadow-sm transform rotate-3 border border-white/30">
             <Info size={40} />
           </div>
-          <h1 className="text-4xl font-bold font-serif mb-2 text-white drop-shadow-md">
+          <h1 className="text-4xl font-bold font-serif mb-2 text-white">
             أسماء الله الحسنى
           </h1>
-          <p className="text-white/80 text-sm font-bold">
+          <p className="text-emerald-100 text-sm font-bold">
             ولله الأسماء الحسنى فادعوه بها
           </p>
         </div>
       </motion.div>
 
-      {/* Search Bar 3D */}
+      {/* Search Bar */}
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.1 }}
-        className="relative card-3d overflow-hidden bg-[var(--color-surface)] border border-black/5 dark:border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+        className="relative overflow-hidden bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm rounded-2xl"
       >
         <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-          <Search className="h-5 w-5 text-[var(--color-primary)]" />
+          <Search className="h-5 w-5 text-emerald-500" />
         </div>
         <input
           type="text"
-          className="block w-full pl-4 pr-12 py-4 bg-transparent border-none focus:ring-0 text-[var(--color-text)] font-bold placeholder-[var(--color-text-muted)] outline-none"
+          className="block w-full pl-4 pr-12 py-4 bg-transparent border-none focus:ring-0 text-slate-800 dark:text-slate-100 font-bold placeholder-slate-400 outline-none"
           placeholder="ابحث عن اسم..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </motion.div>
 
-      {/* Names Grid 3D */}
+      {/* Names Grid */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -171,15 +169,15 @@ export default function NamesOfAllah({ onBack }: { onBack?: () => void }) {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: index * 0.01 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setSelectedName(name)}
-            className="card-3d bg-[var(--color-surface)] p-6 text-center flex flex-col items-center justify-center gap-3 group hover:bg-[var(--color-primary)]/10 hover:border-[var(--color-primary)]/30 transition-colors border border-black/5 dark:border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+            className="bg-white dark:bg-slate-900 rounded-3xl p-6 text-center flex flex-col items-center justify-center gap-3 group hover:border-emerald-500/30 transition-colors border border-slate-100 dark:border-slate-800 shadow-sm"
           >
-            <span className="text-3xl font-bold font-serif text-[var(--color-primary-light)] group-hover:text-[var(--color-text)] drop-shadow-[0_0_10px_rgba(212,175,55,0.3)] transition-colors">
+            <span className="text-3xl font-bold font-serif text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">
               {name.name}
             </span>
-            <span className="text-xs text-[var(--color-text-muted)] group-hover:text-[var(--color-primary-light)] font-bold transition-colors">
+            <span className="text-xs text-slate-500 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 font-bold transition-colors">
               {name.transliteration}
             </span>
           </motion.button>

@@ -61,7 +61,7 @@ export default function DownloadAppBanner() {
                 </div>
                 <div>
                   <h4 className="font-bold text-amber-700 dark:text-amber-500 mb-1">تنبيه هام قبل التثبيت</h4>
-                  <p className="text-sm text-[var(--color-text-muted)] leading-relaxed">
+                  <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
                     نظراً لأن التطبيق يتم تحميله من خارج متجر جوجل بلاي، يرجى التأكد من تفعيل خيار <strong className="text-amber-700 dark:text-amber-500">"تثبيت التطبيقات من مصادر غير معروفة"</strong> في إعدادات الحماية بهاتفك.
                   </p>
                 </div>

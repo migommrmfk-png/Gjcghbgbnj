@@ -344,17 +344,19 @@ export default function Games({ onBack }: { onBack: () => void }) {
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-3xl p-8 text-white shadow-[0_10px_30px_rgba(0,0,0,0.5)] relative overflow-hidden border border-white/5"
+        className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden border border-white/20"
       >
-        <div className="absolute right-0 top-0 w-40 h-40 bg-[var(--color-primary)]/20 rounded-full -mr-10 -mt-10 blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/40 rounded-full -ml-10 -mb-10 blur-2xl"></div>
-        <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
-        <div className="relative z-10">
-          <h1 className="text-3xl font-bold font-serif mb-3 flex items-center gap-3 drop-shadow-[0_0_10px_rgba(212,175,55,0.3)] text-[var(--color-primary-light)]">
-            <Puzzle size={32} className="text-[var(--color-primary)]" />
+        <div className="absolute right-0 top-0 w-48 h-48 bg-white/10 rounded-full -mr-12 -mt-12 blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/20 rounded-full -ml-12 -mb-12 blur-2xl"></div>
+        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
+        <div className="relative z-10 flex flex-col items-center text-center">
+           <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.2)] mb-4 transform rotate-3">
+             <Puzzle size={32} className="text-white drop-shadow-md" />
+           </div>
+          <h1 className="text-4xl font-bold font-serif mb-3 drop-shadow-md">
             ألعاب وتحديات
           </h1>
-          <p className="text-[var(--color-text-muted)] text-sm font-bold">اختبر معلوماتك الدينية بأسئلة متجددة تلقائياً بالذكاء الاصطناعي</p>
+          <p className="text-emerald-50 text-sm font-bold bg-black/20 px-5 py-2.5 rounded-full backdrop-blur-md border border-white/10 mt-2 leading-relaxed">اختبر معلوماتك الدينية بأسئلة متجددة تلقائياً بالذكاء الاصطناعي</p>
         </div>
       </motion.div>
 
@@ -363,14 +365,15 @@ export default function Games({ onBack }: { onBack: () => void }) {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => handleGameSelect('quiz')}
-          className="card-3d bg-[var(--color-surface)] p-6 rounded-3xl shadow-[0_5px_15px_rgba(0,0,0,0.3)] border border-white/5 flex items-center gap-4 text-right hover:border-[var(--color-primary-light)]/30 transition-all group"
+          className="card-3d bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl border border-black/5 dark:border-white/5 flex items-center gap-5 text-right hover:border-emerald-500/50 hover:-translate-y-1 transition-all group overflow-hidden relative"
         >
-          <div className="w-16 h-16 bg-gradient-to-br from-[var(--color-primary)]/20 to-transparent text-[var(--color-primary-light)] rounded-2xl flex items-center justify-center shrink-0 border border-[var(--color-primary)]/30 shadow-inner group-hover:shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all">
-            <Brain size={32} />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-emerald-500/20 transition-colors"></div>
+          <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 text-white rounded-[1.5rem] flex items-center justify-center shrink-0 border border-white/20 shadow-[0_8px_20px_rgba(16,185,129,0.3)] group-hover:scale-110 transition-transform relative z-10">
+            <Brain size={32} className="drop-shadow-sm" />
           </div>
-          <div>
-            <h3 className="text-lg font-bold text-white mb-1 group-hover:text-[var(--color-primary-light)] transition-colors drop-shadow-md">مسابقة المعلومات الإسلامية</h3>
-            <p className="text-sm text-[var(--color-text-muted)] font-bold">أسئلة متنوعة في السيرة والقرآن والتاريخ الإسلامي</p>
+          <div className="relative z-10">
+            <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-1 group-hover:text-emerald-500 transition-colors">مسابقة المعلومات الإسلامية</h3>
+            <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed">أسئلة متنوعة في السيرة والقرآن والتاريخ الإسلامي</p>
           </div>
         </motion.button>
 
@@ -378,14 +381,15 @@ export default function Games({ onBack }: { onBack: () => void }) {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => handleGameSelect('ayah')}
-          className="card-3d bg-[var(--color-surface)] p-6 rounded-3xl shadow-[0_5px_15px_rgba(0,0,0,0.3)] border border-white/5 flex items-center gap-4 text-right hover:border-[var(--color-primary-light)]/30 transition-all group"
+           className="card-3d bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl border border-black/5 dark:border-white/5 flex items-center gap-5 text-right hover:border-teal-500/50 hover:-translate-y-1 transition-all group overflow-hidden relative"
         >
-          <div className="w-16 h-16 bg-gradient-to-br from-[var(--color-primary)]/20 to-transparent text-[var(--color-primary-light)] rounded-2xl flex items-center justify-center shrink-0 border border-[var(--color-primary)]/30 shadow-inner group-hover:shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all">
-            <Book size={32} />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-teal-500/20 transition-colors"></div>
+          <div className="w-16 h-16 bg-gradient-to-br from-teal-400 to-teal-600 text-white rounded-[1.5rem] flex items-center justify-center shrink-0 border border-white/20 shadow-[0_8px_20px_rgba(20,184,166,0.3)] group-hover:scale-110 transition-transform relative z-10">
+            <Book size={32} className="drop-shadow-sm" />
           </div>
-          <div>
-            <h3 className="text-lg font-bold text-white mb-1 group-hover:text-[var(--color-primary-light)] transition-colors drop-shadow-md">أكمل الآية</h3>
-            <p className="text-sm text-[var(--color-text-muted)] font-bold">اختبر حفظك للقرآن الكريم من خلال إكمال الكلمة الناقصة</p>
+          <div className="relative z-10">
+            <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-1 group-hover:text-teal-500 transition-colors">أكمل الآية</h3>
+            <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed">اختبر حفظك للقرآن الكريم من خلال إكمال الكلمة الناقصة</p>
           </div>
         </motion.button>
 
@@ -393,14 +397,15 @@ export default function Games({ onBack }: { onBack: () => void }) {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => handleGameSelect('history')}
-          className="card-3d bg-[var(--color-surface)] p-6 rounded-3xl shadow-[0_5px_15px_rgba(0,0,0,0.3)] border border-white/5 flex items-center gap-4 text-right hover:border-[var(--color-primary-light)]/30 transition-all group"
+           className="card-3d bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl border border-black/5 dark:border-white/5 flex items-center gap-5 text-right hover:border-amber-500/50 hover:-translate-y-1 transition-all group overflow-hidden relative"
         >
-          <div className="w-16 h-16 bg-gradient-to-br from-[var(--color-primary)]/20 to-transparent text-[var(--color-primary-light)] rounded-2xl flex items-center justify-center shrink-0 border border-[var(--color-primary)]/30 shadow-inner group-hover:shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all">
-            <History size={32} />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-amber-500/20 transition-colors"></div>
+          <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 text-white rounded-[1.5rem] flex items-center justify-center shrink-0 border border-white/20 shadow-[0_8px_20px_rgba(245,158,11,0.3)] group-hover:scale-110 transition-transform relative z-10">
+            <History size={32} className="drop-shadow-sm" />
           </div>
-          <div>
-            <h3 className="text-lg font-bold text-white mb-1 group-hover:text-[var(--color-primary-light)] transition-colors drop-shadow-md">أحداث تاريخية</h3>
-            <p className="text-sm text-[var(--color-text-muted)] font-bold">اختبر معلوماتك في التاريخ الإسلامي والغزوات</p>
+          <div className="relative z-10">
+            <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-1 group-hover:text-amber-500 transition-colors">أحداث تاريخية</h3>
+            <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed">اختبر معلوماتك في التاريخ الإسلامي والغزوات</p>
           </div>
         </motion.button>
 
@@ -408,14 +413,15 @@ export default function Games({ onBack }: { onBack: () => void }) {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => handleGameSelect('prophets')}
-          className="card-3d bg-[var(--color-surface)] p-6 rounded-3xl shadow-[0_5px_15px_rgba(0,0,0,0.3)] border border-white/5 flex items-center gap-4 text-right hover:border-[var(--color-primary-light)]/30 transition-all group"
+           className="card-3d bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl border border-black/5 dark:border-white/5 flex items-center gap-5 text-right hover:border-indigo-500/50 hover:-translate-y-1 transition-all group overflow-hidden relative"
         >
-          <div className="w-16 h-16 bg-gradient-to-br from-[var(--color-primary)]/20 to-transparent text-[var(--color-primary-light)] rounded-2xl flex items-center justify-center shrink-0 border border-[var(--color-primary)]/30 shadow-inner group-hover:shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all">
-            <Users size={32} />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-indigo-500/20 transition-colors"></div>
+          <div className="w-16 h-16 bg-gradient-to-br from-indigo-400 to-indigo-600 text-white rounded-[1.5rem] flex items-center justify-center shrink-0 border border-white/20 shadow-[0_8px_20px_rgba(99,102,241,0.3)] group-hover:scale-110 transition-transform relative z-10">
+            <Users size={32} className="drop-shadow-sm" />
           </div>
-          <div>
-            <h3 className="text-lg font-bold text-white mb-1 group-hover:text-[var(--color-primary-light)] transition-colors drop-shadow-md">ألقاب الأنبياء</h3>
-            <p className="text-sm text-[var(--color-text-muted)] font-bold">قم بتوصيل اسم النبي باللقب الخاص به</p>
+          <div className="relative z-10">
+            <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-1 group-hover:text-indigo-500 transition-colors">ألقاب الأنبياء</h3>
+            <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed">قم بتوصيل اسم النبي باللقب الخاص به</p>
           </div>
         </motion.button>
 
@@ -423,14 +429,15 @@ export default function Games({ onBack }: { onBack: () => void }) {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => handleGameSelect('memory')}
-          className="card-3d bg-[var(--color-surface)] p-6 rounded-3xl shadow-[0_5px_15px_rgba(0,0,0,0.3)] border border-white/5 flex items-center gap-4 text-right hover:border-[var(--color-primary-light)]/30 transition-all group"
+           className="card-3d bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl border border-black/5 dark:border-white/5 flex items-center gap-5 text-right hover:border-purple-500/50 hover:-translate-y-1 transition-all group overflow-hidden relative"
         >
-          <div className="w-16 h-16 bg-gradient-to-br from-[var(--color-primary)]/20 to-transparent text-[var(--color-primary-light)] rounded-2xl flex items-center justify-center shrink-0 border border-[var(--color-primary)]/30 shadow-inner group-hover:shadow-[0_0_15px_rgba(212,175,55,0.3)] transition-all">
-            <Grid3X3 size={32} />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-purple-500/20 transition-colors"></div>
+          <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 text-white rounded-[1.5rem] flex items-center justify-center shrink-0 border border-white/20 shadow-[0_8px_20px_rgba(168,85,247,0.3)] group-hover:scale-110 transition-transform relative z-10">
+            <Grid3X3 size={32} className="drop-shadow-sm" />
           </div>
-          <div>
-            <h3 className="text-lg font-bold text-white mb-1 group-hover:text-[var(--color-primary-light)] transition-colors drop-shadow-md">لعبة الذاكرة</h3>
-            <p className="text-sm text-[var(--color-text-muted)] font-bold">طابق بين السور القرآنية المتشابهة</p>
+          <div className="relative z-10">
+            <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-1 group-hover:text-purple-500 transition-colors">لعبة الذاكرة</h3>
+            <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed">طابق بين السور القرآنية المتشابهة</p>
           </div>
         </motion.button>
       </div>
@@ -443,30 +450,30 @@ export default function Games({ onBack }: { onBack: () => void }) {
         <motion.div 
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="card-3d bg-[var(--color-surface)] rounded-3xl p-8 text-center shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/10 mt-10"
+          className="card-3d bg-white dark:bg-slate-900 rounded-3xl p-8 text-center shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/10 mt-10"
         >
-          <div className="w-24 h-24 bg-gradient-to-br from-[var(--color-primary)]/20 to-transparent text-[var(--color-primary-light)] rounded-full flex items-center justify-center mx-auto mb-6 border border-[var(--color-primary)]/30 shadow-inner">
+          <div className="w-24 h-24 bg-gradient-to-br from-emerald-500/20 to-transparent text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-500/30 shadow-inner">
             <Trophy size={48} />
           </div>
           <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-md">أحسنت!</h2>
-          <p className="text-[var(--color-text-muted)] font-bold mb-6">لقد قمت بتوصيل جميع الأنبياء بألقابهم</p>
+          <p className="text-slate-500 dark:text-slate-400 font-bold mb-6">لقد قمت بتوصيل جميع الأنبياء بألقابهم</p>
           
           <div className="bg-black/5 dark:bg-white/5 rounded-2xl p-6 mb-8 border border-black/10 dark:border-white/10 shadow-inner">
-            <div className="text-sm text-[var(--color-text-muted)] font-bold mb-1">النتيجة النهائية</div>
-            <div className="text-5xl font-bold text-[var(--color-primary-light)] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">{score}</div>
+            <div className="text-sm text-slate-500 dark:text-slate-400 font-bold mb-1">النتيجة النهائية</div>
+            <div className="text-5xl font-bold text-emerald-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">{score}</div>
           </div>
 
           <div className="flex flex-col gap-3">
             <button 
               onClick={() => handleGameSelect(activeGame)}
-              className="w-full py-4 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white rounded-xl font-bold hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all shadow-[0_5px_15px_rgba(0,0,0,0.3)] flex items-center justify-center gap-2 border border-[var(--color-primary-light)]/50"
+              className="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-bold hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all shadow-[0_5px_15px_rgba(0,0,0,0.3)] flex items-center justify-center gap-2 border border-emerald-400/50"
             >
               <Sparkles size={20} />
               تحدي جديد
             </button>
             <button 
               onClick={() => setActiveGame('menu')}
-              className="w-full py-4 bg-black/5 dark:bg-white/5 text-[var(--color-text)] rounded-xl font-bold hover:bg-black/10 dark:hover:bg-white/10 transition-colors border border-black/10 dark:border-white/10"
+              className="w-full py-4 bg-black/5 dark:bg-white/5 text-slate-800 dark:text-slate-100 rounded-xl font-bold hover:bg-black/10 dark:hover:bg-white/10 transition-colors border border-black/10 dark:border-white/10"
             >
               العودة للقائمة
             </button>
@@ -477,12 +484,12 @@ export default function Games({ onBack }: { onBack: () => void }) {
 
     return (
       <div className="space-y-6">
-        <div className="flex justify-between items-center bg-[var(--color-surface)] p-4 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.3)] border border-white/5">
-          <div className="flex items-center gap-2 text-[var(--color-primary-light)] font-bold drop-shadow-md">
+        <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.3)] border border-white/5">
+          <div className="flex items-center gap-2 text-emerald-400 font-bold drop-shadow-md">
             <Star size={20} className="fill-current" />
             <span>{score} نقطة</span>
           </div>
-          <div className="text-sm font-bold text-white bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] px-4 py-1.5 rounded-full shadow-inner border border-[var(--color-primary-light)]/50">
+          <div className="text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-1.5 rounded-full shadow-inner border border-emerald-400/50">
             {matchedPairs.length} / {dynamicProphetsData.length}
           </div>
         </div>
@@ -500,8 +507,8 @@ export default function Games({ onBack }: { onBack: () => void }) {
                   onClick={() => handleProphetSelect(p.id, 'name')}
                   className={`w-full p-4 rounded-xl text-center font-bold transition-all border-2 shadow-[0_5px_15px_rgba(0,0,0,0.2)] ${
                     isMatched ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 opacity-50' :
-                    isSelected ? 'bg-gradient-to-br from-[var(--color-primary)]/20 to-transparent border-[var(--color-primary)] text-[var(--color-primary-light)] shadow-[0_0_15px_rgba(212,175,55,0.3)]' :
-                    'bg-[var(--color-surface)] border-black/10 dark:border-white/10 text-[var(--color-text)] hover:border-[var(--color-primary)]/50 hover:bg-black/5 dark:hover:bg-white/5'
+                    isSelected ? 'bg-gradient-to-br from-emerald-500/20 to-transparent border-emerald-500 text-emerald-400 shadow-[0_0_15px_rgba(212,175,55,0.3)]' :
+                    'bg-white dark:bg-slate-900 border-black/10 dark:border-white/10 text-slate-800 dark:text-slate-100 hover:border-emerald-500/50 hover:bg-black/5 dark:hover:bg-white/5'
                   }`}
                 >
                   {p.name}
@@ -521,8 +528,8 @@ export default function Games({ onBack }: { onBack: () => void }) {
                   onClick={() => handleProphetSelect(p.id, 'title')}
                   className={`w-full p-4 rounded-xl text-center font-bold transition-all border-2 shadow-[0_5px_15px_rgba(0,0,0,0.2)] ${
                     isMatched ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 opacity-50' :
-                    isSelected ? 'bg-gradient-to-br from-[var(--color-primary)]/20 to-transparent border-[var(--color-primary)] text-[var(--color-primary-light)] shadow-[0_0_15px_rgba(212,175,55,0.3)]' :
-                    'bg-[var(--color-surface)] border-white/5 text-white hover:border-[var(--color-primary-light)]/30 hover:bg-white/5'
+                    isSelected ? 'bg-gradient-to-br from-emerald-500/20 to-transparent border-emerald-500 text-emerald-400 shadow-[0_0_15px_rgba(212,175,55,0.3)]' :
+                    'bg-white dark:bg-slate-900 border-white/5 text-white hover:border-emerald-400/30 hover:bg-white/5'
                   }`}
                 >
                   {p.title}
@@ -541,30 +548,32 @@ export default function Games({ onBack }: { onBack: () => void }) {
         <motion.div 
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="card-3d bg-[var(--color-surface)] rounded-3xl p-8 text-center shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/10 mt-10"
+          className="card-3d bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 text-center shadow-xl border border-black/5 dark:border-white/5 mt-10 relative overflow-hidden"
         >
-          <div className="w-24 h-24 bg-gradient-to-br from-[var(--color-primary)]/20 to-transparent text-[var(--color-primary-light)] rounded-full flex items-center justify-center mx-auto mb-6 border border-[var(--color-primary)]/30 shadow-inner">
-            <Trophy size={48} />
-          </div>
-          <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-md">أحسنت!</h2>
-          <p className="text-[var(--color-text-muted)] font-bold mb-6">لقد أكملت لعبة الذاكرة بنجاح</p>
+           <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
           
-          <div className="bg-black/5 dark:bg-white/5 rounded-2xl p-6 mb-8 border border-black/10 dark:border-white/10 shadow-inner">
-            <div className="text-sm text-[var(--color-text-muted)] font-bold mb-1">النتيجة النهائية</div>
-            <div className="text-5xl font-bold text-[var(--color-primary-light)] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">{score}</div>
+          <div className="w-24 h-24 bg-gradient-to-br from-emerald-500 to-teal-500 text-white rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 shadow-[0_10px_30px_rgba(16,185,129,0.3)] border border-white/20 transform rotate-3 relative z-10">
+            <Trophy size={48} className="drop-shadow-sm" />
+          </div>
+          <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2 drop-shadow-md relative z-10">أحسنت!</h2>
+          <p className="text-emerald-600 dark:text-emerald-400 font-bold mb-6 relative z-10">لقد أكملت لعبة الذاكرة بنجاح</p>
+          
+          <div className="glass dark:glass-dark rounded-[1.5rem] p-6 mb-8 shadow-inner relative z-10">
+            <div className="text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">النتيجة النهائية</div>
+            <div className="text-5xl font-bold text-emerald-500 drop-shadow-sm">{score}</div>
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 relative z-10">
             <button 
               onClick={() => handleGameSelect(activeGame)}
-              className="w-full py-4 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white rounded-xl font-bold hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all shadow-[0_5px_15px_rgba(0,0,0,0.3)] flex items-center justify-center gap-2 border border-[var(--color-primary-light)]/50"
+              className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-[1.5rem] font-bold hover:shadow-[0_10px_30px_rgba(16,185,129,0.4)] hover:-translate-y-1 transition-all flex items-center justify-center gap-2 border border-white/20 shadow-md"
             >
               <Sparkles size={20} />
               تحدي جديد
             </button>
             <button 
               onClick={() => setActiveGame('menu')}
-              className="w-full py-4 bg-white/5 text-white rounded-xl font-bold hover:bg-white/10 transition-colors border border-white/10"
+              className="w-full py-4 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-[1.5rem] font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 shadow-sm"
             >
               العودة للقائمة
             </button>
@@ -575,12 +584,12 @@ export default function Games({ onBack }: { onBack: () => void }) {
 
     return (
       <div className="space-y-6">
-        <div className="flex justify-between items-center bg-[var(--color-surface)] p-4 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.3)] border border-white/5">
-          <div className="flex items-center gap-2 text-[var(--color-primary-light)] font-bold drop-shadow-md">
+        <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.3)] border border-white/5">
+          <div className="flex items-center gap-2 text-emerald-400 font-bold drop-shadow-md">
             <Star size={20} className="fill-current" />
             <span>{score} نقطة</span>
           </div>
-          <div className="text-sm font-bold text-white bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] px-4 py-1.5 rounded-full shadow-inner border border-[var(--color-primary-light)]/50">
+          <div className="text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-emerald-600 px-4 py-1.5 rounded-full shadow-inner border border-emerald-400/50">
             {matchedCards.length / 2} / {cards.length / 2}
           </div>
         </div>
@@ -597,8 +606,8 @@ export default function Games({ onBack }: { onBack: () => void }) {
                 onClick={() => handleCardClick(index)}
                 className={`aspect-square rounded-2xl flex items-center justify-center p-2 text-center font-bold transition-all duration-300 border-2 shadow-[0_5px_15px_rgba(0,0,0,0.2)] ${
                   isMatched ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 opacity-50' :
-                  isFlipped ? 'bg-[var(--color-surface)] border-[var(--color-primary-light)] text-white shadow-[0_0_15px_rgba(212,175,55,0.3)]' :
-                  'bg-gradient-to-br from-[var(--color-primary)]/20 to-transparent border-[var(--color-primary)]/30 text-transparent hover:border-[var(--color-primary-light)]/50'
+                  isFlipped ? 'bg-white dark:bg-slate-900 border-emerald-400 text-white shadow-[0_0_15px_rgba(212,175,55,0.3)]' :
+                  'bg-gradient-to-br from-emerald-500/20 to-transparent border-emerald-500/30 text-transparent hover:border-emerald-400/50'
                 }`}
               >
                 <span className={isFlipped ? 'opacity-100' : 'opacity-0'}>{card}</span>
@@ -617,10 +626,10 @@ export default function Games({ onBack }: { onBack: () => void }) {
     if (isGenerating) {
       return (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <Loader2 size={48} className="text-[var(--color-primary)] animate-spin mb-6 drop-shadow-[0_0_10px_rgba(212,175,55,0.5)]" />
+          <Loader2 size={48} className="text-emerald-500 animate-spin mb-6 drop-shadow-[0_0_10px_rgba(212,175,55,0.5)]" />
           <h2 className="text-2xl font-bold text-white font-serif mb-2 drop-shadow-md">جاري توليد أسئلة جديدة...</h2>
-          <p className="text-[var(--color-text-muted)] font-bold flex items-center gap-2">
-            <Sparkles size={16} className="text-[var(--color-primary-light)]" />
+          <p className="text-slate-500 dark:text-slate-400 font-bold flex items-center gap-2">
+            <Sparkles size={16} className="text-emerald-400" />
             يتم الآن إنشاء أسئلة حصرية لك بالذكاء الاصطناعي
           </p>
         </div>
@@ -635,31 +644,31 @@ export default function Games({ onBack }: { onBack: () => void }) {
         <motion.div 
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="card-3d bg-[var(--color-surface)] rounded-3xl p-8 text-center shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/10 mt-10"
+          className="card-3d bg-white dark:bg-slate-900 rounded-3xl p-8 text-center shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/10 mt-10"
         >
-          <div className="w-24 h-24 bg-gradient-to-br from-[var(--color-primary)]/20 to-transparent text-[var(--color-primary-light)] rounded-full flex items-center justify-center mx-auto mb-6 border border-[var(--color-primary)]/30 shadow-inner">
+          <div className="w-24 h-24 bg-gradient-to-br from-emerald-500/20 to-transparent text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-6 border border-emerald-500/30 shadow-inner">
             <Trophy size={48} />
           </div>
           <h2 className="text-3xl font-bold text-white mb-2 drop-shadow-md">انتهى التحدي!</h2>
-          <p className="text-[var(--color-text-muted)] font-bold mb-6">لقد أتممت جميع الأسئلة بنجاح</p>
+          <p className="text-slate-500 dark:text-slate-400 font-bold mb-6">لقد أتممت جميع الأسئلة بنجاح</p>
           
           <div className="bg-black/5 dark:bg-white/5 rounded-2xl p-6 mb-8 border border-black/10 dark:border-white/10 shadow-inner">
-            <div className="text-sm text-[var(--color-text-muted)] font-bold mb-1">النتيجة النهائية</div>
-            <div className="text-5xl font-bold text-[var(--color-primary-light)] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">{score}</div>
+            <div className="text-sm text-slate-500 dark:text-slate-400 font-bold mb-1">النتيجة النهائية</div>
+            <div className="text-5xl font-bold text-emerald-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">{score}</div>
             <div className="text-sm text-white/40 font-bold mt-2">من {questionsList.length * 10} نقطة</div>
           </div>
 
           <div className="flex flex-col gap-3">
             <button 
               onClick={() => handleGameSelect(activeGame)}
-              className="w-full py-4 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white rounded-xl font-bold hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all shadow-[0_5px_15px_rgba(0,0,0,0.3)] flex items-center justify-center gap-2 border border-[var(--color-primary-light)]/50"
+              className="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-[1.5rem] font-bold hover:shadow-[0_10px_30px_rgba(16,185,129,0.4)] hover:-translate-y-1 transition-all flex items-center justify-center gap-2 border border-white/20 shadow-[0_5px_15px_rgba(0,0,0,0.3)] relative z-10"
             >
               <Sparkles size={20} />
               توليد أسئلة جديدة
             </button>
             <button 
               onClick={() => setActiveGame('menu')}
-              className="w-full py-4 bg-white/5 text-white rounded-xl font-bold hover:bg-white/10 transition-colors border border-white/10"
+              className="w-full py-4 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-[1.5rem] font-bold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 shadow-sm relative z-10"
             >
               العودة للقائمة
             </button>
@@ -670,12 +679,12 @@ export default function Games({ onBack }: { onBack: () => void }) {
 
     return (
       <div className="space-y-6">
-        <div className="flex justify-between items-center bg-[var(--color-surface)] p-4 rounded-2xl shadow-[0_5px_15px_rgba(0,0,0,0.3)] border border-white/5">
-          <div className="flex items-center gap-2 text-[var(--color-primary-light)] font-bold drop-shadow-md">
+        <div className="flex justify-between items-center bg-white dark:bg-slate-900 p-4 rounded-[1.5rem] shadow-sm border border-black/5 dark:border-white/5">
+          <div className="flex items-center gap-2 text-amber-500 font-bold">
             <Star size={20} className="fill-current" />
             <span>{score} نقطة</span>
           </div>
-          <div className="text-sm font-bold text-white bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] px-4 py-1.5 rounded-full shadow-inner border border-[var(--color-primary-light)]/50">
+          <div className="text-sm font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-4 py-1.5 rounded-full border border-emerald-100 dark:border-emerald-500/20 shadow-sm">
             السؤال {currentQuestion + 1} / {questionsList.length}
           </div>
         </div>
@@ -684,31 +693,33 @@ export default function Games({ onBack }: { onBack: () => void }) {
           key={currentQuestion}
           initial={{ x: 50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          className="card-3d bg-[var(--color-surface)] rounded-3xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5"
+          className="card-3d bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 shadow-xl border border-black/5 dark:border-white/5 relative overflow-hidden"
         >
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+
           {activeGame === 'ayah' && 'surah' in currentQ && (
-            <div className="text-center text-sm text-[var(--color-primary-light)] font-bold mb-4 bg-[var(--color-primary)]/10 py-1 px-4 rounded-full inline-block border border-[var(--color-primary)]/20 shadow-inner">
+            <div className="text-center text-sm text-emerald-600 dark:text-emerald-400 font-bold mb-6 bg-emerald-50 dark:bg-emerald-500/10 py-1.5 px-5 rounded-full inline-block border border-emerald-100 dark:border-emerald-500/20 shadow-sm relative z-10">
               {currentQ.surah}
             </div>
           )}
           
-          <h2 className={`text-2xl font-bold text-white mb-8 leading-relaxed text-center drop-shadow-md ${activeGame === 'ayah' ? 'font-serif text-3xl text-[var(--color-primary-light)]' : ''}`}>
+          <h2 className={`text-2xl font-bold text-slate-800 dark:text-slate-100 mb-8 leading-relaxed text-center relative z-10 ${activeGame === 'ayah' ? 'font-serif text-3xl text-emerald-600 dark:text-emerald-400' : ''}`}>
             {'question' in currentQ ? currentQ.question : currentQ.ayah}
           </h2>
 
-          <div className="space-y-3">
+          <div className="space-y-3 relative z-10">
             {currentQ.options.map((option, index) => {
-              let btnClass = "w-full p-4 rounded-xl text-right font-bold transition-all border-2 shadow-[0_5px_15px_rgba(0,0,0,0.2)] ";
+              let btnClass = "w-full p-4 rounded-2xl text-right font-bold transition-all border shadow-sm ";
               
               if (!isAnswered) {
-                btnClass += "bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 hover:border-[var(--color-primary)]/50 hover:bg-black/10 dark:hover:bg-white/10 text-[var(--color-text)]";
+                btnClass += "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-emerald-500/50 hover:shadow-md text-slate-800 dark:text-slate-100 active:scale-[0.98]";
               } else {
                 if (index === currentQ.correct) {
-                  btnClass += "bg-emerald-500/10 border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]";
+                  btnClass += "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500/50 text-emerald-600 dark:text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.1)]";
                 } else if (index === selectedAnswer) {
-                  btnClass += "bg-red-500/10 border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.2)]";
+                  btnClass += "bg-red-50 dark:bg-red-500/10 border-red-500/50 text-red-600 dark:text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.1)]";
                 } else {
-                  btnClass += "bg-black/5 dark:bg-white/5 border-transparent text-[var(--color-text-muted)] opacity-50";
+                  btnClass += "bg-slate-50 dark:bg-slate-800/50 border-transparent text-slate-400 dark:text-slate-500 opacity-60";
                 }
               }
 
@@ -720,9 +731,9 @@ export default function Games({ onBack }: { onBack: () => void }) {
                   className={btnClass}
                 >
                   <div className="flex justify-between items-center">
-                    <span className="text-lg">{option}</span>
-                    {isAnswered && index === currentQ.correct && <CheckCircle2 className="text-emerald-400 drop-shadow-md" />}
-                    {isAnswered && index === selectedAnswer && index !== currentQ.correct && <XCircle className="text-red-400 drop-shadow-md" />}
+                    <span className="text-lg leading-relaxed">{option}</span>
+                    {isAnswered && index === currentQ.correct && <CheckCircle2 className="text-emerald-500" />}
+                    {isAnswered && index === selectedAnswer && index !== currentQ.correct && <XCircle className="text-red-500" />}
                   </div>
                 </button>
               );
@@ -734,16 +745,16 @@ export default function Games({ onBack }: { onBack: () => void }) {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-[var(--color-bg)]" dir="rtl">
+    <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-slate-50 dark:bg-slate-950" dir="rtl">
       {/* Header */}
-      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-[var(--color-bg)]/80 backdrop-blur-xl border-b border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)] px-4 -mx-4 mb-6">
+      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-xl border-b border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)] px-4 -mx-4 mb-6">
         <button
           onClick={() => activeGame === 'menu' ? onBack() : setActiveGame('menu')}
-          className="p-2 hover:bg-white/5 rounded-full transition-colors border border-white/5 bg-[var(--color-surface)] shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
+          className="p-2 hover:bg-white/5 rounded-full transition-colors border border-white/5 bg-white dark:bg-slate-900 shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
         >
-          <ArrowRight size={24} className="text-[var(--color-text-muted)] hover:text-[var(--color-primary-light)]" />
+          <ArrowRight size={24} className="text-slate-500 dark:text-slate-400 hover:text-emerald-400" />
         </button>
-        <h1 className="text-xl font-bold font-serif text-[var(--color-primary-light)] drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">
+        <h1 className="text-xl font-bold font-serif text-emerald-400 drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">
           {activeGame === 'menu' ? 'الألعاب' : activeGame === 'quiz' ? 'مسابقة المعلومات' : activeGame === 'ayah' ? 'أكمل الآية' : activeGame === 'history' ? 'أحداث تاريخية' : activeGame === 'prophets' ? 'ألقاب الأنبياء' : 'لعبة الذاكرة'}
         </h1>
       </div>

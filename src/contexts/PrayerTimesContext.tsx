@@ -26,6 +26,10 @@ interface PrayerTimesContextType {
   error: string | null;
   autoAdhanEnabled: boolean;
   setAutoAdhanEnabled: (enabled: boolean) => void;
+  calculationMethod: number;
+  setCalculationMethod: (method: number) => void;
+  asrMethod: number;
+  setAsrMethod: (method: number) => void;
 }
 
 const PrayerTimesContext = createContext<PrayerTimesContextType | undefined>(undefined);
@@ -38,8 +42,17 @@ export const PrayerTimesProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
   const [autoAdhanEnabled, setAutoAdhanEnabledState] = useState<boolean>(() => {
     return localStorage.getItem('autoAdhanEnabled') !== 'false'; // Default to true
+  });
+
+  const [calculationMethod, setCalculationMethodState] = useState<number>(() => {
+    return parseInt(localStorage.getItem('calculationMethod') || '4', 10); // Default to Umm Al-Qura
+  });
+
+  const [asrMethod, setAsrMethodState] = useState<number>(() => {
+    return parseInt(localStorage.getItem('asrMethod') || '0', 10); // Default to Standard (Shafi, Maliki, Hanbali)
   });
 
   const setAutoAdhanEnabled = (enabled: boolean) => {
@@ -47,16 +60,26 @@ export const PrayerTimesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     localStorage.setItem('autoAdhanEnabled', enabled.toString());
   };
 
+  const setCalculationMethod = (method: number) => {
+    setCalculationMethodState(method);
+    localStorage.setItem('calculationMethod', method.toString());
+  };
+
+  const setAsrMethod = (method: number) => {
+    setAsrMethodState(method);
+    localStorage.setItem('asrMethod', method.toString());
+  };
+
   useEffect(() => {
     const fetchPrayerTimes = async (lat?: number, lng?: number, cityStr?: string) => {
       try {
         setLoading(true);
         let url =
-          "https://api.aladhan.com/v1/timingsByCity?city=Makkah&country=Saudi Arabia&method=4";
+          `https://api.aladhan.com/v1/timingsByCity?city=Makkah&country=Saudi Arabia&method=${calculationMethod}&school=${asrMethod}`;
 
         if (lat && lng) {
           const timestamp = Math.floor(Date.now() / 1000);
-          url = `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${lat}&longitude=${lng}&method=4`;
+          url = `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${lat}&longitude=${lng}&method=${calculationMethod}&school=${asrMethod}`;
           setUserLocation({ lat, lon: lng });
         }
 
@@ -70,7 +93,7 @@ export const PrayerTimesProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
         if (cityStr) {
           setLocationName(cityStr);
-        } else if (lat && lng) {
+        } else if (lat && lng && !locationName || locationName === "مكة المكرمة") {
           try {
             const geoRes = await fetch(
               `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=ar`,
@@ -120,7 +143,9 @@ export const PrayerTimesProvider: React.FC<{ children: React.ReactNode }> = ({ c
       }
     };
 
-    if (navigator.geolocation) {
+    if (userLocation) {
+      fetchPrayerTimes(userLocation.lat, userLocation.lon, locationName);
+    } else if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           fetchPrayerTimes(position.coords.latitude, position.coords.longitude);
@@ -134,10 +159,15 @@ export const PrayerTimesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     } else {
       fetchByIP();
     }
-  }, []);
+  }, [calculationMethod, asrMethod]); // Re-fetch when settings change
 
   return (
-    <PrayerTimesContext.Provider value={{ prayerTimes, hijriDate, gregorianDate, locationName, userLocation, loading, error, autoAdhanEnabled, setAutoAdhanEnabled }}>
+    <PrayerTimesContext.Provider value={{ 
+      prayerTimes, hijriDate, gregorianDate, locationName, userLocation, loading, error, 
+      autoAdhanEnabled, setAutoAdhanEnabled,
+      calculationMethod, setCalculationMethod,
+      asrMethod, setAsrMethod
+    }}>
       {children}
     </PrayerTimesContext.Provider>
   );

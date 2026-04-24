@@ -5,33 +5,6 @@
 
 @layer base {
   :root {
-    /* أخضر زمردي (Emerald Green) - Default & Only */
-    --theme-bg: #F0FDF4;
-    --theme-surface: #FFFFFF;
-    --theme-surface-hover: #DCFCE7;
-    --theme-primary: #10B981;
-    --theme-primary-dark: #047857;
-    --theme-primary-light: #34D399;
-    --theme-text: #064E3B;
-    --theme-text-muted: #047857;
-    --theme-gold: #10B981;
-    --theme-gold-dark: #047857;
-    --theme-gold-light: #34D399;
-    --theme-accent: #10B981;
-    
-    --color-bg: var(--theme-bg);
-    --color-surface: var(--theme-surface);
-    --color-surface-hover: var(--theme-surface-hover);
-    --color-primary: var(--theme-primary);
-    --color-primary-dark: var(--theme-primary-dark);
-    --color-primary-light: var(--theme-primary-light);
-    --color-text: var(--theme-text);
-    --color-text-muted: var(--theme-text-muted);
-    --color-gold: var(--theme-gold);
-    --color-gold-dark: var(--theme-gold-dark);
-    --color-gold-light: var(--theme-gold-light);
-    --color-accent: var(--theme-accent);
-
     --font-sans: 'Cairo', sans-serif;
     --font-quran: 'Amiri Quran', 'Amiri', serif;
     --font-serif: 'Playfair Display', serif;
@@ -49,8 +22,7 @@ html, body {
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--color-bg);
-  color: var(--color-text);
+  @apply bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
   -webkit-user-select: none;
@@ -61,8 +33,7 @@ body {
 input, textarea {
   user-select: auto;
   -webkit-user-select: auto;
-  background-color: var(--color-surface);
-  color: var(--color-text);
+  @apply bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100;
 }
 
 /* Safe Area Insets for WebViews */
@@ -79,45 +50,52 @@ input, textarea {
 
 /* Premium Glassmorphism Cards */
 .card-3d {
-  background: var(--color-surface);
+  @apply bg-white/90 dark:bg-slate-900/90 backdrop-blur-md;
   border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease-out;
+  border-radius: 28px;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .card-3d {
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
 }
 
 .card-3d:active {
-  transform: scale(0.98);
-  background: var(--color-surface-hover);
+  transform: scale(0.97);
+  @apply bg-slate-100/90 dark:bg-slate-800/90;
 }
 
 /* Premium Button */
 .btn-3d-primary {
-  background: var(--color-primary);
+  @apply bg-gradient-to-r from-emerald-500 to-emerald-600;
   color: #fff;
   border-radius: 50%;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
-  transition: all 0.2s ease;
+  box-shadow: 0 8px 20px -6px rgba(5, 150, 105, 0.5);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-3d-primary:active {
-  transform: scale(0.95);
-  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.1);
+  transform: scale(0.92);
+  box-shadow: 0 4px 10px -4px rgba(5, 150, 105, 0.4);
 }
 
 /* Glassmorphism */
 .glass {
-  background: rgba(20, 28, 24, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(212, 175, 55, 0.15);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
 }
 
 .glass-dark {
-  background: rgba(10, 15, 13, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
 }
 
 /* Bento Grid Utilities */
@@ -132,19 +110,24 @@ input, textarea {
 }
 
 .bento-card {
-  @apply relative overflow-hidden rounded-[2rem] p-6 transition-all duration-500 hover:scale-[1.02] active:scale-[0.98] shadow-lg;
-  background: var(--color-surface);
+  @apply relative overflow-hidden rounded-[2rem] p-6 transition-all duration-500 active:scale-[0.97] bg-white dark:bg-slate-900;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.06);
+}
+
+.dark .bento-card {
   border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.4);
 }
 
 .bento-card-primary {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-  color: #000;
+  @apply bg-gradient-to-br from-emerald-500 to-emerald-600 text-white;
   border: none;
+  box-shadow: 0 10px 25px rgba(5, 150, 105, 0.2);
 }
 
 .bento-card-glass {
-  @apply bg-white/5 backdrop-blur-xl border-white/10;
+  @apply bg-white/60 backdrop-blur-xl border-white/20;
 }
 
 .bento-card-tall {
@@ -178,6 +161,5 @@ input, textarea {
 }
 
 ::selection {
-  background-color: var(--color-primary);
-  color: #000;
+  @apply bg-emerald-400 text-white;
 }

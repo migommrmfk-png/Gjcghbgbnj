@@ -51,12 +51,11 @@ const InheritanceCalculator = lazy(() => import("./components/InheritanceCalcula
 const DreamInterpretation = lazy(() => import("./components/DreamInterpretation"));
 const QuranReels = lazy(() => import("./components/QuranReels"));
 const SelfAccounting = lazy(() => import("./components/SelfAccounting"));
-const Tasbeeh = lazy(() => import("./components/Tasbeeh"));
 
 // Loading fallback for Suspense
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-full min-h-[50vh]">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary)]"></div>
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
   </div>
 );
 
@@ -64,6 +63,7 @@ function AppContent() {
   const [showSplash, setShowSplash] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
+  const [previousTab, setPreviousTab] = useState("home");
   const [adhanData, setAdhanData] = useState<{ prayerName: string, time: string } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -74,6 +74,15 @@ function AppContent() {
   const { notificationsEnabled, toggleNotifications, setNotificationsEnabled } = usePrayerNotifications(handlePrayerTime);
   const { user, loading: authLoading } = useAuth();
   const { t, i18n } = useTranslation();
+
+  const handleNavigate = (tab: string) => {
+    setPreviousTab(activeTab);
+    setActiveTab(tab);
+  };
+
+  const handleBack = () => {
+    setActiveTab(previousTab);
+  };
 
   useEffect(() => {
     const hasOnboarded = localStorage.getItem("hasOnboarded");
@@ -92,7 +101,7 @@ function AppContent() {
   const renderTab = () => {
     switch (activeTab) {
       case "home":
-        return <Dashboard onNavigate={setActiveTab} />;
+        return <Dashboard onNavigate={handleNavigate} />;
       case "quran":
         return <Quran />;
       case "azkar":
@@ -100,11 +109,11 @@ function AppContent() {
       case "tasbeeh":
         return <Tasbeeh />;
       case "more":
-        return <MoreMenu onNavigate={setActiveTab} notificationsEnabled={notificationsEnabled} onToggleNotifications={toggleNotifications} />;
+        return <MoreMenu onNavigate={handleNavigate} notificationsEnabled={notificationsEnabled} onToggleNotifications={toggleNotifications} />;
       case "qibla":
         return <Qibla />;
       case "names":
-        return <NamesOfAllah />;
+        return <NamesOfAllah onBack={handleBack} />;
       case "hadith":
         return <Hadith />;
       case "duas":
@@ -114,49 +123,43 @@ function AppContent() {
       case "radio":
         return <IslamicRadio />;
       case "stories":
-        return <ProphetStories onBack={() => setActiveTab("more")} />;
+        return <ProphetStories onBack={handleBack} />;
       case "muslim-ai":
-        return <MuslimAI onBack={() => setActiveTab("more")} />;
+        return <MuslimAI onBack={handleBack} />;
       case "games":
-        return <Games onBack={() => setActiveTab("more")} />;
+        return <Games onBack={handleBack} />;
       case "prayer-guide":
-        return <PrayerGuide onBack={() => setActiveTab("more")} />;
+        return <PrayerGuide onBack={handleBack} />;
       case "support":
-        return <SupportApp onBack={() => setActiveTab("more")} />;
+        return <SupportApp onBack={handleBack} />;
       case "worship-tracker":
-        return <WorshipTracker onBack={() => setActiveTab("more")} />;
+        return <WorshipTracker onBack={handleBack} />;
       case "quran-plan":
-        return <QuranPlan onBack={() => setActiveTab("more")} />;
+        return <QuranPlan onBack={handleBack} />;
       case "social":
-        return <SocialChallenges onBack={() => setActiveTab("more")} />;
+        return <SocialChallenges onBack={handleBack} />;
       case "dua-wall":
-        return <DuaWall onBack={() => setActiveTab("more")} />;
+        return <DuaWall onBack={handleBack} />;
       case "zakat":
-        return <ZakatCalculator onBack={() => setActiveTab("more")} />;
+        return <ZakatCalculator onBack={handleBack} />;
       case "hajj":
-        return <HajjUmrahGuide onBack={() => setActiveTab("more")} />;
+        return <HajjUmrahGuide onBack={handleBack} />;
       case "smart-plan":
-        return <SmartPlan onBack={() => setActiveTab("more")} />;
+        return <SmartPlan onBack={handleBack} />;
       case "auth":
-        return <Auth onBack={() => setActiveTab("more")} />;
+        return <Auth onBack={handleBack} />;
       case "ruqyah":
         return <Ruqyah />;
       case "inheritance":
-        return <InheritanceCalculator onBack={() => setActiveTab("more")} />;
+        return <InheritanceCalculator onBack={handleBack} />;
       case "dreams":
-        return <DreamInterpretation onBack={() => setActiveTab("more")} />;
+        return <DreamInterpretation onBack={handleBack} />;
       case "reels":
-        return <QuranReels onBack={() => setActiveTab("more")} />;
+        return <QuranReels onBack={handleBack} />;
       case "accounting":
-        return <SelfAccounting onBack={() => setActiveTab("more")} />;
-      case "tasbeeh":
-        return <Tasbeeh onBack={() => setActiveTab("more")} />;
-      case "zakat":
-        return <ZakatCalculator onBack={() => setActiveTab("more")} />;
-      case "names":
-        return <NamesOfAllah onBack={() => setActiveTab("more")} />;
+        return <SelfAccounting onBack={handleBack} />;
       default:
-        return <Dashboard onNavigate={setActiveTab} />;
+        return <Dashboard onNavigate={handleNavigate} />;
     }
   };
 
@@ -170,7 +173,7 @@ function AppContent() {
 
   return (
     <div
-      className="flex flex-col flex-1 h-full w-full bg-[var(--color-bg)] text-[var(--color-text)] font-sans overflow-hidden relative"
+      className="flex flex-col flex-1 h-full w-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans overflow-hidden relative"
       dir={isRTL ? "rtl" : "ltr"}
     >
       <WelcomeModal onEnableNotifications={() => setNotificationsEnabled(true)} />
@@ -215,7 +218,7 @@ function AppContent() {
             setActiveTab("muslim-ai");
           }
         }}
-        className={`fixed bottom-44 ${isRTL ? 'right-4' : 'left-4'} z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-full shadow-[0_0_20px_rgba(212,175,55,0.5)] hover:shadow-[0_0_30px_rgba(212,175,55,0.8)] transition-all cursor-grab active:cursor-grabbing border border-white/20`}
+        className={`fixed bottom-44 ${isRTL ? 'right-4' : 'left-4'} z-50 flex items-center justify-center w-14 h-14 bg-emerald-500 rounded-full shadow-lg hover:shadow-xl transition-all cursor-grab active:cursor-grabbing border border-white/20`}
         initial={{ scale: 0, x: isRTL ? 100 : -100 }}
         animate={{ scale: 1, x: 0 }}
         whileHover={{ scale: 1.1 }}
@@ -223,8 +226,8 @@ function AppContent() {
       >
         <Sparkles size={28} className="text-white animate-pulse" />
         <span className={`absolute -top-1 ${isRTL ? '-right-1' : '-left-1'} flex h-4 w-4`}>
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-primary-light)] opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-4 w-4 bg-[var(--color-primary)] border border-white/50"></span>
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500 border border-white/50"></span>
         </span>
       </motion.div>
 
@@ -266,37 +269,37 @@ function AppContent() {
       </motion.div>
 
       {/* Floating Bottom Navigation */}
-      <nav className="fixed bottom-6 left-4 right-4 bg-[var(--color-surface)]/80 backdrop-blur-xl border border-[var(--color-primary)]/20 shadow-2xl z-40 rounded-3xl">
-        <div className="flex justify-around items-center h-16 max-w-md mx-auto px-2">
+      <nav className="fixed bottom-6 left-4 right-4 bg-white/60 dark:bg-slate-900/60 backdrop-blur-3xl border border-white/40 dark:border-white/10 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)] z-40 rounded-full h-16">
+        <div className="flex justify-around items-center h-full max-w-md mx-auto px-4">
           <NavItem
             icon={<Home />}
             label={t('app_name') === "هذا ديني" ? "الرئيسية" : "Home"}
             isActive={activeTab === "home"}
-            onClick={() => setActiveTab("home")}
+            onClick={() => handleNavigate("home")}
           />
           <NavItem
             icon={<BookOpen />}
             label={t('quran')}
             isActive={activeTab === "quran"}
-            onClick={() => setActiveTab("quran")}
+            onClick={() => handleNavigate("quran")}
           />
           <NavItem
             icon={<Heart />}
             label={t('azkar')}
             isActive={activeTab === "azkar"}
-            onClick={() => setActiveTab("azkar")}
+            onClick={() => handleNavigate("azkar")}
           />
           <NavItem
             icon={<Activity />}
             label={t('tasbeeh')}
             isActive={activeTab === "tasbeeh"}
-            onClick={() => setActiveTab("tasbeeh")}
+            onClick={() => handleNavigate("tasbeeh")}
           />
           <NavItem
             icon={<MoreHorizontal />}
             label={t('more')}
             isActive={activeTab === "more"}
-            onClick={() => setActiveTab("more")}
+            onClick={() => handleNavigate("more")}
           />
         </div>
       </nav>
@@ -330,32 +333,33 @@ function NavItem({
   return (
     <button
       onClick={onClick}
-      className={`relative flex flex-col items-center justify-center w-full h-full space-y-1 transition-all duration-300 ${
+      className={`relative flex flex-col items-center justify-center w-full h-full space-y-1 transition-all duration-500 group ${
         isActive
-          ? "text-[var(--color-primary)]"
-          : "text-[var(--color-text-muted)] hover:text-[var(--color-text)]"
+          ? "text-emerald-500 scale-105"
+          : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
       }`}
     >
-      {isActive && (
-        <motion.div
-          layoutId="nav-indicator"
-          className="absolute -top-1 w-12 h-1 bg-[var(--color-primary)] rounded-b-full"
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        />
-      )}
-      <div
-        className={`p-1.5 rounded-xl transition-all duration-300 ${isActive ? "bg-[var(--color-primary)]/10 scale-110" : "scale-100"}`}
-      >
-        {React.cloneElement(icon as React.ReactElement, {
-          size: 22,
-          strokeWidth: isActive ? 2.5 : 2,
-        })}
+      <div className="relative">
+        {isActive && (
+          <motion.div
+            layoutId="nav-pill"
+            className="absolute -inset-x-4 -inset-y-2 bg-emerald-50 dark:bg-emerald-500/15 rounded-full"
+            transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
+          />
+        )}
+        <div className="relative z-10 flex flex-col items-center gap-1">
+          {React.cloneElement(icon as React.ReactElement, {
+            size: isActive ? 24 : 22,
+            strokeWidth: isActive ? 2.5 : 2,
+            className: `transition-all duration-300 ${isActive ? 'drop-shadow-sm' : 'group-hover:scale-110'}`
+          })}
+          <span
+            className={`text-[10px] font-bold transition-all duration-300 ${isActive ? "opacity-100" : "opacity-0 h-0 overflow-hidden"}`}
+          >
+            {label}
+          </span>
+        </div>
       </div>
-      <span
-        className={`text-[10px] font-bold transition-all duration-300 ${isActive ? "opacity-100" : "opacity-70"}`}
-      >
-        {label}
-      </span>
     </button>
   );
 }

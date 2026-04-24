@@ -83,7 +83,7 @@ export default function AdhanOverlay({ prayerName, time, onClose }: { prayerName
           transition={{ delay: 0.2, type: 'spring' }}
           className="w-32 h-32 rounded-full bg-black/40 backdrop-blur-xl border border-white/20 flex items-center justify-center shadow-[0_0_30px_rgba(0,0,0,0.5)]"
         >
-          <Clock size={64} className="text-[var(--color-gold-light)]" />
+          <Clock size={64} className="text-amber-400" />
         </motion.div>
 
         <motion.div
@@ -92,7 +92,7 @@ export default function AdhanOverlay({ prayerName, time, onClose }: { prayerName
           transition={{ delay: 0.4 }}
           className="bg-black/40 backdrop-blur-md p-8 sm:p-12 rounded-[2.5rem] border border-white/10 shadow-2xl w-full"
         >
-          <h1 className="text-6xl sm:text-7xl font-serif font-bold mb-6 drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)] text-[var(--color-gold-light)]">
+          <h1 className="text-6xl sm:text-7xl font-serif font-bold mb-6 drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)] text-amber-400">
             {currentTime.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}
           </h1>
           <h2 className="text-3xl sm:text-4xl font-serif font-bold drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)] text-white leading-relaxed">حان الآن موعد أذان {prayerName}</h2>
@@ -115,7 +115,7 @@ export default function AdhanOverlay({ prayerName, time, onClose }: { prayerName
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.8 }}
           onClick={onClose}
-          className="mt-12 px-8 py-4 rounded-full bg-[var(--color-primary)] text-white font-bold text-lg shadow-lg hover:bg-[var(--color-primary-dark)] transition-colors border border-white/20 backdrop-blur-md"
+          className="mt-12 px-8 py-4 rounded-full bg-emerald-500 text-white font-bold text-lg shadow-lg hover:bg-emerald-600 transition-colors border border-white/20 backdrop-blur-md"
         >
           إغلاق
         </motion.button>

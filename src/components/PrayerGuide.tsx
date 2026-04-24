@@ -82,16 +82,16 @@ export default function PrayerGuide({ onBack }: { onBack: () => void }) {
   ];
 
   return (
-    <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-[var(--color-bg)]" dir="rtl">
+    <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-slate-50 dark:bg-slate-950" dir="rtl">
       {/* Header */}
-      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-[var(--color-bg)]/80 backdrop-blur-xl border-b border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)] px-4 -mx-4 mb-6">
+      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800 shadow-sm px-4 -mx-4 mb-6">
         <button
           onClick={onBack}
-          className="p-2 hover:bg-white/5 rounded-full transition-colors border border-white/5 bg-[var(--color-surface)] shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
+          className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm"
         >
-          <ArrowRight size={24} className="text-[var(--color-text-muted)] hover:text-[var(--color-primary-light)]" />
+          <ArrowRight size={24} className="text-slate-500 hover:text-emerald-500" />
         </button>
-        <h1 className="text-xl font-bold font-serif text-[var(--color-primary-light)] drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">
+        <h1 className="text-xl font-bold font-serif text-slate-800 dark:text-slate-100">
           الدليل الشامل للصلاة
         </h1>
       </div>
@@ -99,16 +99,16 @@ export default function PrayerGuide({ onBack }: { onBack: () => void }) {
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-3xl p-6 text-[var(--color-text)] shadow-[0_10px_30px_rgba(0,0,0,0.5)] relative overflow-hidden mb-6 border border-black/5 dark:border-white/5"
+        className="bg-emerald-500 rounded-3xl p-6 text-white shadow-sm relative overflow-hidden mb-6 border border-emerald-600"
       >
-        <div className="absolute right-0 top-0 w-32 h-32 bg-[var(--color-primary)]/20 rounded-full -mr-10 -mt-10 blur-xl"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/10 dark:bg-black/40 rounded-full -ml-10 -mb-10 blur-2xl"></div>
+        <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-xl"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/10 rounded-full -ml-10 -mb-10 blur-2xl"></div>
         <div className="relative z-10">
-          <h2 className="text-2xl font-bold font-serif mb-2 flex items-center gap-2 text-[var(--color-primary-light)] drop-shadow-md">
-            <BookOpen size={24} className="text-[var(--color-primary)]" />
+          <h2 className="text-2xl font-bold font-serif mb-2 flex items-center gap-2 text-white">
+            <BookOpen size={24} className="text-emerald-100" />
             كيفية الصلاة الصحيحة
           </h2>
-          <p className="text-[var(--color-text-muted)] text-sm leading-relaxed font-bold">
+          <p className="text-emerald-50 text-sm leading-relaxed font-bold">
             الصلاة عماد الدين، وهي أول ما يُسأل عنه العبد يوم القيامة. هذا الدليل المفصل يشرح لك كيفية أدائها، شروط صحتها، ومبطلاتها.
           </p>
         </div>
@@ -116,26 +116,26 @@ export default function PrayerGuide({ onBack }: { onBack: () => void }) {
 
       {/* Conditions */}
       <div className="mb-8">
-        <h3 className="text-xl font-bold text-[var(--color-primary-light)] mb-4 flex items-center gap-2">
+        <h3 className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mb-4 flex items-center gap-2">
           <CheckCircle2 size={20} className="text-emerald-500" />
           شروط صحة الصلاة (قبل البدء)
         </h3>
-        <div className="bg-[var(--color-surface)] rounded-2xl p-4 border border-black/5 dark:border-white/5 shadow-lg space-y-3">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-100 dark:border-slate-800 shadow-sm space-y-3">
           {conditions.map((condition, idx) => (
             <div key={idx} className="flex items-start gap-3">
               <div className="w-2 h-2 rounded-full bg-emerald-500 mt-2 shrink-0"></div>
-              <p className="text-[var(--color-text)] text-sm leading-relaxed">{condition}</p>
+              <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">{condition}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Steps */}
-      <h3 className="text-xl font-bold text-[var(--color-primary-light)] mb-4 flex items-center gap-2">
-        <Clock size={20} className="text-[var(--color-primary)]" />
+      <h3 className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mb-4 flex items-center gap-2">
+        <Clock size={20} className="text-emerald-500" />
         خطوات أداء الصلاة
       </h3>
-      <div className="space-y-6 mb-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-[var(--color-primary)]/30 before:to-transparent">
+      <div className="space-y-6 mb-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-emerald-500/30 before:to-transparent">
         {steps.map((step, index) => (
           <motion.div
             key={index}
@@ -145,19 +145,19 @@ export default function PrayerGuide({ onBack }: { onBack: () => void }) {
             transition={{ delay: index * 0.1 }}
             className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active"
           >
-            <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-[var(--color-bg)] bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white font-bold shadow-[0_0_10px_rgba(212,175,55,0.5)] shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white dark:border-slate-950 bg-emerald-500 text-white font-bold shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
               {index + 1}
             </div>
-            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-[var(--color-surface)] p-5 rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-black/5 dark:border-white/5 relative">
-              <h3 className="font-bold text-[var(--color-primary-light)] text-lg mb-2 font-serif drop-shadow-md">
+            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-800 relative">
+              <h3 className="font-bold text-emerald-600 dark:text-emerald-400 text-lg mb-2 font-serif">
                 {step.title}
               </h3>
-              <p className="text-[var(--color-text)] text-sm leading-relaxed mb-3">
+              <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed mb-3">
                 {step.description}
               </p>
               {step.dua && (
-                <div className="bg-black/5 dark:bg-black/30 p-4 rounded-xl border border-black/5 dark:border-white/5">
-                  <p className="text-[var(--color-primary)] text-sm font-bold leading-loose text-center">
+                <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+                  <p className="text-emerald-600 dark:text-emerald-400 text-sm font-bold leading-loose text-center">
                     "{step.dua}"
                   </p>
                 </div>

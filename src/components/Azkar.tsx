@@ -490,24 +490,24 @@ export default function Azkar() {
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: -100, opacity: 0 }}
-        className="max-w-md mx-auto bg-[var(--color-bg)] min-h-screen pb-24"
+        className="max-w-md mx-auto bg-slate-50 dark:bg-slate-950 min-h-screen pb-24"
         dir="rtl"
       >
-        {/* Header 3D */}
+        {/* Header */}
         <div
-          className={`sticky top-0 shadow-[0_10px_30px_rgba(0,0,0,0.5)] z-20 px-4 py-4 flex items-center gap-4 bg-[var(--color-bg)]/80 backdrop-blur-xl text-[var(--color-primary-light)] border-b border-white/5`}
+          className={`sticky top-0 shadow-sm z-20 px-4 py-4 flex items-center gap-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl text-slate-800 dark:text-slate-100 border-b border-slate-100 dark:border-slate-800`}
         >
           <button
             onClick={() => {
               setSelectedCategory(null);
             }}
-            className="p-2 hover:bg-white/5 rounded-full transition-colors border border-white/5 bg-[var(--color-surface)] shadow-[0_5px_15px_rgba(0,0,0,0.2)] text-[var(--color-text-muted)] hover:text-[var(--color-primary-light)]"
+            className="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full transition-colors border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm text-slate-500 hover:text-emerald-500"
           >
             <ArrowRight size={24} />
           </button>
-          <div className="flex-1 text-center flex items-center justify-center gap-2 drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">
-            <span className="text-[var(--color-primary)]">{selectedCategory.icon}</span>
-            <h1 className="text-2xl font-bold font-serif text-[var(--color-primary-light)]">
+          <div className="flex-1 text-center flex items-center justify-center gap-2">
+            <span className="text-emerald-500">{selectedCategory.icon}</span>
+            <h1 className="text-2xl font-bold font-serif text-slate-800 dark:text-slate-100">
               {selectedCategory.title}
             </h1>
           </div>
@@ -526,23 +526,24 @@ export default function Azkar() {
                   key={zikr.id}
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
+                  whileTap={{ scale: isCompleted ? 1 : 0.98 }}
                   transition={{ delay: index * 0.1 }}
                   onClick={() => handleZikrClick(zikr)}
-                  className={`card-3d p-6 relative overflow-hidden transition-all duration-500 cursor-pointer border shadow-[0_10px_30px_rgba(0,0,0,0.5)] ${
+                  className={`p-6 relative overflow-hidden transition-all duration-500 cursor-pointer ${
                     isCompleted
-                      ? "bg-[var(--color-surface)]/50 opacity-70 scale-95 border-[var(--color-primary)]/30"
-                      : "bg-[var(--color-surface)] hover:scale-[1.02] border-white/5 hover:border-[var(--color-primary)]/20"
+                      ? "card-3d bg-slate-50/50 dark:bg-slate-800/50 opacity-70 border-emerald-500/30"
+                      : "card-3d hover:-translate-y-1 hover:shadow-2xl hover:border-emerald-500/30"
                   }`}
                 >
                   {isCompleted && (
                     <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute inset-0 bg-[var(--color-primary)]/5 flex items-center justify-center z-0"
+                      className="absolute inset-0 bg-emerald-500/5 flex items-center justify-center z-0"
                     >
                       <CheckCircle2
                         size={120}
-                        className="text-[var(--color-primary)]/10"
+                        className="text-emerald-500/10"
                       />
                     </motion.div>
                   )}
@@ -552,35 +553,35 @@ export default function Azkar() {
                       {zikr.audioUrl && (
                         <button
                           onClick={(e) => toggleAudio(zikr, e)}
-                          className={`p-3 rounded-full shadow-md transition-colors border ${
+                          className={`p-3 rounded-full shadow-sm transition-colors border ${
                             playingId === zikr.id
-                              ? "bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white border-transparent"
-                              : "bg-[var(--color-bg)] text-[var(--color-primary)] hover:bg-[var(--color-surface-hover)] border-white/10"
+                              ? "bg-emerald-500 text-white border-emerald-600"
+                              : "bg-slate-50 dark:bg-slate-800 text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-700 border-slate-100 dark:border-slate-700"
                           }`}
                         >
                           {playingId === zikr.id ? <Pause size={20} /> : <Volume2 size={20} />}
                         </button>
                       )}
                     </div>
-                    <p className="text-xl leading-loose font-serif text-[var(--color-text)] text-justify mb-6 font-bold whitespace-pre-line">
+                    <p className="text-xl leading-loose font-serif text-slate-800 dark:text-slate-100 text-justify mb-6 font-bold whitespace-pre-line">
                       {zikr.text}
                     </p>
-                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/5">
-                      <span className="text-xs text-[var(--color-text-muted)] font-bold">
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                      <span className="text-xs text-slate-500 font-bold">
                         {zikr.reference}
                       </span>
                       <div className="flex items-center gap-3">
-                        <span className="text-sm font-bold text-[var(--color-text-muted)]">
+                        <span className="text-sm font-bold text-slate-500">
                           التكرار: {zikr.count}
                         </span>
                         <motion.div
                           key={currentCount}
                           initial={{ scale: 1.5, opacity: 0 }}
                           animate={{ scale: 1, opacity: 1 }}
-                          className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-xl transition-colors shadow-inner border-2 ${
+                          className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-xl transition-colors shadow-sm border-2 ${
                             isCompleted
-                              ? "bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white border-transparent shadow-[0_0_15px_rgba(212,175,55,0.3)]"
-                              : "bg-[var(--color-bg)] text-[var(--color-primary)] border-[var(--color-primary)]/30"
+                              ? "bg-emerald-500 text-white border-emerald-600"
+                              : "bg-slate-50 dark:bg-slate-800 text-emerald-500 border-emerald-500/30"
                           }`}
                         >
                           {currentCount}
@@ -598,30 +599,29 @@ export default function Azkar() {
   }
 
   return (
-    <div className="max-w-md mx-auto p-4 space-y-6 pb-24" dir="rtl">
-      {/* Header 3D */}
+    <div className="max-w-md mx-auto p-4 space-y-6 pb-28" dir="rtl">
+      {/* Header */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-[2rem] p-8 text-white shadow-[0_15px_40px_rgba(0,0,0,0.6)] relative overflow-hidden border border-black/5 dark:border-white/5"
+        className="bg-gradient-to-bl from-emerald-600 via-emerald-700 to-teal-900 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden text-center border border-white/20"
       >
-        <div className="absolute right-0 top-0 w-40 h-40 bg-[var(--color-primary)]/20 rounded-full -mr-10 -mt-10 blur-3xl"></div>
-        <div className="absolute left-0 bottom-0 w-32 h-32 bg-black/40 rounded-full -ml-10 -mb-10 blur-2xl"></div>
-        <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
+        <div className="absolute right-0 top-0 w-48 h-48 bg-white/10 rounded-full -mr-12 -mt-12 blur-3xl animate-pulse"></div>
+        <div className="absolute left-0 bottom-0 w-40 h-40 bg-black/20 rounded-full -ml-12 -mb-12 blur-2xl"></div>
         <div className="relative z-10 flex flex-col items-center text-center">
-          <div className="w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-3xl flex items-center justify-center text-white mb-6 shadow-[0_0_20px_rgba(212,175,55,0.5)] transform rotate-3">
-            <Heart size={40} />
+          <div className="w-20 h-20 bg-white/20 backdrop-blur-md border border-white/30 rounded-3xl flex items-center justify-center text-white mb-6 shadow-[0_8px_32px_rgba(0,0,0,0.2)] transform rotate-3">
+            <Heart size={40} className="drop-shadow-lg" />
           </div>
-          <h1 className="text-4xl font-bold font-serif mb-2 text-[var(--color-primary-light)] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">
+          <h1 className="text-4xl font-bold font-serif mb-2 text-white drop-shadow-md">
             حصن المسلم
           </h1>
-          <p className="text-[var(--color-text-muted)] text-sm font-bold">
+          <p className="text-emerald-100 text-sm font-bold bg-black/20 px-4 py-2 rounded-full backdrop-blur-md border border-white/10">
             ألا بذكر الله تطمئن القلوب
           </p>
         </div>
       </motion.div>
 
-      {/* Categories Grid 3D */}
+      {/* Categories Grid */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -631,22 +631,22 @@ export default function Azkar() {
         {azkarData.map((category, index) => (
           <motion.button
             key={category.id}
-            whileHover={{ scale: 1.02, y: -2 }}
+            whileHover={{ scale: 1.02, y: -4 }}
             whileTap={{ scale: 0.98 }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
             onClick={() => setSelectedCategory(category)}
-            className="card-3d bg-[var(--color-surface)] rounded-[2rem] p-6 text-[var(--color-text)] flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden group border border-black/5 dark:border-white/5 hover:border-[var(--color-primary)]/30 shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+            className="card-3d rounded-[2rem] p-6 text-slate-800 dark:text-slate-100 flex flex-col items-center justify-center gap-4 text-center relative overflow-hidden group hover:border-emerald-500/30"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-inner border border-white/10 group-hover:rotate-6 transition-transform bg-gradient-to-br ${category.bg} text-white`}>
+            <div className="absolute inset-0 bg-gradient-to-b from-white/50 to-transparent dark:from-slate-800/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className={`relative z-10 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform bg-gradient-to-br ${category.bg} text-white border border-white/20`}>
               {category.icon}
             </div>
-            <h3 className="font-bold font-serif text-lg text-[var(--color-text)] group-hover:text-[var(--color-primary-light)] transition-colors">
+            <h3 className="relative z-10 font-bold font-serif text-lg text-slate-800 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
               {category.title}
             </h3>
-            <span className="text-xs font-bold bg-[var(--color-bg)] text-[var(--color-text-muted)] px-3 py-1 rounded-full border border-white/5 shadow-sm">
+            <span className="relative z-10 text-xs font-bold glass dark:glass-dark text-emerald-700 dark:text-emerald-300 px-3 py-1 rounded-full shadow-sm">
               {category.items.length} أذكار
             </span>
           </motion.button>

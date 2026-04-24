@@ -492,7 +492,7 @@ export default function IslamicRadio() {
 
   return (
     <div
-      className="max-w-md mx-auto p-4 space-y-6 pb-32 min-h-screen bg-[var(--color-bg)]"
+      className="max-w-md mx-auto p-4 space-y-6 pb-32 min-h-screen bg-slate-50 dark:bg-slate-950"
       dir="rtl"
     >
       <audio 
@@ -508,30 +508,30 @@ export default function IslamicRadio() {
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] rounded-[2rem] p-8 text-white shadow-2xl relative overflow-hidden text-center border border-white/5"
+        className="bg-gradient-to-br from-emerald-600 to-emerald-500 rounded-[2rem] p-8 text-white shadow-2xl relative overflow-hidden text-center border border-white/5"
       >
-        <div className="absolute right-0 top-0 w-40 h-40 bg-[var(--color-primary)]/20 rounded-full -mr-10 -mt-10 blur-3xl"></div>
+        <div className="absolute right-0 top-0 w-40 h-40 bg-emerald-500/20 rounded-full -mr-10 -mt-10 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/40 rounded-full -ml-10 -mb-10 blur-2xl"></div>
         <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
         <div className="relative z-10">
-          <h1 className="text-3xl font-bold font-serif mb-2 flex justify-center items-center gap-3 drop-shadow-[0_0_10px_rgba(212,175,55,0.3)] text-[var(--color-primary-light)]">
+          <h1 className="text-3xl font-bold font-serif mb-2 flex justify-center items-center gap-3 drop-shadow-[0_0_10px_rgba(212,175,55,0.3)] text-emerald-400">
             {activeTab === "radio" ? <RadioIcon size={32} /> : <Tv size={32} />}
             {activeTab === "radio" ? "الإذاعة الإسلامية" : "البث التلفزيوني"}
           </h1>
-          <p className="text-[var(--color-text-muted)] text-sm font-medium">
+          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
             بث مباشر على مدار الساعة
           </p>
         </div>
       </motion.div>
 
       {/* Tabs */}
-      <div className="flex bg-[var(--color-surface)] p-1 rounded-2xl shadow-sm border border-black/5 dark:border-white/5">
+      <div className="flex bg-white dark:bg-slate-900 p-1 rounded-2xl shadow-sm border border-black/5 dark:border-white/5">
         <button
           onClick={() => setActiveTab("radio")}
           className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
             activeTab === "radio"
-              ? "bg-[var(--color-primary)] text-white shadow-md"
-              : "text-[var(--color-text-muted)] hover:bg-black/5 dark:hover:bg-white/5"
+              ? "bg-emerald-500 text-white shadow-md"
+              : "text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5"
           }`}
         >
           <RadioIcon size={18} />
@@ -544,8 +544,8 @@ export default function IslamicRadio() {
           }}
           className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
             activeTab === "tv"
-              ? "bg-[var(--color-primary)] text-white shadow-md"
-              : "text-[var(--color-text-muted)] hover:bg-black/5 dark:hover:bg-white/5"
+              ? "bg-emerald-500 text-white shadow-md"
+              : "text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5"
           }`}
         >
           <Tv size={18} />
@@ -563,14 +563,14 @@ export default function IslamicRadio() {
         className="relative"
       >
         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-          <Search size={20} className="text-[var(--color-text-muted)]" />
+          <Search size={20} className="text-slate-500 dark:text-slate-400" />
         </div>
         <input
           type="text"
           placeholder="ابحث عن إذاعة أو قارئ..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full bg-[var(--color-surface)] border border-black/5 dark:border-white/5 rounded-2xl py-3 pr-10 pl-4 text-[var(--color-text)] focus:outline-none focus:border-[var(--color-primary-light)]/50 focus:ring-1 focus:ring-[var(--color-primary-light)]/50 transition-all shadow-[0_5px_15px_rgba(0,0,0,0.3)] placeholder:text-[var(--color-text-muted)]"
+          className="w-full bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 rounded-2xl py-3 pr-10 pl-4 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-400/50 focus:ring-1 focus:ring-emerald-400/50 transition-all shadow-[0_5px_15px_rgba(0,0,0,0.3)] placeholder:text-slate-500 dark:text-slate-400"
         />
       </motion.div>
 
@@ -610,16 +610,16 @@ export default function IslamicRadio() {
                 onClick={() => handlePlayStation(station)}
                 className={`w-full card-3d p-4 flex items-center justify-between group transition-all rounded-2xl ${
                   isActive
-                    ? "bg-gradient-to-r from-[var(--color-surface)] to-[var(--color-primary)]/10 border border-[var(--color-primary-light)]/30 shadow-[0_0_15px_rgba(212,175,55,0.2)]"
-                    : "bg-[var(--color-surface)] border border-white/5 hover:border-[var(--color-primary-light)]/20 hover:bg-white/5 shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
+                    ? "bg-gradient-to-r from-white dark:from-slate-900 to-emerald-500/10 border border-emerald-400/30 shadow-[0_0_15px_rgba(212,175,55,0.2)]"
+                    : "bg-white dark:bg-slate-900 border border-white/5 hover:border-emerald-400/20 hover:bg-white/5 shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
                 }`}
               >
                 <div className="flex items-center gap-4">
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center shadow-inner transition-colors shrink-0 ${
                       isActive
-                        ? "bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-[var(--color-primary-light)]/50"
-                        : "bg-black/5 dark:bg-white/5 text-[var(--color-primary)] dark:text-[var(--color-primary-light)] group-hover:bg-[var(--color-primary)]/20 group-hover:text-[var(--color-primary-dark)] dark:group-hover:text-[var(--color-primary-light)] border border-black/10 dark:border-white/10"
+                        ? "bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-emerald-400/50"
+                        : "bg-black/5 dark:bg-white/5 text-emerald-500 dark:text-emerald-400 group-hover:bg-emerald-500/20 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 border border-black/10 dark:border-white/10"
                     }`}
                   >
                     {isActive && isPlaying ? (
@@ -630,11 +630,11 @@ export default function IslamicRadio() {
                   </div>
                   <div className="text-right">
                     <h3
-                      className={`font-bold font-serif text-lg transition-colors ${isActive ? "text-[var(--color-primary-light)]" : "text-[var(--color-text)]"}`}
+                      className={`font-bold font-serif text-lg transition-colors ${isActive ? "text-emerald-400" : "text-slate-800 dark:text-slate-100"}`}
                     >
                       {station.name}
                     </h3>
-                    <span className="text-xs font-bold text-[var(--color-text-muted)] bg-black/5 dark:bg-white/5 px-2 py-1 rounded-md inline-block mt-1 border border-black/10 dark:border-white/10">
+                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400 bg-black/5 dark:bg-white/5 px-2 py-1 rounded-md inline-block mt-1 border border-black/10 dark:border-white/10">
                       {station.type}
                     </span>
                   </div>
@@ -645,7 +645,7 @@ export default function IslamicRadio() {
                     {[1, 2, 3, 4].map((bar) => (
                       <motion.div
                         key={bar}
-                        className="w-1 bg-[var(--color-primary)] rounded-t-sm shadow-[0_0_5px_rgba(212,175,55,0.5)]"
+                        className="w-1 bg-emerald-500 rounded-t-sm shadow-[0_0_5px_rgba(212,175,55,0.5)]"
                         animate={{ height: ["20%", "100%", "40%", "80%", "20%"] }}
                         transition={{
                           duration: 1 + Math.random(),
@@ -660,7 +660,7 @@ export default function IslamicRadio() {
             );
           })
         ) : (
-          <div className="text-center py-10 text-[var(--color-text-muted)]">
+          <div className="text-center py-10 text-slate-500 dark:text-slate-400">
             لا توجد نتائج مطابقة للبحث
           </div>
         )}
@@ -675,17 +675,17 @@ export default function IslamicRadio() {
             exit={{ y: 100, opacity: 0 }}
             className="fixed bottom-24 left-0 right-0 max-w-md mx-auto px-4 z-40"
           >
-            <div className="card-3d p-4 bg-[var(--color-surface)]/90 backdrop-blur-xl border border-[var(--color-primary-light)]/20 flex flex-col gap-4 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] rounded-3xl">
+            <div className="card-3d p-4 bg-white dark:bg-slate-900/90 backdrop-blur-xl border border-emerald-400/20 flex flex-col gap-4 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] rounded-3xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] animate-pulse shrink-0 border border-[var(--color-primary-light)]/50">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] animate-pulse shrink-0 border border-emerald-400/50">
                     <RadioIcon size={20} />
                   </div>
                   <div>
-                    <p className="text-xs text-[var(--color-text-muted)] font-bold">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">
                       يتم التشغيل الآن
                     </p>
-                    <p className="text-sm font-bold text-[var(--color-primary-light)] truncate w-40">
+                    <p className="text-sm font-bold text-emerald-400 truncate w-40">
                       {currentStation.name}
                     </p>
                   </div>
@@ -693,7 +693,7 @@ export default function IslamicRadio() {
 
                 <button
                   onClick={togglePlay}
-                  className="w-12 h-12 rounded-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] transform active:scale-95 transition-all shrink-0 border border-[var(--color-primary-light)]/50"
+                  className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] transform active:scale-95 transition-all shrink-0 border border-emerald-400/50"
                 >
                   {isPlaying ? (
                     <PauseCircle size={28} />
@@ -706,7 +706,7 @@ export default function IslamicRadio() {
               <div className="flex items-center gap-3 px-2">
                 <button
                   onClick={() => setIsMuted(!isMuted)}
-                  className="text-[var(--color-text-muted)] hover:text-[var(--color-primary)] shrink-0 transition-colors"
+                  className="text-slate-500 dark:text-slate-400 hover:text-emerald-500 shrink-0 transition-colors"
                 >
                   {isMuted || volume === 0 ? (
                     <VolumeX size={20} />
@@ -724,7 +724,7 @@ export default function IslamicRadio() {
                     setVolume(parseFloat(e.target.value));
                     if (isMuted) setIsMuted(false);
                   }}
-                  className="w-full h-2 bg-black/10 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-[var(--color-primary)] shadow-inner"
+                  className="w-full h-2 bg-black/10 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-emerald-500 shadow-inner"
                   dir="ltr"
                 />
               </div>
@@ -740,9 +740,9 @@ export default function IslamicRadio() {
           className="space-y-6"
         >
           {TV_CHANNELS.map((channel) => (
-            <div key={channel.id} className="card-3d overflow-hidden rounded-3xl bg-[var(--color-surface)] border border-black/5 dark:border-white/5 shadow-lg">
+            <div key={channel.id} className="card-3d overflow-hidden rounded-3xl bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 shadow-lg">
               <div className="p-4 border-b border-black/5 dark:border-white/5">
-                <h3 className="font-bold font-serif text-lg text-[var(--color-primary)] flex items-center gap-2">
+                <h3 className="font-bold font-serif text-lg text-emerald-500 flex items-center gap-2">
                   <Tv size={20} />
                   {channel.name}
                 </h3>

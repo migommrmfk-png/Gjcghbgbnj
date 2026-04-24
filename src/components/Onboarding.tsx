@@ -33,13 +33,13 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
       desc: "تطبيق إسلامي شامل يساعدك على تنظيم عبادتك اليومية بسهولة.",
       icon: (
         <div className="relative w-48 h-48 flex items-center justify-center">
-          <div className="absolute inset-0 bg-[var(--color-primary)]/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-3xl animate-pulse"></div>
           <motion.div 
             animate={{ y: [0, -10, 0] }} 
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             className="relative z-10 flex flex-col items-center justify-center"
           >
-            <Moon size={80} className="text-[var(--color-primary-light)] drop-shadow-[0_0_15px_rgba(212,175,55,0.8)] absolute -top-4 -right-4" />
+            <Moon size={80} className="text-emerald-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.8)] absolute -top-4 -right-4" />
             <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-white drop-shadow-lg">
               <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
               <path d="M3 22v-4a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v4" />
@@ -58,9 +58,9 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
       desc: "اقرأ واستمع للقرآن الكريم بأصوات أكثر من 100 قارئ مع إمكانية البحث والتفسير.",
       icon: (
         <div className="relative w-32 h-32 flex items-center justify-center mb-4">
-          <div className="absolute inset-0 bg-[var(--color-primary)]/20 rounded-full blur-2xl"></div>
+          <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-2xl"></div>
           <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
-            <BookOpen size={70} className="text-[var(--color-primary-light)] drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]" />
+            <BookOpen size={70} className="text-emerald-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]" />
           </motion.div>
         </div>
       ),
@@ -71,9 +71,9 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
       desc: "تعرف على أوقات الصلاة حسب موقعك مع تنبيهات الأذان.",
       icon: (
         <div className="relative w-32 h-32 flex items-center justify-center mb-4">
-          <div className="absolute inset-0 bg-[var(--color-primary)]/20 rounded-full blur-2xl"></div>
+          <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-2xl"></div>
           <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
-            <Clock size={70} className="text-[var(--color-primary-light)] drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]" />
+            <Clock size={70} className="text-emerald-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]" />
           </motion.div>
         </div>
       ),
@@ -84,9 +84,9 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
       desc: "مجموعة كاملة من الأذكار اليومية.",
       icon: (
         <div className="relative w-32 h-32 flex items-center justify-center mb-4">
-          <div className="absolute inset-0 bg-[var(--color-primary)]/20 rounded-full blur-2xl"></div>
+          <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-2xl"></div>
           <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
-            <Heart size={70} className="text-[var(--color-primary-light)] drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]" />
+            <Heart size={70} className="text-emerald-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]" />
           </motion.div>
         </div>
       ),
@@ -97,9 +97,9 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
       desc: "مجموعة من الأدوات التي يحتاجها كل مسلم.",
       icon: (
         <div className="relative w-32 h-32 flex items-center justify-center mb-4">
-          <div className="absolute inset-0 bg-[var(--color-primary)]/20 rounded-full blur-2xl"></div>
+          <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-2xl"></div>
           <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
-            <Compass size={70} className="text-[var(--color-primary-light)] drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]" />
+            <Compass size={70} className="text-emerald-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]" />
           </motion.div>
         </div>
       ),
@@ -110,9 +110,9 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
       desc: "المزيد من الميزات لاكتشافها داخل التطبيق.",
       icon: (
         <div className="relative w-32 h-32 flex items-center justify-center mb-4">
-          <div className="absolute inset-0 bg-[var(--color-primary)]/20 rounded-full blur-2xl"></div>
+          <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-2xl"></div>
           <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
-            <Star size={70} className="text-[var(--color-primary-light)] drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]" />
+            <Star size={70} className="text-emerald-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]" />
           </motion.div>
         </div>
       ),
@@ -123,9 +123,9 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
       desc: "اجعل تطبيق \"هذا ديني\" رفيقك اليومي للقرآن والأذكار.",
       icon: (
         <div className="relative w-48 h-48 flex items-center justify-center">
-          <div className="absolute inset-0 bg-[var(--color-primary)]/30 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute inset-0 bg-emerald-500/30 rounded-full blur-3xl animate-pulse"></div>
           <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}>
-            <div className="w-32 h-32 bg-gradient-to-br from-[var(--color-primary-light)] to-[var(--color-primary-dark)] rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(212,175,55,0.6)]">
+            <div className="w-32 h-32 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(212,175,55,0.6)]">
               <CheckCircle2 size={60} className="text-white" />
             </div>
           </motion.div>
@@ -146,7 +146,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
   }));
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-b from-[var(--color-bg)] via-[#1a221d] to-[var(--color-bg)] z-50 flex flex-col items-center justify-between overflow-hidden" dir="rtl">
+    <div className="fixed inset-0 bg-gradient-to-b from-[#f8fafc] via-[#1a221d] to-[#f8fafc] z-50 flex flex-col items-center justify-between overflow-hidden" dir="rtl">
       
       {/* Animated Stars Background */}
       {mounted && stars.map((star) => (
@@ -172,18 +172,18 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
       {/* Background Mosque Silhouette */}
       <div className="absolute bottom-0 left-0 right-0 opacity-15 pointer-events-none">
         <svg viewBox="0 0 1440 320" className="w-full h-auto" preserveAspectRatio="none">
-          <path fill="var(--color-primary)" fillOpacity="1" d="M0,288L48,272C96,256,192,224,288,197.3C384,171,480,149,576,165.3C672,181,768,235,864,250.7C960,267,1056,245,1152,250.7C1248,256,1344,288,1392,304L1440,320L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+          <path fill="#10b981" fillOpacity="1" d="M0,288L48,272C96,256,192,224,288,197.3C384,171,480,149,576,165.3C672,181,768,235,864,250.7C960,267,1056,245,1152,250.7C1248,256,1344,288,1392,304L1440,320L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
           {/* Simple Domes */}
-          <path fill="var(--color-primary)" d="M200,224 C200,180 250,150 250,150 C250,150 300,180 300,224 Z"></path>
-          <path fill="var(--color-primary)" d="M700,235 C700,190 750,160 750,160 C750,160 800,190 800,235 Z"></path>
-          <path fill="var(--color-primary)" d="M1100,250 C1100,200 1150,170 1150,170 C1150,170 1200,200 1200,250 Z"></path>
+          <path fill="#10b981" d="M200,224 C200,180 250,150 250,150 C250,150 300,180 300,224 Z"></path>
+          <path fill="#10b981" d="M700,235 C700,190 750,160 750,160 C750,160 800,190 800,235 Z"></path>
+          <path fill="#10b981" d="M1100,250 C1100,200 1150,170 1150,170 C1150,170 1200,200 1200,250 Z"></path>
           {/* Minarets */}
-          <rect x="245" y="100" width="10" height="124" fill="var(--color-primary)"></rect>
-          <polygon points="240,100 250,70 260,100" fill="var(--color-primary)"></polygon>
-          <rect x="745" y="110" width="10" height="125" fill="var(--color-primary)"></rect>
-          <polygon points="740,110 750,80 760,110" fill="var(--color-primary)"></polygon>
-          <rect x="1145" y="120" width="10" height="130" fill="var(--color-primary)"></rect>
-          <polygon points="1140,120 1150,90 1160,120" fill="var(--color-primary)"></polygon>
+          <rect x="245" y="100" width="10" height="124" fill="#10b981"></rect>
+          <polygon points="240,100 250,70 260,100" fill="#10b981"></polygon>
+          <rect x="745" y="110" width="10" height="125" fill="#10b981"></rect>
+          <polygon points="740,110 750,80 760,110" fill="#10b981"></polygon>
+          <rect x="1145" y="120" width="10" height="130" fill="#10b981"></rect>
+          <polygon points="1140,120 1150,90 1160,120" fill="#10b981"></polygon>
         </svg>
       </div>
 
@@ -194,7 +194,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
         transition={{ delay: 0.2, duration: 0.8 }}
         className="w-full pt-12 pb-4 px-6 text-center relative z-20"
       >
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--color-primary-light)] to-[var(--color-primary-dark)] shadow-[0_0_20px_rgba(212,175,55,0.4)] mb-3">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-[0_0_20px_rgba(212,175,55,0.4)] mb-3">
           <Moon size={28} className="text-white fill-white" />
         </div>
         <h1 className="text-3xl font-bold font-serif text-white mb-2 tracking-wide drop-shadow-md">
@@ -236,8 +236,8 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
                       transition={{ delay: 0.2 + (idx * 0.1) }}
                       className="flex items-center gap-3 text-white/90 text-sm font-bold"
                     >
-                      <div className="w-5 h-5 rounded-full bg-[var(--color-primary)]/20 flex items-center justify-center shrink-0">
-                        <div className="w-2 h-2 rounded-full bg-[var(--color-primary-light)]"></div>
+                      <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
+                        <div className="w-2 h-2 rounded-full bg-emerald-400"></div>
                       </div>
                       {feature}
                     </motion.li>
@@ -262,7 +262,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
             <button 
               key={i} 
               onClick={() => setStep(i)}
-              className={`h-2 rounded-full transition-all duration-300 ${i === step ? 'w-8 bg-[var(--color-primary-light)] shadow-[0_0_10px_rgba(212,175,55,0.5)]' : 'w-2 bg-white/20 hover:bg-white/40'}`} 
+              className={`h-2 rounded-full transition-all duration-300 ${i === step ? 'w-8 bg-emerald-400 shadow-[0_0_10px_rgba(212,175,55,0.5)]' : 'w-2 bg-white/20 hover:bg-white/40'}`} 
               aria-label={`Go to step ${i + 1}`}
             />
           ))}
@@ -277,7 +277,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
               requestPermissions();
             }
           }}
-          className="w-full py-4 rounded-2xl bg-gradient-to-r from-[var(--color-primary-light)] to-[var(--color-primary-dark)] text-white font-bold text-lg shadow-[0_10px_20px_rgba(212,175,55,0.3)] flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all"
+          className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-400 to-emerald-600 text-white font-bold text-lg shadow-[0_10px_20px_rgba(212,175,55,0.3)] flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] transition-all"
         >
           {step < steps.length - 1 ? (
             <>التالي <ArrowLeft size={20} /></>

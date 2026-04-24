@@ -163,16 +163,16 @@ export default function WorshipTracker({ onBack }: { onBack: () => void }) {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-[var(--color-bg)]" dir="rtl">
+    <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-slate-50 dark:bg-slate-950" dir="rtl">
       {/* Header */}
-      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-[var(--color-bg)]/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5">
+      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5">
         <button
           onClick={onBack}
-          className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors border border-black/5 dark:border-white/5 bg-[var(--color-surface)] shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
+          className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors border border-black/5 dark:border-white/5 bg-white dark:bg-slate-900 shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
         >
-          <ArrowRight size={24} className="text-[var(--color-text-muted)] hover:text-[var(--color-primary-light)]" />
+          <ArrowRight size={24} className="text-slate-500 dark:text-slate-400 hover:text-emerald-400" />
         </button>
-        <h1 className="text-2xl font-bold font-serif text-[var(--color-primary-light)] drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">
+        <h1 className="text-2xl font-bold font-serif text-emerald-400 drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">
           متابعة العبادات
         </h1>
       </div>
@@ -192,11 +192,11 @@ export default function WorshipTracker({ onBack }: { onBack: () => void }) {
           <div className="relative z-10 flex items-center justify-between mb-8">
             <div>
               <p className="text-white/80 text-sm font-bold mb-1">المستوى الحالي</p>
-              <h2 className="text-3xl font-bold font-serif text-[var(--color-primary-light)] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">
+              <h2 className="text-3xl font-bold font-serif text-emerald-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">
                 {LEVEL_NAMES[level as keyof typeof LEVEL_NAMES] || `مستوى ${level}`}
               </h2>
             </div>
-            <div className="w-20 h-20 bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] rounded-3xl flex items-center justify-center text-white border border-[var(--color-primary-light)]/50 shadow-[0_0_20px_rgba(212,175,55,0.5)] transform rotate-3">
+            <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-3xl flex items-center justify-center text-white border border-emerald-400/50 shadow-[0_0_20px_rgba(212,175,55,0.5)] transform rotate-3">
               <Trophy size={40} />
             </div>
           </div>
@@ -211,7 +211,7 @@ export default function WorshipTracker({ onBack }: { onBack: () => void }) {
                 initial={{ width: 0 }}
                 animate={{ width: `${calculateProgress()}%` }}
                 transition={{ duration: 1, ease: "easeOut" }}
-                className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] h-full rounded-full shadow-[0_0_10px_rgba(212,175,55,0.5)]"
+                className="bg-gradient-to-r from-emerald-500 to-emerald-600 h-full rounded-full shadow-[0_0_10px_rgba(212,175,55,0.5)]"
               />
             </div>
           </div>
@@ -247,30 +247,30 @@ export default function WorshipTracker({ onBack }: { onBack: () => void }) {
             const isLocked = level < lvl && lvl > 1; // Level 1 is always unlocked
 
             return (
-              <div key={lvl} className="bg-[var(--color-surface)] rounded-2xl border border-black/10 dark:border-white/10 overflow-hidden shadow-lg">
+              <div key={lvl} className={`card-3d bg-white dark:bg-slate-900 rounded-[2rem] overflow-hidden transition-all duration-300 ${isLocked ? 'opacity-60' : 'hover:border-emerald-500/30'}`}>
                 <button 
                   onClick={() => !isLocked && toggleLevelExpand(lvl)}
-                  className={`w-full p-4 flex items-center justify-between ${isLocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                  className={`w-full p-5 flex items-center justify-between ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
-                      isLocked ? 'bg-gray-800 border-gray-700 text-gray-500' :
-                      lvl === 1 ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-500' :
-                      lvl === 2 ? 'bg-blue-500/20 border-blue-500/30 text-blue-500' :
-                      lvl === 3 ? 'bg-purple-500/20 border-purple-500/30 text-purple-500' :
-                      'bg-amber-500/20 border-amber-500/30 text-amber-500'
+                  <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border shadow-sm ${
+                      isLocked ? 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400' :
+                      lvl === 1 ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30 text-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.2)]' :
+                      lvl === 2 ? 'bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/30 text-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.2)]' :
+                      lvl === 3 ? 'bg-purple-50 dark:bg-purple-500/10 border-purple-200 dark:border-purple-500/30 text-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.2)]' :
+                      'bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30 text-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
                     }`}>
-                      <Star size={20} />
+                      <Star size={24} />
                     </div>
                     <div className="text-right">
-                      <h3 className="font-bold text-[var(--color-text)]">المستوى {lvl}: {LEVEL_NAMES[lvl as keyof typeof LEVEL_NAMES].split(' ')[0]}</h3>
-                      <p className="text-xs text-[var(--color-text-muted)]">
+                      <h3 className="font-bold text-slate-800 dark:text-slate-100 text-lg">المستوى {lvl}: <span className="font-serif">{LEVEL_NAMES[lvl as keyof typeof LEVEL_NAMES].split(' ')[0]}</span></h3>
+                      <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mt-1">
                         {isLocked ? `يفتح عند الوصول للمستوى ${lvl}` : `${completedInLevel} من ${levelTasks.length} مهام منجزة`}
                       </p>
                     </div>
                   </div>
                   {!isLocked && (
-                    <div className="text-[var(--color-text-muted)]">
+                    <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800/50 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-transform">
                       {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                     </div>
                   )}
@@ -284,7 +284,7 @@ export default function WorshipTracker({ onBack }: { onBack: () => void }) {
                       exit={{ height: 0, opacity: 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="p-4 pt-0 space-y-2 border-t border-black/5 dark:border-white/5 mt-2">
+                      <div className="p-5 pt-0 space-y-3 border-t border-slate-100 dark:border-slate-800/50 mt-2">
                         {levelTasks.map((task, index) => {
                           const isCompleted = completedTaskIds.includes(task.id);
                           return (
@@ -293,29 +293,34 @@ export default function WorshipTracker({ onBack }: { onBack: () => void }) {
                               initial={{ x: -20, opacity: 0 }}
                               animate={{ x: 0, opacity: 1 }}
                               transition={{ delay: index * 0.05 }}
+                              whileTap={{ scale: 0.98 }}
                               onClick={() => toggleTask(task)}
-                              className={`p-3 rounded-xl flex items-center justify-between cursor-pointer transition-all ${
+                              className={`p-4 rounded-xl flex items-center justify-between cursor-pointer transition-all border ${
                                 isCompleted 
-                                  ? 'bg-[var(--color-primary)]/10 border border-[var(--color-primary)]/30' 
-                                  : 'bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 hover:border-[var(--color-primary)]/30'
+                                  ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30 shadow-sm' 
+                                  : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-md'
                               }`}
                             >
                               <div className="flex items-center gap-3">
-                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors shadow-inner ${
                                   isCompleted 
-                                    ? 'bg-[var(--color-primary)] border-[var(--color-primary)] text-white' 
-                                    : 'border-[var(--color-text-muted)] text-transparent'
+                                    ? 'bg-emerald-500 border-emerald-500 text-white shadow-[0_0_10px_rgba(16,185,129,0.3)]' 
+                                    : 'border-slate-300 dark:border-slate-600 text-transparent'
                                 }`}>
                                   <CheckCircle2 size={14} />
                                 </div>
                                 <div>
-                                  <span className={`font-bold text-sm block ${isCompleted ? 'text-[var(--color-primary-light)] line-through opacity-80' : 'text-[var(--color-text)]'}`}>
+                                  <span className={`font-bold text-sm block transition-colors ${isCompleted ? 'text-emerald-600 dark:text-emerald-400 line-through opacity-80' : 'text-slate-800 dark:text-slate-100'}`}>
                                     {task.title}
                                   </span>
-                                  <span className="text-[10px] text-[var(--color-text-muted)]">{task.category}</span>
+                                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">{task.category}</span>
                                 </div>
                               </div>
-                              <span className="text-xs font-bold text-[var(--color-primary)] bg-[var(--color-primary)]/10 px-2 py-1 rounded-lg border border-[var(--color-primary)]/20 whitespace-nowrap">
+                              <span className={`text-[11px] font-bold px-3 py-1.5 rounded-xl border whitespace-nowrap transition-colors ${
+                                isCompleted 
+                                  ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-500/20 border-emerald-200 dark:border-emerald-500/30'
+                                  : 'text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 shadow-sm'
+                              }`}>
                                 +{task.points} نقطة
                               </span>
                             </motion.div>
