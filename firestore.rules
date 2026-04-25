@@ -20,6 +20,7 @@ service cloud.firestore {
     //   - level: number (required) - User's current level
     //   - streak: number (required) - User's current daily streak
     //   - badges: list (optional) - List of badge IDs earned
+    //   - isAnonymous: boolean (optional) - true if user is a guest
     //
     // Collection: plans
     // Document ID: {planId}
@@ -141,10 +142,10 @@ service cloud.firestore {
     // ===============================================================
 
     function isValidUser(data) {
-      return hasOnlyAllowedFields(['uid', 'email', 'displayName', 'photoURL', 'createdAt', 'role', 'xp', 'level', 'streak', 'badges']) &&
-             hasRequiredFields(['uid', 'email', 'createdAt', 'role', 'xp', 'level', 'streak']) &&
+      return hasOnlyAllowedFields(['uid', 'email', 'displayName', 'photoURL', 'createdAt', 'role', 'xp', 'level', 'streak', 'badges', 'isAnonymous']) &&
+             hasRequiredFields(['uid', 'createdAt', 'role', 'xp', 'level', 'streak']) &&
              data.uid == request.auth.uid &&
-             isValidEmail(data.email) &&
+             (!( 'email' in data ) || data.email == null || isValidEmail(data.email)) &&
              isValidDateString(data.createdAt) &&
              (data.role == 'user' || data.role == 'admin') &&
              data.xp is number && data.xp >= 0 &&
@@ -152,7 +153,8 @@ service cloud.firestore {
              data.streak is number && data.streak >= 0 &&
              (!('badges' in data) || isValidList(data.badges, 100)) &&
              isValidOptionalString('displayName', 1, 100) &&
-             (!( 'photoURL' in data ) || isValidUrl(data.photoURL));
+             (!( 'photoURL' in data ) || isValidUrl(data.photoURL)) &&
+             (!('isAnonymous' in data) || data.isAnonymous is bool);
     }
 
     function isValidPlan(data) {
@@ -197,12 +199,12 @@ service cloud.firestore {
                        uidUnchanged() &&
                        (request.resource.data.role == 'user' || isAdmin());
 
-      // Users can update their own profile. They cannot change their uid, email, createdAt, or role.
+      // Users can update their own profile. They cannot change their uid, createdAt, or role.
       allow update: if isAuthenticated() &&
                        isOwner(userId) &&
                        isValidUser(request.resource.data) &&
                        uidNotModified() &&
-                       areImmutableFieldsUnchanged(['uid', 'email', 'createdAt']) &&
+                       areImmutableFieldsUnchanged(['uid', 'createdAt']) &&
                        (request.resource.data.role == resource.data.role || isAdmin());
 
       // Only admins can delete users.

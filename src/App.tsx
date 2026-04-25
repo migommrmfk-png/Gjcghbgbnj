@@ -12,6 +12,7 @@ import Splash from "./components/Splash";
 import Onboarding from "./components/Onboarding";
 import AdhanOverlay from "./components/AdhanOverlay";
 import WelcomeModal from "./components/WelcomeModal";
+import SupportWelcomeModal from "./components/SupportWelcomeModal";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { PrayerTimesProvider } from "./contexts/PrayerTimesContext";
 import { usePrayerNotifications } from "./hooks/usePrayerNotifications";
@@ -51,6 +52,7 @@ const InheritanceCalculator = lazy(() => import("./components/InheritanceCalcula
 const DreamInterpretation = lazy(() => import("./components/DreamInterpretation"));
 const QuranReels = lazy(() => import("./components/QuranReels"));
 const SelfAccounting = lazy(() => import("./components/SelfAccounting"));
+const Downloads = lazy(() => import("./components/Downloads"));
 
 // Loading fallback for Suspense
 const LoadingFallback = () => (
@@ -158,6 +160,8 @@ function AppContent() {
         return <QuranReels onBack={handleBack} />;
       case "accounting":
         return <SelfAccounting onBack={handleBack} />;
+      case "downloads":
+        return <Downloads onBack={handleBack} />;
       default:
         return <Dashboard onNavigate={handleNavigate} />;
     }
@@ -176,6 +180,7 @@ function AppContent() {
       className="flex flex-col flex-1 h-full w-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans overflow-hidden relative"
       dir={isRTL ? "rtl" : "ltr"}
     >
+      <SupportWelcomeModal />
       <WelcomeModal onEnableNotifications={() => setNotificationsEnabled(true)} />
       <AnimatePresence>
         {adhanData && (

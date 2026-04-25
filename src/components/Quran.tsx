@@ -8,9 +8,15 @@ import {
   Settings,
   X,
   Bookmark,
-  BookmarkCheck
+  BookmarkCheck,
+  Volume2,
+  VolumeX,
+  Loader,
+  Download
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { saveAudio } from "../lib/audioStore";
+import { fetchWithProxy, AUDIO_PROXIES } from "../lib/proxies";
 
 interface Surah {
   number: number;
@@ -66,6 +72,9 @@ export default function Quran() {
   const [audioError, setAudioError] = useState("");
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [isVolumeOpen, setIsVolumeOpen] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   
   const [selectedAyahTafsir, setSelectedAyahTafsir] = useState<{ text: string, tafsir: string, number: number, globalNumber: number } | null>(null);
   const [loadingTafsir, setLoadingTafsir] = useState(false);
@@ -78,6 +87,12 @@ export default function Quran() {
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const ayahRefs = useRef<{ [key: number]: HTMLSpanElement | null }>({});
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
 
   useEffect(() => {
     // Check cache first
@@ -197,7 +212,38 @@ export default function Quran() {
       if (audioRef.current && activeReciterServer) {
         audioRef.current.pause();
         const paddedNumber = String(surahNumber).padStart(3, '0');
-        audioRef.current.src = `${activeReciterServer}${paddedNumber}.mp3`;
+        const directUrl = `${activeReciterServer}${paddedNumber}.mp3`;
+        
+        let currentProxyIndex = 0;
+        
+        const tryPlay = (url: string) => {
+          if (!audioRef.current) return;
+          audioRef.current.src = url;
+          audioRef.current.volume = volume;
+          setIsAudioLoading(true);
+          
+          audioRef.current.play()
+            .then(() => {
+              setIsPlaying(true);
+              setIsAudioLoading(false);
+              setAudioError("");
+            })
+            .catch(e => {
+              console.warn(`Playback failed for ${url}`, e);
+              currentProxyIndex++;
+              if (currentProxyIndex < AUDIO_PROXIES.length) {
+                // Try next proxy
+                tryPlay(AUDIO_PROXIES[currentProxyIndex](directUrl));
+              } else {
+                console.error("All proxies failed for audio playback");
+                setIsPlaying(false);
+                setIsAudioLoading(false);
+                setAudioError("تعذر تشغيل التلاوة. يرجى التحقق من اتصالك بالإنترنت.");
+              }
+            });
+        };
+        
+        tryPlay(AUDIO_PROXIES[0](directUrl));
       }
 
       // Scroll to specific ayah if provided
@@ -313,6 +359,34 @@ export default function Quran() {
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   };
 
+  const handleDownload = async () => {
+    if (!selectedSurah || !selectedReciterServer) return;
+    
+    setIsDownloading(true);
+    try {
+      const url = `${selectedReciterServer}${String(selectedSurah.number).padStart(3, '0')}.mp3`;
+      const response = await fetchWithProxy(url);
+      const blob = await response.blob();
+      
+      const currentReciter = reciters.find(r => r.server === selectedReciterServer);
+      
+      await saveAudio({
+        id: `surah_${selectedSurah.number}_${selectedReciterServer}`,
+        surahNumber: selectedSurah.number,
+        surahName: selectedSurah.name,
+        reciterName: currentReciter?.name || 'مجهول',
+        blob,
+        downloadedAt: new Date().toISOString()
+      });
+      alert('تم تحميل التلاوة بنجاح. يمكنك العثور عليها في قائمة التنزيلات.');
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('حدث خطأ أثناء تحميل التلاوة');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   const filteredSurahs = surahs.filter(
     (s) =>
       s.name.includes(searchQuery) ||
@@ -327,7 +401,11 @@ export default function Quran() {
     );
   }
 
-    if (selectedSurah) {
+  if (selectedSurah) {
+    const currentAudioUrl = selectedReciterServer && selectedSurah 
+      ? `${selectedReciterServer}${String(selectedSurah.number).padStart(3, '0')}.mp3` 
+      : '';
+
     return (
       <motion.div
         initial={{ x: 100, opacity: 0 }}
@@ -590,7 +668,44 @@ export default function Quran() {
                   ))}
                 </select>
               </div>
+              
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setIsVolumeOpen(!isVolumeOpen)}
+                  className="p-2 text-slate-500 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                  title="التحكم بالصوت"
+                >
+                  {volume === 0 ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                </button>
+                {currentAudioUrl && (
+                  <button
+                    onClick={handleDownload}
+                    disabled={isDownloading}
+                    className="p-2 text-slate-500 hover:text-emerald-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors disabled:opacity-50"
+                    title="تحميل التلاوة"
+                  >
+                    {isDownloading ? <Loader size={20} className="animate-spin" /> : <Download size={20} />}
+                  </button>
+                )}
+              </div>
             </div>
+            
+            {/* Volume Control Slider */}
+            {isVolumeOpen && (
+              <div className="flex items-center gap-3 px-2 mt-1 -mb-1 animate-in slide-in-from-top-2" dir="ltr">
+                <VolumeX size={16} className="text-slate-400" />
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={volume}
+                  onChange={(e) => setVolume(Number(e.target.value))}
+                  className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                />
+                <Volume2 size={16} className="text-slate-400" />
+              </div>
+            )}
             
             {/* Progress Bar */}
             <div className="flex items-center gap-3 text-xs text-slate-500 font-mono font-bold mt-1" dir="ltr">

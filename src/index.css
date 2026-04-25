@@ -5,10 +5,48 @@
 
 @layer base {
   :root {
+    --theme-primary: #2A9D8F;
+    --theme-primary-dark: #1F7A6F;
+    --theme-primary-light: #8cb87c;
+    --theme-gold: #D4AF37;
+    --theme-gold-dark: #B5952F;
+    --theme-gold-light: #F4D068;
+    --theme-accent: #E9C46A;
+
+    --color-bg: #f8fafc;
+    --color-surface: #ffffff;
+    --color-text: #0f172a;
+    --color-text-muted: #64748b;
+    --color-primary: var(--theme-primary);
+    --color-primary-dark: var(--theme-primary-dark);
+    --color-primary-light: var(--theme-primary-light);
+    --color-gold: var(--theme-gold);
+    --color-gold-light: var(--theme-gold-light);
+
     --font-sans: 'Cairo', sans-serif;
     --font-quran: 'Amiri Quran', 'Amiri', serif;
     --font-serif: 'Playfair Display', serif;
     --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  .dark {
+    --theme-primary: #2A9D8F;
+    --theme-primary-dark: #185c54;
+    --theme-primary-light: #4AC4B4;
+    --theme-gold: #D4AF37;
+    --theme-gold-dark: #B5952F;
+    --theme-gold-light: #F4D068;
+    --theme-accent: #E9C46A;
+
+    --color-bg: #0f172a;
+    --color-surface: #1e293b;
+    --color-text: #f8fafc;
+    --color-text-muted: #94a3b8;
+    --color-primary: var(--theme-primary);
+    --color-primary-dark: var(--theme-primary-dark);
+    --color-primary-light: var(--theme-primary-light);
+    --color-gold: var(--theme-gold);
+    --color-gold-light: var(--theme-gold-light);
   }
 }
 
@@ -89,6 +127,16 @@ input, textarea {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.pattern-bg {
+  background-image: radial-gradient(rgba(16, 185, 129, 0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.pattern-bg-white {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
 /* Bento Grid Utilities */

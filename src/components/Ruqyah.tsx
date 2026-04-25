@@ -206,7 +206,7 @@ export default function Ruqyah() {
 
               <div className="text-center space-y-3">
                 <h2 className="text-3xl font-bold bg-gradient-to-l from-emerald-600 to-teal-800 dark:from-emerald-400 dark:to-teal-200 bg-clip-text text-transparent font-serif drop-shadow-sm">الرقية الشرعية الشاملة</h2>
-                <p className="text-slate-500 dark:text-slate-400 text-lg">بصوت الشيخ مشاري العفاسي</p>
+                <p className="text-slate-500 dark:text-slate-400 text-lg">إذاعة الرقية الشرعية</p>
               </div>
 
               <button
@@ -223,7 +223,7 @@ export default function Ruqyah() {
               {/* Audio Element */}
               <audio
                 ref={audioRef}
-                src="https://server8.mp3quran.net/afs/roqia.mp3"
+                src="https://qurango.net/radio/roqiah"
                 preload="none"
               />
             </motion.div>

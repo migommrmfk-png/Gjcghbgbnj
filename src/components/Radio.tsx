@@ -20,27 +20,27 @@ interface RadioStation {
 const STATIONS: RadioStation[] = [
   {
     id: "1",
-    name: "إذاعة القرآن الكريم - السعودية",
-    url: "https://n02.radiojar.com/4wqre23fytzuv",
-    type: "مباشر",
+    name: "مختارات من التلاوات",
+    url: "https://qurango.net/radio/tarteel",
+    type: "عام",
   },
   {
     id: "2",
-    name: "إذاعة القرآن الكريم - مصر",
-    url: "https://stream.radioquraan.com/quraan",
-    type: "مباشر",
+    name: "الفتاوى",
+    url: "https://qurango.net/radio/fatwa",
+    type: "عام",
   },
   {
     id: "3",
-    name: "إذاعة السنة النبوية",
-    url: "https://n02.radiojar.com/8s5u5tpdtwzuv",
-    type: "مباشر",
+    name: "تفسير القرآن الكريم",
+    url: "https://qurango.net/radio/tafseer",
+    type: "عام",
   },
   {
     id: "4",
-    name: "إذاعة نداء الإسلام",
-    url: "https://n02.radiojar.com/0t10041zttzuv",
-    type: "مباشر",
+    name: "الرقية الشرعية",
+    url: "https://qurango.net/radio/roqiah",
+    type: "عام",
   },
   {
     id: "63",
@@ -471,10 +471,17 @@ export default function IslamicRadio() {
 
   const togglePlay = () => {
     setError(null);
+    if (!currentStation && STATIONS.length > 0) {
+      handlePlayStation(STATIONS[0]);
+      return;
+    }
     if (isPlaying) {
       audioRef.current?.pause();
       setIsPlaying(false);
-    } else {
+    } else if (currentStation) {
+      if (!audioRef.current?.src) {
+        if (audioRef.current) audioRef.current.src = currentStation.url;
+      }
       audioRef.current
         ?.play()
         .catch((e) => {

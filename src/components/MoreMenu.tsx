@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe, TrendingUp, Play, Circle, Sun, Settings } from 'lucide-react';
+import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe, TrendingUp, Play, Circle, Sun, Settings, Download } from 'lucide-react';
 import { usePrayerTimes } from '../contexts/PrayerTimesContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -147,6 +147,7 @@ export default function MoreMenu({
       items: [
         { id: 'reels', label: t('quran_reels', 'تلاوات خاشعة'), icon: <Play size={24} />, color: 'bg-purple-600' },
         { id: 'radio', label: t('quran_radio', 'إذاعة القرآن'), icon: <Radio size={24} />, color: 'bg-red-500' },
+        { id: 'downloads', label: t('downloads', 'التنزيلات'), icon: <Download size={24} />, color: 'bg-emerald-600' },
       ]
     },
     {

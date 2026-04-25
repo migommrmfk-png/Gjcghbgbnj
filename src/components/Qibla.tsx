@@ -162,34 +162,44 @@ export default function Qibla() {
             )}
 
             <div className="relative w-72 h-72 flex items-center justify-center">
-              {/* Outer Ring */}
-              <div className="absolute inset-0 rounded-full border-[8px] border-slate-50 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900 border-opacity-70 dark:border-opacity-50"></div>
-              <div className="absolute inset-4 rounded-full border border-slate-100 dark:border-slate-800"></div>
+              {/* Metallic Outer Ring */}
+              <div className="absolute inset-0 rounded-full border-[12px] border-transparent shadow-[0_10px_30px_rgba(0,0,0,0.2),inset_0__4px_10px_rgba(0,0,0,0.1)] bg-gradient-to-br from-slate-200 via-slate-100 to-slate-300 dark:from-slate-700 dark:via-slate-600 dark:to-slate-800" style={{ backgroundOrigin: 'border-box', backgroundClip: 'padding-box, border-box' }}></div>
+              <div className="absolute inset-[10px] rounded-full shadow-[inset_0_4px_15px_rgba(0,0,0,0.4)] bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900"></div>
               
-              {/* Degree Marks */}
-              {[...Array(72)].map((_, i) => (
-                <div 
-                  key={i}
-                  className={`absolute rounded-full w-0.5 ${i % 6 === 0 ? 'h-3 bg-emerald-500' : 'h-1.5 bg-slate-200 dark:bg-slate-700'}`}
-                  style={{
-                    top: 20,
-                    transformOrigin: '50% 124px', // 144 (half w-72) - 20 = 124
-                    transform: `rotate(${i * 5}deg)`
-                  }}
-                ></div>
-              ))}
-
+              {/* Internal Glass Shadow */}
+              <div className="absolute inset-[12px] rounded-full shadow-[inset_0_0_20px_rgba(0,0,0,0.2)] pointer-events-none z-30"></div>
+              <div className="absolute top-[12px] left-[12px] right-[12px] h-[120px] bg-gradient-to-b from-white/30 to-transparent rounded-t-full pointer-events-none z-30 mix-blend-overlay"></div>
+              
               {/* Compass Dial */}
               <motion.div
-                className="absolute inset-[32px] rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800 overflow-hidden border border-slate-100 dark:border-slate-700"
+                className="absolute inset-[12px] rounded-full flex items-center justify-center bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white via-slate-50 to-slate-200 dark:from-slate-800 dark:via-slate-800 dark:to-slate-900 overflow-hidden"
                 animate={{ rotate: heading ? -heading : 0 }}
                 transition={{ type: "spring", stiffness: 40, damping: 20 }}
               >
                 
-                <div className="absolute top-4 text-emerald-600 dark:text-emerald-500 font-bold text-xl font-serif">N</div>
-                <div className="absolute bottom-4 text-slate-400 font-bold text-lg font-serif">S</div>
-                <div className="absolute right-4 text-slate-400 font-bold text-lg font-serif">E</div>
-                <div className="absolute left-4 text-slate-400 font-bold text-lg font-serif">W</div>
+                {/* Degree Marks */}
+                {[...Array(72)].map((_, i) => (
+                  <div 
+                    key={i}
+                    className={`absolute rounded-full w-0.5 ${i % 6 === 0 ? 'h-3 bg-emerald-600 dark:bg-emerald-500' : 'h-1.5 bg-slate-400 dark:bg-slate-500'}`}
+                    style={{
+                      top: 4,
+                      transformOrigin: '50% 128px', // 132 (half of 264) - 4 = 128
+                      transform: `rotate(${i * 5}deg)`
+                    }}
+                  ></div>
+                ))}
+                
+                {/* Advanced Rose */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
+                  <div className="w-[80%] h-[80%] border-2 border-slate-900 dark:border-white rounded-full"></div>
+                  <div className="w-[60%] h-[60%] border border-slate-900 dark:border-white rounded-full absolute"></div>
+                </div>
+
+                <div className="absolute top-6 text-emerald-600 dark:text-emerald-500 font-bold text-2xl font-serif drop-shadow-sm">N</div>
+                <div className="absolute bottom-6 text-slate-500 dark:text-slate-400 font-bold text-xl font-serif">S</div>
+                <div className="absolute right-6 text-slate-500 dark:text-slate-400 font-bold text-xl font-serif">E</div>
+                <div className="absolute left-6 text-slate-500 dark:text-slate-400 font-bold text-xl font-serif">W</div>
                 
                 {/* Qibla Indicator on Dial */}
                 {qiblaDirection !== null && (
@@ -197,23 +207,25 @@ export default function Qibla() {
                     className="absolute w-full h-full"
                     style={{ transform: `rotate(${qiblaDirection}deg)` }}
                   >
-                     <div className="absolute top-2 left-1/2 -translate-x-1/2 flex flex-col items-center">
-                       <div className="w-10 h-10 bg-[url('https://cdn-icons-png.flaticon.com/512/1000/1000141.png')] bg-contain bg-center bg-no-repeat transition-transform hover:scale-105 opacity-80 mix-blend-multiply dark:mix-blend-normal"></div>
-                       <div className="w-1 h-6 bg-emerald-500 -mt-1 rounded-full"></div>
+                     <div className="absolute top-1 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                       <div className="w-12 h-12 bg-[#1a1a1a] border-2 border-yellow-500 rounded-sm flex items-center justify-center relative shadow-md">
+                         <div className="w-full h-3 border-b-2 border-yellow-500 absolute top-2"></div>
+                       </div>
+                       <div className="w-1.5 h-8 bg-gradient-to-b from-yellow-500 to-transparent -mt-2 rounded-full opacity-80"></div>
                      </div>
                   </div>
                 )}
               </motion.div>
 
               {/* Center Needle */}
-              <div className="absolute z-10 w-4 h-[180px] flex flex-col items-center justify-center pointer-events-none">
-                <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[80px] border-b-rose-500"></div>
-                <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[80px] border-t-slate-700 dark:border-t-slate-300"></div>
+              <div className="absolute z-40 w-6 h-[200px] flex flex-col items-center justify-center pointer-events-none drop-shadow-xl" style={{ filter: "drop-shadow(0 8px 6px rgba(0,0,0,0.4))" }}>
+                <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[90px] border-b-rose-600"></div>
+                <div className="w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[90px] border-t-slate-800 dark:border-t-slate-200"></div>
               </div>
               
                {/* Center Pin */}
-               <div className="absolute z-20 w-6 h-6 bg-white dark:bg-slate-800 border-2 border-emerald-500 rounded-full shadow-sm flex items-center justify-center">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+               <div className="absolute z-50 w-8 h-8 bg-gradient-to-br from-slate-200 to-slate-400 dark:from-slate-600 dark:to-slate-800 border-[3px] border-slate-300 dark:border-slate-500 rounded-full shadow-[0_2px_10px_rgba(0,0,0,0.5)] flex items-center justify-center">
+                  <div className="w-2.5 h-2.5 bg-slate-800 dark:bg-slate-200 rounded-full shadow-inner"></div>
                </div>
             </div>
 

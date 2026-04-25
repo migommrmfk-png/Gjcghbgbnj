@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, Heart, MessageCircle, Send, User, ShieldAlert, Clock, Flame } from 'lucide-react';
+import { ArrowRight, Heart, MessageCircle, Send, User, ShieldAlert, Clock, Flame, Share2 } from 'lucide-react';
 import { db } from '../firebase';
 import { collection, addDoc, query, orderBy, limit, onSnapshot, updateDoc, doc, increment, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
@@ -242,23 +242,38 @@ export default function DuaWall({ onBack }: { onBack: () => void }) {
                   </p>
                   
                   <div className="flex items-center justify-between border-t border-black/5 dark:border-white/5 pt-3">
-                    <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-xs font-bold">
+                    <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-xs font-bold w-1/2">
                       <Heart size={14} className={dua.ameenCount > 0 ? 'text-rose-500 fill-rose-500' : ''} />
-                      <span>{dua.ameenCount} شخص أمّن على الدعاء</span>
+                      <span className="truncate">{dua.ameenCount} شخص أمّن</span>
                     </div>
                     
-                    <button
-                      onClick={() => handleAmeen(dua.id)}
-                      disabled={hasAmeened}
-                      className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
-                        hasAmeened 
-                          ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20' 
-                          : 'bg-black/5 dark:bg-white/5 text-slate-800 dark:text-slate-100 hover:bg-emerald-500/10 hover:text-emerald-500 border border-transparent'
-                      }`}
-                    >
-                      <Heart size={16} className={hasAmeened ? 'fill-rose-500' : ''} />
-                      <span>{hasAmeened ? 'دعوت له' : 'آمين'}</span>
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          if (navigator.share) {
+                            navigator.share({
+                              title: 'شارك الدعاء',
+                              text: `"${dua.text}"\nأمنوا معي على هذا الدعاء! (عبر تطبيق مسلم AI)`,
+                            }).catch(console.error);
+                          }
+                        }}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-bold transition-all bg-black/5 dark:bg-white/5 text-slate-800 dark:text-slate-100 hover:bg-emerald-500/10 hover:text-emerald-500 border border-transparent"
+                      >
+                        <Share2 size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleAmeen(dua.id)}
+                        disabled={hasAmeened}
+                        className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
+                          hasAmeened 
+                            ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20' 
+                            : 'bg-black/5 dark:bg-white/5 text-slate-800 dark:text-slate-100 hover:bg-emerald-500/10 hover:text-emerald-500 border border-transparent'
+                        }`}
+                      >
+                        <Heart size={16} className={hasAmeened ? 'fill-rose-500' : ''} />
+                        <span>{hasAmeened ? 'دعوت له' : 'آمين'}</span>
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               );

@@ -28,7 +28,8 @@ export default function AdhanOverlay({ prayerName, time, onClose }: { prayerName
     return () => {
       clearInterval(timer);
       audio.pause();
-      audio.src = '';
+      audio.removeAttribute('src');
+      audio.load();
     };
   }, []);
 
