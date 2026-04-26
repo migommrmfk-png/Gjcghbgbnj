@@ -57,7 +57,7 @@ const Downloads = lazy(() => import("./components/Downloads"));
 // Loading fallback for Suspense
 const LoadingFallback = () => (
   <div className="flex items-center justify-center h-full min-h-[50vh]">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary)]"></div>
   </div>
 );
 
@@ -74,7 +74,7 @@ function AppContent() {
   }, []);
 
   const { notificationsEnabled, toggleNotifications, setNotificationsEnabled } = usePrayerNotifications(handlePrayerTime);
-  const { user, loading: authLoading } = useAuth();
+  const { user, userData, loading: authLoading } = useAuth();
   const { t, i18n } = useTranslation();
 
   const handleNavigate = (tab: string) => {
@@ -182,6 +182,7 @@ function AppContent() {
     >
       <SupportWelcomeModal />
       <WelcomeModal onEnableNotifications={() => setNotificationsEnabled(true)} />
+      
       <AnimatePresence>
         {adhanData && (
           <AdhanOverlay 
@@ -220,7 +221,7 @@ function AppContent() {
         }}
         onClick={() => {
           if (!isDragging) {
-            setActiveTab("muslim-ai");
+            handleNavigate("muslim-ai");
           }
         }}
         className={`fixed bottom-28 ${isRTL ? 'right-4' : 'left-4'} z-50 flex items-center justify-center w-14 h-14 bg-emerald-500 rounded-[20px] shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing border border-emerald-400`}

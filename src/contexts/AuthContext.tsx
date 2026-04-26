@@ -69,8 +69,24 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
   throw new Error(JSON.stringify(errInfo));
 }
 
+interface UserData {
+  uid: string;
+  email: string | null;
+  isAnonymous: boolean;
+  createdAt: string;
+  role: string;
+  xp: number;
+  level: number;
+  streak: number;
+  badges: string[];
+  plan?: 'free' | 'plus' | 'pro';
+  displayName?: string;
+  photoURL?: string;
+}
+
 interface AuthContextType {
   user: User | null;
+  userData: UserData | null;
   loading: boolean;
   signIn: (email: string, pass: string) => Promise<void>;
   signUp: (email: string, pass: string, name: string) => Promise<void>;
@@ -95,6 +111,7 @@ export function useAuth() {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -114,7 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
           
           if (!userSnap.exists()) {
-            const userData: any = {
+            const newUserData: UserData = {
               uid: currentUser.uid,
               email: currentUser.email || null,
               isAnonymous: currentUser.isAnonymous,
@@ -123,16 +140,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               xp: 0,
               level: 1,
               streak: 0,
-              badges: []
+              badges: [],
+              plan: 'free'
             };
-            if (currentUser.displayName) userData.displayName = currentUser.displayName;
-            if (currentUser.photoURL) userData.photoURL = currentUser.photoURL;
+            if (currentUser.displayName) newUserData.displayName = currentUser.displayName;
+            if (currentUser.photoURL) newUserData.photoURL = currentUser.photoURL;
 
             try {
-              await setDoc(userRef, userData);
+              await setDoc(userRef, newUserData);
+              setUserData(newUserData);
             } catch (e) {
               handleFirestoreError(e, OperationType.CREATE, `users/${currentUser.uid}`);
             }
+          } else {
+            setUserData(userSnap.data() as UserData);
           }
         } catch (error) {
           console.error("Error fetching or creating user profile:", error);
@@ -444,6 +465,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       localStorage.setItem('hasLoggedOut', 'true');
+      setUserData(null);
       await signOut(auth);
     } catch (error) {
       console.error("Error signing out", error);
@@ -453,6 +475,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value = {
     user,
+    userData,
     loading,
     signIn,
     signUp,

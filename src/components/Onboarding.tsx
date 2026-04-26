@@ -146,8 +146,8 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
   }));
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-b from-[#f8fafc] via-[#1a221d] to-[#f8fafc] z-50 flex flex-col items-center justify-between overflow-hidden" dir="rtl">
-      
+    <div className="fixed inset-0 bg-gradient-to-b from-[var(--color-bg)] via-[#1a221d] to-[var(--color-bg)] z-50 overflow-x-hidden overflow-y-auto" dir="rtl">
+      <div className="min-h-[100dvh] flex flex-col items-center justify-between relative">
       {/* Animated Stars Background */}
       {mounted && stars.map((star) => (
         <motion.div
@@ -286,6 +286,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
           )}
         </button>
       </motion.div>
+      </div>
     </div>
   );
 }
