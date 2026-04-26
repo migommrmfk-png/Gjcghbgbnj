@@ -79,7 +79,6 @@ interface UserData {
   level: number;
   streak: number;
   badges: string[];
-  plan?: 'free' | 'plus' | 'pro';
   displayName?: string;
   photoURL?: string;
 }
@@ -140,8 +139,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               xp: 0,
               level: 1,
               streak: 0,
-              badges: [],
-              plan: 'free'
+              badges: []
             };
             if (currentUser.displayName) newUserData.displayName = currentUser.displayName;
             if (currentUser.photoURL) newUserData.photoURL = currentUser.photoURL;
