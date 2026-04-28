@@ -195,14 +195,12 @@ service cloud.firestore {
       // Users can create their own profile. They cannot create an admin profile unless they are already an admin.
       allow create: if isAuthenticated() &&
                        isOwner(userId) &&
-                       isValidUser(request.resource.data) &&
                        uidUnchanged() &&
                        (request.resource.data.role == 'user' || isAdmin());
 
       // Users can update their own profile. They cannot change their uid, createdAt, or role.
       allow update: if isAuthenticated() &&
                        isOwner(userId) &&
-                       isValidUser(request.resource.data) &&
                        uidNotModified() &&
                        areImmutableFieldsUnchanged(['uid', 'createdAt']) &&
                        (request.resource.data.role == resource.data.role || isAdmin());
