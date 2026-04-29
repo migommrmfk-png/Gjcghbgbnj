@@ -63,7 +63,7 @@ const PulseRing = ({ delay, size }: { delay: number; size: number }) => (
 // ═══════════════════════════════════════════
 // النجوم المتساقطة
 // ═══════════════════════════════════════════
-const FallingStar = ({ x, delay }: { x: number; delay: number }) => (
+const FallingStar = ({ x, delay }: { key?: number | string; x: number; delay: number }) => (
   <motion.div
     className="absolute w-0.5 rounded-full pointer-events-none"
     style={{ left: `${x}%`, top: -10, background: 'linear-gradient(to bottom, rgba(251,191,36,0.8), transparent)' }}
@@ -239,7 +239,7 @@ export default function AdhanOverlay({
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40" />
 
         {/* نجوم متساقطة */}
-        {fallingStars.map((s, i) => <FallingStar key={i} {...s} />)}
+        {fallingStars.map((s, i) => <FallingStar key={i} x={s.x} delay={s.delay} />)}
       </div>
 
       {/* ── زر الإغلاق ── */}

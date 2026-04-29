@@ -225,6 +225,14 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
 
       {/* Chat Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 p-3 rounded-2xl mb-6 flex items-start gap-3">
+          <span className="text-xl">⚠️</span>
+          <p className="text-xs text-yellow-800 dark:text-yellow-200 font-medium leading-relaxed">
+            <strong className="block mb-1">تنبيه هام:</strong>
+            الإجابات هنا يتم توليدها بواسطة الذكاء الاصطناعي. رغم حرصنا على دقتها، يرجى عرض الفتاوى والتفسيرات وأحكام التجويد المعقدة على العلماء والمختصين للتأكد.
+          </p>
+        </div>
+
         {messages.length === 1 && (
           <div className="flex flex-wrap gap-2 justify-center mb-6">
             <button

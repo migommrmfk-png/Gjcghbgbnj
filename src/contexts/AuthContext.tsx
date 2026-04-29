@@ -81,6 +81,9 @@ interface UserData {
   badges: string[];
   displayName?: string;
   photoURL?: string;
+  plan?: 'free' | 'plus' | 'pro';
+  licenseKey?: string;
+  licenseDevice?: string;
 }
 
 interface AuthContextType {
@@ -99,6 +102,15 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
+
+export function getDeviceId() {
+  let deviceId = localStorage.getItem('device_id');
+  if (!deviceId) {
+    deviceId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    localStorage.setItem('device_id', deviceId);
+  }
+  return deviceId;
+}
 
 export function useAuth() {
   const context = useContext(AuthContext);
@@ -151,7 +163,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               handleFirestoreError(e, OperationType.CREATE, `users/${currentUser.uid}`);
             }
           } else {
-            setUserData(userSnap.data() as UserData);
+            const data = userSnap.data() as UserData;
+            // Device ID check to prevent account sharing
+            const currentDeviceId = getDeviceId();
+            if (data.plan && data.plan !== 'free' && data.licenseDevice && data.licenseDevice !== currentDeviceId) {
+              // The plan was activated on another device. Treat this device as free.
+              // Note: We don't overwrite the Firestore document so the original device keeps its access,
+              // we just set the local state to free to force this device to buy its own key or use a new account.
+              setUserData({ ...data, plan: 'free', licenseKey: undefined });
+            } else {
+              setUserData(data);
+            }
           }
         } catch (error) {
           console.error("Error fetching or creating user profile:", error);

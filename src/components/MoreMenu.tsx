@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe, TrendingUp, Play, Circle, Sun, Settings, Download, Crown } from 'lucide-react';
+import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe, TrendingUp, Play, Circle, Sun, Settings, Download, Crown, Award } from 'lucide-react';
 import { usePrayerTimes } from '../contexts/PrayerTimesContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -137,6 +137,7 @@ export default function MoreMenu({
         { id: 'smart-plan', label: t('smart_plan', 'الخطة الذكية'), icon: <Target size={24} />, color: 'bg-emerald-600' },
         { id: 'worship-tracker', label: t('worship_tracker', 'متابعة العبادات'), icon: <Trophy size={24} />, color: 'bg-amber-500' },
         { id: 'quran-plan', label: t('quran_plan', 'خطة القرآن'), icon: <BookOpen size={24} />, color: 'bg-emerald-500' },
+        { id: 'quiz', label: t('islamic_quiz', 'اختبر معلوماتك'), icon: <Award size={24} />, color: 'bg-indigo-600' },
         { id: 'social', label: t('social_and_challenges', 'المجتمع والتحديات'), icon: <Users size={24} />, color: 'bg-rose-500' },
         { id: 'games', label: t('games_and_challenges', 'ألعاب وتحديات'), icon: <Puzzle size={24} />, color: 'bg-teal-500' },
       ]
@@ -154,6 +155,8 @@ export default function MoreMenu({
       title: t('settings', 'إعدادات'),
       image: 'https://i.pinimg.com/736x/d4/ec/c9/d4ecc94676a666d6911d5167e424458d.jpg',
       items: [
+        { id: 'subscription', label: t('subscriptions', 'الباقات والترقية'), icon: <Crown size={24} />, color: 'bg-amber-500' },
+        { id: 'admin', label: 'إدارة التراخيص', icon: <Shield size={24} />, color: 'bg-indigo-600' },
         { id: 'theme', label: theme === 'dark' ? t('light_mode', 'الوضع النهاري') : t('dark_mode', 'الوضع الليلي'), icon: theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />, color: 'bg-slate-700' },
         { id: 'prayer-settings', label: t('prayer_settings', 'إعدادات الصلاة'), icon: <Settings size={24} />, color: 'bg-emerald-600' },
         { id: 'notifications', label: notificationsEnabled ? t('disable_notifications', 'إيقاف الإشعارات') : t('enable_notifications', 'تفعيل الإشعارات'), icon: notificationsEnabled ? <BellOff size={24} /> : <Bell size={24} />, color: notificationsEnabled ? 'bg-gray-500' : 'bg-yellow-500' },

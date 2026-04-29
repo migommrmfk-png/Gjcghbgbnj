@@ -645,6 +645,33 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         </button>
       </motion.div>
       
+      {/* Last Read Quran Shortcut */}
+      {lastReadQuran && (
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.15 }}
+          className="bg-white dark:bg-slate-900 rounded-[24px] p-4 border border-slate-100 dark:border-slate-800 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.05)] flex items-center justify-between cursor-pointer hover:shadow-lg transition-all"
+          onClick={() => {
+            // Passing the value to App.tsx via onNavigate isn't enough, we might need a custom event or query string, 
+            // but for simplicity let's rely on Dashboard simply navigating to "quran".
+            // The QuranScreen can read localStorage.
+            onNavigate("quran");
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 rounded-[16px] flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+              <BookOpen size={24} />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-500">{t('last_read_surah', 'آخر سورة قرأتها')}</p>
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 font-serif">{lastReadQuran.surahName}</h3>
+            </div>
+          </div>
+          <button className="bg-emerald-600 text-white px-4 py-2 rounded-full text-xs font-bold shadow-sm">{t('continue_reading', 'متابعة')}</button>
+        </motion.div>
+      )}
+
       {/* Main Bento Grid */}
       <div className="bento-grid">
         {/* Prayer Times Bento */}

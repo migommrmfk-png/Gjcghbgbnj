@@ -747,6 +747,29 @@ export default function Quran() {
         </div>
       </motion.div>
 
+      {/* Last Read Quick Access */}
+      {lastRead && (
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[24px] p-5 flex items-center justify-between cursor-pointer shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] hover:shadow-lg hover:-translate-y-1 transition-all"
+          onClick={() => fetchSurah(lastRead.surahNumber, lastRead.surahName, lastRead.ayahNumber)}
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+              <BookmarkCheck size={24} />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">متابعة القراءة</p>
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 font-serif">{lastRead.surahName} {lastRead.ayahNumber ? `(آية ${lastRead.ayahNumber})` : ''}</h3>
+            </div>
+          </div>
+          <button className="bg-emerald-600 text-white p-3 rounded-full hover:bg-emerald-700 transition-colors shadow-sm">
+            <PlayCircle size={20} />
+          </button>
+        </motion.div>
+      )}
+
       {/* Search Bar */}
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}

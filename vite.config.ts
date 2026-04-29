@@ -29,18 +29,19 @@ export default defineConfig(({mode}) => {
           theme_color: '#0A3A2A',
           background_color: '#0A3A2A',
           display: 'standalone',
+          display_override: ['window-controls-overlay', 'standalone', 'minimal-ui'],
           orientation: 'portrait',
           icons: [
             {
-              src: 'https://cdn-icons-png.flaticon.com/512/3602/3602145.png',
+              src: '/icon.svg',
               sizes: '192x192',
-              type: 'image/png',
+              type: 'image/svg+xml',
               purpose: 'any maskable'
             },
             {
-              src: 'https://cdn-icons-png.flaticon.com/512/3602/3602145.png',
+              src: '/icon.svg',
               sizes: '512x512',
-              type: 'image/png',
+              type: 'image/svg+xml',
               purpose: 'any maskable'
             }
           ]

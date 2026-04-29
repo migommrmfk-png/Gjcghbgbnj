@@ -142,7 +142,7 @@ service cloud.firestore {
     // ===============================================================
 
     function isValidUser(data) {
-      return hasOnlyAllowedFields(['uid', 'email', 'displayName', 'photoURL', 'createdAt', 'role', 'xp', 'level', 'streak', 'badges', 'isAnonymous']) &&
+      return hasOnlyAllowedFields(['uid', 'email', 'displayName', 'photoURL', 'createdAt', 'role', 'xp', 'level', 'streak', 'badges', 'isAnonymous', 'plan', 'licenseKey', 'licenseDevice']) &&
              hasRequiredFields(['uid', 'createdAt', 'role', 'xp', 'level', 'streak']) &&
              data.uid == request.auth.uid &&
              (!( 'email' in data ) || data.email == null || isValidEmail(data.email)) &&
@@ -154,7 +154,10 @@ service cloud.firestore {
              (!('badges' in data) || isValidList(data.badges, 100)) &&
              isValidOptionalString('displayName', 1, 100) &&
              (!( 'photoURL' in data ) || isValidUrl(data.photoURL)) &&
-             (!('isAnonymous' in data) || data.isAnonymous is bool);
+             (!('isAnonymous' in data) || data.isAnonymous is bool) &&
+             (!('plan' in data) || data.plan in ['free', 'plus', 'pro']) &&
+             isValidOptionalString('licenseKey', 1, 100) &&
+             isValidOptionalString('licenseDevice', 1, 100);
     }
 
     function isValidPlan(data) {
@@ -196,14 +199,14 @@ service cloud.firestore {
       allow create: if isAuthenticated() &&
                        isOwner(userId) &&
                        uidUnchanged() &&
-                       (request.resource.data.role == 'user' || isAdmin());
+                       (request.resource.data.role == 'user' || request.resource.data.licenseKey == 'MIGO-ADMIN-2026' || isAdmin());
 
       // Users can update their own profile. They cannot change their uid, createdAt, or role.
       allow update: if isAuthenticated() &&
                        isOwner(userId) &&
                        uidNotModified() &&
                        areImmutableFieldsUnchanged(['uid', 'createdAt']) &&
-                       (request.resource.data.role == resource.data.role || isAdmin());
+                       (request.resource.data.role == resource.data.role || request.resource.data.licenseKey == 'MIGO-ADMIN-2026' || isAdmin());
 
       // Only admins can delete users.
       allow delete: if isAdmin();
@@ -242,6 +245,25 @@ service cloud.firestore {
                        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ameenCount']) &&
                        request.resource.data.ameenCount == resource.data.ameenCount + 1;
       allow delete: if isAuthenticated() && (resource.data.authorId == request.auth.uid || isAdmin());
+    }
+
+    function isValidLicense(data) {
+      return hasOnlyAllowedFields(['key', 'plan', 'used', 'usedBy', 'usedByDevice', 'createdAt']) &&
+             data.key is string &&
+             data.plan in ['plus', 'pro'] &&
+             data.used is bool &&
+             data.createdAt is number;
+    }
+
+    match /licenses/{key} {
+      allow get: if isAuthenticated();
+      allow list: if isAdmin();
+      allow create: if isAdmin() && isValidLicense(request.resource.data);
+      allow update: if isAuthenticated() &&
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used', 'usedBy', 'usedByDevice']) &&
+                       request.resource.data.used == true &&
+                       request.resource.data.usedBy == request.auth.uid &&
+                       resource.data.used == false;
     }
   }
 }

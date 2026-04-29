@@ -53,6 +53,11 @@ const DreamInterpretation = lazy(() => import("./components/DreamInterpretation"
 const QuranReels = lazy(() => import("./components/QuranReels"));
 const SelfAccounting = lazy(() => import("./components/SelfAccounting"));
 const Downloads = lazy(() => import("./components/Downloads"));
+const IslamicQuiz = lazy(() => import("./components/IslamicQuiz"));
+const Subscription = lazy(() => import("./components/Subscription"));
+const SubscriptionAdmin = lazy(() => import("./components/SubscriptionAdmin"));
+import InstallPrompt from "./components/InstallPrompt";
+import ChatOverlay from "./components/ChatOverlay";
 
 // Loading fallback for Suspense
 const LoadingFallback = () => (
@@ -162,6 +167,12 @@ function AppContent() {
         return <SelfAccounting onBack={handleBack} />;
       case "downloads":
         return <Downloads onBack={handleBack} />;
+      case "quiz":
+        return <IslamicQuiz onBack={handleBack} />;
+      case "subscription":
+        return <Subscription onBack={handleBack} />;
+      case "admin":
+        return <SubscriptionAdmin onBack={handleBack} />;
       default:
         return <Dashboard onNavigate={handleNavigate} />;
     }
@@ -169,6 +180,13 @@ function AppContent() {
 
   if (showSplash || authLoading) {
     return <Splash onComplete={() => setShowSplash(false)} />;
+  }
+
+  // Force Auth screen if user has no license key and is not an admin
+  const isAuthorized = user && userData && (userData.licenseKey || userData.role === 'admin');
+
+  if (!isAuthorized) {
+    return <Auth />;
   }
 
   if (showOnboarding) {
@@ -180,6 +198,8 @@ function AppContent() {
       className="flex flex-col flex-1 h-full w-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans overflow-hidden relative"
       dir={isRTL ? "rtl" : "ltr"}
     >
+      <InstallPrompt />
+      <ChatOverlay />
       <SupportWelcomeModal />
       <WelcomeModal onEnableNotifications={() => setNotificationsEnabled(true)} />
       
