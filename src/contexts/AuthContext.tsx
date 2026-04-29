@@ -137,8 +137,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           try {
             userSnap = await getDoc(userRef);
           } catch (e) {
-            handleFirestoreError(e, OperationType.GET, `users/${currentUser.uid}`);
-            return;
+            console.warn("Failed to get user data (offline or permission denied):", e);
+            // Fallback user data so the app can load
+            setUserData({
+              uid: currentUser.uid,
+              email: currentUser.email || null,
+              isAnonymous: currentUser.isAnonymous,
+              createdAt: new Date().toISOString(),
+              role: 'user',
+              xp: 0,
+              level: 1,
+              streak: 0,
+              badges: []
+            });
+            return setLoading(false);
           }
           
           if (!userSnap.exists()) {

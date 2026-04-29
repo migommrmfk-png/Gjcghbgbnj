@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Key, AlertCircle, Loader, MessageCircle, Moon, Star } from 'lucide-react';
-import { auth, db } from '../firebase';
-import { signInAnonymously } from 'firebase/auth';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-import { getDeviceId } from '../contexts/AuthContext';
+import { LogIn, User, AlertCircle, Loader, Moon, Star } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 // Floating particle component
 const FloatingParticle = ({ delay, x, y, size }: { key?: number | string; delay: number; x: number; y: number; size: number }) => (
@@ -25,124 +23,42 @@ const FloatingParticle = ({ delay, x, y, size }: { key?: number | string; delay:
   />
 );
 
-// Arabic calligraphy star decoration
-const StarDecoration = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 40 40" className={className} fill="currentColor">
-    <path d="M20 2 L22.5 15 L35 10 L25 20 L35 30 L22.5 25 L20 38 L17.5 25 L5 30 L15 20 L5 10 L17.5 15 Z" />
-  </svg>
-);
-
 export default function Auth({ onBack }: { onBack?: () => void }) {
-  const [accessKey, setAccessKey] = useState('');
+  const { signInWithGoogle, signInAsGuest, error: authError } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const cleanKey = accessKey.trim().toUpperCase();
-    if (!cleanKey) return;
-
+  const handleGoogleLogin = async () => {
     setLoading(true);
     setError('');
-
     try {
-      let currentUser = auth.currentUser;
-      if (!currentUser) {
-        const cred = await signInAnonymously(auth);
-        currentUser = cred.user;
-        // Small delay to let AuthContext potentially create the default user document
-        await new Promise(res => setTimeout(res, 1000));
-      }
-
-      const deviceId = getDeviceId();
-
-      // Master admin backdoor functionality
-      if (cleanKey === 'MIGO-ADMIN-2026') {
-         await setDoc(doc(db, 'users', currentUser.uid), {
-            role: 'admin',
-            plan: 'pro',
-            licenseKey: cleanKey,
-            licenseDevice: deviceId,
-            uid: currentUser.uid,
-            createdAt: Date.now(),
-            xp: 0,
-            level: 1,
-            streak: 0,
-            badges: []
-         }, { merge: true });
-         window.location.reload();
-         return;
-      }
-
-      // Check license key
-      const licenseRef = doc(db, 'licenses', cleanKey);
-      const licenseSnap = await getDoc(licenseRef);
-
-      if (!licenseSnap.exists()) {
-        throw new Error('مفتاح الدخول غير صحيح');
-      }
-
-      const licenseData = licenseSnap.data();
-
-      // Ensure user doc is initialized before updating
-      const userRef = doc(db, 'users', currentUser.uid);
-      const userSnap = await getDoc(userRef);
-      if (!userSnap.exists()) {
-         await setDoc(userRef, {
-            uid: currentUser.uid,
-            createdAt: Date.now(),
-            role: 'user',
-            xp: 0,
-            level: 1,
-            streak: 0,
-            badges: []
-         });
-      }
-
-      if (licenseData.used) {
-        if (licenseData.usedByDevice !== deviceId) {
-            throw new Error('هذا المفتاح مستخدم بالفعل على جهاز آخر');
-        }
-        // Valid recovery on same device
-        await setDoc(userRef, {
-            plan: licenseData.plan,
-            licenseKey: cleanKey,
-            licenseDevice: deviceId
-        }, { merge: true });
-        window.location.reload();
-        return;
-      }
-
-      // New Activation
-      await updateDoc(licenseRef, {
-        used: true,
-        usedBy: currentUser.uid,
-        usedByDevice: deviceId
-      });
-
-      await setDoc(userRef, {
-        plan: licenseData.plan,
-        licenseKey: cleanKey,
-        licenseDevice: deviceId,
-        role: 'user'
-      }, { merge: true });
-
-      window.location.reload();
+      await signInWithGoogle();
+      if (onBack) onBack();
     } catch (err: any) {
       console.error(err);
-      if (err?.code === 'auth/admin-restricted-operation') {
-         setError('خاصية الدخول المجهول (Anonymous) غير مفعلة في قاعدة البيانات (Firebase). يرجى تفعيلها من لوحة تحكم Firebase في قسم Authentication -> Sign-in method.');
-      } else {
-         setError(err.message || 'حدث خطأ. يرجى التأكد من اتصالك بالإنترنت والمحاولة مجدداً.');
-      }
+      setError(err.message || 'حدث خطأ أثناء تسجيل الدخول.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleWhatsApp = () => {
-    const text = encodeURIComponent('السلام عليكم، أحتاج إلى مفتاح دخول للتطبيق.');
-    window.open(`https://wa.me/201062082229?text=${text}`, '_blank');
+  const handleGuestLogin = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      await signInAsGuest();
+      if (onBack) onBack();
+    } catch (err: any) {
+      console.error(err);
+      if (err?.code === 'auth/admin-restricted-operation') {
+         setError('خاصية الدخول المجهول (Anonymous) غير مفعلة في قاعدة البيانات (Firebase). يرجى تفعيلها من لوحة تحكم Firebase في قسم Authentication -> Sign-in method.');
+      } else {
+         setError(err.message || 'حدث خطأ أثناء المتابعة كزائر.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const particles = [
@@ -161,6 +77,18 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
         background: 'linear-gradient(160deg, #0a1628 0%, #0d2137 30%, #0a2818 70%, #061a10 100%)',
       }}
     >
+      {onBack && (
+        <button
+          onClick={onBack}
+           className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+        </button>
+      )}
+
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
           className="absolute rounded-full blur-3xl"
@@ -221,12 +149,12 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
             }}
           >
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'serif' }}>مفتاح الدخول</h2>
-              <p className="text-white/50 text-sm">أدخل مفتاح الترخيص الخاص بك للمتابعة</p>
+              <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'serif' }}>تسجيل الدخول</h2>
+              <p className="text-white/50 text-sm">اختر طريقة الدخول المناسبة لك</p>
             </div>
 
             <AnimatePresence>
-              {error && (
+              {(error || authError) && (
                 <motion.div
                   initial={{ opacity: 0, height: 0, marginBottom: 0 }}
                   animate={{ opacity: 1, height: 'auto', marginBottom: 16 }}
@@ -234,42 +162,32 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
                   className="rounded-xl p-3 flex items-start gap-2 text-sm bg-red-500/10 border border-red-500/20 text-red-300"
                 >
                   <AlertCircle size={16} className="shrink-0 mt-0.5" />
-                  <p>{error}</p>
+                  <p>{error || authError}</p>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <input
-                  type="text"
-                  placeholder="XXXX-XXXX-XXXX"
-                  value={accessKey}
-                  onChange={(e) => setAccessKey(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-center uppercase tracking-widest font-mono text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors placeholder:text-white/20"
-                  dir="ltr"
-                  disabled={loading}
-                />
-              </div>
+            <div className="space-y-4">
+              <button
+                onClick={handleGoogleLogin}
+                disabled={loading}
+                className="w-full py-4 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-3 text-slate-900 pr-5 disabled:opacity-50 relative overflow-hidden"
+                style={{ background: 'white', boxShadow: '0 4px 15px rgba(255,255,255,0.1)' }}
+              >
+                {loading ? <Loader className="animate-spin text-slate-400" size={20} /> : (
+                  <>
+                    <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5 opacity-80 shrink-0" />
+                    <span>المتابعة بحساب جوجل</span>
+                  </>
+                )}
+              </button>
 
               <button
-                type="submit"
-                disabled={loading || !accessKey.trim()}
-                className="w-full py-4 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-2 text-slate-900 disabled:opacity-50"
-                style={{ background: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)', boxShadow: '0 4px 15px rgba(16,185,129,0.3)' }}
+                onClick={handleGuestLogin}
+                disabled={loading}
+                className="w-full py-4 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-2 text-white disabled:opacity-50 border border-white/20 hover:bg-white/5"
               >
-                {loading ? <Loader className="animate-spin" size={20} /> : <><Key size={20} /> تسجيل الدخول</>}
-              </button>
-            </form>
-            
-            <div className="mt-6 pt-6 border-t border-white/10">
-              <p className="text-center text-white/50 text-sm mb-3">ليس لديك مفتاح دخول؟</p>
-              <button
-                onClick={handleWhatsApp}
-                className="w-full py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 bg-[#25D366]/20 hover:bg-[#25D366]/30 border border-[#25D366]/30 transition-colors"
-              >
-                <MessageCircle size={18} />
-                تواصل معنا للحصول عليه
+                {loading ? <Loader className="animate-spin" size={20} /> : <><User size={20} /> الدخول كزائر</>}
               </button>
             </div>
           </div>

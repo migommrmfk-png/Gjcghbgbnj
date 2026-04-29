@@ -182,13 +182,6 @@ function AppContent() {
     return <Splash onComplete={() => setShowSplash(false)} />;
   }
 
-  // Force Auth screen if user has no license key and is not an admin
-  const isAuthorized = user && userData && (userData.licenseKey || userData.role === 'admin');
-
-  if (!isAuthorized) {
-    return <Auth />;
-  }
-
   if (showOnboarding) {
     return <Onboarding onComplete={handleOnboardingComplete} />;
   }
