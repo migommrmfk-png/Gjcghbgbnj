@@ -29,7 +29,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
 
   const steps = [
     {
-      title: 'مرحبًا بك في "هذا ديني"',
+      title: 'مرحبًا بك في "اليقين"',
       desc: "تطبيق إسلامي شامل يساعدك على تنظيم عبادتك اليومية بسهولة.",
       icon: (
         <div className="relative w-48 h-48 flex items-center justify-center">
@@ -120,7 +120,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
     },
     {
       title: "جاهز للبدء؟",
-      desc: "اجعل تطبيق \"هذا ديني\" رفيقك اليومي للقرآن والأذكار.",
+      desc: "اجعل تطبيق \"اليقين\" رفيقك اليومي للقرآن والأذكار.",
       icon: (
         <div className="relative w-48 h-48 flex items-center justify-center">
           <div className="absolute inset-0 bg-emerald-500/30 rounded-full blur-3xl animate-pulse"></div>
@@ -198,7 +198,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
           <Moon size={28} className="text-white fill-white" />
         </div>
         <h1 className="text-3xl font-bold font-serif text-white mb-2 tracking-wide drop-shadow-md">
-          هذا ديني
+          اليقين
         </h1>
       </motion.div>
 

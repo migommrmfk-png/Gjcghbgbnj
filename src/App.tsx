@@ -186,6 +186,10 @@ function AppContent() {
     return <Onboarding onComplete={handleOnboardingComplete} />;
   }
 
+  if (!user) {
+    return <Auth />;
+  }
+
   return (
     <div
       className="flex flex-col flex-1 h-full w-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans overflow-hidden relative"
@@ -251,7 +255,7 @@ function AppContent() {
         <div className="flex justify-around items-center h-full max-w-md mx-auto px-4">
           <NavItem
             icon={<Home />}
-            label={t('app_name') === "هذا ديني" ? "الرئيسية" : "Home"}
+            label={t('app_name') === "اليقين" ? "الرئيسية" : "Home"}
             isActive={activeTab === "home"}
             onClick={() => handleNavigate("home")}
           />

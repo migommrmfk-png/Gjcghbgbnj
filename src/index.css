@@ -5,18 +5,18 @@
 
 @layer base {
   :root {
-    --theme-primary: #2A9D8F;
-    --theme-primary-dark: #1F7A6F;
-    --theme-primary-light: #8cb87c;
-    --theme-gold: #D4AF37;
-    --theme-gold-dark: #B5952F;
-    --theme-gold-light: #F4D068;
+    --theme-primary: #1B5E4F; /* Deep Emerald */
+    --theme-primary-dark: #124538;
+    --theme-primary-light: #2c8c77;
+    --theme-gold: #DDA76A; /* Soft Gold */
+    --theme-gold-dark: #C68E4C;
+    --theme-gold-light: #F2C994;
     --theme-accent: #E9C46A;
 
-    --color-bg: #f8fafc;
+    --color-bg: #FAFAF9; /* Warmer background */
     --color-surface: #ffffff;
-    --color-text: #0f172a;
-    --color-text-muted: #64748b;
+    --color-text: #1C1917;
+    --color-text-muted: #78716C;
     --color-primary: var(--theme-primary);
     --color-primary-dark: var(--theme-primary-dark);
     --color-primary-light: var(--theme-primary-light);
@@ -30,18 +30,18 @@
   }
 
   .dark {
-    --theme-primary: #2A9D8F;
-    --theme-primary-dark: #185c54;
+    --theme-primary: #2c8c77;
+    --theme-primary-dark: #1B5E4F;
     --theme-primary-light: #4AC4B4;
-    --theme-gold: #D4AF37;
-    --theme-gold-dark: #B5952F;
-    --theme-gold-light: #F4D068;
+    --theme-gold: #DDA76A;
+    --theme-gold-dark: #C68E4C;
+    --theme-gold-light: #F2C994;
     --theme-accent: #E9C46A;
 
-    --color-bg: #0f172a;
-    --color-surface: #1e293b;
-    --color-text: #f8fafc;
-    --color-text-muted: #94a3b8;
+    --color-bg: #0C0A09; /* Deeper background for dark mode */
+    --color-surface: #1C1917;
+    --color-text: #FAFAF9;
+    --color-text-muted: #A8A29E;
     --color-primary: var(--theme-primary);
     --color-primary-dark: var(--theme-primary-dark);
     --color-primary-light: var(--theme-primary-light);

@@ -69,7 +69,7 @@ export default function WelcomeModal({ onEnableNotifications }: WelcomeModalProp
               </div>
               
               <h2 className="text-2xl font-bold text-emerald-600 font-serif mb-2">
-                مرحباً بك في هذا ديني
+                مرحباً بك في اليقين
               </h2>
               
               <p className="text-gray-600 leading-relaxed mb-6 font-sans">

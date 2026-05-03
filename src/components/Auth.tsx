@@ -24,10 +24,55 @@ const FloatingParticle = ({ delay, x, y, size }: { key?: number | string; delay:
 );
 
 export default function Auth({ onBack }: { onBack?: () => void }) {
-  const { signInWithGoogle, signInAsGuest, error: authError } = useAuth();
+  const { signInWithGoogle, signInWithGithub, signInAsGuest, signIn, signUp, error: authError } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const { t } = useTranslation();
+
+  const handleEmailAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setError('يرجى إدخال البريد الإلكتروني وكلمة المرور');
+      return;
+    }
+    if (isSignUp && !name) {
+      setError('يرجى إدخال الاسم');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      if (isSignUp) {
+        await signUp(email, password, name);
+      } else {
+        await signIn(email, password);
+      }
+      if (onBack) onBack();
+    } catch (err: any) {
+      console.error(err);
+      if (err?.message?.includes('provider is not enabled') || err?.error_code === 'validation_failed') {
+        setError('تسجيل الدخول بالبريد الإلكتروني غير مفعل. يرجى تفعيله من لوحة تحكم Supabase في قسم Authentication -> Providers -> Email.');
+      } else if (err?.message?.includes('Email signups are disabled')) {
+        setError('إنشاء حسابات جديدة بالبريد الإلكتروني معطل حالياً.');
+      } else if (err?.message?.includes('Invalid login credentials')) {
+        setError('بيانات الدخول غير صحيحة. يرجى التأكد من البريد الإلكتروني وكلمة المرور.');
+      } else if (err?.message?.includes('captcha_token')) {
+        setError('تم تفعيل حماية Captcha في Supabase. يرجى إيقافها من Authentication -> Security Protection أو إعداد Captcha.');
+      } else if (err?.message?.includes('User already registered') || err?.message?.includes('already registered')) {
+        setError('هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول بدلاً من ذلك.');
+      } else {
+        setError(err.message || 'حدث خطأ. يرجى المحاولة مرة أخرى.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleGoogleLogin = async () => {
     setLoading(true);
@@ -37,7 +82,29 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
       if (onBack) onBack();
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'حدث خطأ أثناء تسجيل الدخول.');
+      if (err?.message?.includes('provider is not enabled') || err?.error_code === 'validation_failed') {
+        setError('تسجيل الدخول باستخدام جوجل غير مفعل. يرجى تفعيله من لوحة تحكم Supabase في قسم Authentication -> Providers.');
+      } else {
+        setError(err.message || 'حدث خطأ أثناء تسجيل الدخول.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGithubLogin = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      await signInWithGithub();
+      if (onBack) onBack();
+    } catch (err: any) {
+      console.error(err);
+      if (err?.message?.includes('provider is not enabled') || err?.error_code === 'validation_failed') {
+        setError('تسجيل الدخول باستخدام GitHub غير مفعل. يرجى تفعيله من لوحة تحكم Supabase في قسم Authentication -> Providers.');
+      } else {
+        setError(err.message || 'حدث خطأ أثناء تسجيل الدخول.');
+      }
     } finally {
       setLoading(false);
     }
@@ -51,8 +118,8 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
       if (onBack) onBack();
     } catch (err: any) {
       console.error(err);
-      if (err?.code === 'auth/admin-restricted-operation') {
-         setError('خاصية الدخول المجهول (Anonymous) غير مفعلة في قاعدة البيانات (Firebase). يرجى تفعيلها من لوحة تحكم Firebase في قسم Authentication -> Sign-in method.');
+      if (err?.message?.includes('Anonymous Sign-ins are disabled') || err?.message?.includes('provider is not enabled') || err?.error_code === 'validation_failed') {
+         setError('خاصية الدخول كزائر غير مفعلة. يرجى تفعيلها من لوحة تحكم Supabase في قسم Authentication -> Providers -> Anonymous.');
       } else {
          setError(err.message || 'حدث خطأ أثناء المتابعة كزائر.');
       }
@@ -130,7 +197,7 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
             </div>
           </div>
           <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Georgia, serif', textShadow: '0 0 30px rgba(16,185,129,0.4)' }}>
-            مسلم
+            اليقين
           </h1>
           <p className="text-emerald-400/60 text-sm">التطبيق الإسلامي الشامل</p>
         </motion.div>
@@ -149,9 +216,62 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
             }}
           >
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'serif' }}>تسجيل الدخول</h2>
-              <p className="text-white/50 text-sm">اختر طريقة الدخول المناسبة لك</p>
+              <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'serif' }}>
+                {isSignUp ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
+              </h2>
+              <p className="text-white/50 text-sm">
+                {isSignUp ? 'قم بإنشاء حساب للوصول لجميع الميزات' : 'اختر طريقة الدخول المناسبة لك'}
+              </p>
             </div>
+
+            <form onSubmit={handleEmailAuth} className="space-y-4 mb-4">
+              {isSignUp && (
+                <div>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="الاسم"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors placeholder:text-white/30"
+                    disabled={loading}
+                    dir="auto"
+                  />
+                </div>
+              )}
+              <div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="البريد الإلكتروني"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors placeholder:text-white/30"
+                  disabled={loading}
+                  dir="ltr"
+                />
+              </div>
+              <div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="كلمة المرور"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors placeholder:text-white/30"
+                  disabled={loading}
+                  dir="ltr"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={loading || !email || !password || (isSignUp && !name)}
+                className="w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-2 text-white disabled:opacity-50"
+                style={{
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  boxShadow: '0 4px 15px rgba(16,185,129,0.2)',
+                }}
+              >
+                {loading ? <Loader className="animate-spin" size={20} /> : (isSignUp ? 'إنشاء حساب' : 'دخول')}
+              </button>
+            </form>
 
             <AnimatePresence>
               {(error || authError) && (
@@ -167,11 +287,17 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
               )}
             </AnimatePresence>
 
+            <div className="flex items-center gap-4 my-6">
+              <div className="flex-1 h-px bg-white/10"></div>
+              <span className="text-white/30 text-sm">أو</span>
+              <div className="flex-1 h-px bg-white/10"></div>
+            </div>
+
             <div className="space-y-4">
               <button
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="w-full py-4 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-3 text-slate-900 pr-5 disabled:opacity-50 relative overflow-hidden"
+                className="w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-3 text-slate-900 pr-5 disabled:opacity-50 relative overflow-hidden"
                 style={{ background: 'white', boxShadow: '0 4px 15px rgba(255,255,255,0.1)' }}
               >
                 {loading ? <Loader className="animate-spin text-slate-400" size={20} /> : (
@@ -183,11 +309,38 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
               </button>
 
               <button
+                onClick={handleGithubLogin}
+                disabled={loading}
+                className="w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-3 text-white disabled:opacity-50 relative overflow-hidden"
+                style={{ background: '#24292e', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}
+              >
+                {loading ? <Loader className="animate-spin text-slate-400" size={20} /> : (
+                  <>
+                    <img src="https://github.githubassets.com/favicons/favicon.svg" alt="GitHub" className="w-5 h-5 opacity-80 shrink-0 invert" />
+                    <span>المتابعة بحساب جيت هاب</span>
+                  </>
+                )}
+              </button>
+
+              <button
                 onClick={handleGuestLogin}
                 disabled={loading}
-                className="w-full py-4 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-2 text-white disabled:opacity-50 border border-white/20 hover:bg-white/5"
+                className="w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-2 text-white disabled:opacity-50 border border-white/20 hover:bg-white/5"
               >
                 {loading ? <Loader className="animate-spin" size={20} /> : <><User size={20} /> الدخول كزائر</>}
+              </button>
+            </div>
+
+            <div className="mt-6 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setError('');
+                }}
+                className="text-emerald-400 text-sm hover:text-emerald-300 hover:underline transition-colors block w-full"
+              >
+                {isSignUp ? 'لديك حساب بالفعل؟ قم بتسجيل الدخول' : 'ليس لديك حساب؟ قم بإنشاء حساب جديد'}
               </button>
             </div>
           </div>

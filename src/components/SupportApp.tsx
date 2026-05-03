@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Heart, Copy, Phone, CheckCircle, Share2, ArrowRight, Gift, HandHeart } from 'lucide-react';
 
 const THANK_YOU_MESSAGES = [
-  "جزاك الله خيرًا على دعمك لتطبيق \"هذا ديني\". دعمك يساعدنا على الاستمرار في تطوير التطبيق.",
+  "جزاك الله خيرًا على دعمك لتطبيق \"اليقين\". دعمك يساعدنا على الاستمرار في تطوير التطبيق.",
   "شكراً لك، بدعمك نستطيع إضافة ميزات جديدة لخدمة المسلمين حول العالم.",
   "نسأل الله أن يجعل دعمك هذا في ميزان حسناتك."
 ];
@@ -51,8 +51,8 @@ export default function SupportApp({ onBack }: { onBack?: () => void }) {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'تطبيق هذا ديني',
-          text: 'ساهم في نشر الخير بدعم تطبيق "هذا ديني". تطبيق إسلامي شامل خالي من الإعلانات المزعجة.',
+          title: 'تطبيق اليقين',
+          text: 'ساهم في نشر الخير بدعم تطبيق "اليقين". تطبيق إسلامي شامل خالي من الإعلانات المزعجة.',
           url: window.location.href,
         });
       } catch (error) {
@@ -98,7 +98,7 @@ export default function SupportApp({ onBack }: { onBack?: () => void }) {
               <HandHeart size={40} className="text-amber-400" />
             </div>
             <h2 className="text-2xl font-bold font-serif mb-3 text-amber-400">
-              ادعم تطبيق "هذا ديني"
+              ادعم تطبيق "اليقين"
             </h2>
             <p className="text-slate-800 dark:text-slate-100/90 text-sm leading-relaxed font-medium">
               هذا التطبيق صُمم لخدمة المسلمين ومساعدتهم في حياتهم اليومية من خلال القرآن الكريم والأذكار ومواقيت الصلاة.

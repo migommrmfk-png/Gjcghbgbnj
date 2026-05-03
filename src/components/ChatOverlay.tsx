@@ -50,7 +50,7 @@ export default function ChatOverlay() {
 
     const newMsg: ChatMessage = {
       id: Date.now().toString(),
-      senderId: user.uid,
+      senderId: user.id,
       senderName: user.displayName || 'مستخدم',
       text: input.trim(),
       timestamp: Date.now()

@@ -121,7 +121,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     if (user && streakUpdated) {
       const syncStreak = async () => {
         try {
-          const userRef = doc(db, 'users', user.uid);
+          const userRef = doc(db, 'users', user.id);
           const userSnap = await getDoc(userRef);
           if (userSnap.exists()) {
             const data = userSnap.data();
@@ -129,8 +129,10 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
               await updateDoc(userRef, { streak: currentStreak });
             }
           }
-        } catch (err) {
-          console.error("Error syncing streak:", err);
+        } catch (err: any) {
+          if (!err?.message?.includes('offline')) {
+            console.error("Error syncing streak:", err);
+          }
         }
       };
       syncStreak();
@@ -138,7 +140,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       // Just fetch it to make sure it matches
       const fetchStreak = async () => {
         try {
-          const userRef = doc(db, 'users', user.uid);
+          const userRef = doc(db, 'users', user.id);
           const userSnap = await getDoc(userRef);
           if (userSnap.exists()) {
             const data = userSnap.data();
@@ -147,8 +149,10 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
               localStorage.setItem('appStreak', data.streak.toString());
             }
           }
-        } catch (err) {
-          console.error("Error fetching streak:", err);
+        } catch (err: any) {
+          if (!err?.message?.includes('offline')) {
+            console.error("Error fetching streak:", err);
+          }
         }
       };
       fetchStreak();

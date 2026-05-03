@@ -48,7 +48,7 @@ export default function SupportWelcomeModal() {
             
             <h2 className="text-2xl font-bold font-serif mb-3 text-slate-800 dark:text-slate-100 flex items-center gap-2">
               <Sparkles size={20} className="text-rose-500" />
-              ادعم تطبيق هذا ديني
+              ادعم تطبيق اليقين
             </h2>
             
             <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-8">

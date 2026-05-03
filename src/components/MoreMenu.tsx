@@ -17,10 +17,11 @@ export default function MoreMenu({
 }) {
   const [showToast, setShowToast] = useState(false);
   const { autoAdhanEnabled, setAutoAdhanEnabled, calculationMethod, setCalculationMethod, asrMethod, setAsrMethod } = usePrayerTimes();
-  const { user, logout, linkWithGoogle } = useAuth();
+  const { user, logout, linkWithGoogle, linkWithGithub } = useAuth();
   const { t, i18n } = useTranslation();
   const { theme, setTheme } = useTheme();
   const [linking, setLinking] = useState(false);
+  const [linkMethod, setLinkMethod] = useState<'google' | 'github'>('google');
 
   const [showLangModal, setShowLangModal] = useState(false);
   const [showPrayerSettingsModal, setShowPrayerSettingsModal] = useState(false);
@@ -57,6 +58,30 @@ export default function MoreMenu({
     }
   };
 
+  const handleLinkGoogle = async () => {
+    setLinking(true);
+    setLinkMethod('google');
+    try {
+      await linkWithGoogle();
+    } catch (error) {
+      console.error("Failed to link account", error);
+    } finally {
+      setLinking(false);
+    }
+  };
+
+  const handleLinkGithub = async () => {
+    setLinking(true);
+    setLinkMethod('github');
+    try {
+      await linkWithGithub();
+    } catch (error) {
+      console.error("Failed to link account", error);
+    } finally {
+      setLinking(false);
+    }
+  };
+
   const changeLanguage = (lng: string) => {
     i18n.changeLanguage(lng);
     setShowLangModal(false);
@@ -89,17 +114,6 @@ export default function MoreMenu({
     { id: 0, name: 'شافعي، مالكي، حنبلي (الجمهور)' },
     { id: 1, name: 'حنفي' },
   ];
-
-  const handleLinkGoogle = async () => {
-    setLinking(true);
-    try {
-      await linkWithGoogle();
-    } catch (error) {
-      console.error("Failed to link account", error);
-    } finally {
-      setLinking(false);
-    }
-  };
 
   const categories = [
     {
@@ -196,20 +210,36 @@ export default function MoreMenu({
                 {!user.isAnonymous && <p className="text-emerald-100/90 text-xs font-mono bg-black/10 px-3 py-1 rounded-full">{user.email}</p>}
                 
                 {user.isAnonymous && (
-                  <button
-                    onClick={handleLinkGoogle}
-                    disabled={linking}
-                    className="mt-4 bg-white text-emerald-700 text-sm font-bold py-2 px-5 rounded-full shadow-sm hover:bg-emerald-50 transition-all active:scale-95 flex items-center justify-center gap-2 mx-auto disabled:opacity-70 disabled:scale-100"
-                  >
-                    {linking ? (
-                      <div className="w-5 h-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
-                    ) : (
-                      <>
-                        <Shield size={16} />
-                        <span>اربط حسابك لحفظ تقدمك</span>
-                      </>
-                    )}
-                  </button>
+                  <div className="flex gap-2 mt-4">
+                    <button
+                      onClick={handleLinkGoogle}
+                      disabled={linking}
+                      className="bg-white text-emerald-700 text-sm font-bold py-2 px-4 rounded-full shadow-sm hover:bg-emerald-50 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:scale-100 flex-1"
+                    >
+                      {linking && linkMethod === 'google' ? (
+                        <div className="w-5 h-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <>
+                          <img src="https://www.google.com/favicon.ico" alt="Google" className="w-4 h-4 opacity-80" />
+                          <span>ربط بجوجل</span>
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={handleLinkGithub}
+                      disabled={linking}
+                      className="bg-[#24292e] text-white text-sm font-bold py-2 px-4 rounded-full shadow-sm hover:bg-[#2c3137] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:scale-100 flex-1 border border-white/10"
+                    >
+                      {linking && linkMethod === 'github' ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <>
+                          <img src="https://github.githubassets.com/favicons/favicon.svg" alt="GitHub" className="w-4 h-4 opacity-80 invert" />
+                          <span>ربط بـ Github</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 )}
               </div>
             </div>

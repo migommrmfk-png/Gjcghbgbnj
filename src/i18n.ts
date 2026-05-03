@@ -5,7 +5,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 const resources = {
   ar: {
     translation: {
-      "app_name": "هذا ديني",
+      "app_name": "اليقين",
       "quran": "القرآن",
       "azkar": "الأذكار",
       "tasbeeh": "السبحة",
@@ -65,7 +65,7 @@ const resources = {
   },
   en: {
     translation: {
-      "app_name": "Hatha Deeni",
+      "app_name": "Al-Yaqeen",
       "quran": "Quran",
       "azkar": "Azkar",
       "tasbeeh": "Tasbeeh",
@@ -125,7 +125,7 @@ const resources = {
   },
   fr: {
     translation: {
-      "app_name": "C'est ma religion",
+      "app_name": "Al-Yaqeen",
       "quran": "Coran",
       "azkar": "Azkar",
       "tasbeeh": "Tasbeeh",
@@ -185,7 +185,7 @@ const resources = {
   },
   ur: {
     translation: {
-      "app_name": "یہ میرا دین ہے",
+      "app_name": "الیقین",
       "quran": "قرآن",
       "azkar": "اذکار",
       "tasbeeh": "تسبیح",
@@ -245,7 +245,7 @@ const resources = {
   },
   id: {
     translation: {
-      "app_name": "Ini Agamaku",
+      "app_name": "Al-Yaqeen",
       "quran": "Al-Qur'an",
       "azkar": "Dzikir",
       "tasbeeh": "Tasbih",
@@ -305,7 +305,7 @@ const resources = {
   },
   es: {
     translation: {
-      "app_name": "Esta es mi religión",
+      "app_name": "Al-Yaqeen",
       "quran": "Corán",
       "azkar": "Azkar",
       "tasbeeh": "Tasbih",
@@ -365,7 +365,7 @@ const resources = {
   },
   tr: {
     translation: {
-      "app_name": "Bu Benim Dinim",
+      "app_name": "Al-Yaqeen",
       "quran": "Kuran",
       "azkar": "Zikirler",
       "tasbeeh": "Tesbih",
@@ -425,7 +425,7 @@ const resources = {
   },
   bn: {
     translation: {
-      "app_name": "এটি আমার ধর্ম",
+      "app_name": "আল-ইয়াকিন",
       "quran": "কুরআন",
       "azkar": "জিকির",
       "tasbeeh": "তাসবিহ",

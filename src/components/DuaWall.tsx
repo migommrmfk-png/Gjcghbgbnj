@@ -60,7 +60,7 @@ export default function DuaWall({ onBack }: { onBack: () => void }) {
       await addDoc(collection(db, 'duaWall'), {
         text: newDua.trim(),
         authorName: isAnonymous ? 'فاعل خير' : (user.displayName || 'مستخدم'),
-        authorId: user.uid,
+        authorId: user.id,
         createdAt: serverTimestamp(),
         ameenCount: 0,
         isAnonymous
@@ -68,7 +68,7 @@ export default function DuaWall({ onBack }: { onBack: () => void }) {
       
       // Reward user with XP for posting a dua
       try {
-        const userRef = doc(db, 'users', user.uid);
+        const userRef = doc(db, 'users', user.id);
         await updateDoc(userRef, {
           xp: increment(10)
         });
@@ -101,7 +101,7 @@ export default function DuaWall({ onBack }: { onBack: () => void }) {
       // Reward user with XP for saying Ameen
       if (user) {
         try {
-          const userRef = doc(db, 'users', user.uid);
+          const userRef = doc(db, 'users', user.id);
           await updateDoc(userRef, {
             xp: increment(2)
           });

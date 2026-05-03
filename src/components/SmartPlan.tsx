@@ -47,7 +47,7 @@ export default function SmartPlan() {
   const fetchUserStats = async () => {
     if (!user) return;
     try {
-      const userRef = doc(db, 'users', user.uid);
+      const userRef = doc(db, 'users', user.id);
       const userSnap = await getDoc(userRef);
       if (userSnap.exists()) {
         const data = userSnap.data();
@@ -70,7 +70,7 @@ export default function SmartPlan() {
       const today = new Date().toISOString().split('T')[0];
       const q = query(
         collection(db, 'plans'),
-        where('userId', '==', user.uid),
+        where('userId', '==', user.id),
         where('date', '==', today)
       );
       const querySnapshot = await getDocs(q);
@@ -144,7 +144,7 @@ export default function SmartPlan() {
       }));
 
       const newPlan: DailyPlan = {
-        userId: user.uid,
+        userId: user.id,
         date: today,
         tasks
       };
@@ -195,7 +195,7 @@ export default function SmartPlan() {
   const awardXP = async (amount: number) => {
     if (!user) return;
     try {
-      const userRef = doc(db, 'users', user.uid);
+      const userRef = doc(db, 'users', user.id);
       const userSnap = await getDoc(userRef);
       
       if (userSnap.exists()) {

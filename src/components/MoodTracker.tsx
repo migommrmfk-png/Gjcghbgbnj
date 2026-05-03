@@ -37,7 +37,7 @@ export default function MoodTracker() {
       const today = new Date().toISOString().split('T')[0];
       const q = query(
         collection(db, 'moods'),
-        where('userId', '==', user.uid),
+        where('userId', '==', user.id),
         where('timestamp', '>=', today + 'T00:00:00Z'),
         where('timestamp', '<=', today + 'T23:59:59Z'),
         orderBy('timestamp', 'desc'),
@@ -65,7 +65,7 @@ export default function MoodTracker() {
       // Save to Firestore
       const now = new Date().toISOString();
       await addDoc(collection(db, 'moods'), {
-        userId: user.uid,
+        userId: user.id,
         mood: moodId,
         timestamp: now
       });

@@ -202,7 +202,7 @@ export default function Hadith() {
 
     const shareData = {
       title: "الحديث اليومي",
-      text: `${hadith.text}\n\n${hadith.source}\n\nشرح مبسط:\n${hadith.explanation}\n\nالفوائد المستفادة:\n${hadith.benefits.map(b => `- ${b}`).join('\n')}\n\nعبر تطبيق هذا ديني`,
+      text: `${hadith.text}\n\n${hadith.source}\n\nشرح مبسط:\n${hadith.explanation}\n\nالفوائد المستفادة:\n${hadith.benefits.map(b => `- ${b}`).join('\n')}\n\nعبر تطبيق اليقين`,
     };
 
     try {

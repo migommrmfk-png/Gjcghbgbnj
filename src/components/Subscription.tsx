@@ -1,21 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
-import { ChevronRight, Crown, CheckCircle, Shield, XCircle, Loader, MessageCircle, Send } from 'lucide-react';
+import { ChevronRight, Crown, CheckCircle, Send, MessageCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '../firebase';
 
 export default function Subscription({ onBack }: { onBack: () => void }) {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar' || i18n.language === 'ur';
-  const { user, userData } = useAuth();
+  const { userData } = useAuth();
   
-  const [licenseKey, setLicenseKey] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-
   const currentPlan = userData?.plan || 'free';
 
   const plans = [
@@ -64,52 +57,6 @@ export default function Subscription({ onBack }: { onBack: () => void }) {
       iconColor: 'text-amber-500',
     }
   ];
-
-  const handleActivate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!licenseKey.trim() || !user) return;
-
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
-
-    try {
-      const licenseRef = doc(db, 'licenses', licenseKey.trim());
-      const licenseSnap = await getDoc(licenseRef);
-
-      if (!licenseSnap.exists()) {
-        throw new Error('مفتاح التفعيل غير صحيح');
-      }
-
-      const licenseData = licenseSnap.data();
-
-      if (licenseData.used) {
-        throw new Error('مفتاح التفعيل مستخدم من قبل');
-      }
-
-      const { getDeviceId } = await import('../contexts/AuthContext');
-      const deviceId = getDeviceId();
-
-      await updateDoc(licenseRef, {
-        used: true,
-        usedBy: user.uid,
-        usedByDevice: deviceId
-      });
-
-      await updateDoc(doc(db, 'users', user.uid), {
-        plan: licenseData.plan,
-        licenseKey: licenseKey.trim(),
-        licenseDevice: deviceId
-      });
-
-      setSuccess(`تم تفعيل خطة ${licenseData.plan} بنجاح! الرجاء إعادة تشغيل التطبيق لتفعيل كافة المميزات.`);
-      setLicenseKey('');
-    } catch (err: any) {
-      setError(err.message || 'حدث خطأ أثناء تفعيل المفتاح');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleWhatsApp = () => {
     const text = encodeURIComponent('السلام عليكم، أود الاشتراك في التطبيق. ما هي الخطوات؟');
@@ -177,7 +124,7 @@ export default function Subscription({ onBack }: { onBack: () => void }) {
           ))}
         </div>
 
-        {/* Subscription Instructions */}
+        {/* Subscription Info */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -190,14 +137,14 @@ export default function Subscription({ onBack }: { onBack: () => void }) {
             </div>
             <div>
               <h2 className="font-bold text-slate-800 dark:text-slate-100">كيفية الاشتراك؟</h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">احصل على مفتاح التفعيل الخاص بك</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">فعل عبر الإيميل</p>
             </div>
           </div>
           
           <ol className="list-decimal list-inside space-y-3 text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed mb-6">
             <li>قم بتحويل قيمة الباقة المطلوبة على فودافون كاش أو إنستاباي على الرقم: <span className="font-bold font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded ml-1">01062082229</span></li>
-            <li>أرسل صورة إشعار التحويل (سكرين شوت) عبر الواتساب لنفس الرقم للتحقق.</li>
-            <li>سيتم إرسال <strong className="text-emerald-600 dark:text-emerald-400">مفتاح التفعيل (License Key)</strong> الخاص بك فوراً على الواتساب.</li>
+            <li>أرسل صورة إشعار التحويل مع <strong className="text-emerald-600 dark:text-emerald-400">البريد الإلكتروني</strong> الخاص بحسابك عبر الواتساب.</li>
+            <li>سيتم تفعيل الباقة لحسابك المسجل بهذا البريد الإلكتروني خلال ساعات.</li>
           </ol>
 
           <button
@@ -207,51 +154,6 @@ export default function Subscription({ onBack }: { onBack: () => void }) {
             <MessageCircle size={20} />
             تواصل معنا عبر واتساب
           </button>
-        </motion.div>
-
-        {/* Activation Form */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="bg-white dark:bg-slate-900 rounded-[2rem] p-6 shadow-xl border border-slate-100 dark:border-slate-800 mb-8"
-        >
-          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">إدخال مفتاح التفعيل</h2>
-          <p className="text-sm text-slate-500 mb-4">
-            أدخل المفتاح الذي استلمته لتفعيل الباقة أو الترقية.
-          </p>
-
-          <form onSubmit={handleActivate} className="space-y-4">
-            <div>
-              <input
-                type="text"
-                placeholder="XXXX-XXXX-XXXX"
-                value={licenseKey}
-                onChange={(e) => setLicenseKey(e.target.value)}
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-center uppercase tracking-widest font-mono focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:text-white"
-                dir="ltr"
-              />
-            </div>
-            {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-xl text-sm flex items-start gap-2 font-medium">
-                <XCircle size={18} className="shrink-0 mt-0.5" />
-                <span>{error}</span>
-              </div>
-            )}
-            {success && (
-              <div className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 p-3 rounded-xl text-sm flex items-start gap-2 font-medium">
-                <CheckCircle size={18} className="shrink-0 mt-0.5" />
-                <span>{success}</span>
-              </div>
-            )}
-            <button
-              type="submit"
-              disabled={loading || !licenseKey.trim()}
-              className="w-full bg-slate-800 dark:bg-white dark:text-slate-900 text-white p-4 rounded-xl font-bold shadow-md hover:bg-slate-700 dark:hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {loading ? <Loader className="animate-spin" size={20} /> : 'تفعيل الباقة'}
-            </button>
-          </form>
         </motion.div>
       </div>
     </div>
