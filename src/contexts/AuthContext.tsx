@@ -63,16 +63,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check for OAuth errors in the URL hash
-    const hash = window.location.hash;
-    if (hash && hash.includes('error=')) {
-      const params = new URLSearchParams(hash.substring(1));
-      const errorDesc = params.get('error_description');
+    // Check for OAuth errors in the URL hash or search params
+    const hashParams = new URLSearchParams(window.location.hash.substring(window.location.hash.indexOf('#') + 1));
+    const searchParams = new URLSearchParams(window.location.search);
+    
+    const errorParam = hashParams.get('error') || searchParams.get('error');
+    const errorDesc = hashParams.get('error_description') || searchParams.get('error_description');
+    
+    if (errorParam || errorDesc) {
       if (errorDesc) {
-        setError(decodeURIComponent(errorDesc.replace(/\+/g, ' ')));
-        // Clear the hash to prevent it from showing error forever
-        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+        let desc = decodeURIComponent(errorDesc.replace(/\+/g, ' '));
+        if (desc.includes('Database error saving new user')) {
+          desc = 'هذا البريد الإلكتروني مسجل مسبقاً. يرجى تسجيل الدخول بحسابك القديم (جوجل مثلاً) ثم ربط هذا الحساب من الإعدادات.';
+        }
+        setError(desc);
+      } else {
+        setError(errorParam || 'Authentication failed');
       }
+      window.history.replaceState(null, '', window.location.pathname);
     }
 
     supabase.auth.getSession().then(({ data: { session }, error }) => {

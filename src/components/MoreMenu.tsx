@@ -209,12 +209,12 @@ export default function MoreMenu({
                 </h1>
                 {!user.isAnonymous && <p className="text-emerald-100/90 text-xs font-mono bg-black/10 px-3 py-1 rounded-full">{user.email}</p>}
                 
-                {user.isAnonymous && (
-                  <div className="flex gap-2 mt-4">
+                <div className="flex gap-2 mt-4 flex-wrap justify-center">
+                  {!user.app_metadata?.providers?.includes('google') && (
                     <button
                       onClick={handleLinkGoogle}
                       disabled={linking}
-                      className="bg-white text-emerald-700 text-sm font-bold py-2 px-4 rounded-full shadow-sm hover:bg-emerald-50 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:scale-100 flex-1"
+                      className="bg-white text-emerald-700 text-sm font-bold py-2 px-4 rounded-full shadow-sm hover:bg-emerald-50 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:scale-100 min-w-32"
                     >
                       {linking && linkMethod === 'google' ? (
                         <div className="w-5 h-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
@@ -225,10 +225,12 @@ export default function MoreMenu({
                         </>
                       )}
                     </button>
+                  )}
+                  {!user.app_metadata?.providers?.includes('github') && (
                     <button
                       onClick={handleLinkGithub}
                       disabled={linking}
-                      className="bg-[#24292e] text-white text-sm font-bold py-2 px-4 rounded-full shadow-sm hover:bg-[#2c3137] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:scale-100 flex-1 border border-white/10"
+                      className="bg-[#24292e] text-white text-sm font-bold py-2 px-4 rounded-full shadow-sm hover:bg-[#2c3137] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:scale-100 min-w-32 border border-white/10"
                     >
                       {linking && linkMethod === 'github' ? (
                         <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -239,8 +241,8 @@ export default function MoreMenu({
                         </>
                       )}
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
           ) : (
