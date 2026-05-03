@@ -63,8 +63,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Check for OAuth errors in the URL hash
+    const hash = window.location.hash;
+    if (hash && hash.includes('error=')) {
+      const params = new URLSearchParams(hash.substring(1));
+      const errorDesc = params.get('error_description');
+      if (errorDesc) {
+        setError(decodeURIComponent(errorDesc.replace(/\+/g, ' ')));
+        // Clear the hash to prevent it from showing error forever
+        window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      }
+    }
+
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error("Supabase getSession error:", error);
+        setError(error.message);
+      }
       handleSession(session);
+    }).catch(err => {
+      console.error("Unhandled error in getSession:", err);
+      handleSession(null);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {

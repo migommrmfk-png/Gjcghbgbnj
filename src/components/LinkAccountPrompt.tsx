@@ -16,7 +16,6 @@ export default function LinkAccountPrompt() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const { linkWithGoogle, linkWithGithub, linkWithEmail } = useAuth();
 
   // Only show if user is anonymous and has used the app for a bit (streak >= 2)
   const streak = parseInt(localStorage.getItem('appStreak') || '0', 10);
