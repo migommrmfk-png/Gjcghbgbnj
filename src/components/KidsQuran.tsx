@@ -17,7 +17,7 @@ export default function KidsQuran({ onBack }: { onBack: () => void }) {
   return (
     <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100" dir="rtl">
       {/* Header */}
-      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5">
+      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-md border-b border-black/5 dark:border-white/5">
         <button
           onClick={onBack}
           className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors border border-black/5 dark:border-white/5 bg-white dark:bg-slate-900 shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
@@ -37,7 +37,7 @@ export default function KidsQuran({ onBack }: { onBack: () => void }) {
           animate={{ y: 0, opacity: 1 }}
           className="bg-gradient-to-br from-emerald-600 to-emerald-500 rounded-[2rem] p-6 text-white shadow-[0_15px_40px_rgba(0,0,0,0.6)] relative overflow-hidden border border-emerald-500/30"
         >
-          <div className="absolute left-0 top-0 w-32 h-32 bg-emerald-500/20 rounded-full -ml-10 -mt-10 blur-3xl"></div>
+          <div className="absolute left-0 top-0 w-32 h-32 bg-emerald-500/20 rounded-full -ml-10 -mt-10 "></div>
           <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
           
           <div className="relative z-10 flex items-center justify-between">

@@ -303,7 +303,7 @@ export default function AdhanOverlay({
                 >
                   {/* هالة ضوئية */}
                   <div
-                    className="absolute inset-0 rounded-full blur-2xl"
+                    className="absolute inset-0 rounded-full "
                     style={{ background: 'radial-gradient(circle, rgba(251,191,36,0.4) 0%, transparent 70%)' }}
                   />
                   <MinaretIcon className="w-20 h-40 text-amber-400 drop-shadow-[0_0_20px_rgba(251,191,36,0.6)]" />

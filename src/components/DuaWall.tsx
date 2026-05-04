@@ -156,7 +156,7 @@ export default function DuaWall({ onBack }: { onBack: () => void }) {
 
       {/* Write Dua Form */}
       <div className="mt-6 bg-white dark:bg-slate-900 rounded-[2rem] p-5 shadow-lg border border-black/5 dark:border-white/5 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-10 -mt-10 "></div>
         
         <form onSubmit={handleSubmit} className="relative z-10">
           <textarea

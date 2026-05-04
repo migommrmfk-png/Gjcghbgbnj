@@ -147,7 +147,7 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
       {/* Zikr Display */}
       <div className="px-6 mt-4 z-10">
         <div className="card-3d bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 shadow-xl relative overflow-hidden text-center min-h-[140px] flex items-center justify-center border border-black/5 dark:border-white/5">
-          <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+          <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full -mr-16 -mt-16 "></div>
           
           <button onClick={changeZikr} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-500 transition-colors p-3 bg-white dark:bg-slate-800 rounded-[1rem] shadow-sm border border-slate-100 dark:border-slate-700 hover:-translate-x-1 active:scale-95 z-20">
             <ChevronRight className="rotate-180" size={22} />

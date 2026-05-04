@@ -24,14 +24,37 @@ const FloatingParticle = ({ delay, x, y, size }: { key?: number | string; delay:
 );
 
 export default function Auth({ onBack }: { onBack?: () => void }) {
-  const { signInWithGoogle, signInWithGithub, signInAsGuest, signIn, signUp, error: authError } = useAuth();
+  const { signInAsGuest, signIn, signUp, resetPassword, error: authError } = useAuth();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const { t } = useTranslation();
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      setError('يرجى إدخال البريد الإلكتروني');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      if (resetPassword) {
+         await resetPassword(email);
+         setResetSent(true);
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'حدث خطأ. يرجى المحاولة مرة أخرى.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,61 +72,34 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
 
     try {
       if (isSignUp) {
-        await signUp(email, password, name);
+        const data = await signUp(email, password, name);
+        if (data?.user && !data?.session) {
+          // Email confirmation required
+          setError('');
+          setResetSent(false);
+          alert('تم إنشاء الحساب بنجاح! يرجى التحقق من بريدك الإلكتروني لتفعيل حسابك.');
+          setIsSignUp(false); // switch back to login
+        } else {
+          if (onBack) onBack();
+        }
       } else {
         await signIn(email, password);
+        if (onBack) onBack();
       }
-      if (onBack) onBack();
     } catch (err: any) {
       console.error(err);
       if (err?.message?.includes('provider is not enabled') || err?.error_code === 'validation_failed') {
-        setError('تسجيل الدخول بالبريد الإلكتروني غير مفعل. يرجى تفعيله من لوحة تحكم Supabase في قسم Authentication -> Providers -> Email.');
+        setError('تسجيل الدخول بالبريد الإلكتروني غير مفعل.');
       } else if (err?.message?.includes('Email signups are disabled')) {
         setError('إنشاء حسابات جديدة بالبريد الإلكتروني معطل حالياً.');
       } else if (err?.message?.includes('Invalid login credentials')) {
         setError('بيانات الدخول غير صحيحة. يرجى التأكد من البريد الإلكتروني وكلمة المرور.');
       } else if (err?.message?.includes('captcha_token')) {
-        setError('تم تفعيل حماية Captcha في Supabase. يرجى إيقافها من Authentication -> Security Protection أو إعداد Captcha.');
+        setError('تم تفعيل حماية Captcha.');
       } else if (err?.message?.includes('User already registered') || err?.message?.includes('already registered')) {
         setError('هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول بدلاً من ذلك.');
       } else {
         setError(err.message || 'حدث خطأ. يرجى المحاولة مرة أخرى.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      await signInWithGoogle();
-      if (onBack) onBack();
-    } catch (err: any) {
-      console.error(err);
-      if (err?.message?.includes('provider is not enabled') || err?.error_code === 'validation_failed') {
-        setError('تسجيل الدخول باستخدام جوجل غير مفعل. يرجى تفعيله من لوحة تحكم Supabase في قسم Authentication -> Providers.');
-      } else {
-        setError(err.message || 'حدث خطأ أثناء تسجيل الدخول.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGithubLogin = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      await signInWithGithub();
-      if (onBack) onBack();
-    } catch (err: any) {
-      console.error(err);
-      if (err?.message?.includes('provider is not enabled') || err?.error_code === 'validation_failed') {
-        setError('تسجيل الدخول باستخدام GitHub غير مفعل. يرجى تفعيله من لوحة تحكم Supabase في قسم Authentication -> Providers.');
-      } else {
-        setError(err.message || 'حدث خطأ أثناء تسجيل الدخول.');
       }
     } finally {
       setLoading(false);
@@ -119,7 +115,7 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
     } catch (err: any) {
       console.error(err);
       if (err?.message?.includes('Anonymous Sign-ins are disabled') || err?.message?.includes('provider is not enabled') || err?.error_code === 'validation_failed') {
-         setError('خاصية الدخول كزائر غير مفعلة. يرجى تفعيلها من لوحة تحكم Supabase في قسم Authentication -> Providers -> Anonymous.');
+         setError('خاصية الدخول كزائر غير مفعلة.');
       } else {
          setError(err.message || 'حدث خطأ أثناء المتابعة كزائر.');
       }
@@ -158,7 +154,7 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
 
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
-          className="absolute rounded-full blur-3xl"
+          className="absolute rounded-full "
           style={{ width: 400, height: 400, top: '-100px', right: '-100px', background: 'radial-gradient(circle, rgba(16,185,129,0.15) 0%, transparent 70%)' }}
         />
         <svg className="absolute inset-0 w-full h-full opacity-5" xmlns="http://www.w3.org/2000/svg">
@@ -215,63 +211,138 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
               backdropFilter: 'blur(20px)',
             }}
           >
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'serif' }}>
-                {isSignUp ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
-              </h2>
-              <p className="text-white/50 text-sm">
-                {isSignUp ? 'قم بإنشاء حساب للوصول لجميع الميزات' : 'اختر طريقة الدخول المناسبة لك'}
-              </p>
-            </div>
-
-            <form onSubmit={handleEmailAuth} className="space-y-4 mb-4">
-              {isSignUp && (
-                <div>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="الاسم"
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors placeholder:text-white/30"
-                    disabled={loading}
-                    dir="auto"
-                  />
+            {isForgotPassword ? (
+              <>
+                <div className="text-center mb-6">
+                  <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'serif' }}>
+                    استعادة كلمة المرور
+                  </h2>
+                  <p className="text-white/50 text-sm">
+                    أدخل بريدك الإلكتروني وسنرسل لك رابطاً لإعادة تعيين كلمة المرور.
+                  </p>
                 </div>
-              )}
-              <div>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="البريد الإلكتروني"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors placeholder:text-white/30"
-                  disabled={loading}
-                  dir="ltr"
-                />
-              </div>
-              <div>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="كلمة المرور"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors placeholder:text-white/30"
-                  disabled={loading}
-                  dir="ltr"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={loading || !email || !password || (isSignUp && !name)}
-                className="w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-2 text-white disabled:opacity-50"
-                style={{
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                  boxShadow: '0 4px 15px rgba(16,185,129,0.2)',
-                }}
-              >
-                {loading ? <Loader className="animate-spin" size={20} /> : (isSignUp ? 'إنشاء حساب' : 'دخول')}
-              </button>
-            </form>
+                {resetSent ? (
+                  <div className="text-center bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl mb-6">
+                    <p className="text-emerald-400 font-medium pb-2">تم الإرسال بنجاح!</p>
+                    <p className="text-emerald-400/80 text-sm mb-2">يرجى التحقق من بريدك الإلكتروني.</p>
+                    <p className="text-white/50 text-xs">ملاحظة: إذا لم تجده، تحقق من مجلد الرسائل غير المرغوب فيها (Spam).</p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleResetPassword} className="space-y-4 mb-4">
+                    <div>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="البريد الإلكتروني"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors placeholder:text-white/30"
+                        disabled={loading}
+                        dir="ltr"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={loading || !email}
+                      className="w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-2 text-white disabled:opacity-50"
+                      style={{
+                        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                        boxShadow: '0 4px 15px rgba(16,185,129,0.2)',
+                      }}
+                    >
+                      {loading ? <Loader className="animate-spin" size={20} /> : 'إرسال رابط الاستعادة'}
+                    </button>
+                  </form>
+                )}
+                <div className="mt-4 text-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsForgotPassword(false);
+                      setResetSent(false);
+                      setError('');
+                    }}
+                    className="text-emerald-400 text-sm hover:text-emerald-300 hover:underline transition-colors block w-full"
+                  >
+                    العودة لتسجيل الدخول
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-center mb-6">
+                  <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'serif' }}>
+                    {isSignUp ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
+                  </h2>
+                  <p className="text-white/50 text-sm">
+                    {isSignUp ? 'قم بإنشاء حساب للوصول لجميع الميزات' : 'اختر طريقة الدخول المناسبة لك'}
+                  </p>
+                </div>
+
+                <form onSubmit={handleEmailAuth} className="space-y-4 mb-4">
+                  {isSignUp && (
+                    <div>
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="الاسم"
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors placeholder:text-white/30"
+                        disabled={loading}
+                        dir="auto"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="البريد الإلكتروني"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors placeholder:text-white/30"
+                      disabled={loading}
+                      dir="ltr"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="كلمة المرور"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-colors placeholder:text-white/30"
+                      disabled={loading}
+                      dir="ltr"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={loading || !email || !password || (isSignUp && !name)}
+                    className="w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-2 text-white disabled:opacity-50"
+                    style={{
+                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                      boxShadow: '0 4px 15px rgba(16,185,129,0.2)',
+                    }}
+                  >
+                    {loading ? <Loader className="animate-spin" size={20} /> : (isSignUp ? 'إنشاء حساب' : 'دخول')}
+                  </button>
+                  
+                  {!isSignUp && (
+                    <div className="text-left mt-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsForgotPassword(true);
+                          setError('');
+                        }}
+                        className="text-white/50 text-xs hover:text-white/80 transition-colors"
+                      >
+                        نسيت كلمة المرور؟
+                      </button>
+                    </div>
+                  )}
+                </form>
+              </>
+            )}
 
             <AnimatePresence>
               {(error || authError) && (
@@ -287,62 +358,38 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
               )}
             </AnimatePresence>
 
-            <div className="flex items-center gap-4 my-6">
-              <div className="flex-1 h-px bg-white/10"></div>
-              <span className="text-white/30 text-sm">أو</span>
-              <div className="flex-1 h-px bg-white/10"></div>
-            </div>
+            {!isForgotPassword && (
+              <>
+                <div className="flex items-center gap-4 my-6">
+                  <div className="flex-1 h-px bg-white/10"></div>
+                  <span className="text-white/30 text-sm">أو</span>
+                  <div className="flex-1 h-px bg-white/10"></div>
+                </div>
 
-            <div className="space-y-4">
-              <button
-                onClick={handleGoogleLogin}
-                disabled={loading}
-                className="w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-3 text-slate-900 pr-5 disabled:opacity-50 relative overflow-hidden"
-                style={{ background: 'white', boxShadow: '0 4px 15px rgba(255,255,255,0.1)' }}
-              >
-                {loading ? <Loader className="animate-spin text-slate-400" size={20} /> : (
-                  <>
-                    <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5 opacity-80 shrink-0" />
-                    <span>المتابعة بحساب جوجل</span>
-                  </>
-                )}
-              </button>
+                <div className="space-y-4">
+                  <button
+                    onClick={handleGuestLogin}
+                    disabled={loading}
+                    className="w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-2 text-white disabled:opacity-50 border border-white/20 hover:bg-white/5"
+                  >
+                    {loading ? <Loader className="animate-spin" size={20} /> : <><User size={20} /> الدخول كزائر</>}
+                  </button>
+                </div>
 
-              <button
-                onClick={handleGithubLogin}
-                disabled={loading}
-                className="w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-3 text-white disabled:opacity-50 relative overflow-hidden"
-                style={{ background: '#24292e', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}
-              >
-                {loading ? <Loader className="animate-spin text-slate-400" size={20} /> : (
-                  <>
-                    <img src="https://github.githubassets.com/favicons/favicon.svg" alt="GitHub" className="w-5 h-5 opacity-80 shrink-0 invert" />
-                    <span>المتابعة بحساب جيت هاب</span>
-                  </>
-                )}
-              </button>
-
-              <button
-                onClick={handleGuestLogin}
-                disabled={loading}
-                className="w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-2 text-white disabled:opacity-50 border border-white/20 hover:bg-white/5"
-              >
-                {loading ? <Loader className="animate-spin" size={20} /> : <><User size={20} /> الدخول كزائر</>}
-              </button>
-            </div>
-
-            <div className="mt-6 text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsSignUp(!isSignUp);
-                  setError('');
-                }}
-                className="text-emerald-400 text-sm hover:text-emerald-300 hover:underline transition-colors block w-full"
-              >
-                {isSignUp ? 'لديك حساب بالفعل؟ قم بتسجيل الدخول' : 'ليس لديك حساب؟ قم بإنشاء حساب جديد'}
-              </button>
-            </div>
+                <div className="mt-6 text-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSignUp(!isSignUp);
+                      setError('');
+                    }}
+                    className="text-emerald-400 text-sm hover:text-emerald-300 hover:underline transition-colors block w-full"
+                  >
+                    {isSignUp ? 'لديك حساب بالفعل؟ قم بتسجيل الدخول' : 'ليس لديك حساب؟ قم بإنشاء حساب جديد'}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </motion.div>
 

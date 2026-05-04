@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe, TrendingUp, Play, Circle, Sun, Settings, Download, Crown, Award } from 'lucide-react';
+import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe, TrendingUp, Play, Circle, Sun, Settings, Download, Crown, Award, Activity, Wind, TreePine } from 'lucide-react';
 import { usePrayerTimes } from '../contexts/PrayerTimesContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -121,6 +121,7 @@ export default function MoreMenu({
       image: 'https://i.pinimg.com/736x/87/1b/2f/871b2f81152a51f801a61327111b1511.jpg',
       items: [
         { id: 'muslim-ai', label: t('muslim_ai', 'الذكاء الاصطناعي'), icon: <Bot size={24} />, color: 'bg-indigo-500' },
+        { id: 'kids-quran', label: t('kids_quran', 'مصحف الأطفال'), icon: <Smile size={24} />, color: 'bg-emerald-400' },
         { id: 'dreams', label: t('dream_interpretation', 'تفسير الأحلام'), icon: <Moon size={24} />, color: 'bg-indigo-700' },
         { id: 'stories', label: t('prophet_stories', 'قصص الأنبياء'), icon: <BookOpen size={24} />, color: 'bg-purple-500' },
         { id: 'prayer-guide', label: t('prayer_guide', 'كيفية الصلاة'), icon: <BookOpen size={24} />, color: 'bg-amber-600' },
@@ -133,6 +134,7 @@ export default function MoreMenu({
       title: t('tools_and_seasons', 'أدوات ومواسم'),
       image: 'https://i.pinimg.com/736x/3f/8b/77/3f8b77626915152a54b38d7c49b6b801.jpg',
       items: [
+        { id: 'sakina', label: t('sakina', 'خيمة السكينة'), icon: <Wind size={24} />, color: 'bg-emerald-500' },
         { id: 'tasbeeh', label: t('tasbeeh', 'السبحة الإلكترونية'), icon: <Circle size={24} />, color: 'bg-indigo-500' },
         { id: 'ruqyah', label: t('ruqyah', 'الرقية الشرعية'), icon: <Shield size={24} />, color: 'bg-teal-500' },
         { id: 'qibla', label: t('qibla', 'اتجاه القبلة'), icon: <Compass size={24} />, color: 'bg-orange-500' },
@@ -146,7 +148,10 @@ export default function MoreMenu({
       title: t('community_and_challenges', 'مجتمع وتحديات'),
       image: 'https://i.pinimg.com/736x/60/76/8b/60768b598b049d53c7a36e1c94411d73.jpg',
       items: [
+        { id: 'garden', label: t('muslim_garden', 'بستان العبادات'), icon: <TreePine size={24} />, color: 'bg-emerald-600', isNew: true },
+        { id: 'orbit', label: t('spiritual_orbit', 'فلك العبادات'), icon: <Activity size={24} />, color: 'bg-indigo-900', isNew: true },
         { id: 'dua-wall', label: t('dua_wall', 'حائط الدعاء'), icon: <HandHeart size={24} />, color: 'bg-rose-500' },
+        { id: 'mood-tracker', label: t('mood_tracker', 'تتبع المزاج'), icon: <Smile size={24} />, color: 'bg-indigo-500' },
         { id: 'accounting', label: t('self_accounting', 'ورد المحاسبة'), icon: <TrendingUp size={24} />, color: 'bg-teal-600' },
         { id: 'smart-plan', label: t('smart_plan', 'الخطة الذكية'), icon: <Target size={24} />, color: 'bg-emerald-600' },
         { id: 'worship-tracker', label: t('worship_tracker', 'متابعة العبادات'), icon: <Trophy size={24} />, color: 'bg-amber-500' },
@@ -192,7 +197,7 @@ export default function MoreMenu({
         animate={{ y: 0, opacity: 1 }}
         className="bg-emerald-600 rounded-[2rem] p-8 text-white shadow-[0_8px_32px_-8px_rgba(16,185,129,0.3)] relative overflow-hidden text-center border border-white/10"
       >
-        <div className="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-2xl"></div>
+        <div className="absolute right-0 top-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20"></div>
         <div className="relative z-10 text-center flex flex-col items-center">
           {user ? (
             <div className="flex flex-col items-center gap-3 w-full">

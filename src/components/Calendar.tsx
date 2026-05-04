@@ -116,8 +116,8 @@ export default function HijriCalendar() {
         animate={{ y: 0, opacity: 1 }}
         className="bg-gradient-to-br from-amber-600 via-amber-500 to-orange-500 rounded-[2.5rem] p-8 text-white shadow-[0_15px_30px_-10px_rgba(245,158,11,0.5)] relative overflow-hidden border border-amber-400/30"
       >
-        <div className="absolute right-0 top-0 w-40 h-40 bg-white/20 rounded-full -mr-12 -mt-12 blur-2xl"></div>
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-orange-900/20 rounded-full -ml-10 -mb-10 blur-xl"></div>
+        <div className="absolute right-0 top-0 w-40 h-40 bg-white/20 rounded-full -mr-12 -mt-12 "></div>
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-orange-900/20 rounded-full -ml-10 -mb-10 "></div>
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
         <div className="relative z-10 flex flex-col items-center text-center">
           <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-[16px] flex items-center justify-center mb-4 border border-white/30 shadow-inner">
@@ -254,7 +254,7 @@ export default function HijriCalendar() {
               key={day.hijri.date}
               className="bg-white dark:bg-slate-900 rounded-[20px] p-4 border border-slate-100 dark:border-slate-800 flex items-center gap-4 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] relative overflow-hidden"
             >
-              <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/5 rounded-full -mr-8 -mt-8 blur-lg"></div>
+              <div className="absolute top-0 right-0 w-16 h-16 bg-amber-500/5 rounded-full -mr-8 -mt-8 "></div>
               
               <div className="w-14 h-14 rounded-[16px] bg-amber-50 dark:bg-amber-500/10 flex flex-col items-center justify-center text-amber-500 font-bold border border-amber-100 dark:border-amber-500/20">
                 <span className="text-xl leading-none">

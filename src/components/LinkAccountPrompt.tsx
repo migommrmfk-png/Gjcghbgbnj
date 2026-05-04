@@ -100,7 +100,7 @@ export default function LinkAccountPrompt() {
         exit={{ opacity: 0, scale: 0.95 }}
         className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-4 shadow-lg text-white relative overflow-hidden"
       >
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 "></div>
         
         <button 
           onClick={handleDismiss}

@@ -148,7 +148,7 @@ export default function IslamicLibrary({ onBack }: { onBack: () => void }) {
   return (
     <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-slate-50 dark:bg-slate-950" dir="rtl">
       {/* Header */}
-      <div className="sticky top-0 z-20 py-4 flex flex-col gap-4 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-xl border-b border-black/10 dark:border-white/10">
+      <div className="sticky top-0 z-20 py-4 flex flex-col gap-4 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-md border-b border-black/10 dark:border-white/10">
         <div className="flex items-center gap-4">
           <button
             onClick={onBack}
@@ -286,11 +286,11 @@ export default function IslamicLibrary({ onBack }: { onBack: () => void }) {
                   <div className="relative h-48 bg-black/40 overflow-hidden">
                     <img src={`https://picsum.photos/seed/video${video.id}/800/400`} alt={video.title} className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700" referrerPolicy="no-referrer" />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f0d] via-black/40 to-transparent group-hover:from-black/90 transition-colors flex items-center justify-center">
-                      <div className="w-16 h-16 bg-black/60 backdrop-blur-xl rounded-full flex items-center justify-center text-emerald-400 shadow-[0_5px_15px_rgba(0,0,0,0.5)] transform group-hover:scale-110 transition-all border border-white/20 group-hover:border-emerald-400/50 group-hover:bg-gradient-to-br group-hover:from-emerald-500 group-hover:to-emerald-600 group-hover:text-white group-hover:shadow-[0_0_25px_rgba(212,175,55,0.5)]">
+                      <div className="w-16 h-16 bg-black/60 backdrop- rounded-full flex items-center justify-center text-emerald-400 shadow-[0_5px_15px_rgba(0,0,0,0.5)] transform group-hover:scale-110 transition-all border border-white/20 group-hover:border-emerald-400/50 group-hover:bg-gradient-to-br group-hover:from-emerald-500 group-hover:to-emerald-600 group-hover:text-white group-hover:shadow-[0_0_25px_rgba(212,175,55,0.5)]">
                         <PlayCircle size={36} className="ml-1" />
                       </div>
                     </div>
-                    <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-xl text-white text-xs font-mono px-3 py-1.5 rounded-xl border border-white/20 shadow-inner">
+                    <div className="absolute bottom-4 right-4 bg-black/60 backdrop- text-white text-xs font-mono px-3 py-1.5 rounded-xl border border-white/20 shadow-inner">
                       {video.duration}
                     </div>
                   </div>

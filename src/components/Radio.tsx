@@ -517,8 +517,8 @@ export default function IslamicRadio() {
         animate={{ y: 0, opacity: 1 }}
         className="bg-gradient-to-br from-emerald-600 to-emerald-500 rounded-[2rem] p-8 text-white shadow-2xl relative overflow-hidden text-center border border-white/5"
       >
-        <div className="absolute right-0 top-0 w-40 h-40 bg-emerald-500/20 rounded-full -mr-10 -mt-10 blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/40 rounded-full -ml-10 -mb-10 blur-2xl"></div>
+        <div className="absolute right-0 top-0 w-40 h-40 bg-emerald-500/20 rounded-full -mr-10 -mt-10 "></div>
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/40 rounded-full -ml-10 -mb-10 "></div>
         <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
         <div className="relative z-10">
           <h1 className="text-3xl font-bold font-serif mb-2 flex justify-center items-center gap-3 drop-shadow-[0_0_10px_rgba(212,175,55,0.3)] text-emerald-400">
@@ -682,7 +682,7 @@ export default function IslamicRadio() {
             exit={{ y: 100, opacity: 0 }}
             className="fixed bottom-24 left-0 right-0 max-w-md mx-auto px-4 z-40"
           >
-            <div className="card-3d p-4 bg-white dark:bg-slate-900/90 backdrop-blur-xl border border-emerald-400/20 flex flex-col gap-4 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] rounded-3xl">
+            <div className="card-3d p-4 bg-white dark:bg-slate-900/90 backdrop-blur-md border border-emerald-400/20 flex flex-col gap-4 shadow-[0_-10px_30px_rgba(0,0,0,0.5)] rounded-3xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.4)] animate-pulse shrink-0 border border-emerald-400/50">

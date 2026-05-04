@@ -505,7 +505,7 @@ export default function Quran() {
         </AnimatePresence>
 
         {/* Header */}
-        <div className="sticky top-0 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-sm z-20 px-4 py-3 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
+        <div className="sticky top-0 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md shadow-sm z-20 px-4 py-3 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
           <button
             onClick={() => {
               setSelectedSurah(null);
@@ -619,7 +619,7 @@ export default function Quran() {
               {audioError}
             </div>
           )}
-          <div className="p-4 flex flex-col gap-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 shadow-lg rounded-3xl relative z-30">
+          <div className="p-4 flex flex-col gap-3 bg-white/95 dark:bg-slate-900/95 backdrop- border border-slate-200 dark:border-slate-800 shadow-lg rounded-3xl relative z-30">
             <div className="flex items-center gap-3">
               <button
                 onClick={togglePlay}
@@ -734,8 +734,8 @@ export default function Quran() {
         animate={{ y: 0, opacity: 1 }}
         className="bg-gradient-to-bl from-emerald-600 via-emerald-700 to-teal-900 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden text-center border border-white/20"
       >
-        <div className="absolute right-0 top-0 w-48 h-48 bg-white/10 rounded-full -mr-12 -mt-12 blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/20 rounded-full -ml-12 -mb-12 blur-2xl"></div>
+        <div className="absolute right-0 top-0 w-48 h-48 bg-white/5 rounded-full -mr-12 -mt-12 animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/10 rounded-full -ml-12 -mb-12"></div>
         <div className="relative z-10 flex flex-col items-center">
           <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.2)] mb-4 transform rotate-3">
              <Book size={32} className="text-white drop-shadow-md" />

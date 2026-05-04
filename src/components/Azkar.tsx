@@ -495,7 +495,7 @@ export default function Azkar() {
       >
         {/* Header */}
         <div
-          className={`sticky top-0 shadow-sm z-20 px-4 py-4 flex items-center gap-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl text-slate-800 dark:text-slate-100 border-b border-slate-100 dark:border-slate-800`}
+          className={`sticky top-0 shadow-sm z-20 px-4 py-4 flex items-center gap-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md text-slate-800 dark:text-slate-100 border-b border-slate-100 dark:border-slate-800`}
         >
           <button
             onClick={() => {
@@ -606,8 +606,8 @@ export default function Azkar() {
         animate={{ y: 0, opacity: 1 }}
         className="bg-gradient-to-bl from-emerald-600 via-emerald-700 to-teal-900 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden text-center border border-white/20"
       >
-        <div className="absolute right-0 top-0 w-48 h-48 bg-white/10 rounded-full -mr-12 -mt-12 blur-3xl animate-pulse"></div>
-        <div className="absolute left-0 bottom-0 w-40 h-40 bg-black/20 rounded-full -ml-12 -mb-12 blur-2xl"></div>
+        <div className="absolute right-0 top-0 w-48 h-48 bg-white/5 rounded-full -mr-12 -mt-12 animate-pulse"></div>
+        <div className="absolute left-0 bottom-0 w-40 h-40 bg-black/10 rounded-full -ml-12 -mb-12"></div>
         <div className="relative z-10 flex flex-col items-center text-center">
           <div className="w-20 h-20 bg-white/20 backdrop-blur-md border border-white/30 rounded-3xl flex items-center justify-center text-white mb-6 shadow-[0_8px_32px_rgba(0,0,0,0.2)] transform rotate-3">
             <Heart size={40} className="drop-shadow-lg" />

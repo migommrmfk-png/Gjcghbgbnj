@@ -78,7 +78,7 @@ export default function QuranPlan({ onBack }: { onBack: () => void }) {
   if (!hasPlan) {
     return (
       <div className="max-w-md mx-auto p-4 pb-28 min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100" dir="rtl">
-        <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5">
+        <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-black/5 dark:border-white/5">
           <button onClick={onBack} className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors border border-black/5 dark:border-white/10 bg-white dark:bg-slate-900 shadow-sm">
             <ArrowRight size={24} className="text-slate-500 dark:text-slate-400 hover:text-emerald-500" />
           </button>
@@ -99,7 +99,7 @@ export default function QuranPlan({ onBack }: { onBack: () => void }) {
                 
                 <div className="grid gap-4">
                   <button onClick={() => { setGoal('reading'); setSetupStep(1); }} className="card-3d bg-white dark:bg-slate-900 p-6 rounded-[2rem] flex items-center gap-5 hover:border-emerald-500/50 hover:-translate-y-1 transition-all group overflow-hidden relative">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-emerald-500/20 transition-colors"></div>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full -mr-10 -mt-10  group-hover:bg-emerald-500/20 transition-colors"></div>
                     <div className="w-16 h-16 rounded-[1.5rem] bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white shadow-[0_8px_20px_rgba(16,185,129,0.3)] group-hover:scale-110 transition-transform relative z-10 border border-white/20">
                       <BookOpen size={28} className="drop-shadow-sm" />
                     </div>
@@ -111,7 +111,7 @@ export default function QuranPlan({ onBack }: { onBack: () => void }) {
                   </button>
 
                   <button onClick={() => { setGoal('memorization'); setSetupStep(1); }} className="card-3d bg-white dark:bg-slate-900 p-6 rounded-[2rem] flex items-center gap-5 hover:border-teal-500/50 hover:-translate-y-1 transition-all group overflow-hidden relative">
-                     <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-teal-500/20 transition-colors"></div>
+                     <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/10 rounded-full -mr-10 -mt-10  group-hover:bg-teal-500/20 transition-colors"></div>
                     <div className="w-16 h-16 rounded-[1.5rem] bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white shadow-[0_8px_20px_rgba(20,184,166,0.3)] group-hover:scale-110 transition-transform relative z-10 border border-white/20">
                       <Target size={28} className="drop-shadow-sm" />
                     </div>
@@ -163,7 +163,7 @@ export default function QuranPlan({ onBack }: { onBack: () => void }) {
   return (
     <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-slate-50 dark:bg-slate-950" dir="rtl">
       {/* Header */}
-      <div className="sticky top-0 z-20 py-4 flex items-center justify-between bg-slate-50 dark:bg-slate-950/80 backdrop-blur-xl border-b border-white/5">
+      <div className="sticky top-0 z-20 py-4 flex items-center justify-between bg-slate-50 dark:bg-slate-950/80 backdrop- border-b border-white/5">
         <div className="flex items-center gap-4">
           <button onClick={onBack} className="p-2 hover:bg-white/5 rounded-full transition-colors border border-white/5 bg-white dark:bg-slate-900 shadow-[0_5px_15px_rgba(0,0,0,0.2)]">
             <ArrowRight size={24} className="text-slate-500 dark:text-slate-400 hover:text-emerald-400" />

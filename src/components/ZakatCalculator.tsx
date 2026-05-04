@@ -127,7 +127,7 @@ export default function ZakatCalculator({ onBack }: { onBack?: () => void }) {
           transition={{ delay: 0.2 }}
           className="bg-emerald-500 rounded-[2rem] p-8 text-white shadow-sm text-center relative overflow-hidden border border-emerald-600"
         >
-          <div className="absolute right-0 top-0 w-40 h-40 bg-white/20 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+          <div className="absolute right-0 top-0 w-40 h-40 bg-white/20 rounded-full -mr-10 -mt-10 "></div>
           <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
           
           <h3 className="text-lg font-bold mb-3 relative z-10 drop-shadow-sm">مقدار الزكاة الواجب إخراجها</h3>

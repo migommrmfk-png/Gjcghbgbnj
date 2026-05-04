@@ -90,7 +90,7 @@ export default function SupportApp({ onBack }: { onBack?: () => void }) {
           animate={{ y: 0, opacity: 1 }}
           className="bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden text-center"
         >
-          <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-xl"></div>
+          <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 "></div>
           <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
           
           <div className="relative z-10 flex flex-col items-center">
@@ -128,7 +128,7 @@ export default function SupportApp({ onBack }: { onBack?: () => void }) {
           transition={{ delay: 0.2 }}
           className="card-3d bg-white dark:bg-slate-900 p-6 relative overflow-hidden border-2 border-amber-500/20"
         >
-          <div className="absolute -right-6 -top-6 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl"></div>
+          <div className="absolute -right-6 -top-6 w-24 h-24 bg-amber-500/10 rounded-full "></div>
           
           <div className="text-center mb-6 relative z-10">
             <span className="inline-block bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-bold mb-3 border border-red-100">

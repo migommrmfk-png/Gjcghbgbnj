@@ -112,8 +112,8 @@ export default function Qibla() {
     <div className="space-y-6 pb-28" dir="rtl">
       {/* Header */}
       <div className="bg-gradient-to-bl from-emerald-600 via-emerald-700 to-teal-900 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden border border-white/20">
-        <div className="absolute right-0 top-0 w-48 h-48 bg-white/10 rounded-full -mr-12 -mt-12 blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/20 rounded-full -ml-12 -mb-12 blur-2xl"></div>
+        <div className="absolute right-0 top-0 w-48 h-48 bg-white/10 rounded-full -mr-12 -mt-12  animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/20 rounded-full -ml-12 -mb-12 "></div>
         <div className="relative z-10 flex items-center justify-between">
           <div>
             <h2 className="text-3xl font-bold font-serif mb-2 text-white drop-shadow-md">اتجاه القبلة</h2>

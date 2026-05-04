@@ -78,7 +78,7 @@ const Downloads: React.FC<DownloadsProps> = ({ onBack }) => {
     <div className="max-w-md mx-auto p-4 min-h-screen bg-[var(--color-bg)] pb-24" dir="rtl">
       <audio ref={audioRef} />
 
-      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-[var(--color-bg)]/80 backdrop-blur-xl border-b border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)] px-4 -mx-4 mb-6">
+      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-[var(--color-bg)]/80 backdrop-blur-md border-b border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)] px-4 -mx-4 mb-6">
         <button
           onClick={onBack}
           className="p-2 hover:bg-white/5 rounded-full transition-colors border border-white/5 bg-[var(--color-surface)] shadow-[0_5px_15px_rgba(0,0,0,0.2)]"

@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from "react";
-import {
-  MapPin,
-  Calendar,
-  Compass,
-  BookOpen,
-  Heart,
-  Activity,
-  Info,
-  Radio,
-  ChevronLeft,
-  Puzzle,
+import { 
+  BookOpen, 
+  MapPin, 
+  Compass, 
+  Heart, 
+  Activity, 
+  Moon, 
+  ChevronLeft, 
+  Calendar, 
+  Quote, 
   Share2,
-  Quote,
-  Flame,
-  Moon,
   Sparkles,
   Sun,
   Bot,
   Mic,
-  Target
+  Target,
+  Radio,
+  Flame,
+  Info,
+  Puzzle
 } from "lucide-react";
 import { motion } from "motion/react";
 import { usePrayerTimes } from "../contexts/PrayerTimesContext";
@@ -567,215 +567,309 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   const isRTL = i18n.language === 'ar' || i18n.language === 'ur';
 
   return (
-    <div className="max-w-md mx-auto p-4 space-y-6 pb-28" dir={isRTL ? "rtl" : "ltr"}>
-      {/* Header Card - Dynamic Background */}
+    <div className="max-w-md mx-auto p-4 space-y-5 pb-28 min-h-screen" dir={isRTL ? "rtl" : "ltr"}>
+      {/* Premium Header Card */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className={`relative overflow-hidden rounded-[2rem] ${getBackgroundStyle()} text-white shadow-[0_8px_32px_-8px_rgba(0,0,0,0.15)] transition-colors duration-1000 border border-white/10`}
+        className="relative overflow-hidden rounded-[32px] bg-[#0A1914] text-white shadow-2xl shadow-emerald-900/20"
       >
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-2xl"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-teal-900/40"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/10 rounded-full -mr-20 -mt-20"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-teal-500/10 rounded-full -ml-10 -mb-10"></div>
         
-        <div className="relative z-10 p-6 flex flex-col items-center text-center space-y-4">
-          <div className="flex flex-col items-center gap-2">
-            <h2 className="text-xl font-medium text-white/90 tracking-wide">{getGreeting()}</h2>
+        <div className="relative z-10 p-6 flex flex-col justify-center space-y-6">
+          <div className="flex justify-between items-start">
+            <div>
+              <h2 className="text-xl font-medium text-emerald-50 tracking-wide">{getGreeting()}</h2>
+              <div className="flex items-center gap-1.5 mt-1 text-emerald-200/80 text-xs font-medium">
+                <MapPin size={12} />
+                <span>{locationName || t('locating')}</span>
+              </div>
+            </div>
             {streak > 0 && (
-              <div className="flex items-center gap-1.5 bg-white/10 text-white px-3 py-1 rounded-full text-xs font-medium border border-white/20 backdrop-blur-sm">
-                <span>🔥</span>
+              <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold border border-white/10">
+                <Flame size={14} className="text-orange-400" />
                 <span>{streak} {t('days_streak')}</span>
               </div>
             )}
           </div>
-          <div className={`flex items-center space-x-2 ${isRTL ? 'space-x-reverse' : ''} bg-black/20 px-4 py-1.5 rounded-full text-xs backdrop-blur-md border border-white/10`}>
-            <MapPin size={14} className="text-white/80" />
-            <span className="font-medium text-white/90">{locationName || t('locating')}</span>
-          </div>
 
           {hijriDate && (
-            <div className="mt-2">
-              <h1 className="text-4xl font-bold font-serif mb-1 text-white">
+            <div className="flex flex-col items-center justify-center py-4 border-y border-white/5">
+              <h1 className="text-3xl font-bold font-serif mb-1 text-white tracking-wide">
                 {hijriDate.day} {hijriDate.month.ar} {hijriDate.year}
               </h1>
-              <p className="text-white/70 text-sm font-medium">
+              <p className="text-emerald-200/70 text-sm font-medium tracking-wide">
                 {hijriDate.weekday.ar} • {gregorianDate}
               </p>
             </div>
           )}
+
+          <div className="flex justify-between items-end">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-300">
+                {t('next_prayer')}
+              </p>
+              <h3 className="text-xl font-bold text-white mt-0.5">{nextPrayerName}</h3>
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-bold font-mono tracking-tighter text-emerald-400">
+                {nextPrayerTime}
+              </p>
+            </div>
+          </div>
         </div>
       </motion.div>
 
-      {/* Quick Access Row */}
+      {/* Modern Quick Access */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.1 }}
-        className="grid grid-cols-3 gap-3"
+        className="grid grid-cols-4 gap-3 bg-white dark:bg-slate-900 rounded-[32px] p-4 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.08)] border border-slate-100 dark:border-slate-800"
       >
-        <button onClick={() => onNavigate("quran")} className="flex flex-col items-center justify-center gap-2 group bg-white dark:bg-slate-900 rounded-[24px] p-4 border border-slate-100 dark:border-slate-800 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-          <div className="w-12 h-12 rounded-[16px] bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform duration-300">
-            <BookOpen size={22} />
+        <button onClick={() => onNavigate("quran")} className="flex flex-col items-center gap-2 group">
+          <div className="w-14 h-14 rounded-[20px] bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-900/40 dark:to-emerald-800/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-sm group-hover:scale-105 group-active:scale-95 transition-all">
+            <BookOpen size={24} strokeWidth={1.5} />
           </div>
-          <span className="text-xs font-bold text-slate-600 dark:text-slate-300 group-hover:text-emerald-600 transition-colors">القرآن</span>
+          <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">القرآن</span>
         </button>
-        <button onClick={() => onNavigate("quran-plan")} className="flex flex-col items-center justify-center gap-2 group bg-white dark:bg-slate-900 rounded-[24px] p-4 border border-slate-100 dark:border-slate-800 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-          <div className="w-12 h-12 rounded-[16px] bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center text-teal-500 group-hover:scale-110 transition-transform duration-300">
-            <Target size={22} />
+        <button onClick={() => onNavigate("azkar")} className="flex flex-col items-center gap-2 group">
+          <div className="w-14 h-14 rounded-[20px] bg-gradient-to-br from-rose-100 to-rose-50 dark:from-rose-900/40 dark:to-rose-800/20 flex items-center justify-center text-rose-600 dark:text-rose-400 shadow-sm group-hover:scale-105 group-active:scale-95 transition-all">
+            <Heart size={24} strokeWidth={1.5} />
           </div>
-          <span className="text-xs font-bold text-slate-600 dark:text-slate-300 group-hover:text-teal-600 transition-colors">ختمة</span>
+          <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">الأذكار</span>
         </button>
-        <button onClick={() => onNavigate("azkar")} className="flex flex-col items-center justify-center gap-2 group bg-white dark:bg-slate-900 rounded-[24px] p-4 border border-slate-100 dark:border-slate-800 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-          <div className="w-12 h-12 rounded-[16px] bg-rose-50 dark:bg-rose-900/30 flex items-center justify-center text-rose-500 group-hover:scale-110 transition-transform duration-300">
-            <Heart size={22} />
+        <button onClick={() => onNavigate("qibla")} className="flex flex-col items-center gap-2 group">
+          <div className="w-14 h-14 rounded-[20px] bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/40 dark:to-blue-800/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-sm group-hover:scale-105 group-active:scale-95 transition-all">
+            <Compass size={24} strokeWidth={1.5} />
           </div>
-          <span className="text-xs font-bold text-slate-600 dark:text-slate-300 group-hover:text-rose-600 transition-colors">الأذكار</span>
+          <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">القبلة</span>
         </button>
-        <button onClick={() => onNavigate("tasbeeh")} className="flex flex-col items-center justify-center gap-2 group bg-white dark:bg-slate-900 rounded-[24px] p-4 border border-slate-100 dark:border-slate-800 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-          <div className="w-12 h-12 rounded-[16px] bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-500 group-hover:scale-110 transition-transform duration-300">
-            <Activity size={22} />
+        <button onClick={() => onNavigate("tasbeeh")} className="flex flex-col items-center gap-2 group">
+          <div className="w-14 h-14 rounded-[20px] bg-gradient-to-br from-purple-100 to-purple-50 dark:from-purple-900/40 dark:to-purple-800/20 flex items-center justify-center text-purple-600 dark:text-purple-400 shadow-sm group-hover:scale-105 group-active:scale-95 transition-all">
+            <Activity size={24} strokeWidth={1.5} />
           </div>
-          <span className="text-xs font-bold text-slate-600 dark:text-slate-300 group-hover:text-indigo-600 transition-colors">السبحة</span>
-        </button>
-        <button onClick={() => onNavigate("qibla")} className="flex flex-col items-center justify-center gap-2 group bg-white dark:bg-slate-900 rounded-[24px] p-4 border border-slate-100 dark:border-slate-800 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-          <div className="w-12 h-12 rounded-[16px] bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-500 group-hover:scale-110 transition-transform duration-300">
-            <Compass size={22} />
-          </div>
-          <span className="text-xs font-bold text-slate-600 dark:text-slate-300 group-hover:text-amber-600 transition-colors">القبلة</span>
-        </button>
-        <button onClick={() => onNavigate("worship-tracker")} className="flex flex-col items-center justify-center gap-2 group bg-white dark:bg-slate-900 rounded-[24px] p-4 border border-slate-100 dark:border-slate-800 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.05)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
-          <div className="w-12 h-12 rounded-[16px] bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform duration-300">
-            <Calendar size={22} />
-          </div>
-          <span className="text-xs font-bold text-slate-600 dark:text-slate-300 group-hover:text-purple-600 transition-colors">العبادات</span>
+          <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">السبحة</span>
         </button>
       </motion.div>
-      
-      {/* Last Read Quran Shortcut */}
-      {lastReadQuran && (
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.15 }}
-          className="bg-white dark:bg-slate-900 rounded-[24px] p-4 border border-slate-100 dark:border-slate-800 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.05)] flex items-center justify-between cursor-pointer hover:shadow-lg transition-all"
-          onClick={() => {
-            // Passing the value to App.tsx via onNavigate isn't enough, we might need a custom event or query string, 
-            // but for simplicity let's rely on Dashboard simply navigating to "quran".
-            // The QuranScreen can read localStorage.
-            onNavigate("quran");
-          }}
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 rounded-[16px] flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-              <BookOpen size={24} />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-slate-500">{t('last_read_surah', 'آخر سورة قرأتها')}</p>
-              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 font-serif">{lastReadQuran.surahName}</h3>
-            </div>
+
+      {/* Explore More Row */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.12 }}
+        className="flex gap-3 overflow-x-auto hide-scrollbar pb-2 pt-1 px-1 -mx-1"
+      >
+        <button onClick={() => onNavigate("radio")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+          <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400">
+            <Radio size={16} />
           </div>
-          <button className="bg-emerald-600 text-white px-4 py-2 rounded-full text-xs font-bold shadow-sm">{t('continue_reading', 'متابعة')}</button>
-        </motion.div>
-      )}
-
-      {/* Main Bento Grid */}
-      <div className="bento-grid">
-        {/* Prayer Times Bento */}
-        <motion.div
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="bento-item-large bg-white dark:bg-slate-900 rounded-[24px] p-6 border border-slate-100 dark:border-slate-800 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] relative overflow-hidden"
-        >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 dark:bg-emerald-900/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-          <div className="relative z-10">
-            <div className="flex justify-between items-start mb-6">
-              <div>
-                <h2 className="text-2xl font-bold font-serif mb-1 text-slate-800 dark:text-slate-100">{t('prayer_times')}</h2>
-                <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">
-                  <MapPin size={12} />
-                  {locationName || t('locating')}
-                </div>
-              </div>
-              <div className={`text-${isRTL ? 'left' : 'right'}`}>
-                <p className="text-3xl font-bold font-mono tracking-tighter text-emerald-500">
-                  {nextPrayerTime}
-                </p>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                  {t('next_prayer')}: <span className="text-emerald-600 dark:text-emerald-400">{nextPrayerName}</span>
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-              {prayersList.map((prayer) => {
-                const isNext = nextPrayer?.id === prayer.id;
-                const time = prayerTimes ? prayerTimes[prayer.id as keyof typeof prayerTimes] : "--:--";
-                return (
-                  <div
-                    key={prayer.id}
-                    className={`flex flex-col items-center p-3 rounded-2xl transition-all duration-300 ${
-                      isNext
-                        ? "bg-gradient-to-b from-emerald-500 to-emerald-600 text-white shadow-lg shadow-emerald-500/20 scale-105 border border-emerald-400/50"
-                        : "bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 border border-slate-100/50 dark:border-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800"
-                    }`}
-                  >
-                    <span className={`text-[10px] font-bold uppercase mb-1 ${isNext ? 'opacity-90' : 'opacity-60'}`}>
-                      {prayer.name}
-                    </span>
-                    <span className={`text-sm font-bold font-mono ${isNext ? '' : 'text-slate-800 dark:text-slate-200'}`}>{formatTime(time)}</span>
-                  </div>
-                );
-              })}
-            </div>
+          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">الإذاعة</span>
+        </button>
+        
+        <button onClick={() => onNavigate("reels")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+          <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center text-purple-600 dark:text-purple-400">
+            <Share2 size={16} /> {/* Using Share2 temporarily, Play would be better but not imported */}
           </div>
-        </motion.div>
+          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">مقاطع تلاوات</span>
+        </button>
 
-        {/* Muslim AI Agent Bento */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.25 }}
-          className="bento-item-large bg-white dark:bg-slate-900 rounded-[24px] p-6 cursor-pointer group relative overflow-hidden bg-gradient-to-br from-indigo-50/50 to-blue-50/50 dark:from-indigo-900/20 dark:to-blue-900/20 border border-indigo-100 dark:border-indigo-800/30 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
-          onClick={() => onNavigate("muslim-ai")}
-        >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-500/10 rounded-full -ml-10 -mb-10 blur-xl"></div>
-          
-          <div className="relative z-10 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white dark:bg-slate-800 rounded-[16px] flex items-center justify-center shadow-sm border border-indigo-100/50 dark:border-indigo-800/50 group-hover:scale-110 transition-transform duration-300">
-                <Sparkles size={28} className="text-indigo-500 animate-pulse" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2 font-serif">
-                  {t('muslim_ai')}
-                  <span className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">AI</span>
-                </h3>
-                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">{t('ai_assistant_desc')}</p>
-              </div>
-            </div>
-            <div className="w-10 h-10 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm border border-indigo-100/50 dark:border-indigo-800/50 group-hover:bg-indigo-50 dark:group-hover:bg-slate-700 transition-colors">
-              <ChevronLeft size={20} className={`text-indigo-500 ${isRTL ? '' : 'rotate-180'} group-hover:-translate-x-1 transition-transform`} />
-            </div>
+        <button onClick={() => onNavigate("hadith")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+          <div className="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center text-teal-600 dark:text-teal-400">
+            <Quote size={16} />
           </div>
-        </motion.div>
+          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">الحديث</span>
+        </button>
 
+        <button onClick={() => onNavigate("quran-plan")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+          <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+            <BookOpen size={16} />
+          </div>
+          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">الختمة</span>
+        </button>
+
+        <button onClick={() => onNavigate("smart-plan")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+          <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+            <Target size={16} />
+          </div>
+          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">الخطة الذكية</span>
+        </button>
+
+        <button onClick={() => onNavigate("dreams")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+          <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+            <Moon size={16} />
+          </div>
+          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">تفسير الأحلام</span>
+        </button>
+
+        <button onClick={() => onNavigate("names")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+          <div className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-900/40 flex items-center justify-center text-sky-600 dark:text-sky-400">
+            <Heart size={16} />
+          </div>
+          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">أسماء الله</span>
+        </button>
+
+        <button onClick={() => onNavigate("ruqyah")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+          <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-900/40 flex items-center justify-center text-rose-600 dark:text-rose-400">
+            <Activity size={16} />
+          </div>
+          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">الرقية الشرعية</span>
+        </button>
+      </motion.div>
+
+      {/* AI Assistant Banner */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.15 }}
+        onClick={() => onNavigate("muslim-ai")}
+        className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-indigo-500 to-blue-500 shadow-xl shadow-indigo-500/20 p-5 flex items-center justify-between cursor-pointer group active:scale-[0.98] transition-all"
+      >
+        <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-10 -mt-10 blur-md group-hover:scale-125 transition-transform duration-700"></div>
+        <div className="relative z-10 flex items-center gap-4">
+          <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-[18px] flex items-center justify-center border border-white/20">
+            <Sparkles size={24} className="text-white" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-white mb-0.5 tracking-wide flex items-center gap-2">
+              {t('muslim_ai')} 
+              <span className="bg-white text-indigo-600 text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider font-extrabold">NEW</span>
+            </h3>
+            <p className="text-indigo-50 text-xs font-medium opacity-90">{t('ai_assistant_desc')}</p>
+          </div>
+        </div>
+        <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 group-hover:bg-white group-hover:text-indigo-600 transition-colors">
+          <ChevronLeft size={16} className={isRTL ? '' : 'rotate-180'} />
+        </div>
+      </motion.div>
+
+      {/* Sakina Banner */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.18 }}
+        onClick={() => onNavigate("sakina")}
+        className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-teal-500 to-emerald-600 shadow-xl shadow-teal-500/20 p-5 flex items-center justify-between cursor-pointer group active:scale-[0.98] transition-all"
+      >
+        <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-10 -mt-10 blur-sm group-hover:scale-125 transition-transform duration-700"></div>
+        <div className="relative z-10 flex items-center gap-4">
+          <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-[18px] flex items-center justify-center border border-white/20">
+            <Wind size={24} className="text-white" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-white mb-0.5 tracking-wide flex items-center gap-2">
+              خيمة السكينة
+              <span className="bg-white/20 px-2 py-0.5 rounded-md text-[10px] uppercase font-black tracking-wider text-teal-100">ميزة جديدة ومبتكرة</span>
+            </h3>
+            <p className="text-teal-50 text-xs font-medium opacity-90">دمج التأمل الإسلامي مع مؤثرات الطبيعة</p>
+          </div>
+        </div>
+        <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 group-hover:bg-white group-hover:text-teal-600 transition-colors">
+          <ChevronLeft size={16} className={isRTL ? '' : 'rotate-180'} />
+        </div>
+      </motion.div>
+
+      {/* Spiritual Orbit Banner */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        onClick={() => onNavigate("orbit")}
+        className="relative overflow-hidden rounded-[32px] bg-indigo-950 shadow-xl shadow-indigo-900/20 p-6 flex flex-col justify-center cursor-pointer group active:scale-[0.98] transition-all border border-indigo-500/20"
+      >
+        <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] bg-repeat"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-amber-500/20 rounded-full blur-xl group-hover:scale-150 transition-transform duration-1000 pointer-events-none"></div>
+        
+        <div className="relative z-10 flex items-center justify-between text-white w-full">
+          <div>
+            <h3 className="text-lg font-bold mb-1 flex items-center gap-2 drop-shadow-md">
+              فلك العبادات 
+              <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-md text-[10px] uppercase font-black tracking-wider">مبتكر</span>
+            </h3>
+            <p className="text-indigo-200 text-xs opacity-90 tracking-wide font-medium">اجعل طاعاتك تدور حول قلبك</p>
+          </div>
+          <div className="w-12 h-12 bg-black/30 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10 group-hover:bg-amber-500/20 group-hover:text-amber-400 group-hover:border-amber-500/40 transition-colors shadow-inner">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 22a10 10 0 0 1-10-10"/></svg>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Muslim Garden Banner */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.22 }}
+        onClick={() => onNavigate("garden")}
+        className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-emerald-900 to-teal-950 shadow-xl shadow-emerald-900/20 p-6 flex flex-col justify-center cursor-pointer group active:scale-[0.98] transition-all border border-emerald-500/20"
+      >
+        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/leaves-pattern.png')] bg-repeat"></div>
+        <div className="absolute top-1/2 right-0 -translate-y-1/2 w-48 h-48 bg-emerald-500/20 rounded-full blur-xl group-hover:scale-125 transition-transform duration-1000 pointer-events-none"></div>
+        
+        <div className="relative z-10 flex items-center gap-4 text-white">
+          <div className="w-14 h-14 bg-emerald-500/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-emerald-400/30 group-hover:bg-emerald-500/40 transition-colors shadow-inner">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-300 drop-shadow-md"><path d="M12 22v-3"/><path d="m11 19-3-3"/><path d="m13 19 3-3"/><path d="m7 16-2-2"/><path d="m17 16 2-2"/><path d="M12 2l3 3-3 3-3-3 3-3z"/><path d="m9 5-2-2"/><path d="m15 5 2-2"/><path d="m7 9-2-2"/><path d="m17 9 2-2"/></svg>
+          </div>
+          <div className="flex-1">
+            <h3 className="text-lg font-bold mb-1 flex items-center gap-2 drop-shadow-md">
+              بستان العبادات 
+              <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-md text-[10px] uppercase font-black tracking-wider">حصري</span>
+            </h3>
+            <p className="text-emerald-100/70 text-xs font-medium">كل طاعة زرعة في بستانك</p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Prayers Row */}
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="bg-white dark:bg-slate-900 rounded-[32px] p-5 border border-slate-100 dark:border-slate-800 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.06)]"
+      >
+        <div className="flex justify-between items-center mb-4 px-1">
+          <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">{t('prayer_times')}</h3>
+        </div>
+        <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-2 rounded-[24px]">
+          {prayersList.map((prayer) => {
+            const isNext = nextPrayer?.id === prayer.id;
+            const time = prayerTimes ? prayerTimes[prayer.id as keyof typeof prayerTimes] : "--:--";
+            return (
+              <div
+                key={prayer.id}
+                className={`flex flex-col items-center justify-center p-2 rounded-[20px] transition-all flex-1 min-w-0 ${
+                  isNext
+                    ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20 transform scale-105"
+                    : "text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700"
+                }`}
+              >
+                <span className={`text-[10px] font-bold mb-1 truncate w-full text-center ${isNext ? 'opacity-100' : ''}`}>{prayer.name}</span>
+                <span className={`text-xs font-bold font-mono ${isNext ? '' : 'text-slate-800 dark:text-slate-200'}`}>{formatTime(time).split(' ')[0]}</span>
+              </div>
+            );
+          })}
+        </div>
+      </motion.div>
+
+      <div className="grid grid-cols-2 gap-4">
         {/* Daily Content Bento - Ayah */}
         {dailyAyah && (
           <motion.div
-            initial={{ x: -20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="bg-white dark:bg-slate-900 rounded-[24px] p-6 border border-slate-100 dark:border-slate-800 cursor-pointer shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.25 }}
+            className="col-span-2 sm:col-span-1 bg-white dark:bg-slate-900 rounded-[32px] p-6 border border-slate-100 dark:border-slate-800 cursor-pointer shadow-[0_8px_30px_-12px_rgba(0,0,0,0.06)] group hover:shadow-xl hover:-translate-y-1 transition-all"
             onClick={() => handleShare(`${dailyAyah.text}\n\n[${dailyAyah.surah}]`, t('ayah_of_day'))}
           >
             <div className="flex items-center gap-2 mb-4 text-emerald-500">
-              <BookOpen size={18} />
-              <span className="text-[11px] font-bold uppercase tracking-widest">{t('ayah_of_day')}</span>
+              <BookOpen size={16} strokeWidth={2.5} />
+              <span className="text-[10px] font-bold uppercase tracking-widest">{t('ayah_of_day')}</span>
             </div>
-            <p className="text-quran text-xl text-slate-800 dark:text-slate-100 leading-loose mb-4 line-clamp-4 hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors">
+            <p className="text-lg font-serif text-slate-800 dark:text-slate-100 leading-loose mb-4">
               {dailyAyah.text}
             </p>
-            <p className={`text-[11px] font-bold text-slate-400 text-${isRTL ? 'left' : 'right'} tracking-wider`}>
+            <p className={`text-[10px] font-bold text-slate-400 text-${isRTL ? 'left' : 'right'}`}>
               {dailyAyah.surah}
             </p>
           </motion.div>
@@ -784,86 +878,73 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         {/* Daily Content Bento - Hadith */}
         {dailyHadith && (
           <motion.div
-            initial={{ x: 20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="bg-white dark:bg-slate-900 rounded-[24px] p-6 border border-slate-100 dark:border-slate-800 cursor-pointer shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="col-span-2 sm:col-span-1 bg-white dark:bg-slate-900 rounded-[32px] p-6 border border-slate-100 dark:border-slate-800 cursor-pointer shadow-[0_8px_30px_-12px_rgba(0,0,0,0.06)] group hover:shadow-xl hover:-translate-y-1 transition-all"
             onClick={() => handleShare(`${dailyHadith.text}\n\n[${dailyHadith.narrator}]`, t('hadith_of_day'))}
           >
             <div className="flex items-center gap-2 mb-4 text-amber-500">
-              <Quote size={18} />
-              <span className="text-[11px] font-bold uppercase tracking-widest">{t('hadith_of_day')}</span>
+              <Quote size={16} strokeWidth={2.5} />
+              <span className="text-[10px] font-bold uppercase tracking-widest">{t('hadith_of_day')}</span>
             </div>
-            <p className="text-sm font-serif text-slate-800 dark:text-slate-100 leading-relaxed mb-4 line-clamp-5 hover:text-amber-700 dark:hover:text-amber-400 transition-colors">
+            <p className="text-sm font-serif text-slate-800 dark:text-slate-100 leading-relaxed mb-4">
               {dailyHadith.text}
             </p>
-            <p className={`text-[11px] font-bold text-slate-400 text-${isRTL ? 'left' : 'right'} tracking-wider`}>
+            <p className={`text-[10px] font-bold text-slate-400 text-${isRTL ? 'left' : 'right'}`}>
               {dailyHadith.narrator}
             </p>
           </motion.div>
         )}
+      </div>
 
-        {/* Smart Athkar Bento */}
-        {smartAthkar && (
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.45 }}
-            className="bento-card bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 cursor-pointer group"
-            onClick={() => onNavigate(smartAthkar.id)}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2 text-indigo-500">
-                <Sparkles size={18} className="animate-pulse" />
-                <span className="text-xs font-bold uppercase tracking-widest">{t('smart_suggestion')}</span>
-              </div>
-              <span className="text-2xl group-hover:scale-125 transition-transform duration-300">{smartAthkar.icon}</span>
-            </div>
-            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-1">{smartAthkar.title}</h3>
-            <p className="text-xs text-slate-500 font-medium">{smartAthkar.desc}</p>
-          </motion.div>
-        )}
-
-        {/* Quick Dua Wall Preview */}
+      {/* Smart Athkar Bento */}
+      {smartAthkar && (
         <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.45 }}
-          className="col-span-1 sm:col-span-2 md:col-span-3 mt-4"
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.35 }}
+          className="bg-white dark:bg-slate-900 rounded-[32px] p-5 border border-slate-100 dark:border-slate-800 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.06)] cursor-pointer group hover:shadow-xl hover:-translate-y-1 transition-all flex items-center justify-between"
+          onClick={() => onNavigate(smartAthkar.id)}
         >
-          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[24px] p-6 shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] hover:shadow-lg transition-all duration-300">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-rose-50 dark:bg-rose-500/10 rounded-[16px] flex items-center justify-center text-rose-500">
-                  <Heart size={20} className="fill-rose-500/20" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 font-serif">حائط الدعاء</h2>
-                  <p className="text-xs text-slate-500">شارك دعاءك مع المجتمع</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => onNavigate("dua-wall")}
-                className="text-xs font-bold bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 px-4 py-2 rounded-full hover:bg-rose-100 dark:hover:bg-rose-500/20 transition-colors"
-              >
-                تصفح الحائط
-              </button>
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-[20px] bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+              {smartAthkar.icon}
             </div>
-            
-            <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-800/50">
-              <p className="text-sm text-slate-600 dark:text-slate-300 mb-3 text-center">أضف دعاءك ليؤمن عليه آلاف المسلمين في التطبيق</p>
-              <button
-                onClick={() => onNavigate("dua-wall")}
-                className="w-full bg-gradient-to-r from-rose-500 to-pink-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 active:translate-y-0"
-              >
-                <span>اكتب دعاءك الآن</span>
-                <Heart size={16} />
-              </button>
+            <div>
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-0.5">{smartAthkar.title}</h3>
+              <p className="text-[11px] text-slate-500 font-medium">{smartAthkar.desc}</p>
             </div>
           </div>
+          <ChevronLeft size={16} className={`text-slate-400 ${isRTL ? '' : 'rotate-180'} group-hover:-translate-x-1 transition-transform`} />
         </motion.div>
+      )}
 
-        {/* Highlighted Hijri Calendar Preview */}
+      {/* Quick Dua Wall Preview */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.4 }}
+      >
+        <div className="bg-white dark:bg-slate-900 rounded-[32px] p-5 border border-slate-100 dark:border-slate-800 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.06)] hover:shadow-xl transition-all cursor-pointer group" onClick={() => onNavigate("dua-wall")}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-rose-50 dark:bg-rose-900/30 rounded-[20px] flex items-center justify-center text-rose-500 group-hover:scale-110 transition-transform">
+                <Heart size={20} className="fill-current" />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100 font-serif">حائط الدعاء</h2>
+                <p className="text-[11px] text-slate-500 font-medium mt-0.5">شارك دعاءك مع المجتمع</p>
+              </div>
+            </div>
+            <div className="text-[10px] font-bold bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 px-3 py-1.5 rounded-full group-hover:bg-rose-100 dark:group-hover:bg-rose-900/50 transition-colors">
+              تصفح
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Highlighted Hijri Calendar Preview */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -874,8 +955,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             onClick={() => onNavigate("calendar")}
             className="group relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 rounded-[24px] p-6 shadow-lg shadow-amber-500/20 cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-amber-400/50"
           >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full -mr-10 -mt-10 blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-orange-900/20 rounded-full -ml-10 -mb-10 blur-xl"></div>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-md group-hover:scale-150 transition-transform duration-700"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-orange-900/10 rounded-full -ml-10 -mb-10 blur-sm"></div>
             <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
             
             <div className="relative z-10 flex items-center justify-between">
@@ -985,7 +1066,6 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             ))}
           </div>
         </motion.div>
-      </div>
     </div>
   );
 }

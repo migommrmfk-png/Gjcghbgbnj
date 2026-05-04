@@ -88,8 +88,8 @@ export default function Ruqyah() {
     <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 overflow-hidden" dir="rtl">
       {/* Header */}
       <div className="pt-12 pb-8 px-6 bg-gradient-to-bl from-emerald-600 via-emerald-700 to-teal-900 text-white rounded-b-[2.5rem] shadow-xl shrink-0 relative overflow-hidden border-b border-white/10">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/20 rounded-full -ml-16 -mb-16 blur-2xl"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20  animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/20 rounded-full -ml-16 -mb-16 "></div>
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] opacity-10"></div>
         
         <div className="relative z-10 flex items-center justify-between">
@@ -141,7 +141,7 @@ export default function Ruqyah() {
               className="space-y-6"
             >
               <div className="card-3d bg-emerald-50/80 dark:bg-emerald-900/20 p-5 rounded-2xl border border-emerald-100 dark:border-emerald-800/50 flex items-start gap-4 shadow-sm relative overflow-hidden backdrop-blur-sm">
-                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full -mr-10 -mt-10 blur-xl"></div>
+                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full -mr-10 -mt-10 "></div>
                 <Info className="text-emerald-500 shrink-0 mt-1 relative z-10" size={24} />
                 <p className="text-sm md:text-base leading-relaxed text-slate-700 dark:text-slate-300 relative z-10 font-medium">
                   يُستحب قراءة الرقية الشرعية مع النفث (النفخ الخفيف مع ريق يسير) على النفس أو المريض، أو القراءة في ماء والشرب منه.
@@ -156,7 +156,7 @@ export default function Ruqyah() {
                   transition={{ delay: index * 0.1 }}
                   className="card-3d bg-white dark:bg-slate-900 rounded-[2rem] p-6 md:p-8 shadow-xl border border-black/5 dark:border-white/5 relative overflow-hidden"
                 >
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 blur-2xl pointer-events-none"></div>
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16  pointer-events-none"></div>
                   
                   <h3 className="text-xl md:text-2xl font-bold bg-gradient-to-l from-emerald-600 to-teal-800 dark:from-emerald-400 dark:to-teal-200 bg-clip-text text-transparent mb-6 flex items-center gap-3 font-serif">
                     <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-100 to-teal-50 dark:from-emerald-900/50 dark:to-teal-900/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm shadow-inner border border-emerald-200/50 dark:border-emerald-700/50 group-hover:scale-110 transition-transform">
@@ -183,7 +183,7 @@ export default function Ruqyah() {
               className="flex flex-col items-center justify-center h-full min-h-[60vh] space-y-10"
             >
               <div className="relative group">
-                <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-3xl group-hover:bg-emerald-500/30 transition-colors duration-500"></div>
+                <div className="absolute inset-0 bg-emerald-500/20 rounded-full  group-hover:bg-emerald-500/30 transition-colors duration-500"></div>
                 <div className="w-56 h-56 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center shadow-[0_20px_50px_rgba(16,185,129,0.3)] relative overflow-hidden border-4 border-white/20 dark:border-slate-800/50">
                   <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] opacity-20 MixBlendMode-overlay"></div>
                   <Shield size={90} className="text-white relative z-10 drop-shadow-xl" />

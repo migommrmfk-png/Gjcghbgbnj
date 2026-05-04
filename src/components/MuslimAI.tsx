@@ -170,7 +170,7 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
   return (
     <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 relative overflow-hidden pb-24" dir="rtl">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 z-10 mt-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl sticky top-0 border-b border-slate-100 dark:border-slate-800 shadow-sm">
+      <div className="flex items-center justify-between p-4 z-10 mt-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 border-b border-slate-100 dark:border-slate-800 shadow-sm">
         <button onClick={onBack} className="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full transition-colors border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
           <ArrowRight className="text-slate-500 hover:text-emerald-500" size={24} />
         </button>

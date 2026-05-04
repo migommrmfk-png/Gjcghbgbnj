@@ -232,8 +232,8 @@ export default function Hadith() {
         animate={{ y: 0, opacity: 1 }}
         className="bg-gradient-to-bl from-emerald-600 via-emerald-700 to-teal-900 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden text-center border border-white/20"
       >
-        <div className="absolute right-0 top-0 w-48 h-48 bg-white/10 rounded-full -mr-12 -mt-12 blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/20 rounded-full -ml-12 -mb-12 blur-2xl"></div>
+        <div className="absolute right-0 top-0 w-48 h-48 bg-white/10 rounded-full -mr-12 -mt-12  animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/20 rounded-full -ml-12 -mb-12 "></div>
         <div className="relative z-10 flex flex-col items-center">
           <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.2)] mb-4 transform rotate-3">
              <BookOpen size={32} className="text-white drop-shadow-md" />
@@ -254,8 +254,8 @@ export default function Hadith() {
       >
         <div className="card-3d bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 relative overflow-hidden shadow-xl border border-black/5 dark:border-white/5">
           {/* Decorative Elements */}
-          <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-teal-500/10 rounded-full -ml-20 -mb-20 blur-3xl"></div>
+          <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full -mr-20 -mt-20 "></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-teal-500/10 rounded-full -ml-20 -mb-20 "></div>
 
           <div className="relative z-10 flex flex-col items-center text-center space-y-8">
             <div className="w-20 h-20 rounded-[1.5rem] bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-4xl shadow-[0_10px_30px_rgba(16,185,129,0.3)] border border-white/20 text-white mb-4">

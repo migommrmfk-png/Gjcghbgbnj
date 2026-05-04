@@ -327,7 +327,7 @@ export default function ProphetStories({ onBack }: { onBack: () => void }) {
   return (
     <div className="max-w-md mx-auto min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col" dir="rtl">
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5 px-4 py-4 flex items-center gap-4">
+      <div className="sticky top-0 z-20 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-md border-b border-black/5 dark:border-white/5 px-4 py-4 flex items-center gap-4">
         <button
           onClick={onBack}
           className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors bg-white dark:bg-slate-900 shadow-sm border border-black/5 dark:border-white/5"
@@ -348,7 +348,7 @@ export default function ProphetStories({ onBack }: { onBack: () => void }) {
               className="grid grid-cols-1 gap-4 pb-20"
             >
               <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-6 rounded-3xl text-white mb-4 shadow-lg relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full -ml-10 -mt-10 blur-2xl"></div>
+                <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full -ml-10 -mt-10 "></div>
                 <h2 className="text-xl font-bold mb-2">أحسن القصص</h2>
                 <p className="text-white/80 text-sm leading-relaxed">
                   تأمل في سير الأنبياء والمرسلين، واستلهم من صبرهم ويقينهم دروساً تضيء دربك.
@@ -401,7 +401,7 @@ export default function ProphetStories({ onBack }: { onBack: () => void }) {
               </button>
 
               <div className="card-3d bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 shadow-xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
+                <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full -mr-20 -mt-20 "></div>
                 
                 <div className="flex items-center gap-4 mb-8 relative z-10">
                   <div className="w-20 h-20 rounded-[1.5rem] bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-4xl shadow-[0_10px_30px_rgba(16,185,129,0.3)] border border-white/20">

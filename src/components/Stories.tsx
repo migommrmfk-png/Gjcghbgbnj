@@ -9,7 +9,7 @@ export default function Stories({ onBack }: { onBack: () => void }) {
   return (
     <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 relative overflow-hidden pb-24" dir="rtl">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 z-10 mt-2 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-xl sticky top-0 border-b border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+      <div className="flex items-center justify-between p-4 z-10 mt-2 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-md sticky top-0 border-b border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
         <button onClick={selectedStory ? () => setSelectedStory(null) : onBack} className="p-2 hover:bg-white/5 rounded-full transition-colors border border-white/5 bg-white dark:bg-slate-900 shadow-[0_5px_15px_rgba(0,0,0,0.2)]">
           <ArrowRight className="text-slate-500 dark:text-slate-400 hover:text-emerald-400" size={24} />
         </button>
@@ -82,7 +82,7 @@ export default function Stories({ onBack }: { onBack: () => void }) {
                   <div className="absolute right-0 top-3 w-6 h-6 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 border-4 border-[#f8fafc] shadow-[0_0_10px_rgba(212,175,55,0.5)]"></div>
                   
                   <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-black/5 dark:border-white/5 relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full  -mr-10 -mt-10"></div>
                     <h4 className="font-bold text-emerald-400 text-xl mb-3 font-serif drop-shadow-md relative z-10">
                       {event.title}
                     </h4>

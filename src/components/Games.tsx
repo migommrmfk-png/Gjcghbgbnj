@@ -346,8 +346,8 @@ export default function Games({ onBack }: { onBack: () => void }) {
         animate={{ y: 0, opacity: 1 }}
         className="bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-900 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden border border-white/20"
       >
-        <div className="absolute right-0 top-0 w-48 h-48 bg-white/10 rounded-full -mr-12 -mt-12 blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/20 rounded-full -ml-12 -mb-12 blur-2xl"></div>
+        <div className="absolute right-0 top-0 w-48 h-48 bg-white/10 rounded-full -mr-12 -mt-12  animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/20 rounded-full -ml-12 -mb-12 "></div>
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
         <div className="relative z-10 flex flex-col items-center text-center">
            <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.2)] mb-4 transform rotate-3">
@@ -367,7 +367,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
           onClick={() => handleGameSelect('quiz')}
           className="card-3d bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl border border-black/5 dark:border-white/5 flex items-center gap-5 text-right hover:border-emerald-500/50 hover:-translate-y-1 transition-all group overflow-hidden relative"
         >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-emerald-500/20 transition-colors"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full -mr-10 -mt-10  group-hover:bg-emerald-500/20 transition-colors"></div>
           <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 text-white rounded-[1.5rem] flex items-center justify-center shrink-0 border border-white/20 shadow-[0_8px_20px_rgba(16,185,129,0.3)] group-hover:scale-110 transition-transform relative z-10">
             <Brain size={32} className="drop-shadow-sm" />
           </div>
@@ -383,7 +383,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
           onClick={() => handleGameSelect('ayah')}
            className="card-3d bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl border border-black/5 dark:border-white/5 flex items-center gap-5 text-right hover:border-teal-500/50 hover:-translate-y-1 transition-all group overflow-hidden relative"
         >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-teal-500/20 transition-colors"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/10 rounded-full -mr-10 -mt-10  group-hover:bg-teal-500/20 transition-colors"></div>
           <div className="w-16 h-16 bg-gradient-to-br from-teal-400 to-teal-600 text-white rounded-[1.5rem] flex items-center justify-center shrink-0 border border-white/20 shadow-[0_8px_20px_rgba(20,184,166,0.3)] group-hover:scale-110 transition-transform relative z-10">
             <Book size={32} className="drop-shadow-sm" />
           </div>
@@ -399,7 +399,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
           onClick={() => handleGameSelect('history')}
            className="card-3d bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl border border-black/5 dark:border-white/5 flex items-center gap-5 text-right hover:border-amber-500/50 hover:-translate-y-1 transition-all group overflow-hidden relative"
         >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-amber-500/20 transition-colors"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full -mr-10 -mt-10  group-hover:bg-amber-500/20 transition-colors"></div>
           <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 text-white rounded-[1.5rem] flex items-center justify-center shrink-0 border border-white/20 shadow-[0_8px_20px_rgba(245,158,11,0.3)] group-hover:scale-110 transition-transform relative z-10">
             <History size={32} className="drop-shadow-sm" />
           </div>
@@ -415,7 +415,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
           onClick={() => handleGameSelect('prophets')}
            className="card-3d bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl border border-black/5 dark:border-white/5 flex items-center gap-5 text-right hover:border-indigo-500/50 hover:-translate-y-1 transition-all group overflow-hidden relative"
         >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-indigo-500/20 transition-colors"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full -mr-10 -mt-10  group-hover:bg-indigo-500/20 transition-colors"></div>
           <div className="w-16 h-16 bg-gradient-to-br from-indigo-400 to-indigo-600 text-white rounded-[1.5rem] flex items-center justify-center shrink-0 border border-white/20 shadow-[0_8px_20px_rgba(99,102,241,0.3)] group-hover:scale-110 transition-transform relative z-10">
             <Users size={32} className="drop-shadow-sm" />
           </div>
@@ -431,7 +431,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
           onClick={() => handleGameSelect('memory')}
            className="card-3d bg-white dark:bg-slate-900 p-6 rounded-[2rem] shadow-xl border border-black/5 dark:border-white/5 flex items-center gap-5 text-right hover:border-purple-500/50 hover:-translate-y-1 transition-all group overflow-hidden relative"
         >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:bg-purple-500/20 transition-colors"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full -mr-10 -mt-10  group-hover:bg-purple-500/20 transition-colors"></div>
           <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-purple-600 text-white rounded-[1.5rem] flex items-center justify-center shrink-0 border border-white/20 shadow-[0_8px_20px_rgba(168,85,247,0.3)] group-hover:scale-110 transition-transform relative z-10">
             <Grid3X3 size={32} className="drop-shadow-sm" />
           </div>
@@ -550,7 +550,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
           animate={{ scale: 1, opacity: 1 }}
           className="card-3d bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 text-center shadow-xl border border-black/5 dark:border-white/5 mt-10 relative overflow-hidden"
         >
-           <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
+           <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full -mr-20 -mt-20 "></div>
           
           <div className="w-24 h-24 bg-gradient-to-br from-emerald-500 to-teal-500 text-white rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 shadow-[0_10px_30px_rgba(16,185,129,0.3)] border border-white/20 transform rotate-3 relative z-10">
             <Trophy size={48} className="drop-shadow-sm" />
@@ -695,7 +695,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
           animate={{ x: 0, opacity: 1 }}
           className="card-3d bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 shadow-xl border border-black/5 dark:border-white/5 relative overflow-hidden"
         >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 "></div>
 
           {activeGame === 'ayah' && 'surah' in currentQ && (
             <div className="text-center text-sm text-emerald-600 dark:text-emerald-400 font-bold mb-6 bg-emerald-50 dark:bg-emerald-500/10 py-1.5 px-5 rounded-full inline-block border border-emerald-100 dark:border-emerald-500/20 shadow-sm relative z-10">
@@ -747,7 +747,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
   return (
     <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-slate-50 dark:bg-slate-950" dir="rtl">
       {/* Header */}
-      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-xl border-b border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)] px-4 -mx-4 mb-6">
+      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-md border-b border-white/5 shadow-[0_10px_30px_rgba(0,0,0,0.5)] px-4 -mx-4 mb-6">
         <button
           onClick={() => activeGame === 'menu' ? onBack() : setActiveGame('menu')}
           className="p-2 hover:bg-white/5 rounded-full transition-colors border border-white/5 bg-white dark:bg-slate-900 shadow-[0_5px_15px_rgba(0,0,0,0.2)]"

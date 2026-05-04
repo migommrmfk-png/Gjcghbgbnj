@@ -52,7 +52,7 @@ export default function NamesOfAllah({ onBack }: { onBack?: () => void }) {
         dir="rtl"
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-sm z-20 px-4 py-4 flex items-center gap-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm z-20 px-4 py-4 flex items-center gap-4 border-b border-slate-100 dark:border-slate-800">
           <button
             onClick={() => setSelectedName(null)}
             className="p-2 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-full transition-colors border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm"
@@ -74,8 +74,8 @@ export default function NamesOfAllah({ onBack }: { onBack?: () => void }) {
             animate={{ scale: 1, opacity: 1 }}
             className="rounded-3xl p-8 text-center bg-emerald-500 text-white relative overflow-hidden border border-emerald-600 shadow-sm"
           >
-            <div className="absolute right-0 top-0 w-40 h-40 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
-            <div className="absolute left-0 bottom-0 w-32 h-32 bg-black/10 rounded-full -ml-10 -mb-10 blur-2xl"></div>
+            <div className="absolute right-0 top-0 w-40 h-40 bg-white/10 rounded-full -mr-10 -mt-10 "></div>
+            <div className="absolute left-0 bottom-0 w-32 h-32 bg-black/10 rounded-full -ml-10 -mb-10 "></div>
 
             <div className="relative z-10">
               <h2 className="text-6xl font-bold font-serif mb-4 text-white">
@@ -122,8 +122,8 @@ export default function NamesOfAllah({ onBack }: { onBack?: () => void }) {
             <ArrowRight size={24} className="text-white" />
           </button>
         )}
-        <div className="absolute right-0 top-0 w-40 h-40 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
-        <div className="absolute left-0 bottom-0 w-32 h-32 bg-black/10 rounded-full -ml-10 -mb-10 blur-2xl"></div>
+        <div className="absolute right-0 top-0 w-40 h-40 bg-white/10 rounded-full -mr-10 -mt-10 "></div>
+        <div className="absolute left-0 bottom-0 w-32 h-32 bg-black/10 rounded-full -ml-10 -mb-10 "></div>
         <div className="relative z-10 flex flex-col items-center text-center">
           <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-3xl flex items-center justify-center text-white mb-6 shadow-sm transform rotate-3 border border-white/30">
             <Info size={40} />

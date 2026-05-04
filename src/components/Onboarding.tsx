@@ -33,7 +33,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
       desc: "تطبيق إسلامي شامل يساعدك على تنظيم عبادتك اليومية بسهولة.",
       icon: (
         <div className="relative w-48 h-48 flex items-center justify-center">
-          <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute inset-0 bg-emerald-500/20 rounded-full  animate-pulse"></div>
           <motion.div 
             animate={{ y: [0, -10, 0] }} 
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -58,7 +58,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
       desc: "اقرأ واستمع للقرآن الكريم بأصوات أكثر من 100 قارئ مع إمكانية البحث والتفسير.",
       icon: (
         <div className="relative w-32 h-32 flex items-center justify-center mb-4">
-          <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-2xl"></div>
+          <div className="absolute inset-0 bg-emerald-500/20 rounded-full "></div>
           <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
             <BookOpen size={70} className="text-emerald-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]" />
           </motion.div>
@@ -71,7 +71,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
       desc: "تعرف على أوقات الصلاة حسب موقعك مع تنبيهات الأذان.",
       icon: (
         <div className="relative w-32 h-32 flex items-center justify-center mb-4">
-          <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-2xl"></div>
+          <div className="absolute inset-0 bg-emerald-500/20 rounded-full "></div>
           <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
             <Clock size={70} className="text-emerald-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]" />
           </motion.div>
@@ -84,7 +84,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
       desc: "مجموعة كاملة من الأذكار اليومية.",
       icon: (
         <div className="relative w-32 h-32 flex items-center justify-center mb-4">
-          <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-2xl"></div>
+          <div className="absolute inset-0 bg-emerald-500/20 rounded-full "></div>
           <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
             <Heart size={70} className="text-emerald-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]" />
           </motion.div>
@@ -97,7 +97,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
       desc: "مجموعة من الأدوات التي يحتاجها كل مسلم.",
       icon: (
         <div className="relative w-32 h-32 flex items-center justify-center mb-4">
-          <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-2xl"></div>
+          <div className="absolute inset-0 bg-emerald-500/20 rounded-full "></div>
           <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
             <Compass size={70} className="text-emerald-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]" />
           </motion.div>
@@ -110,7 +110,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
       desc: "المزيد من الميزات لاكتشافها داخل التطبيق.",
       icon: (
         <div className="relative w-32 h-32 flex items-center justify-center mb-4">
-          <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-2xl"></div>
+          <div className="absolute inset-0 bg-emerald-500/20 rounded-full "></div>
           <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
             <Star size={70} className="text-emerald-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]" />
           </motion.div>
@@ -123,7 +123,7 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
       desc: "اجعل تطبيق \"اليقين\" رفيقك اليومي للقرآن والأذكار.",
       icon: (
         <div className="relative w-48 h-48 flex items-center justify-center">
-          <div className="absolute inset-0 bg-emerald-500/30 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute inset-0 bg-emerald-500/30 rounded-full  animate-pulse"></div>
           <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}>
             <div className="w-32 h-32 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(212,175,55,0.6)]">
               <CheckCircle2 size={60} className="text-white" />

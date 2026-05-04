@@ -56,6 +56,11 @@ const Downloads = lazy(() => import("./components/Downloads"));
 const IslamicQuiz = lazy(() => import("./components/IslamicQuiz"));
 const Subscription = lazy(() => import("./components/Subscription"));
 const SubscriptionAdmin = lazy(() => import("./components/SubscriptionAdmin"));
+const KidsQuran = lazy(() => import("./components/KidsQuran"));
+const MoodTracker = lazy(() => import("./components/MoodTracker"));
+const Sakina = lazy(() => import("./components/Sakina"));
+const SpiritualOrbit = lazy(() => import("./components/SpiritualOrbit"));
+const MuslimGarden = lazy(() => import("./components/MuslimGarden"));
 import InstallPrompt from "./components/InstallPrompt";
 import ChatOverlay from "./components/ChatOverlay";
 
@@ -173,6 +178,26 @@ function AppContent() {
         return <Subscription onBack={handleBack} />;
       case "admin":
         return <SubscriptionAdmin onBack={handleBack} />;
+      case "kids-quran":
+        return <KidsQuran onBack={handleBack} />;
+      case "sakina":
+        return <Sakina onBack={handleBack} />;
+      case "orbit":
+        return <SpiritualOrbit onBack={handleBack} />;
+      case "garden":
+        return <MuslimGarden onBack={handleBack} />;
+      case "mood-tracker":
+        return (
+          <div className="p-4 pb-24 max-w-md mx-auto pt-8 min-h-screen" dir="rtl">
+            <button
+              onClick={handleBack}
+              className="mb-4 flex items-center justify-center p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors border border-black/5 dark:border-white/5 bg-white dark:bg-slate-900 shadow-[0_5px_15px_rgba(0,0,0,0.2)] w-max"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-500 dark:text-slate-400 rotate-180"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+            </button>
+            <MoodTracker />
+          </div>
+        );
       default:
         return <Dashboard onNavigate={handleNavigate} />;
     }
@@ -192,7 +217,7 @@ function AppContent() {
 
   return (
     <div
-      className="flex flex-col flex-1 h-full w-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans overflow-hidden relative"
+      className="flex flex-col flex-1 h-full w-full bg-[#f4f7f6] dark:bg-[#07130F] text-slate-800 dark:text-slate-100 font-sans overflow-hidden relative"
       dir={isRTL ? "rtl" : "ltr"}
     >
       <InstallPrompt />
@@ -211,7 +236,7 @@ function AppContent() {
       </AnimatePresence>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto pb-24 relative">
+      <main className="flex-1 overflow-y-auto pb-28 relative">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -241,18 +266,18 @@ function AppContent() {
             handleNavigate("muslim-ai");
           }
         }}
-        className={`fixed bottom-28 ${isRTL ? 'right-4' : 'left-4'} z-50 flex items-center justify-center w-14 h-14 bg-emerald-500 rounded-[20px] shadow-sm hover:shadow-md transition-all cursor-grab active:cursor-grabbing border border-emerald-400`}
+        className={`fixed bottom-28 ${isRTL ? 'right-5' : 'left-5'} z-50 flex items-center justify-center w-[52px] h-[52px] bg-gradient-to-br from-indigo-500 to-blue-600 rounded-[22px] shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all cursor-grab active:cursor-grabbing border border-white/20`}
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
-        <Sparkles size={24} className="text-white" />
+        <Sparkles size={24} className="text-white animate-pulse" />
       </motion.div>
 
-      {/* Flat Bottom Navigation */}
-      <nav className="fixed bottom-6 left-4 right-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.08)] z-40 rounded-[24px] h-16">
-        <div className="flex justify-around items-center h-full max-w-md mx-auto px-4">
+      {/* Modern Floating Bottom Navigation */}
+      <nav className="fixed bottom-6 left-5 right-5 bg-white/95 backdrop-blur-md dark:bg-[#0A1914]/95 border border-white dark:border-[#122A21] shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] z-40 rounded-[28px] h-[72px]">
+        <div className="flex justify-around items-center h-full max-w-md mx-auto px-2">
           <NavItem
             icon={<Home />}
             label={t('app_name') === "اليقين" ? "الرئيسية" : "Home"}
@@ -315,17 +340,17 @@ function NavItem({
   return (
     <button
       onClick={onClick}
-      className={`relative flex flex-col items-center justify-center w-full h-full space-y-1 transition-all duration-500 group ${
+      className={`relative flex items-center justify-center h-full flex-1 group ${
         isActive
-          ? "text-emerald-500 scale-105"
-          : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
-      }`}
+          ? "text-emerald-600 dark:text-emerald-400"
+          : "text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300"
+      } transition-colors duration-300`}
     >
-      <div className="relative">
+      <div className="relative flex flex-col items-center gap-1.5">
         {isActive && (
           <motion.div
             layoutId="nav-pill"
-            className="absolute -inset-x-4 -inset-y-2 bg-emerald-50 dark:bg-emerald-500/15 rounded-full"
+            className="absolute inset-0 bg-emerald-50 dark:bg-emerald-900/40 rounded-[18px] w-14 h-14 -m-4 left-1/2 -ml-7 top-1/2 -mt-7 z-0"
             transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
           />
         )}
@@ -333,10 +358,10 @@ function NavItem({
           {React.cloneElement(icon as React.ReactElement, {
             size: isActive ? 24 : 22,
             strokeWidth: isActive ? 2.5 : 2,
-            className: `transition-all duration-300 ${isActive ? 'drop-shadow-sm' : 'group-hover:scale-110'}`
+            className: `transition-transform duration-300 ${isActive ? 'scale-110 drop-shadow-sm' : 'group-hover:scale-105'}`
           })}
           <span
-            className={`text-[10px] font-bold transition-all duration-300 ${isActive ? "opacity-100" : "opacity-0 h-0 overflow-hidden"}`}
+            className={`text-[10px] font-bold transition-all duration-300 whitespace-nowrap ${isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 absolute bottom-0"}`}
           >
             {label}
           </span>

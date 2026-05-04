@@ -204,7 +204,7 @@ export default function Duas() {
   return (
     <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-slate-50 dark:bg-slate-950" dir="rtl">
       {/* Header */}
-      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800 px-4 -mx-4 mb-6">
+      <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 px-4 -mx-4 mb-6">
         <button
           onClick={() => window.history.back()}
           className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm"
@@ -221,8 +221,8 @@ export default function Duas() {
         animate={{ y: 0, opacity: 1 }}
         className="bg-emerald-500 rounded-3xl p-6 text-white shadow-sm relative overflow-hidden mb-6 border border-emerald-600"
       >
-        <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-xl"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/10 rounded-full -ml-10 -mb-10 blur-2xl"></div>
+        <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 "></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/10 rounded-full -ml-10 -mb-10 "></div>
         <div className="relative z-10">
           <h2 className="text-2xl font-bold font-serif mb-2 flex items-center gap-2 text-white">
             <Heart size={24} className="text-emerald-100" />

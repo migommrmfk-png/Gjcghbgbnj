@@ -25,7 +25,7 @@ interface AuthContextType {
   loading: boolean;
   error: string | null;
   signIn: (email: string, pass: string) => Promise<void>;
-  signUp: (email: string, pass: string, name: string) => Promise<void>;
+  signUp: (email: string, pass: string, name: string) => Promise<any>;
   signInWithGoogle: () => Promise<void>;
   signInWithGithub: () => Promise<void>;
   signInWithFacebook: () => Promise<void>;
@@ -35,6 +35,7 @@ interface AuthContextType {
   linkWithGithub: () => Promise<void>;
   linkWithEmail: (email: string, pass: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -173,12 +174,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, pass: string, name: string) => {
     localStorage.removeItem('hasLoggedOut');
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password: pass,
-      options: { data: { full_name: name } }
+      options: { data: { full_name: name }, emailRedirectTo: window.location.origin }
     });
     if (error) throw error;
+    return data;
   };
 
   const signIn = async (email: string, pass: string) => {
@@ -258,6 +260,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await supabase.auth.signOut();
   };
 
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin,
+    });
+    if (error) throw error;
+  };
+
   const value = {
     user,
     userData,
@@ -273,7 +282,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     linkWithGoogle,
     linkWithGithub,
     linkWithEmail,
-    logout
+    logout,
+    resetPassword
   };
 
   return (

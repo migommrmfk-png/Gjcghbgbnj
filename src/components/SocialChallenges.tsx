@@ -68,7 +68,7 @@ export default function SocialChallenges({ onBack }: { onBack: () => void }) {
           >
             {/* Weekly Challenge Banner */}
             <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-[2rem] p-6 text-white shadow-2xl relative overflow-hidden border border-emerald-500/30">
-              <div className="absolute left-0 top-0 w-32 h-32 bg-white/20 rounded-full -ml-10 -mt-10 blur-xl"></div>
+              <div className="absolute left-0 top-0 w-32 h-32 bg-white/20 rounded-full -ml-10 -mt-10 "></div>
               <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
               <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-2">
