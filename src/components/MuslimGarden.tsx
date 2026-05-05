@@ -1,62 +1,68 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sprout, TreePine, Flower2, Droplets, Sun, CalendarDays, X, ChevronLeft } from 'lucide-react';
-
-// Generates the last 30 days
-const generateLast30Days = () => {
-  const days = [];
-  const today = new Date();
-  for (let i = 29; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(today.getDate() - i);
-    days.push(d.toISOString().split('T')[0]);
-  }
-  return days;
-};
+import { Sprout, TreePine, Flower2, Droplets, Leaf, ArrowUpCircle, ArrowDownCircle, ChevronLeft, ShieldAlert } from 'lucide-react';
 
 export default function MuslimGarden({ onBack }: { onBack: () => void }) {
-  const [gardenData, setGardenData] = useState<Record<string, number>>({});
-  const days = generateLast30Days();
-  const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  // Tree Level: 0 to 10
+  const [treeLevel, setTreeLevel] = useState<number>(1);
+  const [points, setPoints] = useState<number>(0);
 
-  // Load random dummy data on mount (to make it look alive)
-  useEffect(() => {
-    const data: Record<string, number> = {};
-    days.forEach(day => {
-      // randomly assign levels 0 to 4 (0: unplanted, 1: sprout, 2: small plant, 3: flower, 4: big tree)
-      data[day] = Math.floor(Math.random() * 5);
-    });
-    setGardenData(data);
-  }, []);
+  const pointsToLevelUp = 10;
 
-  const getDayIcon = (level: number) => {
-    switch (level) {
-      case 0: return <div className="w-4 h-4 rounded-full bg-slate-800 border border-white/5 opacity-50" />;
-      case 1: return <Sprout size={24} className="text-emerald-400 opacity-80" />;
-      case 2: return <TreePine size={32} className="text-emerald-500" />;
-      case 3: return <Flower2 size={32} className="text-pink-400 drop-shadow-[0_0_10px_rgba(244,114,182,0.5)]" />;
-      case 4: return <TreePine size={40} className="text-emerald-300 drop-shadow-[0_0_15px_rgba(52,211,153,0.8)]" />;
-      default: return <div className="w-4 h-4 rounded-full bg-slate-800" />;
-    }
-  };
-
-  const getWaterCount = () => {
-    return Object.values(gardenData).reduce((sum, val) => sum + val, 0);
-  };
-
-  // Water the selected day manually for interactive feel
-  const waterPlant = (day: string) => {
+  const handleGoodDeed = () => {
     if (navigator.vibrate) navigator.vibrate(50);
-    setGardenData(prev => {
-      const newVal = (prev[day] || 0) + 1;
-      return { ...prev, [day]: newVal > 4 ? 4 : newVal };
+    setPoints(prev => {
+      const next = prev + 3;
+      if (next >= pointsToLevelUp && treeLevel < 10) {
+        setTreeLevel(l => Math.min(l + 1, 10));
+        return next - pointsToLevelUp;
+      }
+      return Math.min(next, pointsToLevelUp);
     });
+  };
+
+  const handleBadDeed = () => {
+    if (navigator.vibrate) navigator.vibrate([20, 50, 20]);
+    setPoints(prev => {
+      const next = prev - 4;
+      if (next < 0) {
+        if (treeLevel > 0) {
+          setTreeLevel(l => Math.max(l - 1, 0));
+          return pointsToLevelUp + next; // e.g. 10 - 4 = 6
+        }
+        return 0;
+      }
+      return next;
+    });
+  };
+
+  const getTreeIcon = () => {
+    if (treeLevel === 0) return <div className="w-12 h-12 rounded-full bg-slate-800 border border-white/10 opacity-50 flex items-center justify-center"><Leaf size={20} className="text-slate-600" /></div>;
+    if (treeLevel <= 2) return <Sprout size={64} className="text-emerald-400 opacity-80 animate-pulse" />;
+    if (treeLevel <= 5) return <TreePine size={100} className="text-emerald-500 drop-shadow-[0_0_15px_rgba(52,211,153,0.3)]" />;
+    if (treeLevel <= 8) return <Flower2 size={130} className="text-pink-400 drop-shadow-[0_0_20px_rgba(244,114,182,0.5)]" />;
+    return <TreePine size={180} className="text-emerald-300 drop-shadow-[0_0_30px_rgba(52,211,153,0.8)]" />;
+  };
+
+  const getTreeName = () => {
+    if (treeLevel === 0) return "أرض قاحلة";
+    if (treeLevel <= 2) return "بذرة طاعة";
+    if (treeLevel <= 5) return "نبتة خير";
+    if (treeLevel <= 8) return "زهرة الإحسان";
+    return "شجرة مثمرة";
+  };
+
+  const getMessage = () => {
+    if (treeLevel === 0) return "بادر بالاستغفار والطاعات لتروي أرضك.";
+    if (treeLevel === 10) return "ما شاء الله! شجرتك اكتملت وثمرت بفضل الله.";
+    if (points === 0) return "شجرتك تنتظر سقيا الأعمال الصالحة.";
+    return "استمر، فكل طاعة تزيد من نور شجرتك.";
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-[#05110E] text-white flex flex-col overflow-hidden" dir="rtl">
       {/* Background Ambience */}
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none transition-all duration-1000" style={{ opacity: Math.max(0.2, treeLevel / 10) }}>
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-[120px] mix-blend-screen"></div>
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-teal-500/10 rounded-full blur-[150px] mix-blend-screen"></div>
       </div>
@@ -68,126 +74,81 @@ export default function MuslimGarden({ onBack }: { onBack: () => void }) {
             <ChevronLeft size={24} className="text-white/70" />
           </button>
           <div>
-            <h1 className="text-2xl font-serif text-emerald-100 font-bold drop-shadow-md">بستان العبادات</h1>
-            <p className="text-xs text-emerald-200/50 mt-1 uppercase tracking-widest">كل طاعة زرعة في بستانك</p>
+            <h1 className="text-2xl font-serif text-emerald-100 font-bold drop-shadow-md">شجرة الإيمان</h1>
+            <p className="text-xs text-emerald-200/50 mt-1 uppercase tracking-widest">تنمو بالطاعات وتذبل بالمعاصي</p>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 pb-24 relative z-10">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10 -mt-10">
         
-        {/* Info Card */}
-        <motion.div 
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="bg-emerald-950/40 rounded-3xl p-6 border border-emerald-500/20 backdrop-blur-md shadow-2xl mb-8 flex justify-between items-center"
-        >
-          <div>
-            <p className="text-slate-400 text-sm font-medium mb-1">النمو الإجمالي</p>
-            <div className="text-4xl font-bold text-white flex items-baseline gap-2">
-              {getWaterCount()} 
-              <span className="text-sm font-normal text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]">قطرة نور</span>
+        {/* The Tree */}
+        <div className="relative w-full aspect-square max-w-sm flex flex-col items-center justify-end p-8">
+           <AnimatePresence mode="wait">
+             <motion.div
+               key={treeLevel}
+               initial={{ scale: 0.5, y: 50, opacity: 0 }}
+               animate={{ scale: 1, y: 0, opacity: 1 }}
+               exit={{ scale: 0.8, y: -50, opacity: 0 }}
+               transition={{ type: 'spring', bounce: 0.5, duration: 1 }}
+               className="relative z-10 flex flex-col items-center justify-end h-full"
+             >
+                {getTreeIcon()}
+             </motion.div>
+           </AnimatePresence>
+
+           {/* Grass/Pot line */}
+           <motion.div 
+             className="w-3/4 h-8 bg-emerald-900/40 rounded-full blur-md absolute bottom-10 z-0"
+             animate={{ width: 100 + (treeLevel * 20) }}
+           />
+           <div className="w-48 h-3 bg-gradient-to-r from-transparent via-emerald-800 to-transparent rounded-full absolute bottom-14 z-10"></div>
+        </div>
+
+        {/* Status */}
+        <div className="text-center mt-4 bg-emerald-950/40 px-6 py-4 rounded-3xl border border-emerald-500/20 backdrop-blur-md shadow-lg">
+          <h2 className="text-2xl font-serif font-bold text-white mb-2">{getTreeName()}</h2>
+          <p className="text-emerald-200/80 text-sm">{getMessage()}</p>
+          
+          {/* Progress to next level */}
+          {treeLevel < 10 && (
+            <div className="mt-4">
+              <div className="flex justify-between text-[10px] text-emerald-300 font-mono mb-1 px-1">
+                <span>المستوى {treeLevel}</span>
+                <span>المستوى {treeLevel + 1}</span>
+              </div>
+              <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden border border-white/5">
+                <motion.div 
+                  className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full shadow-[0_0_10px_rgba(52,211,153,0.5)]"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${(points / pointsToLevelUp) * 100}%` }}
+                  transition={{ type: "spring", bounce: 0 }}
+                />
+              </div>
             </div>
-          </div>
-          <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(52,211,153,0.3)] transform rotate-3">
-            <Droplets size={32} className="text-white drop-shadow-lg" />
-          </div>
-        </motion.div>
-
-        <h2 className="text-xl font-bold font-serif mb-6 flex items-center gap-2 text-slate-200">
-          <CalendarDays size={20} className="text-emerald-500" />
-          بستان الشهر الجاري
-        </h2>
-
-        {/* The Garden Grid */}
-        <div className="grid grid-cols-5 gap-3 sm:gap-4 justify-items-center">
-          {days.map((day, index) => {
-            const level = gardenData[day] || 0;
-            const isToday = index === days.length - 1;
-            
-            return (
-              <motion.div 
-                key={day}
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: index * 0.02, type: 'spring' }}
-                onClick={() => setSelectedDay(day)}
-                className={`relative w-full aspect-square rounded-2xl flex flex-col items-center justify-end p-2 cursor-pointer transition-all duration-300
-                  ${isToday ? 'border-2 border-emerald-500 bg-emerald-900/20 shadow-[0_0_20px_rgba(16,185,129,0.2)]' : 'border border-white/5 bg-white/5 hover:bg-white/10'}
-                `}
-                style={{ 
-                  boxShadow: level > 2 ? `0 0 ${level * 5}px rgba(52,211,153,${level * 0.1}) inset` : 'none'
-                }}
-              >
-                <span className="absolute top-2 right-2 text-[10px] text-white/30 font-mono font-bold">
-                  {new Date(day).getDate()}
-                </span>
-                
-                <div className="flex-1 flex items-center justify-center w-full">
-                  <AnimatePresence mode="popLayout">
-                    <motion.div
-                      key={level}
-                      initial={{ scale: 0.5, y: 10, opacity: 0 }}
-                      animate={{ scale: 1, y: 0, opacity: 1 }}
-                      transition={{ type: 'spring', bounce: 0.5 }}
-                      className="origin-bottom"
-                    >
-                      {getDayIcon(level)}
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
-
-                {/* Ground Line */}
-                <div className="h-1 w-8 rounded-full bg-emerald-900/50 mt-1"></div>
-              </motion.div>
-            );
-          })}
+          )}
         </div>
 
       </div>
 
-      {/* Selected Day Interaction Panel */}
-      <AnimatePresence>
-        {selectedDay && (
-          <motion.div 
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            className="absolute bottom-0 left-0 right-0 bg-[#091e18] border-t border-emerald-500/20 rounded-t-[40px] p-8 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] z-30 backdrop-blur-xl"
-          >
-            <button onClick={() => setSelectedDay(null)} className="absolute top-4 right-4 p-2 text-white/50 hover:text-white transition-colors bg-white/5 rounded-full">
-              <X size={20} />
-            </button>
-            
-            <div className="flex items-center gap-6">
-              <div className="w-24 h-24 bg-gradient-to-br from-black/40 to-emerald-900/40 border border-emerald-500/30 rounded-3xl flex items-center justify-center shadow-inner relative overflow-hidden">
-                 <div className="absolute inset-0 bg-emerald-500/10 blur-xl"></div>
-                 <div className="relative z-10 transform scale-150">
-                    {getDayIcon(gardenData[selectedDay] || 0)}
-                 </div>
-              </div>
-              <div className="flex-1">
-                <p className="text-emerald-400 font-bold text-sm tracking-widest">{new Intl.DateTimeFormat('ar-EG', { weekday: 'long', month: 'long', day: 'numeric' }).format(new Date(selectedDay))}</p>
-                <h3 className="text-2xl font-serif text-white mt-1 mb-3">
-                  {gardenData[selectedDay] === 0 ? 'يوم خالي' :
-                   gardenData[selectedDay] === 1 ? 'بذرة طاعة' :
-                   gardenData[selectedDay] === 2 ? 'نبتة خير' :
-                   gardenData[selectedDay] === 3 ? 'زهرة الإحسان' : 'شجرة مثمرة'}
-                </h3>
-                
-                <button 
-                  onClick={() => waterPlant(selectedDay)}
-                  disabled={(gardenData[selectedDay] || 0) >= 4}
-                  className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white rounded-xl font-bold shadow-lg shadow-emerald-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
-                >
-                  <Droplets size={20} />
-                  {(gardenData[selectedDay] || 0) >= 4 ? 'اكتمل النمو بفضل الله' : 'اسقِ هذا اليوم بطاعة'}
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* Buttons */}
+      <div className="px-6 pb-12 pt-6 shrink-0 relative z-20 flex gap-4">
+         <button 
+           onClick={handleGoodDeed}
+           className="flex-1 bg-gradient-to-t from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 active:scale-95 transition-all text-white rounded-3xl p-4 flex flex-col items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 border border-emerald-400/30"
+         >
+           <Droplets size={28} className="drop-shadow-md" />
+           <span className="font-bold text-sm tracking-wide">طاعة (+3)</span>
+         </button>
+
+         <button 
+           onClick={handleBadDeed}
+           className="flex-1 bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all text-white/80 rounded-3xl p-4 flex flex-col items-center justify-center gap-2 border border-slate-600/50"
+         >
+           <ShieldAlert size={28} className="text-rose-400 opacity-80" />
+           <span className="font-bold text-sm text-slate-300 tracking-wide">ذنب (-4)</span>
+         </button>
+      </div>
     </div>
   );
 }

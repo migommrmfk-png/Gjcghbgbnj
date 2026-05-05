@@ -18,7 +18,8 @@ import {
   Radio,
   Flame,
   Info,
-  Puzzle
+  Puzzle,
+  Wind
 } from "lucide-react";
 import { motion } from "motion/react";
 import { usePrayerTimes } from "../contexts/PrayerTimesContext";
