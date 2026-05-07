@@ -28,7 +28,7 @@ export default function DreamInterpretation({ onBack }: { onBack?: () => void })
     try {
       const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
       const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
+        model: 'gemini-2.5-flash',
         contents: userMsg,
         config: {
           systemInstruction: "أنت خبير في تفسير الأحلام والرؤى في الإسلام، تعتمد على كتب ابن سيرين والنابلسي. قدم تفسيراً مختصراً ومفيداً للحلم الذي يطرحه المستخدم. ابدأ دائماً أو اختم بعبارة 'والله تعالى أعلى وأعلم، والرؤى تختلف باختلاف حال الرائي'. كن إيجابياً ومبشراً ما أمكن.",

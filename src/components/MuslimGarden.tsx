@@ -1,13 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sprout, TreePine, Flower2, Droplets, Leaf, ArrowUpCircle, ArrowDownCircle, ChevronLeft, ShieldAlert } from 'lucide-react';
 
 export default function MuslimGarden({ onBack }: { onBack: () => void }) {
-  // Tree Level: 0 to 10
-  const [treeLevel, setTreeLevel] = useState<number>(1);
-  const [points, setPoints] = useState<number>(0);
+  const [treeLevel, setTreeLevel] = useState<number>(() => {
+    return parseInt(localStorage.getItem('muslimGarden_level') || '1', 10);
+  });
+  const [points, setPoints] = useState<number>(() => {
+    return parseInt(localStorage.getItem('muslimGarden_points') || '0', 10);
+  });
 
   const pointsToLevelUp = 10;
+
+  useEffect(() => {
+    localStorage.setItem('muslimGarden_level', String(treeLevel));
+    localStorage.setItem('muslimGarden_points', String(points));
+  }, [treeLevel, points]);
+
+  useEffect(() => {
+    const today = new Date().toDateString();
+    const lastOpen = localStorage.getItem('muslimGarden_lastOpenDate');
+    
+    if (lastOpen && lastOpen !== today) {
+      const last = new Date(lastOpen);
+      const now = new Date();
+      const diffDays = Math.floor((now.getTime() - last.getTime()) / (1000 * 3600 * 24));
+      
+      if (diffDays > 0) {
+        // Penalty for inactivity: Shrink tree based on days missed
+        const penalty = diffDays * 2;
+        setPoints(prev => {
+          let next = prev - penalty;
+          if (next < 0) {
+            setTreeLevel(l => {
+              let newLevel = l;
+              while (next < 0 && newLevel > 0) {
+                newLevel--;
+                next += pointsToLevelUp;
+              }
+              return Math.max(newLevel, 0);
+            });
+            return next < 0 ? 0 : next;
+          }
+          return next;
+        });
+      }
+    }
+    localStorage.setItem('muslimGarden_lastOpenDate', today);
+  }, []);
 
   const handleGoodDeed = () => {
     if (navigator.vibrate) navigator.vibrate(50);
