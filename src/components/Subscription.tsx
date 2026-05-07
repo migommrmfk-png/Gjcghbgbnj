@@ -1,15 +1,67 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { ChevronRight, Crown, CheckCircle, Send, MessageCircle } from 'lucide-react';
+import { ChevronRight, Crown, CheckCircle, Send, MessageCircle, Key, Loader } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
+import { db } from '../firebase';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 export default function Subscription({ onBack }: { onBack: () => void }) {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar' || i18n.language === 'ur';
-  const { userData } = useAuth();
+  const { userData, user } = useAuth();
   
   const currentPlan = userData?.plan || 'free';
+  const [licenseKey, setLicenseKey] = useState('');
+  const [redeeming, setRedeeming] = useState(false);
+
+  const handleRedeemKey = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || user.isAnonymous) {
+      alert("عذراً، يجب تسجيل الدخول بحساب لتفعيل الاشتراك.");
+      return;
+    }
+    if (!licenseKey.trim()) return;
+
+    setRedeeming(true);
+    try {
+      const keyRef = doc(db, 'licenses', licenseKey.trim());
+      const keySnap = await getDoc(keyRef);
+      if (!keySnap.exists()) {
+        alert("المفتاح غير صحيح أو غير موجود.");
+        setRedeeming(false);
+        return;
+      }
+
+      const keyData = keySnap.data();
+      if (keyData.used) {
+        alert("هذا المفتاح تم استخدامه من قبل.");
+        setRedeeming(false);
+        return;
+      }
+
+      // Mark key as used
+      await updateDoc(keyRef, {
+        used: true,
+        usedBy: user.uid,
+        usedAt: Date.now()
+      });
+
+      // Update user plan
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, {
+        plan: keyData.plan
+      });
+
+      alert(`تم تفعيل اشتراك ${keyData.plan.toUpperCase()} بنجاح!`);
+      setLicenseKey('');
+    } catch (err: any) {
+      alert("حدث خطأ: " + err.message);
+    } finally {
+      setRedeeming(false);
+    }
+  };
+
 
   const plans = [
     {
@@ -149,11 +201,41 @@ export default function Subscription({ onBack }: { onBack: () => void }) {
 
           <button
             onClick={handleWhatsApp}
-            className="w-full bg-[#25D366] hover:bg-[#1ebd5a] text-white p-4 rounded-xl font-bold shadow-md transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-[#25D366] hover:bg-[#1ebd5a] text-white p-4 rounded-xl font-bold shadow-md transition-colors flex items-center justify-center gap-2 mb-6"
           >
             <MessageCircle size={20} />
             تواصل معنا عبر واتساب
           </button>
+
+          <form onSubmit={handleRedeemKey} className="border-t border-slate-100 dark:border-slate-800 pt-6 mt-2">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center shrink-0">
+                <Key size={20} />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm">لديك مفتاح تفعيل؟</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">أدخل المفتاح هنا لتفعيل الاشتراك مباشرة</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="أدخل مفتاح التفعيل هنا..."
+                value={licenseKey}
+                onChange={(e) => setLicenseKey(e.target.value)}
+                className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-center uppercase tracking-widest font-mono text-sm focus:outline-none focus:border-indigo-500 dark:text-white"
+                dir="ltr"
+                required
+              />
+              <button
+                type="submit"
+                disabled={redeeming || !licenseKey.trim()}
+                className="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center justify-center min-w-24"
+              >
+                {redeeming ? <Loader className="animate-spin" size={18} /> : 'تفعيل'}
+              </button>
+            </div>
+          </form>
         </motion.div>
       </div>
     </div>

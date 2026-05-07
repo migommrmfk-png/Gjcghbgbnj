@@ -61,6 +61,14 @@ const MoodTracker = lazy(() => import("./components/MoodTracker"));
 const Sakina = lazy(() => import("./components/Sakina"));
 const SpiritualOrbit = lazy(() => import("./components/SpiritualOrbit"));
 const MuslimGarden = lazy(() => import("./components/MuslimGarden"));
+const NearbyMosques = lazy(() => import("./components/NearbyMosques"));
+const LiveMakkah = lazy(() => import("./components/LiveMakkah"));
+const IslamicEvents = lazy(() => import("./components/IslamicEvents"));
+const HalalChecker = lazy(() => import("./components/HalalChecker"));
+const QuranReflection = lazy(() => import("./components/QuranReflection"));
+const IslamicTimeline = lazy(() => import("./components/IslamicTimeline"));
+const GreetingCards = lazy(() => import("./components/GreetingCards"));
+const IslamicNames = lazy(() => import("./components/IslamicNames"));
 import InstallPrompt from "./components/InstallPrompt";
 import ChatOverlay from "./components/ChatOverlay";
 
@@ -198,6 +206,22 @@ function AppContent() {
             <MoodTracker />
           </div>
         );
+      case "mosques":
+        return <NearbyMosques onBack={handleBack} />;
+      case "live-makkah":
+        return <LiveMakkah onBack={handleBack} />;
+      case "events":
+        return <IslamicEvents onBack={handleBack} />;
+      case "halal-checker":
+        return <HalalChecker onBack={handleBack} />;
+      case "quran-reflection":
+        return <QuranReflection onBack={handleBack} />;
+      case "timeline":
+        return <IslamicTimeline onBack={handleBack} />;
+      case "greeting-cards":
+        return <GreetingCards onBack={handleBack} />;
+      case "islamic-names":
+        return <IslamicNames onBack={handleBack} />;
       default:
         return <Dashboard onNavigate={handleNavigate} />;
     }

@@ -19,7 +19,13 @@ import {
   Flame,
   Info,
   Puzzle,
-  Wind
+  Wind,
+  Video,
+  Sparkles,
+  Scan,
+  Hourglass,
+  Baby,
+  ImageIcon
 } from "lucide-react";
 import { motion } from "motion/react";
 import { usePrayerTimes } from "../contexts/PrayerTimesContext";
@@ -547,6 +553,48 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       color: "text-teal-400",
       bg: "bg-teal-500/10",
     },
+    {
+      id: "mosques",
+      title: "المساجد القريبة",
+      icon: <MapPin size={28} />,
+      color: "text-emerald-500",
+      bg: "bg-emerald-500/10",
+    },
+    {
+      id: "events",
+      title: "المناسبات",
+      icon: <Calendar size={28} />,
+      color: "text-rose-400",
+      bg: "bg-rose-500/10",
+    },
+    {
+      id: "timeline",
+      title: "خط الزمن الإسلامي",
+      icon: <Hourglass size={28} />,
+      color: "text-orange-400",
+      bg: "bg-orange-500/10",
+    },
+    {
+      id: "live-makkah",
+      title: "بث الحرمين",
+      icon: <Video size={28} />,
+      color: "text-amber-400",
+      bg: "bg-amber-500/10",
+    },
+    {
+      id: "islamic-names",
+      title: "مستشار الأسماء",
+      icon: <Baby size={28} />,
+      color: "text-indigo-400",
+      bg: "bg-indigo-500/10",
+    },
+    {
+      id: "greeting-cards",
+      title: "صانع البطاقات",
+      icon: <ImageIcon size={28} />,
+      color: "text-fuchsia-400",
+      bg: "bg-fuchsia-500/10",
+    },
   ];
 
   const getGreeting = () => {
@@ -1015,22 +1063,22 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
               <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{t('recitation_correction')}</span>
             </div>
             <div 
-              onClick={() => onNavigate("muslim-ai")}
-              className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 rounded-[24px] flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-300 text-center group shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] hover:shadow-lg hover:-translate-y-1"
-            >
-              <div className="w-12 h-12 rounded-[16px] bg-orange-50 dark:bg-orange-500/10 text-orange-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Bot size={24} />
-              </div>
-              <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{t('fatwas_and_questions')}</span>
-            </div>
-            <div 
-              onClick={() => onNavigate("muslim-ai")}
+              onClick={() => onNavigate("quran-reflection")}
               className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 rounded-[24px] flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-300 text-center group shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] hover:shadow-lg hover:-translate-y-1"
             >
               <div className="w-12 h-12 rounded-[16px] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Heart size={24} />
+                <Sparkles size={24} />
               </div>
-              <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{t('spiritual_guide')}</span>
+              <span className="text-sm font-bold text-slate-700 dark:text-slate-200">تأملات قرآنية</span>
+            </div>
+            <div 
+              onClick={() => onNavigate("halal-checker")}
+              className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 rounded-[24px] flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-300 text-center group shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] hover:shadow-lg hover:-translate-y-1"
+            >
+              <div className="w-12 h-12 rounded-[16px] bg-teal-50 dark:bg-teal-500/10 text-teal-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Scan size={24} />
+              </div>
+              <span className="text-sm font-bold text-slate-700 dark:text-slate-200">الماسح الغذائي</span>
             </div>
           </div>
         </motion.div>

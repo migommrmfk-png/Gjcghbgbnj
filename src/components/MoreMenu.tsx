@@ -215,38 +215,7 @@ export default function MoreMenu({
                 {!user.isAnonymous && <p className="text-emerald-100/90 text-xs font-mono bg-black/10 px-3 py-1 rounded-full">{user.email}</p>}
                 
                 <div className="flex gap-2 mt-4 flex-wrap justify-center">
-                  {!user.app_metadata?.providers?.includes('google') && (
-                    <button
-                      onClick={handleLinkGoogle}
-                      disabled={linking}
-                      className="bg-white text-emerald-700 text-sm font-bold py-2 px-4 rounded-full shadow-sm hover:bg-emerald-50 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:scale-100 min-w-32"
-                    >
-                      {linking && linkMethod === 'google' ? (
-                        <div className="w-5 h-5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
-                      ) : (
-                        <>
-                          <img src="https://www.google.com/favicon.ico" alt="Google" className="w-4 h-4 opacity-80" />
-                          <span>ربط بجوجل</span>
-                        </>
-                      )}
-                    </button>
-                  )}
-                  {!user.app_metadata?.providers?.includes('github') && (
-                    <button
-                      onClick={handleLinkGithub}
-                      disabled={linking}
-                      className="bg-[#24292e] text-white text-sm font-bold py-2 px-4 rounded-full shadow-sm hover:bg-[#2c3137] transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-70 disabled:scale-100 min-w-32 border border-white/10"
-                    >
-                      {linking && linkMethod === 'github' ? (
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      ) : (
-                        <>
-                          <img src="https://github.githubassets.com/favicons/favicon.svg" alt="GitHub" className="w-4 h-4 opacity-80 invert" />
-                          <span>ربط بـ Github</span>
-                        </>
-                      )}
-                    </button>
-                  )}
+                  {/* OAuth Linking Buttons Removed */}
                 </div>
               </div>
             </div>

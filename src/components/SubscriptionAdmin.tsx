@@ -224,10 +224,24 @@ export default function SubscriptionAdmin({ onBack }: { onBack: () => void }) {
           </form>
 
           {generatedKey && (
-            <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 text-center">
+            <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700 text-center relative group">
               <p className="text-xs text-slate-500 mb-2">تم إصدار مفتاح لـ {selectedPlan.toUpperCase()}</p>
-              <div className="font-mono text-xl tracking-widest font-bold text-indigo-600 dark:text-indigo-400 user-select-all selection:bg-indigo-200 selection:text-indigo-900">
+              <div className="font-mono text-xl tracking-widest font-bold text-indigo-600 dark:text-indigo-400 select-all selection:bg-indigo-200 selection:text-indigo-900 flex items-center justify-center gap-3">
                 {generatedKey}
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(generatedKey);
+                    alert('تم نسخ المفتاح بنجاح!');
+                  }}
+                  className="p-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors"
+                  title="نسخ المفتاح"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                </button>
               </div>
             </div>
           )}
@@ -269,7 +283,23 @@ export default function SubscriptionAdmin({ onBack }: { onBack: () => void }) {
                         </span>
                       )}
                     </div>
-                    <p className="font-mono font-bold text-sm text-slate-800 dark:text-slate-200">{license.key}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="font-mono font-bold text-sm text-slate-800 dark:text-slate-200">{license.key}</p>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigator.clipboard.writeText(license.key);
+                          alert('تم نسخ المفتاح بنجاح!');
+                        }}
+                        className="text-slate-400 hover:text-indigo-600 transition-colors"
+                        title="نسخ المفتاح"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                      </button>
+                    </div>
                     <p className="text-[10px] text-slate-400 mt-1">{new Date(license.createdAt).toLocaleDateString()}</p>
                   </div>
                   <button 
