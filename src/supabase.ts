@@ -14,4 +14,11 @@ if (!supabaseAnonKey) {
   supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InplbG1mcHFvdnR2eXVraW96d2R0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0NzkyMTcsImV4cCI6MjA5MzA1NTIxN30.68YXRplxLk3jZod83YqDyOLdmvcfW9xSmJONDTbTcOg';
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    storage: window.localStorage,
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+});

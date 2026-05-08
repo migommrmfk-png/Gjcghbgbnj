@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Moon, Send, ArrowRight, Sparkles, Loader2, Info } from 'lucide-react';
 import { motion } from 'motion/react';
-import { GoogleGenAI } from '@google/genai';
+import { getGeminiClient } from '../lib/gemini';
 
 export default function DreamInterpretation({ onBack }: { onBack?: () => void }) {
   const [query, setQuery] = useState('');
@@ -26,7 +26,7 @@ export default function DreamInterpretation({ onBack }: { onBack?: () => void })
     setIsLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+      const ai = getGeminiClient();
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: userMsg,

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { ChevronLeft, Scan, ShieldCheck, AlertTriangle, AlertOctagon, Loader2 } from 'lucide-react';
-import { GoogleGenAI } from '@google/genai';
+import { getGeminiClient } from '../lib/gemini';
 
 export default function HalalChecker({ onBack }: { onBack: () => void }) {
   const [ingredients, setIngredients] = useState('');
@@ -14,8 +14,7 @@ export default function HalalChecker({ onBack }: { onBack: () => void }) {
     setResult(null);
 
     try {
-      const apiKey = process.env.GEMINI_API_KEY || '';
-      const ai = new GoogleGenAI({ apiKey });
+      const ai = getGeminiClient();
 
       const prompt = `
         أنت خبير في علم الأغذية والشريعة الإسلامية.

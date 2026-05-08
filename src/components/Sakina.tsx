@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Wind, CloudRain, Waves, Flame, X, Volume2, VolumeX } from 'lucide-react';
+import { Wind, CloudRain, Waves, Flame, X, Volume2, VolumeX, Moon } from 'lucide-react';
 
 const zikrSequence = [
   { text: 'سُبْحَانَ اللَّهِ', phase: 'شهيق - تنفس ببطء', duration: 4000 },
@@ -9,10 +9,10 @@ const zikrSequence = [
 ];
 
 const ambientSounds = [
-  { id: 'rain', name: 'مطر هادئ', icon: <CloudRain size={20} />, color: 'bg-blue-500' },
-  { id: 'waves', name: 'أمواج البحر', icon: <Waves size={20} />, color: 'bg-cyan-500' },
-  { id: 'wind', name: 'نسيم الرياح', icon: <Wind size={20} />, color: 'bg-teal-500' },
-  { id: 'fire', name: 'نار دافئة', icon: <Flame size={20} />, color: 'bg-orange-500' }
+  { id: 'quran', name: 'القرآن الكريم', icon: <Moon size={20} />, color: 'bg-emerald-500', url: 'https://backup.qurango.net/radio/tarteel' },
+  { id: 'rain', name: 'مطر هادئ', icon: <CloudRain size={20} />, color: 'bg-blue-500', url: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Rain_Heavy_Loud.ogg' },
+  { id: 'waves', name: 'أمواج البحر', icon: <Waves size={20} />, color: 'bg-cyan-500', url: 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Ocean_waves_sound.ogg' },
+  { id: 'wind', name: 'نسيم الرياح', icon: <Wind size={20} />, color: 'bg-teal-500', url: 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Wind-1.ogg' },
 ];
 
 export default function Sakina({ onBack }: { onBack: () => void }) {
@@ -20,6 +20,8 @@ export default function Sakina({ onBack }: { onBack: () => void }) {
   const [step, setStep] = useState(0);
   const [sound, setSound] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState(false);
+  
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     let interval: any;
@@ -32,6 +34,26 @@ export default function Sakina({ onBack }: { onBack: () => void }) {
     }
     return () => clearInterval(interval);
   }, [isActive]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      if (sound) {
+        const selectedSound = ambientSounds.find(s => s.id === sound);
+        if (selectedSound) {
+          audioRef.current.src = selectedSound.url;
+          audioRef.current.play().catch(e => console.error("Audio play failed:", e?.message || String(e)));
+        }
+      } else {
+        audioRef.current.pause();
+      }
+    }
+  }, [sound]);
 
   const currentZikr = zikrSequence[step];
 
@@ -52,6 +74,8 @@ export default function Sakina({ onBack }: { onBack: () => void }) {
       className="fixed inset-0 z-50 bg-[#050B14] text-white flex flex-col items-center justify-center overflow-hidden" 
       dir="rtl"
     >
+      <audio ref={audioRef} loop />
+
       {/* Background Ambient Effect */}
       <div className="absolute inset-0 opacity-20 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/20 rounded-full blur-[100px] animate-pulse"></div>
@@ -60,7 +84,7 @@ export default function Sakina({ onBack }: { onBack: () => void }) {
 
       {/* Header */}
       <div className="absolute top-0 w-full p-6 flex justify-between items-center z-20">
-        <button onClick={onBack} className="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors backdrop-blur-md border border-white/10">
+        <button onClick={() => { setSound(null); onBack(); }} className="p-3 bg-white/5 hover:bg-white/10 rounded-full transition-colors backdrop-blur-md border border-white/10">
           <X size={24} className="text-white/70" />
         </button>
         <div className="text-center">
@@ -75,7 +99,7 @@ export default function Sakina({ onBack }: { onBack: () => void }) {
       {/* Breathing Orb */}
       <div className="relative w-64 h-64 flex items-center justify-center z-10 m-auto mt-10">
         <motion.div
-          animate={isActive ? getOrbAnimation() : { scale: 1, opacity: 0.3 }}
+           animate={isActive ? getOrbAnimation() : { scale: 1, opacity: 0.3 }}
           className="absolute w-40 h-40 rounded-full bg-gradient-to-br from-emerald-400/30 to-teal-600/30 blur-2xl"
         />
         <motion.div
@@ -115,30 +139,30 @@ export default function Sakina({ onBack }: { onBack: () => void }) {
           className={`px-12 py-4 rounded-full font-bold text-lg tracking-wide transition-all shadow-lg ${
             isActive 
               ? 'bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20' 
-              : 'bg-emerald-500 text-white shadow-emerald-500/20 hover:bg-emerald-400 hover:shadow-emerald-500/40'
+              : 'bg-emerald-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:bg-emerald-400'
           }`}
         >
           {isActive ? 'إنهاء الجلسة' : 'ابدأ لحظة السكينة'}
         </button>
 
         {/* Ambient Sounds */}
-        <div className="w-full flex justify-center gap-3">
+        <div className="w-full flex justify-center gap-3 bg-white/5 backdrop-blur-md p-3 rounded-2xl border border-white/10">
           {ambientSounds.map((env) => (
             <button
               key={env.id}
               onClick={() => setSound(sound === env.id ? null : env.id)}
-              className={`p-3 rounded-2xl transition-all flex flex-col items-center gap-2 border ${
+              className={`p-3 rounded-2xl transition-all flex flex-col items-center gap-2 border flex-1 ${
                 sound === env.id 
-                  ? 'bg-white/10 border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.1)] scale-110 relative' 
-                  : 'bg-white/5 border-transparent text-white/50 hover:bg-white/10'
+                  ? 'bg-white/10 border-white/30 shadow-[0_0_20px_rgba(255,255,255,0.1)] relative' 
+                  : 'bg-transparent border-transparent text-white/50 hover:bg-white/5'
               }`}
             >
               <div className={`${sound === env.id ? env.color + ' text-white shadow-lg' : 'text-white/50 bg-black/20'} p-2.5 rounded-full transition-colors`}>
                 {env.icon}
               </div>
-              {sound === env.id && (
-                <span className="absolute -bottom-6 text-[10px] text-white/70 whitespace-nowrap">{env.name}</span>
-              )}
+              <span className={`text-[10px] whitespace-nowrap font-bold ${sound === env.id ? 'text-white' : 'text-white/40'}`}>
+                {env.name}
+              </span>
             </button>
           ))}
         </div>

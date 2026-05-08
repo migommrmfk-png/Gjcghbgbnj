@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { GoogleGenAI } from "@google/genai";
 import { ChevronRight } from 'lucide-react';
 import { useTranslation } from "react-i18next";
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+import { getGeminiClient } from '../lib/gemini';
 
 const CATEGORIES = [
   { id: "tafseer", label: "تفسير الآيات", icon: "📖" },
@@ -97,6 +95,7 @@ export default function IslamicQuiz({ onBack }: { onBack: () => void }) {
     setRevealed(false);
     clearInterval(timerRef.current);
     try {
+      const ai = getGeminiClient();
       const prompt = `أنشئ سؤالاً قرآنياً من فئة "${category}" بمستوى "${difficulty}". 
       تأكد أن الأسئلة متنوعة ومختلفة في كل مرة ولم تسألني إياه في هذه الجلسة. الرقم العشوائي للتميز: ${Math.random()}`;
 

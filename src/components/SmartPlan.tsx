@@ -3,9 +3,10 @@ import { motion } from 'motion/react';
 import { CheckCircle2, Circle, Loader2, Sparkles, Trophy, Flame, Target } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
-import { db } from '../firebase';
+import { db, auth as firebaseAuth } from '../firebase';
 import { collection, query, where, getDocs, addDoc, updateDoc, doc, getDoc, setDoc } from 'firebase/firestore';
-import { GoogleGenAI, Type } from '@google/genai';
+import { Type } from '@google/genai';
+import { getGeminiClient } from '../lib/gemini';
 
 interface Task {
   id: string;
@@ -47,10 +48,9 @@ export default function SmartPlan() {
   const fetchUserStats = async () => {
     if (!user) return;
     try {
-      const userRef = doc(db, 'users', user.id);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        const data = userSnap.data();
+      const { supabase } = await import('../supabase');
+      const { data, error } = await supabase.from('users').select('xp, level, streak, badges').eq('uid', user.id).single();
+      if (data) {
         setStats({
           xp: data.xp || 0,
           level: data.level || 1,
@@ -93,7 +93,7 @@ export default function SmartPlan() {
     if (!user) return;
     setGenerating(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const ai = getGeminiClient();
       const today = new Date().toISOString().split('T')[0];
       
       const prompt = `Generate a personalized daily Islamic plan for a user. The plan should include 3-5 tasks. 
@@ -152,7 +152,28 @@ export default function SmartPlan() {
       const docRef = await addDoc(collection(db, 'plans'), newPlan);
       setPlan({ id: docRef.id, ...newPlan });
     } catch (error) {
-      console.error('Error generating plan:', error);
+      console.error('Error generating plan with AI:', error);
+      
+      // Fallback to static plan if AI fails
+      const fallbackTasks: Task[] = [
+        { id: "f1", title: "صلاة الضحى", description: "ركعتان تجزئ عن 360 صدقة", xpReward: 20, completed: false },
+        { id: "f2", title: "قراءة سورة الملك", description: "تنجي من عذاب القبر", xpReward: 30, completed: false },
+        { id: "f3", title: "أذكار الصباح/المساء", description: "حصن المسلم اليومي", xpReward: 20, completed: false },
+        { id: "f4", title: "الاستغفار 100 مرة", description: "طهارة للقلب ومغفرة للذنوب", xpReward: 15, completed: false }
+      ];
+      
+      const newPlan: DailyPlan = {
+        userId: user.id,
+        date: new Date().toISOString().split('T')[0],
+        tasks: fallbackTasks
+      };
+      
+      try {
+         const docRef = await addDoc(collection(db, 'plans'), newPlan);
+         setPlan({ id: docRef.id, ...newPlan });
+      } catch(e) {
+         console.error('Failed to save fallback plan', e);
+      }
     } finally {
       setGenerating(false);
     }
@@ -195,21 +216,20 @@ export default function SmartPlan() {
   const awardXP = async (amount: number) => {
     if (!user) return;
     try {
-      const userRef = doc(db, 'users', user.id);
-      const userSnap = await getDoc(userRef);
+      const { supabase } = await import('../supabase');
+      const { data, error } = await supabase.from('users').select('xp').eq('uid', user.id).single();
       
-      if (userSnap.exists()) {
-        const data = userSnap.data();
+      if (data) {
         let newXp = (data.xp || 0) + amount;
         if (newXp < 0) newXp = 0;
         
         // Simple leveling logic: 100 XP per level
         const newLevel = Math.floor(newXp / 100) + 1;
         
-        await updateDoc(userRef, {
+        await supabase.from('users').update({
           xp: newXp,
           level: newLevel
-        });
+        }).eq('uid', user.id);
         
         setStats(prev => ({ ...prev, xp: newXp, level: newLevel }));
       }

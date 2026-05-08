@@ -50,19 +50,18 @@ const SmartPlan = lazy(() => import("./components/SmartPlan"));
 const Ruqyah = lazy(() => import("./components/Ruqyah"));
 const InheritanceCalculator = lazy(() => import("./components/InheritanceCalculator"));
 const DreamInterpretation = lazy(() => import("./components/DreamInterpretation"));
-const QuranReels = lazy(() => import("./components/QuranReels"));
+
 const SelfAccounting = lazy(() => import("./components/SelfAccounting"));
 const Downloads = lazy(() => import("./components/Downloads"));
 const IslamicQuiz = lazy(() => import("./components/IslamicQuiz"));
 const Subscription = lazy(() => import("./components/Subscription"));
 const SubscriptionAdmin = lazy(() => import("./components/SubscriptionAdmin"));
-const KidsQuran = lazy(() => import("./components/KidsQuran"));
+const NotificationsPage = lazy(() => import("./components/NotificationsPage"));
 const MoodTracker = lazy(() => import("./components/MoodTracker"));
 const Sakina = lazy(() => import("./components/Sakina"));
-const SpiritualOrbit = lazy(() => import("./components/SpiritualOrbit"));
+
 const MuslimGarden = lazy(() => import("./components/MuslimGarden"));
 const NearbyMosques = lazy(() => import("./components/NearbyMosques"));
-const LiveMakkah = lazy(() => import("./components/LiveMakkah"));
 const IslamicEvents = lazy(() => import("./components/IslamicEvents"));
 const HalalChecker = lazy(() => import("./components/HalalChecker"));
 const QuranReflection = lazy(() => import("./components/QuranReflection"));
@@ -109,6 +108,13 @@ function AppContent() {
     if (!hasOnboarded) {
       setShowOnboarding(true);
     }
+    
+    // Auto sign in to Firebase anonymously for DB operations
+    import('./firebase').then(({ auth }) => {
+      import('firebase/auth').then(({ signInAnonymously }) => {
+        signInAnonymously(auth).catch((e) => console.log('Firebase anon auth failed:', e));
+      });
+    });
   }, []);
 
   const handleOnboardingComplete = () => {
@@ -174,8 +180,7 @@ function AppContent() {
         return <InheritanceCalculator onBack={handleBack} />;
       case "dreams":
         return <DreamInterpretation onBack={handleBack} />;
-      case "reels":
-        return <QuranReels onBack={handleBack} />;
+
       case "accounting":
         return <SelfAccounting onBack={handleBack} />;
       case "downloads":
@@ -186,12 +191,11 @@ function AppContent() {
         return <Subscription onBack={handleBack} />;
       case "admin":
         return <SubscriptionAdmin onBack={handleBack} />;
-      case "kids-quran":
-        return <KidsQuran onBack={handleBack} />;
+      case "notifications":
+        return <NotificationsPage onBack={handleBack} />;
       case "sakina":
         return <Sakina onBack={handleBack} />;
-      case "orbit":
-        return <SpiritualOrbit onBack={handleBack} />;
+
       case "garden":
         return <MuslimGarden onBack={handleBack} />;
       case "mood-tracker":
@@ -208,8 +212,6 @@ function AppContent() {
         );
       case "mosques":
         return <NearbyMosques onBack={handleBack} />;
-      case "live-makkah":
-        return <LiveMakkah onBack={handleBack} />;
       case "events":
         return <IslamicEvents onBack={handleBack} />;
       case "halal-checker":

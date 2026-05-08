@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, BookOpen, Sparkles, RefreshCw, Loader2, Share2 } from 'lucide-react';
-import { GoogleGenAI } from '@google/genai';
+import { getGeminiClient } from '../lib/gemini';
 
 export default function QuranReflection({ onBack }: { onBack: () => void }) {
   const [ayah, setAyah] = useState<any>(null);
@@ -33,8 +33,7 @@ export default function QuranReflection({ onBack }: { onBack: () => void }) {
   const generateReflection = async (text: string, surahName: string, number: number) => {
     setLoading(true);
     try {
-      const apiKey = process.env.GEMINI_API_KEY || '';
-      const ai = new GoogleGenAI({ apiKey });
+      const ai = getGeminiClient();
 
       const prompt = `
         تأمل في هذه الآية الكريمة:

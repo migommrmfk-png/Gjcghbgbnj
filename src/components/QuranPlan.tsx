@@ -121,6 +121,19 @@ export default function QuranPlan({ onBack }: { onBack: () => void }) {
                     </div>
                     <ArrowRight size={20} className="mr-auto text-teal-500/0 group-hover:text-teal-500 transform translate-x-4 group-hover:translate-x-0 transition-all relative z-10" />
                   </button>
+
+                  <button onClick={() => { setGoal('revision'); setSetupStep(1); }} className="card-3d bg-white dark:bg-slate-900 p-6 rounded-[2rem] flex items-center gap-5 hover:border-indigo-500/50 hover:-translate-y-1 transition-all group overflow-hidden relative">
+                     <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full -mr-10 -mt-10  group-hover:bg-indigo-500/20 transition-colors"></div>
+                    <div className="w-16 h-16 rounded-[1.5rem] bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center text-white shadow-[0_8px_20px_rgba(79,70,229,0.3)] group-hover:scale-110 transition-transform relative z-10 border border-white/20">
+                      <BookOpen size={28} className="drop-shadow-sm" />
+                    </div>
+                    <div className="text-right relative z-10">
+                      <h3 className="font-bold text-xl text-slate-800 dark:text-slate-100 group-hover:text-indigo-500 transition-colors mb-1">المراجعة والتثبيت</h3>
+                      <span className="bg-gradient-to-r from-amber-400 to-yellow-600 text-white text-[8px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider mb-0.5 shadow-sm absolute -top-8 left-0">PRO</span>
+                      <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium">مراجعة المحفوظات وتقوية التذكر</p>
+                    </div>
+                    <ArrowRight size={20} className="mr-auto text-indigo-500/0 group-hover:text-indigo-500 transform translate-x-4 group-hover:translate-x-0 transition-all relative z-10" />
+                  </button>
                 </div>
               </motion.div>
             )}

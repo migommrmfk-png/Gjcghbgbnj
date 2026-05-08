@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, Trophy, Star, CheckCircle2, XCircle, Brain, Book, Puzzle, History, Users, Grid3X3, Loader2, Sparkles } from 'lucide-react';
-import { GoogleGenAI, Type } from "@google/genai";
+import { Type } from "@google/genai";
+import { getGeminiClient } from '../lib/gemini';
 
 // --- Default Game Data ---
 const defaultQuizQuestions = [
@@ -129,7 +130,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
   const generateNewQuestions = async (type: 'quiz' | 'ayah' | 'history' | 'prophets' | 'memory') => {
     setIsGenerating(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const ai = getGeminiClient();
       
       let prompt = "";
       let schema: any = {};

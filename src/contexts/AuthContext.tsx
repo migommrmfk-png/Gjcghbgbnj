@@ -84,18 +84,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       window.history.replaceState(null, '', window.location.pathname);
     }
 
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (error) {
-        console.error("Supabase getSession error:", error);
-        setError(error.message);
+    // Get initial session
+    const initializeAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("Supabase getSession error:", error);
+          setError(error.message);
+        }
+        await handleSession(session);
+      } catch (err) {
+        console.error("Unhandled error in getSession:", err);
+        await handleSession(null);
       }
-      handleSession(session);
-    }).catch(err => {
-      console.error("Unhandled error in getSession:", err);
-      handleSession(null);
-    });
+    };
 
+    initializeAuth();
+
+    // Listen to changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      // Avoid fetching if it's the exact same session (fast refresh)
       handleSession(session);
     });
 

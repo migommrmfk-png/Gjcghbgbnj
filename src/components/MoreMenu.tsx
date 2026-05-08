@@ -120,9 +120,8 @@ export default function MoreMenu({
       title: t('library_and_learning', 'المكتبة والتعلم'),
       image: 'https://i.pinimg.com/736x/87/1b/2f/871b2f81152a51f801a61327111b1511.jpg',
       items: [
-        { id: 'muslim-ai', label: t('muslim_ai', 'الذكاء الاصطناعي'), icon: <Bot size={24} />, color: 'bg-indigo-500' },
-        { id: 'kids-quran', label: t('kids_quran', 'مصحف الأطفال'), icon: <Smile size={24} />, color: 'bg-emerald-400' },
-        { id: 'dreams', label: t('dream_interpretation', 'تفسير الأحلام'), icon: <Moon size={24} />, color: 'bg-indigo-700' },
+        { id: 'muslim-ai', label: t('muslim_ai', 'الذكاء الاصطناعي'), icon: <Bot size={24} />, color: 'bg-indigo-500', isPro: true },
+        { id: 'dreams', label: t('dream_interpretation', 'تفسير الأحلام'), icon: <Moon size={24} />, color: 'bg-indigo-700', isPro: true },
         { id: 'stories', label: t('prophet_stories', 'قصص الأنبياء'), icon: <BookOpen size={24} />, color: 'bg-purple-500' },
         { id: 'prayer-guide', label: t('prayer_guide', 'كيفية الصلاة'), icon: <BookOpen size={24} />, color: 'bg-amber-600' },
         { id: 'names', label: t('names_of_allah', 'أسماء الله الحسنى'), icon: <Heart size={24} />, color: 'bg-pink-500' },
@@ -134,7 +133,7 @@ export default function MoreMenu({
       title: t('tools_and_seasons', 'أدوات ومواسم'),
       image: 'https://i.pinimg.com/736x/3f/8b/77/3f8b77626915152a54b38d7c49b6b801.jpg',
       items: [
-        { id: 'sakina', label: t('sakina', 'خيمة السكينة'), icon: <Wind size={24} />, color: 'bg-emerald-500' },
+        { id: 'sakina', label: t('sakina', 'خيمة السكينة'), icon: <Wind size={24} />, color: 'bg-emerald-500', isPro: true },
         { id: 'tasbeeh', label: t('tasbeeh', 'السبحة الإلكترونية'), icon: <Circle size={24} />, color: 'bg-indigo-500' },
         { id: 'ruqyah', label: t('ruqyah', 'الرقية الشرعية'), icon: <Shield size={24} />, color: 'bg-teal-500' },
         { id: 'qibla', label: t('qibla', 'اتجاه القبلة'), icon: <Compass size={24} />, color: 'bg-orange-500' },
@@ -149,15 +148,12 @@ export default function MoreMenu({
       image: 'https://i.pinimg.com/736x/60/76/8b/60768b598b049d53c7a36e1c94411d73.jpg',
       items: [
         { id: 'garden', label: t('muslim_garden', 'بستان العبادات'), icon: <TreePine size={24} />, color: 'bg-emerald-600', isNew: true },
-        { id: 'orbit', label: t('spiritual_orbit', 'فلك العبادات'), icon: <Activity size={24} />, color: 'bg-indigo-900', isNew: true },
         { id: 'dua-wall', label: t('dua_wall', 'حائط الدعاء'), icon: <HandHeart size={24} />, color: 'bg-rose-500' },
         { id: 'mood-tracker', label: t('mood_tracker', 'تتبع المزاج'), icon: <Smile size={24} />, color: 'bg-indigo-500' },
-        { id: 'accounting', label: t('self_accounting', 'ورد المحاسبة'), icon: <TrendingUp size={24} />, color: 'bg-teal-600' },
-        { id: 'smart-plan', label: t('smart_plan', 'الخطة الذكية'), icon: <Target size={24} />, color: 'bg-emerald-600' },
-        { id: 'worship-tracker', label: t('worship_tracker', 'متابعة العبادات'), icon: <Trophy size={24} />, color: 'bg-amber-500' },
+        { id: 'accounting', label: t('self_accounting', 'ورد المحاسبة'), icon: <TrendingUp size={24} />, color: 'bg-teal-600', isPro: true },
+        { id: 'smart-plan', label: t('smart_plan', 'الخطة الذكية'), icon: <Target size={24} />, color: 'bg-emerald-600', isPro: true },
         { id: 'quran-plan', label: t('quran_plan', 'خطة القرآن'), icon: <BookOpen size={24} />, color: 'bg-emerald-500' },
         { id: 'quiz', label: t('islamic_quiz', 'اختبر معلوماتك'), icon: <Award size={24} />, color: 'bg-indigo-600' },
-        { id: 'social', label: t('social_and_challenges', 'المجتمع والتحديات'), icon: <Users size={24} />, color: 'bg-rose-500' },
         { id: 'games', label: t('games_and_challenges', 'ألعاب وتحديات'), icon: <Puzzle size={24} />, color: 'bg-teal-500' },
       ]
     },
@@ -165,7 +161,6 @@ export default function MoreMenu({
       title: t('audios', 'صوتيات'),
       image: 'https://i.pinimg.com/736x/f6/3c/65/f63c65c270d7406f52285188d8b2d423.jpg',
       items: [
-        { id: 'reels', label: t('quran_reels', 'تلاوات خاشعة'), icon: <Play size={24} />, color: 'bg-purple-600' },
         { id: 'radio', label: t('quran_radio', 'إذاعة القرآن'), icon: <Radio size={24} />, color: 'bg-red-500' },
         { id: 'downloads', label: t('downloads', 'التنزيلات'), icon: <Download size={24} />, color: 'bg-emerald-600' },
       ]
@@ -288,7 +283,14 @@ export default function MoreMenu({
                   </div>
                   
                   <div className="relative z-10 w-full flex flex-col items-center">
-                    <span className="font-semibold text-slate-700 dark:text-slate-200 text-sm block group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">{item.label}</span>
+                    <span className="font-semibold text-slate-700 dark:text-slate-200 text-sm block group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex justify-center items-center gap-1">
+                      {item.label}
+                      {(item as any).isPro && (
+                        <span className="bg-gradient-to-r from-amber-400 to-yellow-600 text-white text-[8px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider mb-0.5 shadow-sm">
+                          PRO
+                        </span>
+                      )}
+                    </span>
                   </div>
                 </motion.button>
               ))}

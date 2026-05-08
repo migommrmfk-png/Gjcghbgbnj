@@ -21,17 +21,16 @@ import {
   Puzzle,
   Wind,
   Video,
-  Sparkles,
   Scan,
   Hourglass,
   Baby,
-  ImageIcon
+  ImageIcon,
+  Bell
 } from "lucide-react";
 import { motion } from "motion/react";
 import { usePrayerTimes } from "../contexts/PrayerTimesContext";
 import { useAuth } from "../contexts/AuthContext";
-import { db } from "../firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { supabase } from '../supabase';
 import DownloadAppBanner from "./DownloadAppBanner";
 import MoodTracker from "./MoodTracker";
 import { useTranslation } from 'react-i18next';
@@ -128,18 +127,12 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     if (user && streakUpdated) {
       const syncStreak = async () => {
         try {
-          const userRef = doc(db, 'users', user.id);
-          const userSnap = await getDoc(userRef);
-          if (userSnap.exists()) {
-            const data = userSnap.data();
-            if (data.streak !== currentStreak) {
-              await updateDoc(userRef, { streak: currentStreak });
-            }
+          const { data, error } = await supabase.from('users').select('streak').eq('uid', user.id).single();
+          if (data && data.streak !== currentStreak) {
+            await supabase.from('users').update({ streak: currentStreak }).eq('uid', user.id);
           }
         } catch (err: any) {
-          if (!err?.message?.includes('offline')) {
-            console.error("Error syncing streak:", err);
-          }
+          console.error("Error syncing streak:", err);
         }
       };
       syncStreak();
@@ -147,19 +140,13 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       // Just fetch it to make sure it matches
       const fetchStreak = async () => {
         try {
-          const userRef = doc(db, 'users', user.id);
-          const userSnap = await getDoc(userRef);
-          if (userSnap.exists()) {
-            const data = userSnap.data();
-            if (data.streak && data.streak > currentStreak) {
-              setStreak(data.streak);
-              localStorage.setItem('appStreak', data.streak.toString());
-            }
+          const { data, error } = await supabase.from('users').select('streak').eq('uid', user.id).single();
+          if (data && data.streak && data.streak > currentStreak) {
+            setStreak(data.streak);
+            localStorage.setItem('appStreak', data.streak.toString());
           }
         } catch (err: any) {
-          if (!err?.message?.includes('offline')) {
-            console.error("Error fetching streak:", err);
-          }
+          console.error("Error fetching streak:", err);
         }
       };
       fetchStreak();
@@ -575,13 +562,6 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       bg: "bg-orange-500/10",
     },
     {
-      id: "live-makkah",
-      title: "بث الحرمين",
-      icon: <Video size={28} />,
-      color: "text-amber-400",
-      bg: "bg-amber-500/10",
-    },
-    {
       id: "islamic-names",
       title: "مستشار الأسماء",
       icon: <Baby size={28} />,
@@ -636,12 +616,22 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                 <span>{locationName || t('locating')}</span>
               </div>
             </div>
-            {streak > 0 && (
-              <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold border border-white/10">
-                <Flame size={14} className="text-orange-400" />
-                <span>{streak} {t('days_streak')}</span>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              {streak > 0 && (
+                <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold border border-white/10">
+                  <Flame size={14} className="text-orange-400" />
+                  <span>{streak} {t('days_streak')}</span>
+                </div>
+              )}
+              <button 
+                onClick={() => onNavigate("notifications")}
+                className="relative bg-white/10 backdrop-blur-md p-2 rounded-full border border-white/10 text-white hover:bg-white/20 transition-colors"
+                title="الإشعارات"
+              >
+                <Bell size={18} />
+                <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#0A1914]"></span>
+              </button>
+            </div>
           </div>
 
           {hijriDate && (
@@ -716,13 +706,6 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             <Radio size={16} />
           </div>
           <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">الإذاعة</span>
-        </button>
-        
-        <button onClick={() => onNavigate("reels")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
-          <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/40 flex items-center justify-center text-purple-600 dark:text-purple-400">
-            <Share2 size={16} /> {/* Using Share2 temporarily, Play would be better but not imported */}
-          </div>
-          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">مقاطع تلاوات</span>
         </button>
 
         <button onClick={() => onNavigate("hadith")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
@@ -820,30 +803,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         </div>
       </motion.div>
 
-      {/* Spiritual Orbit Banner */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        onClick={() => onNavigate("orbit")}
-        className="relative overflow-hidden rounded-[32px] bg-indigo-950 shadow-xl shadow-indigo-900/20 p-6 flex flex-col justify-center cursor-pointer group active:scale-[0.98] transition-all border border-indigo-500/20"
-      >
-        <div className="absolute inset-0 opacity-30 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] bg-repeat"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-amber-500/20 rounded-full blur-xl group-hover:scale-150 transition-transform duration-1000 pointer-events-none"></div>
-        
-        <div className="relative z-10 flex items-center justify-between text-white w-full">
-          <div>
-            <h3 className="text-lg font-bold mb-1 flex items-center gap-2 drop-shadow-md">
-              فلك العبادات 
-              <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-md text-[10px] uppercase font-black tracking-wider">مبتكر</span>
-            </h3>
-            <p className="text-indigo-200 text-xs opacity-90 tracking-wide font-medium">اجعل طاعاتك تدور حول قلبك</p>
-          </div>
-          <div className="w-12 h-12 bg-black/30 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10 group-hover:bg-amber-500/20 group-hover:text-amber-400 group-hover:border-amber-500/40 transition-colors shadow-inner">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 22a10 10 0 0 1-10-10"/></svg>
-          </div>
-        </div>
-      </motion.div>
+
 
       {/* Muslim Garden Banner */}
       <motion.div
@@ -870,35 +830,74 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         </div>
       </motion.div>
 
+      {/* Subscription Banner on Normal Page */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.24 }}
+        onClick={() => onNavigate("subscription")}
+        className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-amber-500 to-orange-500 shadow-xl shadow-amber-500/20 p-5 flex items-center justify-between cursor-pointer group active:scale-[0.98] transition-all"
+      >
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-md group-hover:scale-110 transition-transform duration-500"></div>
+        <div className="relative z-10 flex items-center gap-4 text-white">
+          <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-[18px] flex items-center justify-center border border-white/20">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg>
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-white mb-0.5 tracking-wide flex items-center gap-2">
+              الترقية وإضافة المفتاح
+              <span className="bg-white/20 border border-white/30 text-white text-[9px] px-1.5 py-0.5 rounded-md uppercase tracking-wider font-extrabold hidden sm:inline-block">PRO</span>
+            </h3>
+            <p className="text-amber-50 text-xs font-medium opacity-90 tracking-wide">أدخل مفتاح التفعيل للحصول على الباقة</p>
+          </div>
+        </div>
+        <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 group-hover:bg-white group-hover:text-amber-600 transition-colors">
+          <ChevronLeft size={16} className={isRTL ? '' : 'rotate-180'} />
+        </div>
+      </motion.div>
+
       {/* Prayers Row */}
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.2 }}
-        className="bg-white dark:bg-slate-900 rounded-[32px] p-5 border border-slate-100 dark:border-slate-800 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.06)]"
+        className="card-3d bg-white dark:bg-slate-900 rounded-[32px] p-6 border border-slate-100 dark:border-slate-800 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.1)] relative overflow-hidden"
       >
-        <div className="flex justify-between items-center mb-4 px-1">
-          <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">{t('prayer_times')}</h3>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+        <div className="flex justify-between items-center mb-5 px-1 relative z-10">
+          <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
+            <span className="w-1.5 h-4 bg-emerald-500 rounded-full inline-block"></span>
+            {t('prayer_times')}
+          </h3>
+          <span className="text-xs font-bold text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-1 rounded-lg">
+             مكة المكرمة
+          </span>
         </div>
-        <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 p-2 rounded-[24px]">
+        <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/80 p-1.5 rounded-[24px] shadow-inner relative z-10 border border-slate-100 dark:border-slate-700/50">
           {prayersList.map((prayer) => {
             const isNext = nextPrayer?.id === prayer.id;
             const time = prayerTimes ? prayerTimes[prayer.id as keyof typeof prayerTimes] : "--:--";
             return (
               <div
                 key={prayer.id}
-                className={`flex flex-col items-center justify-center p-2 rounded-[20px] transition-all flex-1 min-w-0 ${
+                className={`flex flex-col items-center justify-center py-3 px-1 rounded-[20px] transition-all flex-1 min-w-0 ${
                   isNext
-                    ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20 transform scale-105"
+                    ? "bg-gradient-to-br from-emerald-400 to-emerald-600 text-white shadow-lg shadow-emerald-500/30 transform scale-[1.05]"
                     : "text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700"
                 }`}
               >
-                <span className={`text-[10px] font-bold mb-1 truncate w-full text-center ${isNext ? 'opacity-100' : ''}`}>{prayer.name}</span>
-                <span className={`text-xs font-bold font-mono ${isNext ? '' : 'text-slate-800 dark:text-slate-200'}`}>{formatTime(time).split(' ')[0]}</span>
+                <span className={`text-[11px] font-bold mb-1 truncate w-full text-center ${isNext ? 'opacity-100' : ''}`}>{prayer.name}</span>
+                <span className={`text-sm font-bold font-mono tracking-tight ${isNext ? '' : 'text-slate-800 dark:text-slate-200'}`}>{formatTime(time).split(' ')[0]}</span>
               </div>
             );
           })}
         </div>
+        {nextPrayer && (
+          <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-xs text-slate-500 font-medium px-2">
+             <span>باقي على الصلاة القادمة: <span className="font-bold text-emerald-500">{nextPrayerTime}</span></span>
+             <span className="text-[10px] text-slate-400">({nextPrayerName})</span>
+          </div>
+        )}
       </motion.div>
 
       <div className="grid grid-cols-2 gap-4">

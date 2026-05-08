@@ -3,9 +3,10 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Smile, Frown, Meh, Heart, Coffee, CloudRain, Sparkles, Loader2, MessageCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
-import { db } from '../firebase';
+import { db, auth as firebaseAuth } from '../firebase';
 import { collection, addDoc, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
-import { GoogleGenAI, Type } from '@google/genai';
+import { Type } from '@google/genai';
+import { getGeminiClient } from '../lib/gemini';
 
 const moods = [
   { id: 'happy', icon: <Smile className="w-8 h-8" />, label: 'سعيد', color: 'bg-emerald-500' },
@@ -32,12 +33,12 @@ export default function MoodTracker() {
   }, [user]);
 
   const checkTodayMood = async () => {
-    if (!user) return;
+    if (!user || !firebaseAuth.currentUser) return;
     try {
       const today = new Date().toISOString().split('T')[0];
       const q = query(
         collection(db, 'moods'),
-        where('userId', '==', user.id),
+        where('userId', '==', firebaseAuth.currentUser.uid),
         where('timestamp', '>=', today + 'T00:00:00Z'),
         where('timestamp', '<=', today + 'T23:59:59Z'),
         orderBy('timestamp', 'desc'),
@@ -48,7 +49,6 @@ export default function MoodTracker() {
         setHasLoggedToday(true);
         const data = snapshot.docs[0].data();
         setSelectedMood(data.mood);
-        // We could also save the suggestion in the DB, but for now we just show they logged it.
       }
     } catch (error) {
       console.error("Error checking mood:", error);
@@ -56,7 +56,7 @@ export default function MoodTracker() {
   };
 
   const handleMoodSelect = async (moodId: string) => {
-    if (!user) return;
+    if (!user || !firebaseAuth.currentUser) return;
     setSelectedMood(moodId);
     setSaving(true);
     setLoading(true);
@@ -65,14 +65,14 @@ export default function MoodTracker() {
       // Save to Firestore
       const now = new Date().toISOString();
       await addDoc(collection(db, 'moods'), {
-        userId: user.id,
+        userId: firebaseAuth.currentUser.uid,
         mood: moodId,
         timestamp: now
       });
       setHasLoggedToday(true);
 
       // Generate AI Suggestion
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const ai = getGeminiClient();
       const moodLabel = moods.find(m => m.id === moodId)?.label || moodId;
       const prompt = `The user is feeling "${moodLabel}". Provide a comforting Islamic suggestion. 
       It can be a short Ayah, a Dua, or a Hadith that fits this mood.

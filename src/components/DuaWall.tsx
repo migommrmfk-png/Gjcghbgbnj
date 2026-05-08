@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, Heart, MessageCircle, Send, User, ShieldAlert, Clock, Flame, Share2 } from 'lucide-react';
-import { db } from '../firebase';
+import { db, auth as firebaseAuth } from '../firebase';
 import { collection, addDoc, query, orderBy, limit, onSnapshot, updateDoc, doc, increment, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -59,21 +59,19 @@ export default function DuaWall({ onBack }: { onBack: () => void }) {
     try {
       await addDoc(collection(db, 'duaWall'), {
         text: newDua.trim(),
-        authorName: isAnonymous ? 'فاعل خير' : (user.displayName || 'مستخدم'),
+        authorName: isAnonymous ? 'فاعل خير' : (user.user_metadata?.full_name || 'مستخدم'),
         authorId: user.id,
         createdAt: serverTimestamp(),
         ameenCount: 0,
         isAnonymous
       });
       
-      // Reward user with XP for posting a dua
+      // Reward user with XP for posting a dua via Supabase
       try {
-        const userRef = doc(db, 'users', user.id);
-        await updateDoc(userRef, {
-          xp: increment(10)
-        });
+        const { supabase } = await import('../supabase');
+        await supabase.rpc('increment_xp', { amount: 10, user_id: user.id });
       } catch (xpError) {
-        console.error("Error updating XP:", xpError);
+        console.error("Error updating XP via Supabase:", xpError);
       }
       
       setNewDua('');
@@ -101,12 +99,10 @@ export default function DuaWall({ onBack }: { onBack: () => void }) {
       // Reward user with XP for saying Ameen
       if (user) {
         try {
-          const userRef = doc(db, 'users', user.id);
-          await updateDoc(userRef, {
-            xp: increment(2)
-          });
+          const { supabase } = await import('../supabase');
+          await supabase.rpc('increment_xp', { amount: 2, user_id: user.id });
         } catch (xpError) {
-          console.error("Error updating XP:", xpError);
+          console.error("Error updating XP via Supabase:", xpError);
         }
       }
     } catch (error) {

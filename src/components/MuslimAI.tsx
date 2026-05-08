@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Bot, Send, User, Sparkles, ArrowRight, Loader2, Trash2, Mic, Square } from 'lucide-react';
-import { GoogleGenAI } from '@google/genai';
+import { getGeminiClient } from '../lib/gemini';
 
 export default function MuslimAI({ onBack }: { onBack: () => void }) {
   const [messages, setMessages] = useState<{ role: 'user' | 'model', text: string }[]>(() => {
@@ -100,7 +100,7 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
     setIsLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+      const ai = getGeminiClient();
       
       const audioPart = {
         inlineData: {
@@ -122,9 +122,16 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
       });
       
       setMessages(prev => [...prev, { role: 'model', text: response.text || 'عذراً، لم أتمكن من معالجة التسجيل الصوتي.' }]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error calling Gemini AI for audio:", error);
-      setMessages(prev => [...prev, { role: 'model', text: 'عذراً، حدث خطأ في معالجة الصوت. يرجى المحاولة مرة أخرى لاحقاً.' }]);
+      let errorMessage = 'عذراً، حدث خطأ في معالجة الصوت. يرجى المحاولة مرة أخرى لاحقاً.';
+      
+      const errorStr = String(error?.message || error);
+      if (errorStr.includes('API key') || errorStr.includes('key not valid') || errorStr.includes('400')) {
+        errorMessage = 'مفتاح الذكاء الاصطناعي (GEMINI_API_KEY) غير صالح أو مفقود. يجب إضافة المفتاح في الإعدادات.';
+      }
+      
+      setMessages(prev => [...prev, { role: 'model', text: errorMessage }]);
     } finally {
       setIsLoading(false);
     }
@@ -139,7 +146,7 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
     setIsLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+      const ai = getGeminiClient();
       
       const chat = ai.chats.create({
         model: "gemini-2.5-flash",
@@ -153,9 +160,16 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
       const response = await chat.sendMessage({ message: userMessage });
       
       setMessages(prev => [...prev, { role: 'model', text: response.text || 'عذراً، لم أتمكن من معالجة طلبك.' }]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error calling Gemini AI:", error);
-      setMessages(prev => [...prev, { role: 'model', text: 'عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى لاحقاً.' }]);
+      let errorMessage = 'عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى لاحقاً.';
+      
+      const errorStr = String(error?.message || error);
+      if (errorStr.includes('API key') || errorStr.includes('key not valid') || errorStr.includes('400')) {
+        errorMessage = 'مفتاح الذكاء الاصطناعي (GEMINI_API_KEY) غير صالح أو غير موجود. يرجى الحصول على المفتاح من aistudio.google.com/app/apikey وإضافته في إعدادات التطبيق (Secrets).';
+      }
+      
+      setMessages(prev => [...prev, { role: 'model', text: errorMessage }]);
     } finally {
       setIsLoading(false);
     }

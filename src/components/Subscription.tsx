@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { ChevronRight, Crown, CheckCircle, Send, MessageCircle, Key, Loader } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
-import { db } from '../firebase';
+import { db, auth as firebaseAuth } from '../firebase';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 export default function Subscription({ onBack }: { onBack: () => void }) {
@@ -17,7 +17,7 @@ export default function Subscription({ onBack }: { onBack: () => void }) {
 
   const handleRedeemKey = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || user.isAnonymous) {
+    if (!user || !firebaseAuth.currentUser) {
       alert("عذراً، يجب تسجيل الدخول بحساب لتفعيل الاشتراك.");
       return;
     }
@@ -40,21 +40,22 @@ export default function Subscription({ onBack }: { onBack: () => void }) {
         return;
       }
 
-      // Mark key as used
+      // Mark key as used in Firebase
       await updateDoc(keyRef, {
         used: true,
-        usedBy: user.uid,
+        usedBy: user.id || firebaseAuth.currentUser.uid,
         usedAt: Date.now()
       });
 
-      // Update user plan
-      const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, {
-        plan: keyData.plan
-      });
+      // Update user plan in Supabase
+      const { supabase } = await import('../supabase');
+      await supabase.from('users').update({ plan: keyData.plan }).eq('uid', user.id);
 
       alert(`تم تفعيل اشتراك ${keyData.plan.toUpperCase()} بنجاح!`);
       setLicenseKey('');
+      
+      // Refresh browser to fetch updated plan from Supabase
+      window.location.reload();
     } catch (err: any) {
       alert("حدث خطأ: " + err.message);
     } finally {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, Baby, Sparkles, User, Info, Loader2 } from 'lucide-react';
-import { GoogleGenAI } from '@google/genai';
+import { getGeminiClient } from '../lib/gemini';
 
 export default function IslamicNames({ onBack }: { onBack: () => void }) {
   const [gender, setGender] = useState<'boy' | 'girl' | 'any'>('boy');
@@ -15,8 +15,7 @@ export default function IslamicNames({ onBack }: { onBack: () => void }) {
     setResults([]);
 
     try {
-      const apiKey = process.env.GEMINI_API_KEY || '';
-      const ai = new GoogleGenAI({ apiKey });
+      const ai = getGeminiClient();
 
       const prompt = `
         أنت مستشار للأسماء العربية والإسلامية.
