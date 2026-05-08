@@ -129,7 +129,6 @@ export default function QuranPlan({ onBack }: { onBack: () => void }) {
                     </div>
                     <div className="text-right relative z-10">
                       <h3 className="font-bold text-xl text-slate-800 dark:text-slate-100 group-hover:text-indigo-500 transition-colors mb-1">المراجعة والتثبيت</h3>
-                      <span className="bg-gradient-to-r from-amber-400 to-yellow-600 text-white text-[8px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider mb-0.5 shadow-sm absolute -top-8 left-0">PRO</span>
                       <p className="text-[13px] text-slate-500 dark:text-slate-400 font-medium">مراجعة المحفوظات وتقوية التذكر</p>
                     </div>
                     <ArrowRight size={20} className="mr-auto text-indigo-500/0 group-hover:text-indigo-500 transform translate-x-4 group-hover:translate-x-0 transition-all relative z-10" />

@@ -54,8 +54,7 @@ const DreamInterpretation = lazy(() => import("./components/DreamInterpretation"
 const SelfAccounting = lazy(() => import("./components/SelfAccounting"));
 const Downloads = lazy(() => import("./components/Downloads"));
 const IslamicQuiz = lazy(() => import("./components/IslamicQuiz"));
-const Subscription = lazy(() => import("./components/Subscription"));
-const SubscriptionAdmin = lazy(() => import("./components/SubscriptionAdmin"));
+
 const NotificationsPage = lazy(() => import("./components/NotificationsPage"));
 const MoodTracker = lazy(() => import("./components/MoodTracker"));
 const Sakina = lazy(() => import("./components/Sakina"));
@@ -187,10 +186,7 @@ function AppContent() {
         return <Downloads onBack={handleBack} />;
       case "quiz":
         return <IslamicQuiz onBack={handleBack} />;
-      case "subscription":
-        return <Subscription onBack={handleBack} />;
-      case "admin":
-        return <SubscriptionAdmin onBack={handleBack} />;
+
       case "notifications":
         return <NotificationsPage onBack={handleBack} />;
       case "sakina":

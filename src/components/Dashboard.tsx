@@ -830,31 +830,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         </div>
       </motion.div>
 
-      {/* Subscription Banner on Normal Page */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.24 }}
-        onClick={() => onNavigate("subscription")}
-        className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-amber-500 to-orange-500 shadow-xl shadow-amber-500/20 p-5 flex items-center justify-between cursor-pointer group active:scale-[0.98] transition-all"
-      >
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-md group-hover:scale-110 transition-transform duration-500"></div>
-        <div className="relative z-10 flex items-center gap-4 text-white">
-          <div className="w-14 h-14 bg-white/20 backdrop-blur-md rounded-[18px] flex items-center justify-center border border-white/20">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"/></svg>
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-white mb-0.5 tracking-wide flex items-center gap-2">
-              الترقية وإضافة المفتاح
-              <span className="bg-white/20 border border-white/30 text-white text-[9px] px-1.5 py-0.5 rounded-md uppercase tracking-wider font-extrabold hidden sm:inline-block">PRO</span>
-            </h3>
-            <p className="text-amber-50 text-xs font-medium opacity-90 tracking-wide">أدخل مفتاح التفعيل للحصول على الباقة</p>
-          </div>
-        </div>
-        <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 group-hover:bg-white group-hover:text-amber-600 transition-colors">
-          <ChevronLeft size={16} className={isRTL ? '' : 'rotate-180'} />
-        </div>
-      </motion.div>
+
 
       {/* Prayers Row */}
       <motion.div
@@ -870,7 +846,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             {t('prayer_times')}
           </h3>
           <span className="text-xs font-bold text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-1 rounded-lg">
-             مكة المكرمة
+             {locationName || "مكة المكرمة"}
           </span>
         </div>
         <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/80 p-1.5 rounded-[24px] shadow-inner relative z-10 border border-slate-100 dark:border-slate-700/50">
@@ -898,6 +874,10 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
              <span className="text-[10px] text-slate-400">({nextPrayerName})</span>
           </div>
         )}
+        <div className="mt-3 text-[10px] text-center text-emerald-600/70 dark:text-emerald-400/70 font-medium flex items-center justify-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          المصدر: Aladhan (معتمد للأوقات الشرعية)
+        </div>
       </motion.div>
 
       <div className="grid grid-cols-2 gap-4">
