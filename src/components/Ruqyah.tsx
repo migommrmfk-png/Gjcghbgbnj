@@ -69,7 +69,7 @@ export default function Ruqyah() {
       if (isPlaying) {
         audioRef.current.pause();
       } else {
-        audioRef.current.play();
+        audioRef.current.play().catch(e => console.error("Audio playback error:", e?.message || String(e)));
       }
       setIsPlaying(!isPlaying);
     }
@@ -223,7 +223,7 @@ export default function Ruqyah() {
               {/* Audio Element */}
               <audio
                 ref={audioRef}
-                src="https://qurango.net/radio/roqiah"
+                src="https://server8.mp3quran.net/afs/roqia.mp3"
                 preload="none"
               />
             </motion.div>

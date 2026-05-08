@@ -423,7 +423,7 @@ export default function Quran() {
           onPlaying={() => { setIsAudioLoading(false); setIsPlaying(true); }}
           onWaiting={() => setIsAudioLoading(true)}
           onError={(e) => {
-            console.error("Audio error", e);
+            console.error("Audio error", e?.type || String(e));
             setIsAudioLoading(false);
             setIsPlaying(false);
             setAudioError("حدث خطأ في الصوت. يرجى تجربة قارئ آخر.");

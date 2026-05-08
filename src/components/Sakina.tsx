@@ -10,9 +10,9 @@ const zikrSequence = [
 
 const ambientSounds = [
   { id: 'quran', name: 'القرآن الكريم', icon: <Moon size={20} />, color: 'bg-emerald-500', url: 'https://backup.qurango.net/radio/tarteel' },
-  { id: 'rain', name: 'مطر هادئ', icon: <CloudRain size={20} />, color: 'bg-blue-500', url: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Rain_Heavy_Loud.ogg' },
-  { id: 'waves', name: 'أمواج البحر', icon: <Waves size={20} />, color: 'bg-cyan-500', url: 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Ocean_waves_sound.ogg' },
-  { id: 'wind', name: 'نسيم الرياح', icon: <Wind size={20} />, color: 'bg-teal-500', url: 'https://upload.wikimedia.org/wikipedia/commons/d/d1/Wind-1.ogg' },
+  { id: 'rain', name: 'مطر هادئ', icon: <CloudRain size={20} />, color: 'bg-blue-500', url: 'https://cdn.pixabay.com/download/audio/2021/08/04/audio_3d1da9a4ab.mp3' },
+  { id: 'waves', name: 'أمواج البحر', icon: <Waves size={20} />, color: 'bg-cyan-500', url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_b2875b6a7a.mp3' },
+  { id: 'wind', name: 'نسيم الرياح', icon: <Wind size={20} />, color: 'bg-teal-500', url: 'https://cdn.pixabay.com/download/audio/2022/02/10/audio_51590e8fcd.mp3' },
 ];
 
 export default function Sakina({ onBack }: { onBack: () => void }) {

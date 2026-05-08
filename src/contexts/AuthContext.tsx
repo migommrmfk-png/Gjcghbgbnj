@@ -14,9 +14,6 @@ interface UserData {
   badges: string[];
   displayName?: string;
   photoURL?: string;
-  plan?: 'free' | 'plus' | 'pro';
-  licenseKey?: string;
-  licenseDevice?: string;
 }
 
 interface AuthContextType {
@@ -162,13 +159,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
           setUserData(newUserData);
         } else {
-          // Device ID check
-          const currentDeviceId = getDeviceId();
-          if (data.plan && data.plan !== 'free' && data.licenseDevice && data.licenseDevice !== currentDeviceId) {
-            setUserData({ ...data, plan: 'free', licenseKey: undefined });
-          } else {
-            setUserData(data);
-          }
+          setUserData(data);
         }
       } catch (err) {
         console.error("Error fetching or creating user profile:", err);

@@ -505,7 +505,7 @@ export default function IslamicRadio() {
       <audio 
         ref={audioRef} 
         onError={(e) => {
-          console.error("Audio playback error:", e);
+          console.error("Audio playback error:", e?.type || String(e));
           setIsPlaying(false);
           setError("عذراً، هذه الإذاعة لا تعمل حالياً أو متوقفة مؤقتاً. يرجى اختيار إذاعة أخرى.");
         }}
