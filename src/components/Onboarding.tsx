@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BookOpen, Compass, Heart, Moon, Star, ArrowLeft, Clock, CheckCircle2, Radio, Calendar, MapPin } from 'lucide-react';
+import Logo from './Logo';
 
 export default function Onboarding({ onComplete }: { onComplete: () => void }) {
   const [step, setStep] = useState(0);
@@ -32,22 +33,14 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
       title: 'مرحبًا بك في "اليقين"',
       desc: "تطبيق إسلامي شامل يساعدك على تنظيم عبادتك اليومية بسهولة.",
       icon: (
-        <div className="relative w-48 h-48 flex items-center justify-center">
-          <div className="absolute inset-0 bg-emerald-500/20 rounded-full  animate-pulse"></div>
+        <div className="relative flex items-center justify-center">
+          <div className="absolute inset-0 bg-[#C6A45F]/20 rounded-full blur-3xl animate-pulse"></div>
           <motion.div 
             animate={{ y: [0, -10, 0] }} 
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             className="relative z-10 flex flex-col items-center justify-center"
           >
-            <Moon size={80} className="text-emerald-400 drop-shadow-[0_0_15px_rgba(212,175,55,0.8)] absolute -top-4 -right-4" />
-            <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-white drop-shadow-lg">
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-              <path d="M3 22v-4a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v4" />
-              <path d="M12 14v8" />
-              <path d="M8 14v8" />
-              <path d="M16 14v8" />
-              <path d="M12 2a3 3 0 0 0-3 3v9a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" fill="currentColor" fillOpacity="0.2"/>
-            </svg>
+            <Logo className="w-48 h-48 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]" />
           </motion.div>
         </div>
       ),

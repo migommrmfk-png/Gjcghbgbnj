@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { saveAudio } from "../lib/audioStore";
-import { fetchWithProxy, AUDIO_PROXIES } from "../lib/proxies";
 
 interface Surah {
   number: number;
@@ -51,9 +50,9 @@ interface ReciterOption {
 }
 
 const TAFSIR_OPTIONS = [
-  { id: 'ar.muyassar', name: 'التفسير الميسر' },
-  { id: 'ar.jalalayn', name: 'تفسير الجلالين' },
-  { id: 'ar.qurtubi', name: 'تفسير القرطبي' },
+  { id: 'muyassar', name: 'التفسير الميسر' },
+  { id: 'ibn_kathir_ar', name: 'تفسير ابن كثير' },
+  { id: 'ibn_kathir', name: 'تفسير ابن كثير (إنجليزي)' },
 ];
 
 export default function Quran() {
@@ -102,11 +101,21 @@ export default function Quran() {
       setLoading(false);
     } else {
       // Fetch Surahs list
-      fetch("https://api.alquran.cloud/v1/surah")
+      fetch("https://ummahapi.com/api/quran/surahs")
         .then((res) => res.json())
         .then((data) => {
-          setSurahs(data.data);
-          localStorage.setItem('quran_surahs', JSON.stringify(data.data));
+          if (data.success) {
+            const mappedSurahs = data.data.surahs.map((s: any) => ({
+              number: s.number,
+              name: s.name_arabic,
+              englishName: s.name_english,
+              englishNameTranslation: s.name_translation,
+              numberOfAyahs: s.verses_count,
+              revelationType: s.revelation_place === 'makkah' ? 'Meccan' : 'Medinan'
+            }));
+            setSurahs(mappedSurahs);
+            localStorage.setItem('quran_surahs', JSON.stringify(mappedSurahs));
+          }
           setLoading(false);
         })
         .catch((err) => {
@@ -176,9 +185,27 @@ export default function Quran() {
       if (cachedSurah) {
         surahData = JSON.parse(cachedSurah);
       } else {
-        const res = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}`);
-        const data = await res.json();
-        surahData = data.data;
+        const res = await fetch(`https://ummahapi.com/api/quran/surah/${surahNumber}`);
+        const resData = await res.json();
+        
+        if (resData.success) {
+          const s = resData.data.surah;
+          surahData = {
+            number: s.number,
+            name: s.name_arabic,
+            englishName: s.name_english,
+            englishNameTranslation: s.name_translation,
+            revelationType: s.revelation_place === 'makkah' ? 'Meccan' : 'Medinan',
+            numberOfAyahs: s.verses_count,
+            ayahs: resData.data.verses.map((v: any) => ({
+              number: parseInt(v.verse_key.split(":")[1]),
+              text: v.arabic,
+              numberInSurah: v.ayah
+            }))
+          };
+        } else {
+          throw new Error("Failed to load surah");
+        }
         try {
           localStorage.setItem(cacheKey, JSON.stringify(surahData));
         } catch (e) {
@@ -214,36 +241,23 @@ export default function Quran() {
         const paddedNumber = String(surahNumber).padStart(3, '0');
         const directUrl = `${activeReciterServer}${paddedNumber}.mp3`;
         
-        let currentProxyIndex = 0;
+        audioRef.current.src = directUrl;
+        audioRef.current.load();
+        audioRef.current.volume = volume;
+        setIsAudioLoading(true);
         
-        const tryPlay = (url: string) => {
-          if (!audioRef.current) return;
-          audioRef.current.src = url;
-          audioRef.current.volume = volume;
-          setIsAudioLoading(true);
-          
-          audioRef.current.play()
-            .then(() => {
-              setIsPlaying(true);
-              setIsAudioLoading(false);
-              setAudioError("");
-            })
-            .catch(e => {
-              console.warn(`Playback failed for ${url}`, e);
-              currentProxyIndex++;
-              if (currentProxyIndex < AUDIO_PROXIES.length) {
-                // Try next proxy
-                tryPlay(AUDIO_PROXIES[currentProxyIndex](directUrl));
-              } else {
-                console.error("All proxies failed for audio playback");
-                setIsPlaying(false);
-                setIsAudioLoading(false);
-                setAudioError("تعذر تشغيل التلاوة. يرجى التحقق من اتصالك بالإنترنت.");
-              }
-            });
-        };
-        
-        tryPlay(AUDIO_PROXIES[0](directUrl));
+        audioRef.current.play()
+          .then(() => {
+            setIsPlaying(true);
+            setIsAudioLoading(false);
+            setAudioError("");
+          })
+          .catch(e => {
+            console.warn(`Playback failed for ${directUrl}`, e);
+            setIsPlaying(false);
+            setIsAudioLoading(false);
+            setAudioError("تعذر تشغيل التلاوة. يرجى التحقق من اتصالك بالإنترنت.");
+          });
       }
 
       // Scroll to specific ayah if provided
@@ -268,9 +282,14 @@ export default function Quran() {
     setLoadingTafsir(true);
     setSelectedAyahTafsir({ text: ayahText, tafsir: "", number: numberInSurah, globalNumber: ayahNumber });
     try {
-      const res = await fetch(`https://api.alquran.cloud/v1/ayah/${ayahNumber}/${tafsirId}`);
+      if (!selectedSurah) throw new Error("No surah selected");
+      const res = await fetch(`https://ummahapi.com/api/tafsir/${tafsirId}/surah/${selectedSurah.number}/ayah/${numberInSurah}`);
       const data = await res.json();
-      setSelectedAyahTafsir({ text: ayahText, tafsir: data.data.text, number: numberInSurah, globalNumber: ayahNumber });
+      if (data.success) {
+        setSelectedAyahTafsir({ text: ayahText, tafsir: data.data.tafsir.text, number: numberInSurah, globalNumber: ayahNumber });
+      } else {
+        throw new Error("Failed to load tafsir");
+      }
     } catch (err) {
       console.error(err);
       setSelectedAyahTafsir({ text: ayahText, tafsir: "عذراً، تعذر تحميل التفسير.", number: numberInSurah, globalNumber: ayahNumber });
@@ -307,6 +326,7 @@ export default function Quran() {
       if (selectedReciterServer) {
         const paddedNumber = String(selectedSurah.number).padStart(3, '0');
         audioRef.current.src = `${selectedReciterServer}${paddedNumber}.mp3`;
+        audioRef.current.load();
       } else {
         setAudioError("يرجى اختيار قارئ أولاً");
         return; // Cannot play without a server
@@ -365,7 +385,7 @@ export default function Quran() {
     setIsDownloading(true);
     try {
       const url = `${selectedReciterServer}${String(selectedSurah.number).padStart(3, '0')}.mp3`;
-      const response = await fetchWithProxy(url);
+      const response = await fetch(url);
       const blob = await response.blob();
       
       const currentReciter = reciters.find(r => r.server === selectedReciterServer);
@@ -647,7 +667,9 @@ export default function Quran() {
                     if (selectedSurah && audioRef.current) {
                        const paddedNumber = String(selectedSurah.number).padStart(3, '0');
                        const wasPlaying = isPlaying;
+                       audioRef.current.pause();
                        audioRef.current.src = `${e.target.value}${paddedNumber}.mp3`;
+                       audioRef.current.load();
                        if (wasPlaying) {
                          setIsAudioLoading(true);
                          audioRef.current.play().catch(() => {

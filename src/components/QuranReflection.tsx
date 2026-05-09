@@ -14,13 +14,18 @@ export default function QuranReflection({ onBack }: { onBack: () => void }) {
     setReflection('');
     try {
       // Fetch random number between 1 and 6236
-      const randomSurah = Math.floor(Math.random() * 114) + 1;
-      const ayahRes = await fetch(`https://api.alquran.cloud/v1/ayah/${Math.floor(Math.random() * 6236) + 1}/ar.alafasy`);
+      const ayahRes = await fetch(`https://ummahapi.com/api/quran/random`);
       const ayahData = await ayahRes.json();
       
-      if (ayahData.code === 200) {
-        setAyah(ayahData.data);
-        generateReflection(ayahData.data.text, ayahData.data.surah.name, ayahData.data.numberInSurah);
+      if (ayahData.success) {
+        const newAyah = {
+          surah: { name: ayahData.data.surah.name_arabic },
+          numberInSurah: ayahData.data.verse.ayah,
+          text: ayahData.data.verse.arabic,
+          audio: ayahData.data.audio?.[0]?.ayah_audio
+        };
+        setAyah(newAyah);
+        generateReflection(newAyah.text, newAyah.surah.name, newAyah.numberInSurah);
       }
     } catch (error) {
       console.error(error);

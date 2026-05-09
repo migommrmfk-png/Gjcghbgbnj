@@ -223,7 +223,7 @@ export default function Ruqyah() {
               {/* Audio Element */}
               <audio
                 ref={audioRef}
-                src="https://server8.mp3quran.net/afs/roqia.mp3"
+                src="https://qurango.net/radio/roqiah"
                 preload="none"
               />
             </motion.div>

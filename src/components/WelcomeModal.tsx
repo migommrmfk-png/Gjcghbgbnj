@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Heart, X, Bell } from 'lucide-react';
 import { requestNotificationPermission } from '../services/NotificationService';
+import Logo from './Logo';
 
 interface WelcomeModalProps {
   onEnableNotifications?: () => void;
@@ -64,9 +65,7 @@ export default function WelcomeModal({ onEnableNotifications }: WelcomeModalProp
             </button>
 
             <div className="flex flex-col items-center text-center mt-4 relative z-10">
-              <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-full flex items-center justify-center shadow-lg mb-6">
-                <Heart size={40} className="text-amber-500" />
-              </div>
+              <Logo className="w-24 h-24 mb-4" />
               
               <h2 className="text-2xl font-bold text-emerald-600 font-serif mb-2">
                 مرحباً بك في اليقين

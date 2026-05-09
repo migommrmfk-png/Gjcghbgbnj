@@ -193,13 +193,12 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       }
 
       try {
-        const randomAyah = Math.floor(Math.random() * 6236) + 1;
-        const res = await fetch(`https://api.alquran.cloud/v1/ayah/${randomAyah}`);
+        const res = await fetch(`https://ummahapi.com/api/quran/random`);
         if (!res.ok) throw new Error("API response not ok");
         const data = await res.json();
         const ayahData = {
-          text: data.data.text,
-          surah: `${data.data.surah.name} - آية ${data.data.numberInSurah}`
+          text: data.data.verse.arabic,
+          surah: `${data.data.surah.name_arabic} - آية ${data.data.verse.ayah}`
         };
         setDailyAyah(ayahData);
         localStorage.setItem('dailyAyah', JSON.stringify({ date: today, data: ayahData }));

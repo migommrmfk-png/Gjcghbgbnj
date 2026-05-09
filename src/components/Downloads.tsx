@@ -48,7 +48,9 @@ const Downloads: React.FC<DownloadsProps> = ({ onBack }) => {
       }
       
       const objectUrl = URL.createObjectURL(item.blob);
+      audioRef.current.pause();
       audioRef.current.src = objectUrl;
+      audioRef.current.load();
       audioRef.current.volume = volume;
       audioRef.current.play().catch(e => console.error("Audio playback error:", e?.message || String(e)));
       setIsPlaying(item.id);

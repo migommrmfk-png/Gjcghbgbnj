@@ -426,6 +426,11 @@ const TV_CHANNELS = [
     id: "tv2",
     name: "قناة السنة النبوية - المدينة المنورة",
     videoId: "a1aB5m-c1O0", // Madinah Live
+  },
+  {
+    id: "tv3",
+    name: "إذاعة القرآن الكريم من القاهرة - بث مباشر",
+    videoId: "fZvuHkHYaXk", // Cairo Quran Radio Live
   }
 ];
 
@@ -457,7 +462,9 @@ export default function IslamicRadio() {
       setCurrentStation(station);
       setIsPlaying(true);
       if (audioRef.current) {
+        audioRef.current.pause();
         audioRef.current.src = station.url;
+        audioRef.current.load();
         audioRef.current
           .play()
           .catch((e) => {
@@ -479,8 +486,11 @@ export default function IslamicRadio() {
       audioRef.current?.pause();
       setIsPlaying(false);
     } else if (currentStation) {
-      if (!audioRef.current?.src) {
-        if (audioRef.current) audioRef.current.src = currentStation.url;
+      if (!audioRef.current?.src || audioRef.current.src === window.location.href) {
+        if (audioRef.current) {
+          audioRef.current.src = currentStation.url;
+          audioRef.current.load();
+        }
       }
       audioRef.current
         ?.play()

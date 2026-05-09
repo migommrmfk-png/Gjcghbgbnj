@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { LogIn, User, AlertCircle, Loader, Moon, Star } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+import Logo from './Logo';
 
 // Floating particle component
 const FloatingParticle = ({ delay, x, y, size }: { key?: number | string; delay: number; x: number; y: number; size: number }) => (
@@ -180,16 +181,8 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
           <div className="relative inline-block mb-6">
             <div
               className="relative w-24 h-24 rounded-full flex items-center justify-center mx-auto"
-              style={{
-                background: 'linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(5,150,105,0.3) 100%)',
-                border: '1px solid rgba(16,185,129,0.3)',
-                boxShadow: '0 0 40px rgba(16,185,129,0.3)',
-              }}
             >
-              <Moon size={40} className="text-emerald-400" />
-              <motion.div className="absolute top-2 right-3">
-                <Star size={10} className="text-emerald-300" fill="currentColor" />
-              </motion.div>
+              <Logo className="w-24 h-24" />
             </div>
           </div>
           <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Georgia, serif', textShadow: '0 0 30px rgba(16,185,129,0.4)' }}>

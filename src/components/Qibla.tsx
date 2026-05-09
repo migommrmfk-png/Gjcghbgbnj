@@ -33,22 +33,7 @@ export default function Qibla() {
           const { latitude, longitude } = position.coords;
           setUserLocation([latitude, longitude]);
           calculateQibla(latitude, longitude);
-          
-          try {
-            const geoRes = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=ar`,
-              { headers: { 'Accept': 'application/json' } }
-            );
-            if (!geoRes.ok) throw new Error("Geocoding failed");
-            const geoData = await geoRes.json();
-            if (geoData.address) {
-              const city = geoData.address.city || geoData.address.town || geoData.address.village || geoData.address.state;
-              if (city) setLocationName(city);
-            }
-          } catch (e) {
-            console.error("Reverse geocoding failed", e);
-            setLocationName("موقع غير معروف");
-          }
+          setLocationName("تم تحديد الموقع");
         },
         (err) => {
           setError("يرجى تفعيل خدمة الموقع لتحديد القبلة");

@@ -96,34 +96,17 @@ export const PrayerTimesProvider: React.FC<{ children: React.ReactNode }> = ({ c
         } else if (lat && lng && !locationName || locationName === "مكة المكرمة") {
           try {
             const geoRes = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=ar`,
-              {
-                headers: {
-                  'Accept': 'application/json',
-                  'User-Agent': 'IslamicApp/1.0'
-                }
-              }
+              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=ar`
             );
             if (!geoRes.ok) throw new Error("Geocoding failed");
-            const geoText = await geoRes.text();
-            try {
-              const geoData = JSON.parse(geoText);
-              if (geoData.address) {
-                const city =
-                  geoData.address.city ||
-                  geoData.address.town ||
-                  geoData.address.village ||
-                  geoData.address.state ||
-                  geoData.address.country;
-                if (city) setLocationName(city);
-              }
-            } catch (e) {
-              console.error("Invalid JSON from Nominatim:", geoText.substring(0, 100));
-              setLocationName("موقعك الحالي");
+            const geoData = await geoRes.json();
+            if (geoData.city || geoData.locality || geoData.countryName) {
+              const city = geoData.city || geoData.locality || geoData.countryName;
+              if (city) setLocationName(city);
             }
           } catch (e) {
             console.error("Reverse geocoding failed", e);
-            setLocationName("موقعك الحالي");
+            setLocationName("موقع غير معروف");
           }
         }
       } catch (err) {
@@ -135,11 +118,27 @@ export const PrayerTimesProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
     const fetchByIP = async () => {
       try {
-        const res = await fetch("https://get.geojs.io/v1/ip/geo.json");
+        const res = await fetch("https://ipapi.co/json/");
+        if (!res.ok) throw new Error("ipapi failed");
         const data = await res.json();
-        fetchPrayerTimes(parseFloat(data.latitude), parseFloat(data.longitude), data.city || data.country);
+        if (data && data.latitude && data.longitude) {
+           fetchPrayerTimes(parseFloat(data.latitude), parseFloat(data.longitude), data.city || data.country_name);
+           return;
+        }
+        throw new Error("Invalid IP geo data");
       } catch (e) {
-        fetchPrayerTimes();
+        try {
+          const res2 = await fetch("https://get.geojs.io/v1/ip/geo.json");
+          if (!res2.ok) throw new Error("geojs failed");
+          const data2 = await res2.json();
+          if (data2 && data2.latitude) {
+            fetchPrayerTimes(parseFloat(data2.latitude), parseFloat(data2.longitude), data2.city || data2.country);
+            return;
+          }
+          throw new Error("Invalid geojs data");
+        } catch (e2) {
+          fetchPrayerTimes(); // fallback to default (Makkah)
+        }
       }
     };
 

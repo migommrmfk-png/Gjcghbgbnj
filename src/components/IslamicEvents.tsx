@@ -29,14 +29,28 @@ export default function IslamicEvents({ onBack }: { onBack: () => void }) {
       const yyyy = today.getFullYear();
       const dateStr = `${dd}-${mm}-${yyyy}`;
 
-      const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${dateStr}`);
-      const data = await res.json();
-      
-      const hijri = data.data.hijri;
-      const hDay = parseInt(hijri.day);
-      const hMonth = hijri.month.number;
-      const hYear = parseInt(hijri.year);
-      
+      // Calculate fallback using Intl.DateTimeFormat if needed
+      let hDay, hMonth, hYear;
+      try {
+        const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${dateStr}`);
+        if (!res.ok) throw new Error('API failed');
+        const data = await res.json();
+        
+        const hijri = data.data.hijri;
+        hDay = parseInt(hijri.day);
+        hMonth = hijri.month.number;
+        hYear = parseInt(hijri.year);
+      } catch (err) {
+        console.warn('Fallback to Intl.DateTimeFormat for Hijri date', err);
+        const parts = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
+          day: 'numeric', month: 'numeric', year: 'numeric'
+        }).formatToParts(today);
+        
+        hDay = parseInt(parts.find(p => p.type === 'day')?.value || '1');
+        hMonth = parseInt(parts.find(p => p.type === 'month')?.value || '1');
+        hYear = parseInt(parts.find(p => p.type === 'year')?.value || '1445');
+      }
+
       setCurrentHijriDate({ day: hDay, month: hMonth, year: hYear });
 
       const islamicEvents: Event[] = [
