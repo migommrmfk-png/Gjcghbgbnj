@@ -17,6 +17,7 @@ export const requestNotificationPermission = async (): Promise<boolean> => {
 };
 
 export const sendNotification = (title: string, options?: NotificationOptions) => {
+  if (!("Notification" in window)) return;
   if (Notification.permission === "granted") {
     new Notification(title, options);
   }

@@ -46,7 +46,7 @@ const DuaWall = lazy(() => import("./components/DuaWall"));
 const ZakatCalculator = lazy(() => import("./components/ZakatCalculator"));
 const HajjUmrahGuide = lazy(() => import("./components/HajjUmrahGuide"));
 const Auth = lazy(() => import("./components/Auth"));
-const SmartPlan = lazy(() => import("./components/SmartPlan"));
+
 const Ruqyah = lazy(() => import("./components/Ruqyah"));
 const InheritanceCalculator = lazy(() => import("./components/InheritanceCalculator"));
 const DreamInterpretation = lazy(() => import("./components/DreamInterpretation"));
@@ -60,12 +60,12 @@ const MoodTracker = lazy(() => import("./components/MoodTracker"));
 const Sakina = lazy(() => import("./components/Sakina"));
 
 const MuslimGarden = lazy(() => import("./components/MuslimGarden"));
-const NearbyMosques = lazy(() => import("./components/NearbyMosques"));
+
 const IslamicEvents = lazy(() => import("./components/IslamicEvents"));
 const HalalChecker = lazy(() => import("./components/HalalChecker"));
 const QuranReflection = lazy(() => import("./components/QuranReflection"));
 const IslamicTimeline = lazy(() => import("./components/IslamicTimeline"));
-const GreetingCards = lazy(() => import("./components/GreetingCards"));
+
 const IslamicNames = lazy(() => import("./components/IslamicNames"));
 import InstallPrompt from "./components/InstallPrompt";
 import ChatOverlay from "./components/ChatOverlay";
@@ -169,8 +169,7 @@ function AppContent() {
         return <ZakatCalculator onBack={handleBack} />;
       case "hajj":
         return <HajjUmrahGuide onBack={handleBack} />;
-      case "smart-plan":
-        return <SmartPlan onBack={handleBack} />;
+
       case "auth":
         return <Auth onBack={handleBack} />;
       case "ruqyah":
@@ -206,8 +205,7 @@ function AppContent() {
             <MoodTracker />
           </div>
         );
-      case "mosques":
-        return <NearbyMosques onBack={handleBack} />;
+
       case "events":
         return <IslamicEvents onBack={handleBack} />;
       case "halal-checker":
@@ -216,8 +214,7 @@ function AppContent() {
         return <QuranReflection onBack={handleBack} />;
       case "timeline":
         return <IslamicTimeline onBack={handleBack} />;
-      case "greeting-cards":
-        return <GreetingCards onBack={handleBack} />;
+
       case "islamic-names":
         return <IslamicNames onBack={handleBack} />;
       default:

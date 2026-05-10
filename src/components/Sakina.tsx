@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Wind, CloudRain, Waves, Flame, X, Volume2, VolumeX, Moon } from 'lucide-react';
+import ReactPlayer from 'react-player';
 
 const zikrSequence = [
   { text: 'سُبْحَانَ اللَّهِ', phase: 'شهيق - تنفس ببطء', duration: 4000 },
@@ -9,10 +10,10 @@ const zikrSequence = [
 ];
 
 const ambientSounds = [
-  { id: 'quran', name: 'القرآن الكريم', icon: <Moon size={20} />, color: 'bg-emerald-500', url: 'https://backup.qurango.net/radio/tarteel' },
-  { id: 'rain', name: 'مطر هادئ', icon: <CloudRain size={20} />, color: 'bg-blue-500', url: 'https://cdn.pixabay.com/download/audio/2021/08/04/audio_3d1da9a4ab.mp3' },
-  { id: 'waves', name: 'أمواج البحر', icon: <Waves size={20} />, color: 'bg-cyan-500', url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_b2875b6a7a.mp3' },
-  { id: 'wind', name: 'نسيم الرياح', icon: <Wind size={20} />, color: 'bg-teal-500', url: 'https://cdn.pixabay.com/download/audio/2022/02/10/audio_51590e8fcd.mp3' },
+  { id: 'quran', name: 'القرآن الكريم', icon: <Moon size={20} />, color: 'bg-emerald-500', url: 'https://www.youtube.com/watch?v=R9ZzE15wXos' },
+  { id: 'rain', name: 'مطر هادئ', icon: <CloudRain size={20} />, color: 'bg-blue-500', url: 'https://www.youtube.com/watch?v=mPZkdNFkNps' },
+  { id: 'waves', name: 'أمواج البحر', icon: <Waves size={20} />, color: 'bg-cyan-500', url: 'https://www.youtube.com/watch?v=nep1qPtqAlA' },
+  { id: 'wind', name: 'نسيم الرياح', icon: <Wind size={20} />, color: 'bg-teal-500', url: 'https://www.youtube.com/watch?v=QZ0B87Qng0E' },
 ];
 
 export default function Sakina({ onBack }: { onBack: () => void }) {
@@ -21,8 +22,6 @@ export default function Sakina({ onBack }: { onBack: () => void }) {
   const [sound, setSound] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
   useEffect(() => {
     let interval: any;
     if (isActive) {
@@ -35,26 +34,6 @@ export default function Sakina({ onBack }: { onBack: () => void }) {
     return () => clearInterval(interval);
   }, [isActive]);
 
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.muted = isMuted;
-    }
-  }, [isMuted]);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      if (sound) {
-        const selectedSound = ambientSounds.find(s => s.id === sound);
-        if (selectedSound) {
-          audioRef.current.src = selectedSound.url;
-          audioRef.current.play().catch(e => console.error("Audio play failed:", e?.message || String(e)));
-        }
-      } else {
-        audioRef.current.pause();
-      }
-    }
-  }, [sound]);
-
   const currentZikr = zikrSequence[step];
 
   const getOrbAnimation = () => {
@@ -66,6 +45,8 @@ export default function Sakina({ onBack }: { onBack: () => void }) {
     }
   };
 
+  const selectedSound = ambientSounds.find(s => s.id === sound);
+
   return (
     <motion.div 
       initial={{ opacity: 0 }}
@@ -74,7 +55,19 @@ export default function Sakina({ onBack }: { onBack: () => void }) {
       className="fixed inset-0 z-50 bg-[#050B14] text-white flex flex-col items-center justify-center overflow-hidden" 
       dir="rtl"
     >
-      <audio ref={audioRef} loop />
+      {selectedSound && (
+        <div className="hidden">
+          <ReactPlayer 
+            url={selectedSound.url} 
+            playing={true} 
+            loop={true} 
+            muted={isMuted}
+            volume={1}
+            width="0" 
+            height="0" 
+          />
+        </div>
+      )}
 
       {/* Background Ambient Effect */}
       <div className="absolute inset-0 opacity-20 pointer-events-none">

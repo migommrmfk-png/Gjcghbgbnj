@@ -135,13 +135,13 @@ export default function NotificationsPage({ onBack }: { onBack: () => void }) {
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ delay: idx * 0.05 }}
                   onClick={() => markAsRead(notif.id)}
-                  className={`p-4 rounded-2xl border transition-all cursor-pointer flex gap-4 \${
+                  className={`p-4 rounded-2xl border transition-all cursor-pointer flex gap-4 ${
                     notif.read 
                       ? 'bg-white border-slate-100 dark:bg-slate-800 dark:border-slate-700 opacity-70' 
                       : 'bg-emerald-50 border-emerald-100 dark:bg-emerald-900/20 dark:border-emerald-800/50 shadow-sm'
                   }`}
                 >
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 \${
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${
                     notif.read ? 'bg-slate-100 dark:bg-slate-700' : 'bg-white dark:bg-slate-800 shadow-sm'
                   }`}>
                     {getIcon(notif.type)}
@@ -149,14 +149,14 @@ export default function NotificationsPage({ onBack }: { onBack: () => void }) {
                   
                   <div className="flex-1">
                     <div className="flex justify-between items-start gap-2 mb-1">
-                      <h3 className={`font-bold \${notif.read ? 'text-slate-600 dark:text-slate-400' : 'text-slate-800 dark:text-slate-100'}`}>
+                      <h3 className={`font-bold ${notif.read ? 'text-slate-600 dark:text-slate-400' : 'text-slate-800 dark:text-slate-100'}`}>
                         {notif.title}
                       </h3>
                       <span className="text-[10px] whitespace-nowrap text-slate-400 mt-1">
                         {formatTime(notif.createdAt)}
                       </span>
                     </div>
-                    <p className={`text-sm leading-relaxed \${notif.read ? 'text-slate-500 dark:text-slate-500' : 'text-slate-600 dark:text-slate-300'}`}>
+                    <p className={`text-sm leading-relaxed ${notif.read ? 'text-slate-500 dark:text-slate-500' : 'text-slate-600 dark:text-slate-300'}`}>
                       {notif.body}
                     </p>
                   </div>

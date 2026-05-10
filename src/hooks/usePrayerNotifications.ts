@@ -65,8 +65,12 @@ export const usePrayerNotifications = (onPrayerTime: (prayerName: string, time: 
 
             // Trigger system notification ONLY if enabled
             if (notificationsEnabled) {
+              const bodyText = prayer.id === 'Fajr' 
+                ? `الصلاة خير من النوم - حان وقت صلاة ${prayer.name}`
+                : `حي على الصلاة - حان وقت صلاة ${prayer.name}`;
+                
               sendNotification(`حان الآن موعد أذان ${prayer.name}`, {
-                body: `الصلاة خير من النوم - حان وقت صلاة ${prayer.name}`,
+                body: bodyText,
                 icon: '/icon.png', // Assuming there's an icon, or fallback to default
                 requireInteraction: true,
               });

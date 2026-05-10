@@ -137,77 +137,36 @@ export default function Games({ onBack }: { onBack: () => void }) {
       const randomSeed = Math.floor(Math.random() * 1000000);
 
       if (type === 'quiz') {
-        prompt = `قم بتوليد 5 أسئلة دينية إسلامية متنوعة (في السيرة، الفقه، القرآن، قصص الأنبياء). تجنب الأسئلة الشائعة جداً والمكررة (مثل من أول الخلفاء أو ما أطول سورة). أريد أسئلة جديدة كلياً وتفصيلية. لكل سؤال 4 خيارات وحدد الإجابة الصحيحة. (رقم عشوائي لتنويع الأسئلة: ${randomSeed})`;
-        schema = {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              question: { type: Type.STRING },
-              options: { type: Type.ARRAY, items: { type: Type.STRING } },
-              correct: { type: Type.INTEGER, description: "Index of the correct option (0-3)" }
-            },
-            required: ["question", "options", "correct"]
-          }
-        };
+        prompt = `قم بتوليد 5 أسئلة دينية إسلامية متنوعة (في السيرة، الفقه، القرآن، قصص الأنبياء). تجنب الأسئلة الشائعة جداً والمكررة. لكل سؤال 4 خيارات وحدد الإجابة الصحيحة.
+يجب أن يكون الرد مصفوفة JSON بهذا الشكل:
+[{"question": "السؤال", "options": ["خ1", "خ2", "خ3", "خ4"], "correct": 0}]
+(رقم عشوائي لتنويع الأسئلة: ${randomSeed})`;
       } else if (type === 'ayah') {
-        prompt = `قم بتوليد 5 أسئلة 'أكمل الآية' من القرآن الكريم. اختر آيات من سور مختلفة من منتصف القرآن أو طوال السور (تجنب السور القصيرة جداً والمشهورة دائماً). أعطني جزء من آية مع كلمة ناقصة، و4 خيارات للكلمة الناقصة، واسم السورة. (رقم عشوائي لتنويع الأسئلة: ${randomSeed})`;
-        schema = {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              ayah: { type: Type.STRING, description: "الآية مع فراغ مكان الكلمة الناقصة مثل: قُلْ هُوَ اللَّهُ _____ (1)" },
-              options: { type: Type.ARRAY, items: { type: Type.STRING } },
-              correct: { type: Type.INTEGER, description: "Index of the correct option (0-3)" },
-              surah: { type: Type.STRING, description: "اسم السورة" }
-            },
-            required: ["ayah", "options", "correct", "surah"]
-          }
-        };
+        prompt = `قم بتوليد 5 أسئلة 'أكمل الآية' من القرآن الكريم. اختر آيات من سور مختلفة.
+يجب أن يكون الرد مصفوفة JSON بهذا الشكل:
+[{"ayah": "قُلْ هُوَ اللَّهُ _____", "options": ["أحد", "الصمد", "كفوا", "لم"], "correct": 0, "surah": "الإخلاص"}]
+(رقم عشوائي لتنويع الأسئلة: ${randomSeed})`;
       } else if (type === 'history') {
-        prompt = `قم بتوليد 5 أسئلة عن التاريخ الإسلامي، الغزوات، الفتوحات، والشخصيات التاريخية. تجنب الأسئلة المكررة والبديهية (مثل متى كانت غزوة بدر). اسأل عن أحداث وتفاصيل أعمق. لكل سؤال 4 خيارات وحدد الإجابة الصحيحة. (رقم عشوائي لتنويع الأسئلة: ${randomSeed})`;
-        schema = {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              question: { type: Type.STRING },
-              options: { type: Type.ARRAY, items: { type: Type.STRING } },
-              correct: { type: Type.INTEGER, description: "Index of the correct option (0-3)" }
-            },
-            required: ["question", "options", "correct"]
-          }
-        };
+        prompt = `قم بتوليد 5 أسئلة عن التاريخ الإسلامي، الغزوات، الفتوحات.
+يجب أن يكون الرد مصفوفة JSON بهذا الشكل:
+[{"question": "السؤال", "options": ["خ1", "خ2", "خ3", "خ4"], "correct": 0}]
+(رقم عشوائي لتنويع الأسئلة: ${randomSeed})`;
       } else if (type === 'prophets') {
-        prompt = `قم بتوليد 5 أزواج من أسماء الأنبياء وألقابهم (أو صفاتهم المشهورة في القرآن). تجنب تكرار نفس الأنبياء في كل مرة. أريد أنبياء مختلفين وألقاب دقيقة. (رقم عشوائي لتنويع الأسئلة: ${randomSeed})`;
-        schema = {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              id: { type: Type.INTEGER },
-              name: { type: Type.STRING, description: "اسم النبي" },
-              title: { type: Type.STRING, description: "لقب النبي أو صفته" }
-            },
-            required: ["id", "name", "title"]
-          }
-        };
+        prompt = `قم بتوليد 5 أزواج من أسماء الأنبياء وألقابهم (أو صفاتهم).
+يجب أن يكون الرد مصفوفة JSON بهذا الشكل:
+[{"id": 1, "name": "ابراهيم", "title": "خليل الله"}]
+(رقم عشوائي لتنويع الأسئلة: ${randomSeed})`;
       } else if (type === 'memory') {
-        prompt = `قم بتوليد قائمة بـ 6 أسماء سور قرآنية مختلفة (يفضل سور متوسطة أو قصيرة). أريد السور أن تتغير في كل مرة. (رقم عشوائي لتنويع الأسئلة: ${randomSeed})`;
-        schema = {
-          type: Type.ARRAY,
-          items: { type: Type.STRING },
-          description: "An array of exactly 6 strings representing Surah names."
-        };
+        prompt = `قم بتوليد قائمة بـ 6 أسماء سور قرآنية مختلفة.
+يجب أن يكون الرد مصفوفة خطية JSON بهذا الشكل:
+["البقرة", "يوسف", "الكهف", "طه", "مريم", "النور"]
+(رقم عشوائي لتنويع الأسئلة: ${randomSeed})`;
       }
 
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
-        contents: prompt,
+        contents: prompt + "\n\nيجب أن يكون الرد عبارة عن مصفوفة JSON صالحة فقط ولا شيء غير ذلك. (Array of objects).",
         config: {
-          responseMimeType: "application/json",
-          responseSchema: schema,
           temperature: 0.9,
         }
       });
