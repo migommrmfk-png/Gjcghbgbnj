@@ -946,11 +946,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div 
-              onClick={() => onNavigate("muslim-ai")}
+              onClick={() => onNavigate("dreams")}
               className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 rounded-[24px] flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-300 text-center group shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] hover:shadow-lg hover:-translate-y-1"
             >
               <div className="w-12 h-12 rounded-[16px] bg-amber-50 dark:bg-amber-500/10 text-amber-500 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <BookOpen size={24} />
+                <Moon size={24} />
               </div>
               <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{t('dream_interpretation')}</span>
             </div>

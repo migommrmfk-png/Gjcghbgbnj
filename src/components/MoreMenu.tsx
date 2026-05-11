@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe, TrendingUp, Play, Circle, Sun, Settings, Download, Crown, Award, Activity, Wind, TreePine, Baby, Hourglass } from 'lucide-react';
+import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe, TrendingUp, Play, Circle, Sun, Settings, Download, Crown, Award, Activity, Wind, TreePine, CheckCircle, Baby, Hourglass } from 'lucide-react';
 import { usePrayerTimes } from '../contexts/PrayerTimesContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +17,7 @@ export default function MoreMenu({
 }) {
   const [showToast, setShowToast] = useState(false);
   const { autoAdhanEnabled, setAutoAdhanEnabled, calculationMethod, setCalculationMethod, asrMethod, setAsrMethod } = usePrayerTimes();
-  const { user, logout, linkWithGoogle, linkWithGithub } = useAuth();
+  const { user, userData, logout, linkWithGoogle, linkWithGithub } = useAuth();
   const { t, i18n } = useTranslation();
   const { theme, setTheme } = useTheme();
   const [linking, setLinking] = useState(false);
@@ -28,7 +28,7 @@ export default function MoreMenu({
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const handleLogout = async () => {
-    if (user?.isAnonymous) {
+    if (userData?.isAnonymous) {
       setShowLogoutConfirm(true);
       return;
     }
@@ -141,6 +141,7 @@ export default function MoreMenu({
         { id: 'zakat', label: t('zakat_calculator', 'حاسبة الزكاة'), icon: <Calculator size={24} />, color: 'bg-emerald-600' },
         { id: 'inheritance', label: t('inheritance_calculator', 'حاسبة المواريث'), icon: <Calculator size={24} />, color: 'bg-emerald-800' },
         { id: 'hajj', label: t('hajj_guide', 'دليل الحج والعمرة'), icon: <Map size={24} />, color: 'bg-amber-700' },
+        { id: 'halal-checker', label: t('halal_checker', 'المدقق الحلال'), icon: <CheckCircle size={24} />, color: 'bg-green-600' },
       ]
     },
     {
@@ -196,8 +197,8 @@ export default function MoreMenu({
         <div className="relative z-10 text-center flex flex-col items-center">
           {user ? (
             <div className="flex flex-col items-center gap-3 w-full">
-              {user.photoURL ? (
-                <img src={user.photoURL} alt="Profile" className="w-20 h-20 rounded-full border-2 border-white/30 shadow-md object-cover mb-2" referrerPolicy="no-referrer" loading="lazy" />
+              {userData?.photoURL ? (
+                <img src={userData.photoURL} alt="Profile" className="w-20 h-20 rounded-full border-2 border-white/30 shadow-md object-cover mb-2" referrerPolicy="no-referrer" loading="lazy" />
               ) : (
                 <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/30 shadow-md mb-2">
                   <User size={40} className="text-emerald-50" />
@@ -205,9 +206,9 @@ export default function MoreMenu({
               )}
               <div>
                 <h1 className="text-2xl font-bold font-serif text-white mb-1">
-                  {user.isAnonymous ? 'حساب زائر' : (user.displayName || 'مستخدم')}
+                  {userData?.isAnonymous ? 'حساب زائر' : (userData?.displayName || user.user_metadata?.name || 'مستخدم')}
                 </h1>
-                {!user.isAnonymous && <p className="text-emerald-100/90 text-xs font-mono bg-black/10 px-3 py-1 rounded-full">{user.email}</p>}
+                {!userData?.isAnonymous && <p className="text-emerald-100/90 text-xs font-mono bg-black/10 px-3 py-1 rounded-full">{user.email}</p>}
                 
                 <div className="flex gap-2 mt-4 flex-wrap justify-center">
                   {/* OAuth Linking Buttons Removed */}
@@ -279,7 +280,7 @@ export default function MoreMenu({
                   <div className="absolute inset-0 bg-white/10 dark:bg-slate-800/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   
                   <div className={`w-12 h-12 rounded-full ${item.color} text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform relative z-10 border border-white/20`}>
-                    {React.cloneElement(item.icon as React.ReactElement, { size: 22 })}
+                    {React.cloneElement(item.icon as React.ReactElement<any>, { size: 22 })}
                   </div>
                   
                   <div className="relative z-10 w-full flex flex-col items-center">

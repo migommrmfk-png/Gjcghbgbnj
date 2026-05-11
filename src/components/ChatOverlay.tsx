@@ -19,7 +19,7 @@ export default function ChatOverlay() {
   const [input, setInput] = useState('');
   const [socket, setSocket] = useState<Socket | null>(null);
   
-  const { user } = useAuth();
+  const { user, userData } = useAuth();
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === 'ar' || i18n.language === 'ur';
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -50,8 +50,8 @@ export default function ChatOverlay() {
 
     const newMsg: ChatMessage = {
       id: Date.now().toString(),
-      senderId: user.id,
-      senderName: user.displayName || 'مستخدم',
+      senderId: user.id || userData?.uid || '',
+      senderName: userData?.displayName || user.user_metadata?.name || 'مستخدم',
       text: input.trim(),
       timestamp: Date.now()
     };
@@ -102,7 +102,7 @@ export default function ChatOverlay() {
                 </div>
               ) : (
                 messages.map((msg) => {
-                  const isMe = msg.senderId === user?.uid;
+                  const isMe = msg.senderId === (user?.id || userData?.uid);
                   return (
                     <div 
                       key={msg.id} 

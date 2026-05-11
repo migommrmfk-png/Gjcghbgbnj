@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Mail, X, ShieldCheck } from 'lucide-react';
 
 export default function LinkAccountPrompt() {
-  const { user, linkWithGoogle, linkWithGithub, linkWithEmail } = useAuth();
+  const { user, userData, linkWithGoogle, linkWithGithub, linkWithEmail } = useAuth();
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(() => {
     return localStorage.getItem('hideLinkPrompt') !== 'true';
@@ -19,7 +19,7 @@ export default function LinkAccountPrompt() {
 
   // Only show if user is anonymous and has used the app for a bit (streak >= 2)
   const streak = parseInt(localStorage.getItem('appStreak') || '0', 10);
-  if (!user || !user.isAnonymous || !isVisible || streak < 2) return null;
+  if (!user || !userData?.isAnonymous || !isVisible || streak < 2) return null;
 
   const handleDismiss = () => {
     setIsVisible(false);

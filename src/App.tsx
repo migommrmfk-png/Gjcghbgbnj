@@ -82,12 +82,60 @@ function AppContent() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [activeTab, setActiveTab] = useState("home");
   const [previousTab, setPreviousTab] = useState("home");
-  const [adhanData, setAdhanData] = useState<{ prayerName: string, time: string } | null>(null);
+  const [adhanData, setAdhanData] = useState<{ prayerName: string, time: string, step?: string } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  const handlePrayerTime = useCallback((prayerName: string, time: string) => {
-    setAdhanData({ prayerName, time });
+  useEffect(() => {
+    const locked = localStorage.getItem('currentPrayerLock');
+    const snooze = localStorage.getItem('snoozeAdhanUntil');
+    const now = new Date().getTime();
+    
+    if (locked) {
+      if (!snooze || now > parseInt(snooze)) {
+        try {
+          setAdhanData(JSON.parse(locked));
+        } catch(e) {}
+      } else {
+        // Still snoozing, set a timeout to show it when snooze expires
+        const remaining = parseInt(snooze) - now;
+        setTimeout(() => {
+          try {
+            setAdhanData(JSON.parse(localStorage.getItem('currentPrayerLock') || 'null'));
+          } catch(e) {}
+        }, remaining);
+      }
+    }
   }, []);
+
+  const handlePrayerTime = useCallback((prayerName: string, time: string) => {
+    const data = { prayerName, time };
+    setAdhanData(data);
+    localStorage.setItem('currentPrayerLock', JSON.stringify(data));
+  }, []);
+
+  const handleCloseAdhan = () => {
+    localStorage.removeItem('currentPrayerLock');
+    localStorage.removeItem('snoozeAdhanUntil');
+    setAdhanData(null);
+  };
+
+  const handleSnoozeAdhan = () => {
+    if (adhanData) {
+      const snoozeUntil = new Date().getTime() + 10 * 60 * 1000;
+      localStorage.setItem('snoozeAdhanUntil', snoozeUntil.toString());
+      setAdhanData(null);
+      
+      setTimeout(() => {
+        const locked = localStorage.getItem('currentPrayerLock');
+        const snooze = localStorage.getItem('snoozeAdhanUntil');
+        if (locked && (!snooze || new Date().getTime() > parseInt(snooze))) {
+          try {
+            setAdhanData(JSON.parse(locked));
+          } catch(e) {}
+        }
+      }, 10 * 60 * 1000);
+    }
+  };
 
   const { notificationsEnabled, toggleNotifications, setNotificationsEnabled } = usePrayerNotifications(handlePrayerTime);
   const { user, userData, loading: authLoading } = useAuth();
@@ -160,6 +208,8 @@ function AppContent() {
       case "worship-tracker":
         return <WorshipTracker onBack={handleBack} />;
       case "quran-plan":
+        return <QuranPlan onBack={handleBack} />;
+      case "smart-plan":
         return <QuranPlan onBack={handleBack} />;
       case "social":
         return <SocialChallenges onBack={handleBack} />;
@@ -249,7 +299,8 @@ function AppContent() {
           <AdhanOverlay 
             prayerName={adhanData.prayerName} 
             time={adhanData.time} 
-            onClose={() => setAdhanData(null)} 
+            onClose={handleCloseAdhan}
+            onSnooze={handleSnoozeAdhan}
           />
         )}
       </AnimatePresence>
@@ -333,11 +384,20 @@ function AppContent() {
   );
 }
 
+import { Toaster } from 'react-hot-toast';
+
 export default function App() {
   return (
     <AuthProvider>
       <ThemeProvider>
         <PrayerTimesProvider>
+          <Toaster position="top-center" toastOptions={{
+            duration: 3000,
+            style: {
+              background: '#333',
+              color: '#fff',
+            },
+          }} />
           <AppContent />
         </PrayerTimesProvider>
       </ThemeProvider>
@@ -374,7 +434,7 @@ function NavItem({
           />
         )}
         <div className="relative z-10 flex flex-col items-center gap-1">
-          {React.cloneElement(icon as React.ReactElement, {
+          {React.cloneElement(icon as React.ReactElement<any>, {
             size: isActive ? 24 : 22,
             strokeWidth: isActive ? 2.5 : 2,
             className: `transition-transform duration-300 ${isActive ? 'scale-110 drop-shadow-sm' : 'group-hover:scale-105'}`

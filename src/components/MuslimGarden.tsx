@@ -114,9 +114,15 @@ export default function MuslimGarden({ onBack }: { onBack: () => void }) {
             </motion.div>
 
             <motion.div 
-              animate={showAnimation === 'water' ? { x: [-20, -10, -20], rotate: [0, -15, 0] } : {}}
-              transition={{ duration: 0.5 }}
-              className="text-6xl drop-shadow-xl z-10 mb-4"
+              animate={{ 
+                y: [0, -10, 0],
+                rotate: showAnimation === 'water' ? [-15, 0] : [0, 5, -5, 0]
+              }}
+              transition={{ 
+                y: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+                rotate: { duration: showAnimation === 'water' ? 0.5 : 4, repeat: showAnimation === 'water' ? 0 : Infinity, ease: "easeInOut" }
+              }}
+              className="text-[80px] drop-shadow-xl z-20 absolute -right-6 bottom-4"
             >
               {state.character}
             </motion.div>

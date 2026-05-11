@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, Baby, Sparkles, User, Info, Loader2 } from 'lucide-react';
 import { getGeminiClient } from '../lib/gemini';
+import toast from 'react-hot-toast';
 
 export default function IslamicNames({ onBack }: { onBack: () => void }) {
   const [gender, setGender] = useState<'boy' | 'girl' | 'any'>('boy');
@@ -47,7 +48,7 @@ export default function IslamicNames({ onBack }: { onBack: () => void }) {
       }
     } catch (error) {
       console.error(error);
-      alert('حدث خطأ أثناء جلب الأسماء، يرجى المحاولة مرة أخرى.');
+      toast.error('حدث خطأ أثناء جلب الأسماء، يرجى المحاولة مرة أخرى.');
     } finally {
       setLoading(false);
     }

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { ChevronLeft, Scan, ShieldCheck, AlertTriangle, AlertOctagon, Loader2 } from 'lucide-react';
 import { getGeminiClient } from '../lib/gemini';
+import toast from 'react-hot-toast';
 
 export default function HalalChecker({ onBack }: { onBack: () => void }) {
   const [ingredients, setIngredients] = useState('');
@@ -43,7 +44,7 @@ export default function HalalChecker({ onBack }: { onBack: () => void }) {
       setResult(data);
     } catch (error) {
       console.error(error);
-      alert('حدث خطأ أثناء فحص المكونات. يرجى المحاولة مرة أخرى.');
+      toast.error('حدث خطأ أثناء فحص المكونات. يرجى المحاولة مرة أخرى.');
     } finally {
       setLoading(false);
     }

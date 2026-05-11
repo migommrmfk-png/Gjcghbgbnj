@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, BookOpen, Sparkles, RefreshCw, Loader2, Share2 } from 'lucide-react';
 import { getGeminiClient } from '../lib/gemini';
+import toast from 'react-hot-toast';
 
 export default function QuranReflection({ onBack }: { onBack: () => void }) {
   const [ayah, setAyah] = useState<any>(null);
@@ -29,7 +30,7 @@ export default function QuranReflection({ onBack }: { onBack: () => void }) {
       }
     } catch (error) {
       console.error(error);
-      alert('حدث خطأ أثناء جلب الآية.');
+      toast.error('حدث خطأ أثناء جلب الآية.');
     } finally {
       setLoadingAyah(false);
     }

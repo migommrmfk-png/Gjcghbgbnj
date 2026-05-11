@@ -12,10 +12,12 @@ import {
   Volume2,
   VolumeX,
   Loader,
-  Download
+  Download,
+  BookOpen
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { saveAudio } from "../lib/audioStore";
+import toast from 'react-hot-toast';
 
 interface Surah {
   number: number;
@@ -78,6 +80,10 @@ export default function Quran() {
   const [selectedAyahTafsir, setSelectedAyahTafsir] = useState<{ text: string, tafsir: string, number: number, globalNumber: number } | null>(null);
   const [loadingTafsir, setLoadingTafsir] = useState(false);
   const [selectedTafsir, setSelectedTafsir] = useState('ar.muyassar');
+
+  const [textSearchResults, setTextSearchResults] = useState<{ ayah: any, surah: any }[]>([]);
+  const [isSearchingText, setIsSearchingText] = useState(false);
+  const [searchMode, setSearchMode] = useState<'surah' | 'ayah'>('surah');
 
   const [lastRead, setLastRead] = useState<{ surahNumber: number, surahName: string, ayahNumber?: number } | null>(() => {
     const saved = localStorage.getItem('quranLastRead');
@@ -398,10 +404,10 @@ export default function Quran() {
         blob,
         downloadedAt: new Date().toISOString()
       });
-      alert('تم تحميل التلاوة بنجاح. يمكنك العثور عليها في قائمة التنزيلات.');
+      toast.success('تم تحميل التلاوة بنجاح. يمكنك العثور عليها في قائمة التنزيلات.');
     } catch (error) {
       console.error('Download error:', error);
-      alert('حدث خطأ أثناء تحميل التلاوة');
+      toast.error('حدث خطأ أثناء تحميل التلاوة');
     } finally {
       setIsDownloading(false);
     }
@@ -412,6 +418,33 @@ export default function Quran() {
       s.name.includes(searchQuery) ||
       s.englishName.toLowerCase().includes(searchQuery.toLowerCase()),
   );
+
+  useEffect(() => {
+    if (searchMode !== 'ayah' || searchQuery.length < 3) {
+      setTextSearchResults([]);
+      return;
+    }
+
+    const delayDebounceFn = setTimeout(async () => {
+      setIsSearchingText(true);
+      try {
+        const response = await fetch(`https://api.alquran.cloud/v1/search/${searchQuery}/all/quran-simple-clean`);
+        const data = await response.json();
+        if (data.code === 200 && data.data && data.data.matches) {
+          setTextSearchResults(data.data.matches);
+        } else {
+          setTextSearchResults([]);
+        }
+      } catch (error) {
+        console.error("Search error:", error);
+        setTextSearchResults([]);
+      } finally {
+        setIsSearchingText(false);
+      }
+    }, 800);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, searchMode]);
 
   if (loading) {
     return (
@@ -608,7 +641,7 @@ export default function Quran() {
                     return (
                       <span
                         key={ayah.number}
-                        ref={(el) => (ayahRefs.current[ayah.numberInSurah] = el)}
+                        ref={(el) => { ayahRefs.current[ayah.numberInSurah] = el; }}
                         className={`inline cursor-pointer hover:bg-emerald-500/10 transition-colors rounded px-1 leading-loose ${lastRead?.surahNumber === selectedSurah.number && lastRead?.ayahNumber === ayah.numberInSurah ? 'bg-emerald-500/10' : ''}`}
                         onClick={() => fetchTafsir(ayah.number, text, ayah.numberInSurah)}
                       >
@@ -797,18 +830,39 @@ export default function Quran() {
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.1 }}
-        className="relative overflow-hidden rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all"
+        className="relative overflow-hidden rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-[0_4px_20px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.3)] transition-all flex flex-col"
       >
-        <div className="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none">
-          <Search className="h-5 w-5 text-slate-400" />
+        <div className="relative">
+          <div className="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none">
+            {isSearchingText ? (
+              <div className="animate-spin h-5 w-5 border-2 border-emerald-500 border-t-transparent rounded-full" />
+            ) : (
+              <Search className="h-5 w-5 text-slate-400" />
+            )}
+          </div>
+          <input
+            type="text"
+            className="block w-full pl-5 pr-14 py-4 bg-transparent border-none focus:ring-0 text-slate-800 dark:text-slate-100 font-bold placeholder-slate-400 outline-none"
+            placeholder={searchMode === 'surah' ? "ابحث عن سورة..." : "ابحث في آيات القرآن..."}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
-        <input
-          type="text"
-          className="block w-full pl-5 pr-14 py-4 bg-transparent border-none focus:ring-0 text-slate-800 dark:text-slate-100 font-bold placeholder-slate-400 outline-none"
-          placeholder="ابحث عن سورة..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+        <div className="flex border-t border-slate-100 dark:border-slate-800">
+          <button
+            className={`flex-1 py-3 text-sm font-bold transition-colors ${searchMode === 'surah' ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}
+            onClick={() => { setSearchMode('surah'); setTextSearchResults([]); }}
+          >
+            أسماء السور
+          </button>
+          <div className="w-px bg-slate-100 dark:bg-slate-800"></div>
+          <button
+            className={`flex-1 py-3 text-sm font-bold transition-colors ${searchMode === 'ayah' ? 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10' : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}
+            onClick={() => setSearchMode('ayah')}
+          >
+            البحث في الآيات
+          </button>
+        </div>
       </motion.div>
 
       {/* Continue Reading */}
@@ -833,7 +887,39 @@ export default function Quran() {
         </motion.div>
       )}
 
+      {/* Search Results */}
+      {searchMode === 'ayah' && searchQuery.length >= 3 && (
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="space-y-4"
+        >
+          <h3 className="font-bold text-slate-600 dark:text-slate-400 text-sm px-2">
+            {textSearchResults.length > 0 ? `نتائج البحث (${textSearchResults.length})` : (isSearchingText ? 'جاري البحث...' : 'لا توجد نتائج')}
+          </h3>
+          <div className="space-y-3">
+            {textSearchResults.slice(0, 20).map((result: any, index: number) => (
+              <motion.div
+                key={`${result.surah.number}-${result.numberInSurah}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                onClick={() => fetchSurah(result.surah.number, result.surah.name, result.numberInSurah)}
+                className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[1.5rem] p-5 cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:border-emerald-500/30 transition-all"
+              >
+                <p className="font-quran text-xl leading-relaxed text-slate-800 dark:text-slate-100 mb-4">{result.text}</p>
+                <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 text-sm font-bold bg-emerald-50 dark:bg-emerald-500/10 w-fit px-3 py-1.5 rounded-full">
+                  <BookOpen size={14} />
+                  <span>سورة {result.surah.name} - آية {result.numberInSurah}</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
       {/* Surahs List */}
+      {searchMode === 'surah' && (
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -875,6 +961,7 @@ export default function Quran() {
           ))}
         </div>
       </motion.div>
+      )}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { LogIn, User, AlertCircle, Loader, Moon, Star } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import Logo from './Logo';
+import toast from 'react-hot-toast';
 
 // Floating particle component
 const FloatingParticle = ({ delay, x, y, size }: { key?: number | string; delay: number; x: number; y: number; size: number }) => (
@@ -78,7 +79,7 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
           // Email confirmation required
           setError('');
           setResetSent(false);
-          alert('تم إنشاء الحساب بنجاح! يرجى التحقق من بريدك الإلكتروني لتفعيل حسابك.');
+          toast.success('تم إنشاء الحساب بنجاح! يرجى التحقق من بريدك الإلكتروني لتفعيل حسابك.');
           setIsSignUp(false); // switch back to login
         } else {
           if (onBack) onBack();

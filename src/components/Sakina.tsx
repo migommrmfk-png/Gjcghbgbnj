@@ -16,6 +16,8 @@ const ambientSounds = [
   { id: 'wind', name: 'نسيم الرياح', icon: <Wind size={20} />, color: 'bg-teal-500', url: 'https://www.youtube.com/watch?v=QZ0B87Qng0E' },
 ];
 
+const Player = ReactPlayer as any;
+
 export default function Sakina({ onBack }: { onBack: () => void }) {
   const [isActive, setIsActive] = useState(false);
   const [step, setStep] = useState(0);
@@ -36,7 +38,7 @@ export default function Sakina({ onBack }: { onBack: () => void }) {
 
   const currentZikr = zikrSequence[step];
 
-  const getOrbAnimation = () => {
+  const getOrbAnimation = (): any => {
     switch (step) {
       case 0: return { scale: 1.5, opacity: 0.8, transition: { duration: 4, ease: 'easeInOut' } }; // Expand
       case 1: return { scale: 1.5, opacity: 1, transition: { duration: 4, ease: 'linear' } }; // Hold
@@ -57,15 +59,15 @@ export default function Sakina({ onBack }: { onBack: () => void }) {
     >
       {selectedSound && (
         <div className="hidden">
-          <ReactPlayer 
-            url={selectedSound.url} 
-            playing={true} 
-            loop={true} 
-            muted={isMuted}
-            volume={1}
-            width="0" 
-            height="0" 
-          />
+          {React.createElement(Player, {
+            url: selectedSound.url,
+            playing: true,
+            loop: true,
+            muted: isMuted,
+            volume: 1,
+            width: "0",
+            height: "0"
+          })}
         </div>
       )}
 

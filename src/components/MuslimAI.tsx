@@ -148,17 +148,22 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
     try {
       const ai = getGeminiClient();
       
-      const chat = ai.chats.create({
+      const contents = [
+        ...messages.map(msg => ({
+          role: msg.role === 'model' ? 'model' : 'user', // strictly 'user' or 'model'
+          parts: [{ text: msg.text }]
+        })),
+        { role: 'user', parts: [{ text: userMessage }] }
+      ];
+
+      const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
+        contents,
         config: {
           systemInstruction: "أنت مساعد إسلامي ذكي وموثوق. هدفك هو الإجابة على أسئلة المستخدمين المتعلقة بالإسلام، القرآن، السنة، الفقه، السيرة النبوية، والأخلاق الإسلامية. كما يمكنك تفسير الأحلام بناءً على كتب التفسير المعتمدة كابن سيرين، وتقديم فتاوى موثوقة (مع التنبيه على الرجوع للعلماء في المسائل المعقدة). يمكنك أيضاً لعب ألعاب إسلامية تفاعلية مع المستخدم (مثل مسابقات ثقافية إسلامية، أسئلة وأجوبة، ألغاز قرآنية). استخدم لغة عربية فصحى واضحة ومبسطة. كن دائماً مهذباً ولطيفاً.",
         },
       });
 
-      // Send the history to maintain context
-      // In a real app, you'd format the history properly for the API
-      const response = await chat.sendMessage({ message: userMessage });
-      
       setMessages(prev => [...prev, { role: 'model', text: response.text || 'عذراً، لم أتمكن من معالجة طلبك.' }]);
     } catch (error: any) {
       console.error("Error calling Gemini AI:", error);

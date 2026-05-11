@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Volume2, VolumeX, X } from 'lucide-react';
+import { Volume2, VolumeX, X, Lock, Shield, CheckCircle, AlertTriangle } from 'lucide-react';
 
 // ═══════════════════════════════════════════
 // أيقونة المئذنة SVG
@@ -130,6 +130,17 @@ const getPrayerInfo = (prayerName: string): PrayerInfo => {
   return prayers[prayerName] || prayers['الظهر'];
 };
 
+type Step = 'adhan' | 'locked' | 'swear' | 'missed' | 'reason';
+
+const MISS_REASONS = [
+  "نوم غامق",
+  "انشغال بالعمل/الدراسة",
+  "نسيان",
+  "تكاسل/تأجيل",
+  "مرض/عذر شرعي",
+  "غير ذلك"
+];
+
 // ═══════════════════════════════════════════
 // المكوّن الرئيسي
 // ═══════════════════════════════════════════
@@ -137,19 +148,35 @@ export default function AdhanOverlay({
   prayerName,
   time,
   onClose,
+  onSnooze,
 }: {
   prayerName: string;
   time: string;
   onClose: () => void;
+  onSnooze?: () => void;
 }) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [muted, setMuted] = useState(false);
   const [audioPlaying, setAudioPlaying] = useState(false);
   const [audioError, setAudioError] = useState(false);
   const [showContent, setShowContent] = useState(false);
+  
+  const [step, setStep] = useState<Step>('adhan');
+  const [reason, setReason] = useState<string>('');
+  
+  const [prayerStreak, setPrayerStreak] = useState(() => {
+    return parseInt(localStorage.getItem('prayerStreak') || '0', 10);
+  });
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const info = getPrayerInfo(prayerName);
+
+  const updateStreak = (increment: boolean) => {
+    const newStreak = increment ? prayerStreak + 1 : 0;
+    setPrayerStreak(newStreak);
+    localStorage.setItem('prayerStreak', newStreak.toString());
+  };
 
   // تحديث الوقت كل ثانية
   useEffect(() => {
@@ -159,6 +186,11 @@ export default function AdhanOverlay({
 
   // تشغيل الأذان
   useEffect(() => {
+    if (step !== 'adhan') {
+      audioRef.current?.pause();
+      return;
+    }
+    
     const audio = new Audio('https://download.quranicaudio.com/adhan/makkah.mp3');
     audioRef.current = audio;
 
@@ -185,7 +217,7 @@ export default function AdhanOverlay({
       audio.src = '';
       audio.load();
     };
-  }, []);
+  }, [step]);
 
   const toggleMute = () => {
     if (audioRef.current) {
@@ -196,6 +228,18 @@ export default function AdhanOverlay({
 
   const handleManualPlay = () => {
     audioRef.current?.play().then(() => setAudioError(false)).catch(console.error);
+  };
+
+  const completePrayerFlow = (madeUp: boolean = false) => {
+    if (!madeUp) updateStreak(true);
+    else updateStreak(false); // made up means missed time -> streak reset
+    onClose();
+  };
+
+  const handleReasonSubmit = () => {
+    // Save the reason logic here if needed
+    updateStreak(false); // reset streak
+    onClose();
   };
 
   const fallingStars = info.stars
@@ -231,45 +275,25 @@ export default function AdhanOverlay({
           transition={{ duration: 3, ease: 'easeOut' }}
           src={info.image}
           alt=""
-          className="absolute inset-0 w-full h-full object-cover mix-blend-overlay"
+          className="absolute inset-0 w-full h-full object-cover mix-blend-overlay pointer-events-none"
           referrerPolicy="no-referrer"
         />
 
         {/* طبقة ضبابية */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/50 pointer-events-none" />
 
         {/* نجوم متساقطة */}
         {fallingStars.map((s, i) => <FallingStar key={i} x={s.x} delay={s.delay} />)}
       </div>
 
-      {/* ── زر الإغلاق ── */}
-      <motion.button
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 1.5 }}
-        onClick={onClose}
-        className="absolute top-6 left-6 z-20 w-10 h-10 rounded-full flex items-center justify-center transition-all"
-        style={{
-          background: 'rgba(0,0,0,0.4)',
-          border: '1px solid rgba(255,255,255,0.15)',
-          backdropFilter: 'blur(10px)',
-        }}
-      >
-        <X size={18} className="text-white/70" />
-      </motion.button>
-
       {/* ── زر الصوت ── */}
+      {step === 'adhan' && (
       <motion.button
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 1.5 }}
         onClick={audioError ? handleManualPlay : toggleMute}
-        className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full flex items-center justify-center transition-all"
-        style={{
-          background: 'rgba(0,0,0,0.4)',
-          border: '1px solid rgba(255,255,255,0.15)',
-          backdropFilter: 'blur(10px)',
-        }}
+        className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full flex items-center justify-center transition-all bg-black/40 border border-white/20 backdrop-blur-md"
       >
         {muted ? (
           <VolumeX size={18} className="text-white/50" />
@@ -277,18 +301,20 @@ export default function AdhanOverlay({
           <Volume2 size={18} className="text-amber-400" />
         )}
       </motion.button>
+      )}
 
       {/* ── المحتوى الرئيسي ── */}
-      <div className="relative z-10 flex flex-col items-center w-full max-w-sm px-6">
+      <div className="relative z-10 flex flex-col items-center w-full max-w-sm px-4">
 
         {/* المئذنة */}
+        {step === 'adhan' && (
         <AnimatePresence>
           {showContent && (
             <motion.div
               initial={{ y: 60, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 60, damping: 15 }}
-              className="relative mb-8 flex flex-col items-center"
+              className="relative mb-6 flex flex-col items-center"
             >
               {/* دوائر النبض خلف الأيقونة */}
               <div className="relative flex items-center justify-center">
@@ -317,97 +343,202 @@ export default function AdhanOverlay({
             </motion.div>
           )}
         </AnimatePresence>
+        )}
 
-        {/* بطاقة المعلومات */}
-        <AnimatePresence>
+        {/* بطاقة العمليات والتفاعل */}
+        <AnimatePresence mode="wait">
           {showContent && (
             <motion.div
+              key={step}
               initial={{ y: 50, opacity: 0, scale: 0.95 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2, type: 'spring', stiffness: 70, damping: 18 }}
-              className="w-full rounded-3xl overflow-hidden"
-              style={{
-                background: 'rgba(0,0,0,0.45)',
-                border: '1px solid rgba(251,191,36,0.2)',
-                backdropFilter: 'blur(24px)',
-                boxShadow: '0 30px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(251,191,36,0.05), inset 0 1px 0 rgba(251,191,36,0.15)',
-              }}
+              exit={{ y: -50, opacity: 0, scale: 0.95 }}
+              transition={{ delay: 0.1, type: 'spring', stiffness: 70, damping: 18 }}
+              className="w-full rounded-3xl overflow-hidden bg-black/60 border border-amber-400/20 backdrop-blur-2xl shadow-[0_30px_60px_rgba(0,0,0,0.6)] text-center relative"
             >
               {/* شريط علوي ذهبي */}
-              <div
-                className="h-0.5 w-full"
-                style={{ background: 'linear-gradient(90deg, transparent, rgba(251,191,36,0.8), transparent)' }}
-              />
+              <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-amber-400/80 to-transparent" />
 
-              <div className="p-7 text-center">
-                {/* وقت الصلاة */}
-                <p className="text-amber-400/70 text-xs tracking-widest mb-1 font-light">{info.period}</p>
+              <div className="p-7">
+                
+                {/* ---------- خطوة 1: الأذان ---------- */}
+                {step === 'adhan' && (
+                  <>
+                    <p className="text-amber-400/70 text-xs tracking-widest mb-1 font-light">{info.period}</p>
+                    <h1 className="text-5xl font-bold text-amber-400 mb-2 font-serif drop-shadow-lg">{prayerName}</h1>
+                    <p className="text-white/60 text-sm mb-6">حان وقت الصلاة</p>
+                    <div className="bg-white/5 border border-white/10 px-6 py-3 rounded-2xl mb-6 inline-block">
+                      <p className="text-4xl font-mono font-bold text-white tabular-nums drop-shadow-md">
+                        {currentTime.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                    
+                    <div className="flex flex-col gap-3">
+                      <button 
+                        onClick={() => setStep('locked')}
+                        className="w-full py-4 rounded-2xl font-bold text-lg text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:shadow-[0_0_20px_rgba(251,191,36,0.4)] transition-all flex items-center justify-center gap-2"
+                      >
+                        <Lock size={20} />
+                        سأذهب لأصلي
+                      </button>
+                      <button 
+                        onClick={() => {
+                          if (onSnooze) onSnooze();
+                          else onClose();
+                        }}
+                        className="w-full py-3 rounded-2xl font-semibold text-white/80 bg-white/10 hover:bg-white/15 transition-all text-sm"
+                      >
+                        غفوة 10 دقائق
+                      </button>
+                    </div>
+                  </>
+                )}
 
-                {/* اسم الصلاة */}
-                <motion.h1
-                  animate={{ textShadow: ['0 0 20px rgba(251,191,36,0.3)', '0 0 40px rgba(251,191,36,0.6)', '0 0 20px rgba(251,191,36,0.3)'] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                  className="text-5xl font-bold text-amber-400 mb-1"
-                  style={{ fontFamily: 'Georgia, serif' }}
-                >
-                  {prayerName}
-                </motion.h1>
+                {/* ---------- خطوة 2: القفل ---------- */}
+                {step === 'locked' && (
+                  <>
+                    <div className="w-16 h-16 mx-auto bg-amber-500/20 rounded-full flex items-center justify-center mb-4 text-amber-400">
+                      <Lock size={32} />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white mb-2 font-serif">التطبيق مقفل</h2>
+                    <p className="text-white/70 mb-6 leading-relaxed">
+                      نحن بانتظارك لكي تؤدي الصلاة. <br />
+                      الصلاة أهم من أي شيء في هذا التطبيق! 
+                    </p>
+                    
+                    <div className="flex flex-col gap-3">
+                      <button 
+                        onClick={() => setStep('swear')}
+                        className="w-full py-4 rounded-2xl font-bold text-lg text-white bg-emerald-600 hover:bg-emerald-500 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                      >
+                        <CheckCircle size={20} />
+                        أديت الصلاة
+                      </button>
+                      <button 
+                        onClick={() => setStep('missed')}
+                        className="w-full py-3 rounded-2xl font-medium text-white/60 bg-red-500/10 hover:bg-red-500/20 transition-all border border-red-500/20"
+                      >
+                        فاتتني الصلاة (خرج الوقت)
+                      </button>
+                    </div>
+                  </>
+                )}
 
-                <p className="text-white/40 text-sm mb-6">حان وقت الصلاة</p>
+                {/* ---------- خطوة 3: القسم ---------- */}
+                {step === 'swear' && (
+                  <>
+                    <div className="w-16 h-16 mx-auto bg-emerald-500/20 rounded-full flex items-center justify-center mb-4 text-emerald-400">
+                      <Shield size={32} />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white mb-4 font-serif">قسم الصلاة</h2>
+                    <p className="text-emerald-300/90 mb-5 font-bold text-lg leading-loose border-2 border-emerald-500/30 p-4 rounded-xl bg-emerald-900/20 border-dashed">
+                      "أقسم بالله العظيم الذي لا إله إلا هو، أنني أديت صلاة {prayerName}."
+                    </p>
+                    
+                    <div className="flex flex-col gap-3">
+                      <button 
+                        onClick={() => completePrayerFlow(false)}
+                        className="w-full py-4 rounded-2xl font-bold text-lg text-white bg-emerald-600 hover:bg-emerald-500 transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)]"
+                      >
+                        أُشهد الله على ذلك
+                      </button>
+                      <button 
+                        onClick={() => setStep('locked')}
+                        className="w-full py-3 rounded-2xl font-medium text-white/70 bg-white/5 hover:bg-white/10 transition-all"
+                      >
+                        تراجع (أستغفر الله، لم أصلِ بعد)
+                      </button>
+                    </div>
+                  </>
+                )}
 
-                {/* الساعة الحالية */}
-                <div
-                  className="inline-block px-6 py-3 rounded-2xl mb-6"
-                  style={{
-                    background: 'rgba(251,191,36,0.08)',
-                    border: '1px solid rgba(251,191,36,0.15)',
-                  }}
-                >
-                  <motion.p
-                    key={currentTime.getSeconds()}
-                    initial={{ opacity: 0.7 }}
-                    animate={{ opacity: 1 }}
-                    className="text-4xl font-mono font-bold text-white tabular-nums"
-                    style={{ textShadow: '0 0 20px rgba(255,255,255,0.3)' }}
-                  >
-                    {currentTime.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                  </motion.p>
-                </div>
+                {/* ---------- خطوة 4: الفوات والقضاء ---------- */}
+                {step === 'missed' && (
+                  <>
+                    <div className="w-16 h-16 mx-auto bg-red-500/20 rounded-full flex items-center justify-center mb-4 text-red-400">
+                      <AlertTriangle size={32} />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white mb-2 font-serif">فاتتك الصلاة!</h2>
+                    <p className="text-white/70 mb-6 text-sm leading-relaxed">
+                      (فَخَلَفَ مِن بَعْدِهِمْ خَلْفٌ أَضَاعُوا الصَّلَاةَ...) <br />
+                      هل قمت بقضاء صلاة {prayerName} الآن؟
+                    </p>
+                    
+                    <div className="flex flex-col gap-3">
+                      <button 
+                        onClick={() => setStep('reason')}
+                        className="w-full py-4 rounded-2xl font-bold text-lg text-white bg-amber-600 hover:bg-amber-500 transition-all shadow-[0_0_20px_rgba(217,119,6,0.3)]"
+                      >
+                        نعم، قضيتها وتُبت
+                      </button>
+                      <button 
+                        onClick={() => setStep('locked')}
+                        className="w-full py-3 rounded-2xl font-medium text-white/80 bg-red-500/20 hover:bg-red-500/30 transition-all border border-red-500/30 flex flex-col items-center justify-center"
+                      >
+                        <span>لا، لم أقضها بعد</span>
+                        <span className="text-xs opacity-70 mt-1">اذهب وصلّها الآن لفتح التطبيق</span>
+                      </button>
+                    </div>
+                  </>
+                )}
 
-                {/* الآية / الذكر */}
-                <div
-                  className="rounded-2xl p-4 mb-6"
-                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
-                >
-                  <p className="text-white/80 text-lg leading-relaxed" style={{ fontFamily: 'Georgia, serif' }}>
-                    {info.arabicText}
-                  </p>
-                </div>
+                {/* ---------- خطوة 5: السبب ---------- */}
+                {step === 'reason' && (
+                  <>
+                    <h2 className="text-2xl font-bold text-white mb-3 font-serif">لماذا فوّت الصلاة؟</h2>
+                    <p className="text-white/70 mb-5 text-xs">
+                      المصارحة مع النفس أول خطوات التوبة. <br />
+                      لماذا أضعت الصلاة عن وقتها؟ (سيتم تصفير السترايك)
+                    </p>
+                    
+                    <div className="grid grid-cols-2 gap-2 mb-6">
+                      {MISS_REASONS.map((r, i) => (
+                        <button
+                          key={i}
+                          onClick={() => setReason(r)}
+                          className={`p-2 py-3 text-xs font-bold rounded-xl border transition-all ${
+                            reason === r 
+                              ? 'bg-amber-500/30 border-amber-500 text-white shadow-[0_0_15px_rgba(251,191,36,0.2)]' 
+                              : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white'
+                          }`}
+                        >
+                          {r}
+                        </button>
+                      ))}
+                    </div>
 
-                {/* زر الإغلاق */}
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={onClose}
-                  className="w-full py-4 rounded-2xl font-bold text-lg transition-all"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(251,191,36,0.9) 0%, rgba(245,158,11,0.9) 100%)',
-                    color: '#1a0a00',
-                    boxShadow: '0 8px 25px rgba(251,191,36,0.3)',
-                  }}
-                >
-                  اللهم تقبّل صلاتي 🤲
-                </motion.button>
+                    <button 
+                      onClick={handleReasonSubmit}
+                      disabled={!reason}
+                      className="w-full py-4 rounded-2xl font-bold text-sm md:text-base text-white bg-gradient-to-r from-red-600 to-rose-600 hover:shadow-[0_0_20px_rgba(225,29,72,0.4)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      حفظ وتوبة (فتح التطبيق)
+                    </button>
+                  </>
+                )}
+
               </div>
 
               {/* شريط سفلي */}
-              <div
-                className="h-0.5 w-full"
-                style={{ background: 'linear-gradient(90deg, transparent, rgba(251,191,36,0.4), transparent)' }}
-              />
+              <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-amber-400/40 to-transparent" />
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Floating Streak Badge */}
+        {showContent && prayerStreak > 0 && (
+          <motion.div 
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="mt-6 flex items-center justify-center gap-2 bg-black/40 backdrop-blur-md px-5 py-2.5 rounded-full border border-emerald-500/30 text-emerald-400 shadow-[0_4px_20px_rgba(16,185,129,0.2)]"
+          >
+            <span className="font-bold text-sm">سترايك الصلاة الحالي:</span>
+            <span className="font-mono font-black text-xl text-white drop-shadow-md">{prayerStreak}</span>
+            <span className="text-xl">🔥</span>
+          </motion.div>
+        )}
+
       </div>
     </motion.div>
   );

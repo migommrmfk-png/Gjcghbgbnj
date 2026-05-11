@@ -17,7 +17,7 @@ interface AppNotification {
 
 export default function NotificationsPage({ onBack }: { onBack: () => void }) {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, userData } = useAuth();
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -30,7 +30,7 @@ export default function NotificationsPage({ onBack }: { onBack: () => void }) {
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      if (user && !user.isAnonymous) {
+      if (user && !userData?.isAnonymous) {
          // Example structure for firestore
          // const q = query(collection(db, `users/${user.uid}/notifications`), orderBy('createdAt', 'desc'), limit(20));
          // const snap = await getDocs(q);

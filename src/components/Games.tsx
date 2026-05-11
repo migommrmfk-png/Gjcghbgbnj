@@ -425,7 +425,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
 
           <div className="flex flex-col gap-3">
             <button 
-              onClick={() => handleGameSelect(activeGame)}
+              onClick={() => { if (activeGame !== 'menu') handleGameSelect(activeGame); }}
               className="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-bold hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all shadow-[0_5px_15px_rgba(0,0,0,0.3)] flex items-center justify-center gap-2 border border-emerald-400/50"
             >
               <Sparkles size={20} />
@@ -525,7 +525,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
 
           <div className="flex flex-col gap-3 relative z-10">
             <button 
-              onClick={() => handleGameSelect(activeGame)}
+              onClick={() => { if (activeGame !== 'menu') handleGameSelect(activeGame); }}
               className="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-[1.5rem] font-bold hover:shadow-[0_10px_30px_rgba(16,185,129,0.4)] hover:-translate-y-1 transition-all flex items-center justify-center gap-2 border border-white/20 shadow-md"
             >
               <Sparkles size={20} />
@@ -620,7 +620,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
 
           <div className="flex flex-col gap-3">
             <button 
-              onClick={() => handleGameSelect(activeGame)}
+              onClick={() => { if (activeGame !== 'menu') handleGameSelect(activeGame); }}
               className="w-full py-4 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-[1.5rem] font-bold hover:shadow-[0_10px_30px_rgba(16,185,129,0.4)] hover:-translate-y-1 transition-all flex items-center justify-center gap-2 border border-white/20 shadow-[0_5px_15px_rgba(0,0,0,0.3)] relative z-10"
             >
               <Sparkles size={20} />
