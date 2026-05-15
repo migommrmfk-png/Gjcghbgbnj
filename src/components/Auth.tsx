@@ -97,6 +97,8 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
         msg = 'هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول بدلاً من ذلك.';
       } else if (msg.includes('Email signups are disabled')) {
         msg = 'إنشاء الحسابات بالبريد الإلكتروني معطل في لوحة تحكم Supabase.';
+      } else if (msg.includes('Email not confirmed')) {
+        msg = 'يرجى تأكيد بريدك الإلكتروني أولاً. تفقد صندوق الوارد الخاص بك أو مجلد الرسائل غير المرغوب فيها (Spam).';
       }
       setError(msg);
     } finally {
