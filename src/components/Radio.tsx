@@ -436,14 +436,39 @@ const TV_CHANNELS = [
 
 export default function IslamicRadio() {
   const [activeTab, setActiveTab] = useState<"radio" | "tv">("radio");
-  const [currentStation, setCurrentStation] = useState<RadioStation | null>(
-    null,
-  );
+  const [stations, setStations] = useState<RadioStation[]>(STATIONS);
+  const [currentStation, setCurrentStation] = useState<RadioStation | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    // Fetch more radios from mp3quran
+    fetch('https://www.mp3quran.net/api/v3/radios?language=ar')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.radios) {
+          const fetchedStations = data.radios.map((r: any) => ({
+            id: `api_${r.id}`,
+            name: r.name,
+            url: r.url,
+            type: "قراء و منوعات"
+          }));
+          
+          // merge avoiding duplicates by name
+          const finalStations = [...STATIONS];
+          fetchedStations.forEach((fs: any) => {
+             if (!finalStations.find(s => s.name === fs.name)) {
+                finalStations.push(fs);
+             }
+          });
+          setStations(finalStations);
+        }
+      })
+      .catch(err => console.error("Could not fetch radios", err));
+  }, []);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -465,6 +490,29 @@ export default function IslamicRadio() {
         audioRef.current.pause();
         audioRef.current.src = station.url;
         audioRef.current.load();
+        
+        // Setup Media Session API
+        if ('mediaSession' in navigator) {
+          navigator.mediaSession.metadata = new MediaMetadata({
+            title: station.name,
+            artist: station.type || 'إذاعة إسلامية',
+            album: 'الإذاعة',
+            artwork: [
+              { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+              { src: '/icon-512.png', sizes: '512x512', type: 'image/png' }
+            ]
+          });
+          
+          navigator.mediaSession.setActionHandler('play', () => {
+             audioRef.current?.play();
+             setIsPlaying(true);
+          });
+          navigator.mediaSession.setActionHandler('pause', () => {
+             audioRef.current?.pause();
+             setIsPlaying(false);
+          });
+        }
+        
         audioRef.current
           .play()
           .catch((e) => {
@@ -478,8 +526,8 @@ export default function IslamicRadio() {
 
   const togglePlay = () => {
     setError(null);
-    if (!currentStation && STATIONS.length > 0) {
-      handlePlayStation(STATIONS[0]);
+    if (!currentStation && stations.length > 0) {
+      handlePlayStation(stations[0]);
       return;
     }
     if (isPlaying) {
@@ -503,7 +551,7 @@ export default function IslamicRadio() {
     }
   };
 
-  const filteredStations = STATIONS.filter(station => 
+  const filteredStations = stations.filter(station => 
     station.name.includes(searchQuery) || station.type.includes(searchQuery)
   );
 

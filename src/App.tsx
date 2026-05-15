@@ -68,6 +68,7 @@ const QuranReflection = lazy(() => import("./components/QuranReflection"));
 const IslamicTimeline = lazy(() => import("./components/IslamicTimeline"));
 
 const IslamicNames = lazy(() => import("./components/IslamicNames"));
+const QazaTracker = lazy(() => import("./components/QazaTracker"));
 import InstallPrompt from "./components/InstallPrompt";
 import ChatOverlay from "./components/ChatOverlay";
 
@@ -229,6 +230,8 @@ function AppContent() {
         return <InheritanceCalculator onBack={handleBack} />;
       case "dreams":
         return <DreamInterpretation onBack={handleBack} />;
+      case "qaza-tracker":
+        return <QazaTracker onBack={handleBack} />;
 
       case "accounting":
         return <SelfAccounting onBack={handleBack} />;

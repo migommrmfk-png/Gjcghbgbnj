@@ -90,19 +90,15 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
       }
     } catch (err: any) {
       console.error(err);
-      if (err?.message?.includes('provider is not enabled') || err?.error_code === 'validation_failed') {
-        setError('تسجيل الدخول بالبريد الإلكتروني غير مفعل.');
-      } else if (err?.message?.includes('Email signups are disabled')) {
-        setError('إنشاء حسابات جديدة بالبريد الإلكتروني معطل حالياً.');
-      } else if (err?.message?.includes('Invalid login credentials')) {
-        setError('بيانات الدخول غير صحيحة. يرجى التأكد من البريد الإلكتروني وكلمة المرور.');
-      } else if (err?.message?.includes('captcha_token')) {
-        setError('تم تفعيل حماية Captcha.');
-      } else if (err?.message?.includes('User already registered') || err?.message?.includes('already registered')) {
-        setError('هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول بدلاً من ذلك.');
-      } else {
-        setError(err.message || 'حدث خطأ. يرجى المحاولة مرة أخرى.');
+      let msg = err?.message || 'حدث خطأ. يرجى المحاولة مرة أخرى.';
+      if (msg.includes('Invalid login credentials')) {
+        msg = 'بيانات الدخول غير صحيحة. يرجى التأكد من البريد الإلكتروني وكلمة المرور.';
+      } else if (msg.includes('User already registered') || msg.includes('already registered')) {
+        msg = 'هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول بدلاً من ذلك.';
+      } else if (msg.includes('Email signups are disabled')) {
+        msg = 'إنشاء الحسابات بالبريد الإلكتروني معطل في لوحة تحكم Supabase.';
       }
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -116,11 +112,11 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
       if (onBack) onBack();
     } catch (err: any) {
       console.error(err);
-      if (err?.message?.includes('Anonymous Sign-ins are disabled') || err?.message?.includes('provider is not enabled') || err?.error_code === 'validation_failed') {
-         setError('خاصية الدخول كزائر غير مفعلة.');
-      } else {
-         setError(err.message || 'حدث خطأ أثناء المتابعة كزائر.');
+      let msg = err?.message || 'حدث خطأ أثناء المتابعة كزائر.';
+      if (msg.includes('Anonymous Sign-ins are disabled') || msg.includes('provider is not enabled')) {
+         msg = 'الدخول كزائر معطل في لوحة تحكم Supabase (Anonymous sign-ins).';
       }
+      setError(msg);
     } finally {
       setLoading(false);
     }

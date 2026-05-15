@@ -252,6 +252,27 @@ export default function Quran() {
         audioRef.current.volume = volume;
         setIsAudioLoading(true);
         
+        // Setup Media Session API
+        if ('mediaSession' in navigator) {
+          const fallbackReciterName = reciters.find(r => r.server === activeReciterServer)?.name || 'مقرئ';
+          navigator.mediaSession.metadata = new MediaMetadata({
+            title: surahName || surahData.name || 'القرآن الكريم',
+            artist: fallbackReciterName,
+            album: 'القرآن الكريم',
+            artwork: [
+              { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+              { src: '/icon-512.png', sizes: '512x512', type: 'image/png' }
+            ]
+          });
+          
+          navigator.mediaSession.setActionHandler('play', () => {
+            audioRef.current?.play();
+          });
+          navigator.mediaSession.setActionHandler('pause', () => {
+             audioRef.current?.pause();
+          });
+        }
+        
         audioRef.current.play()
           .then(() => {
             setIsPlaying(true);

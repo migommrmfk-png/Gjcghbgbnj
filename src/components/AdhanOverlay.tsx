@@ -191,12 +191,17 @@ export default function AdhanOverlay({
       return;
     }
     
-    const audio = new Audio('https://download.quranicaudio.com/adhan/makkah.mp3');
+    const audio = new Audio('https://server11.mp3quran.net/adhan/1.mp3');
     audioRef.current = audio;
 
     audio.addEventListener('playing', () => setAudioPlaying(true));
     audio.addEventListener('pause', () => setAudioPlaying(false));
     audio.addEventListener('ended', () => setAudioPlaying(false));
+    audio.addEventListener('error', () => {
+       /* Fallback if the first fails */
+       audio.src = 'https://www.islamcan.com/audio/adhan/azan3.mp3';
+       audio.load();
+    });
 
     const play = async () => {
       try {

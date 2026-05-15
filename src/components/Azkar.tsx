@@ -468,8 +468,31 @@ export default function Azkar() {
         audioRef.current.pause();
       }
       const audio = new Audio(zikr.audioUrl);
+      
+      // Setup Media Session API
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: zikr.reference || selectedCategory?.title || 'أذكار',
+          artist: selectedCategory?.title || 'حصن المسلم',
+          album: 'أذكار',
+          artwork: [
+            { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+            { src: '/icon-512.png', sizes: '512x512', type: 'image/png' }
+          ]
+        });
+        
+        navigator.mediaSession.setActionHandler('play', () => {
+           audio.play();
+           setPlayingId(zikr.id);
+        });
+        navigator.mediaSession.setActionHandler('pause', () => {
+           audio.pause();
+           setPlayingId(null);
+        });
+      }
+
       audio.onended = () => setPlayingId(null);
-      audio.play();
+      audio.play().catch(console.error);
       audioRef.current = audio;
       setPlayingId(zikr.id);
     }

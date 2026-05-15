@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe, TrendingUp, Play, Circle, Sun, Settings, Download, Crown, Award, Activity, Wind, TreePine, CheckCircle, Baby, Hourglass } from 'lucide-react';
+import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe, TrendingUp, Play, Circle, Sun, Settings, Download, Crown, Award, Activity, Wind, TreePine, CheckCircle, Baby, Hourglass, History } from 'lucide-react';
 import { usePrayerTimes } from '../contexts/PrayerTimesContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -137,6 +137,7 @@ export default function MoreMenu({
         { id: 'tasbeeh', label: t('tasbeeh', 'السبحة الإلكترونية'), icon: <Circle size={24} />, color: 'bg-indigo-500' },
         { id: 'ruqyah', label: t('ruqyah', 'الرقية الشرعية'), icon: <Shield size={24} />, color: 'bg-teal-500' },
         { id: 'qibla', label: t('qibla', 'اتجاه القبلة'), icon: <Compass size={24} />, color: 'bg-orange-500' },
+        { id: 'qaza-tracker', label: t('qaza_tracker', 'قضاء الفوائت'), icon: <History size={24} />, color: 'bg-rose-600', isNew: true },
         { id: 'calendar', label: t('hijri_calendar', 'التقويم الهجري'), icon: <Calendar size={24} />, color: 'bg-blue-500' },
         { id: 'zakat', label: t('zakat_calculator', 'حاسبة الزكاة'), icon: <Calculator size={24} />, color: 'bg-emerald-600' },
         { id: 'inheritance', label: t('inheritance_calculator', 'حاسبة المواريث'), icon: <Calculator size={24} />, color: 'bg-emerald-800' },
