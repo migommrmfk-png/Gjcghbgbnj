@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, Suspense, lazy } from "react";
+import { Toaster } from 'react-hot-toast';
 import {
   Home,
   BookOpen,
@@ -383,8 +384,6 @@ function AppContent() {
     </div>
   );
 }
-
-import { Toaster } from 'react-hot-toast';
 
 export default function App() {
   return (

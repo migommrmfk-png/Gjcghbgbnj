@@ -7,6 +7,7 @@ import { db, auth as firebaseAuth } from '../firebase';
 import { collection, addDoc, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import { Type } from '@google/genai';
 import { getGeminiClient } from '../lib/gemini';
+import toast from 'react-hot-toast';
 
 const moods = [
   { id: 'happy', icon: <Smile className="w-8 h-8" />, label: 'سعيد', color: 'bg-emerald-500' },
@@ -105,6 +106,7 @@ export default function MoodTracker() {
 
     } catch (error) {
       console.error("Error logging mood:", error);
+      toast.error("عذراً، حدث خطأ أثناء الاتصال بالخادم. حاول مجدداً.");
     } finally {
       setSaving(false);
       setLoading(false);

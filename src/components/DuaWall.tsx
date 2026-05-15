@@ -16,6 +16,8 @@ interface DuaPost {
   isAnonymous: boolean;
 }
 
+import toast from 'react-hot-toast';
+
 export default function DuaWall({ onBack }: { onBack: () => void }) {
   const [duas, setDuas] = useState<DuaPost[]>([]);
   const [newDua, setNewDua] = useState('');
@@ -77,6 +79,7 @@ export default function DuaWall({ onBack }: { onBack: () => void }) {
       setNewDua('');
     } catch (error) {
       console.error("Error posting dua:", error);
+      toast.error("عذراً، حدث خطأ أثناء نشر الدعاء. هل لديك صلاحية للوصول؟");
     } finally {
       setIsSubmitting(false);
     }
@@ -107,6 +110,7 @@ export default function DuaWall({ onBack }: { onBack: () => void }) {
       }
     } catch (error) {
       console.error("Error updating ameen count:", error);
+      toast.error("حدث خطأ في الاتصال بالخادم.");
       // Revert on failure
       const reverted = new Set(ameenedDuas);
       reverted.delete(duaId);
