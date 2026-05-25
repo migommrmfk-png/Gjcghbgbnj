@@ -56,8 +56,13 @@ export default function IslamicNames({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="h-full bg-slate-50 dark:bg-slate-900 pb-20 overflow-y-auto">
-      <div className="bg-emerald-600 dark:bg-emerald-800 text-white p-4 sticky top-0 z-10 shadow-md">
-        <div className="flex items-center gap-3">
+      <div className="bg-[#0A1914] text-white p-4 sticky top-0 z-10 shadow-md relative overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none" 
+          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1542816417-0983cb9c62ce?auto=format&fit=crop&q=80&w=1200")' }}
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/80 to-teal-800/80 mix-blend-overlay"></div>
+        <div className="relative z-10 flex items-center gap-3">
           <button onClick={onBack} className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors shrink-0">
             <ChevronLeft size={24} className={document.documentElement.dir === 'ltr' ? 'rotate-180' : ''} />
           </button>

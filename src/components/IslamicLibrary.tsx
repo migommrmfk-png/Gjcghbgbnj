@@ -1,311 +1,253 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, Book, Headphones, PlayCircle, FileText, Search, Star, Clock, Eye } from 'lucide-react';
+import { ArrowRight, Book, Download, ExternalLink, Search, Filter } from 'lucide-react';
+
+const CATEGORIES = [
+  "الكل",
+  "القرآن وعلومه",
+  "الحديث وشرح السنّة",
+  "العقيدة والتوحيد",
+  "الأذكار والعبادات",
+  "السيرة النبوية",
+  "قصص الأنبياء",
+  "الفقه المبسط",
+  "رمضان والزكاة والحج"
+];
+
+const BOOKS = [
+  {
+    id: 1,
+    title: "التفسير الميسر",
+    author: "نخبة من العلماء",
+    category: "القرآن وعلومه",
+    description: "تفسير مبسط وواضح لمعاني القرآن الكريم، أعده نخبة من علماء التفسير.",
+    readUrl: "https://shamela.ws/book/93",
+    downloadUrl: "https://archive.org/download/tafseer-moyassar/tafseer-moyassar.pdf",
+    image: "https://images.unsplash.com/photo-1584282869372-00b8e6bb2345?auto=format&fit=crop&q=80&w=400"
+  },
+  {
+    id: 2,
+    title: "رياض الصالحين",
+    author: "الإمام النووي",
+    category: "الحديث وشرح السنّة",
+    description: "مختارات من أحاديث الرسول ﷺ في الشؤون الدينية والدنيوية.",
+    readUrl: "https://shamela.ws/book/21808",
+    downloadUrl: "https://archive.org/download/waq46401/46401.pdf",
+    image: "https://images.unsplash.com/photo-1542816417-0983cb9c62ce?auto=format&fit=crop&q=80&w=400"
+  },
+  {
+    id: 3,
+    title: "كتاب التوحيد",
+    author: "الإمام محمد بن عبدالوهاب",
+    category: "العقيدة والتوحيد",
+    description: "كتاب يبين حق الله على العبيد، في توحيد العبادة والتحذير من الشرك.",
+    readUrl: "https://shamela.ws/book/11559",
+    downloadUrl: "https://archive.org/download/waq17849/17849.pdf",
+    image: "https://images.unsplash.com/photo-1590076215667-873dcb3f3fbb?auto=format&fit=crop&q=80&w=400"
+  },
+  {
+    id: 4,
+    title: "حصن المسلم",
+    author: "سعيد بن علي بن وهف القحطاني",
+    category: "الأذكار والعبادات",
+    description: "من أذكار الكتاب والسنة، كتاب مختصر يجمع الأذكار المهمة للمسلم.",
+    readUrl: "https://shamela.ws/book/1888",
+    downloadUrl: "https://archive.org/download/waq108398/108398.pdf",
+    image: "https://images.unsplash.com/photo-1519817914152-2a241f6e2325?auto=format&fit=crop&q=80&w=400"
+  },
+  {
+    id: 5,
+    title: "الرحيق المختوم",
+    author: "صفي الرحمن المباركفوري",
+    category: "السيرة النبوية",
+    description: "كتاب في السيرة النبوية، حاز المركز الأول في مسابقة رابطة العالم الإسلامي.",
+    readUrl: "https://shamela.ws/book/27339",
+    downloadUrl: "https://archive.org/download/waq88523/88523.pdf",
+    image: "https://images.unsplash.com/photo-1572949645841-094f3a9c4c94?auto=format&fit=crop&q=80&w=400"
+  },
+  {
+    id: 6,
+    title: "قصص الأنبياء",
+    author: "الإمام ابن كثير",
+    category: "قصص الأنبياء",
+    description: "يستعرض سيرة الأنبياء والرسل كما وردت في القرآن الكريم والسنّة المطهرة.",
+    readUrl: "https://shamela.ws/book/12170",
+    downloadUrl: "https://archive.org/download/waq13276/13276.pdf",
+    image: "https://images.unsplash.com/photo-1507692049790-de58290a4334?auto=format&fit=crop&q=80&w=400"
+  },
+  {
+    id: 7,
+    title: "الفقه الميسر",
+    author: "نخبة من العلماء",
+    category: "الفقه المبسط",
+    description: "فقه العبادات والمعاملات مدعماً بالأدلة من الكتاب والسنّة وبأسلوب مبسط.",
+    readUrl: "https://shamela.ws/book/11413",
+    downloadUrl: "https://archive.org/download/waq88524/88524.pdf",
+    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=400"
+  },
+  {
+    id: 8,
+    title: "صفة صوم النبي ﷺ",
+    author: "محمد ناصر الدين الألباني",
+    category: "رمضان والزكاة والحج",
+    description: "بيان لصفة صوم النبي ﷺ في رمضان كأنك تراه.",
+    readUrl: "https://shamela.ws/book/10531",
+    downloadUrl: "https://archive.org/download/sifat-sawm/sifat-sawm.pdf",
+    image: "https://images.unsplash.com/photo-1519406086208-cb2687c4f1c1?auto=format&fit=crop&q=80&w=400"
+  }
+];
 
 export default function IslamicLibrary({ onBack }: { onBack: () => void }) {
-  const [activeTab, setActiveTab] = useState<'books' | 'audio' | 'video'>('books');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState("الكل");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const books = [
-    // عقيدة
-    { id: 1, title: 'كتاب التوحيد', author: 'محمد بن عبد الوهاب', category: 'عقيدة', pages: 150, rating: 4.9 },
-    { id: 2, title: 'العقيدة الطحاوية', author: 'الطحاوي', category: 'عقيدة', pages: 200, rating: 4.8 },
-    { id: 3, title: 'لمعة الاعتقاد', author: 'ابن قدامة', category: 'عقيدة', pages: 120, rating: 4.7 },
-    { id: 4, title: 'شرح العقيدة الواسطية', author: 'ابن تيمية', category: 'عقيدة', pages: 350, rating: 4.9 },
-    { id: 5, title: 'الواسطية', author: 'ابن تيمية', category: 'عقيدة', pages: 80, rating: 4.9 },
-    { id: 6, title: 'العقيدة السفارينية', author: 'السفاريني', category: 'عقيدة', pages: 250, rating: 4.8 },
-    { id: 7, title: 'أصول السنة', author: 'الإمام أحمد', category: 'عقيدة', pages: 90, rating: 4.9 },
-    { id: 8, title: 'الإيمان', author: 'ابن تيمية', category: 'عقيدة', pages: 400, rating: 4.9 },
-    { id: 9, title: 'الشريعة', author: 'الآجري', category: 'عقيدة', pages: 600, rating: 4.8 },
-    { id: 10, title: 'السنة', author: 'ابن أبي عاصم', category: 'عقيدة', pages: 450, rating: 4.8 },
-    // تفسير
-    { id: 11, title: 'تفسير ابن كثير', author: 'ابن كثير', category: 'تفسير', pages: 3200, rating: 4.9 },
-    { id: 12, title: 'تفسير الطبري', author: 'الطبري', category: 'تفسير', pages: 4500, rating: 4.9 },
-    { id: 13, title: 'تفسير القرطبي', author: 'القرطبي', category: 'تفسير', pages: 3800, rating: 4.8 },
-    { id: 14, title: 'تفسير السعدي', author: 'السعدي', category: 'تفسير', pages: 1100, rating: 4.9 },
-    { id: 15, title: 'أضواء البيان', author: 'الشنقيطي', category: 'تفسير', pages: 2100, rating: 4.8 },
-    { id: 16, title: 'في ظلال القرآن', author: 'سيد قطب', category: 'تفسير', pages: 2500, rating: 4.7 },
-    { id: 17, title: 'التحرير والتنوير', author: 'ابن عاشور', category: 'تفسير', pages: 3000, rating: 4.8 },
-    { id: 18, title: 'البحر المحيط', author: 'أبو حيان', category: 'تفسير', pages: 2800, rating: 4.7 },
-    { id: 19, title: 'زاد المسير', author: 'ابن الجوزي', category: 'تفسير', pages: 1800, rating: 4.8 },
-    { id: 20, title: 'فتح القدير', author: 'الشوكاني', category: 'تفسير', pages: 2200, rating: 4.8 },
-    // حديث
-    { id: 21, title: 'صحيح البخاري', author: 'البخاري', category: 'حديث', pages: 3500, rating: 5.0 },
-    { id: 22, title: 'صحيح مسلم', author: 'مسلم', category: 'حديث', pages: 3000, rating: 5.0 },
-    { id: 23, title: 'سنن أبي داود', author: 'أبو داود', category: 'حديث', pages: 2000, rating: 4.9 },
-    { id: 24, title: 'سنن الترمذي', author: 'الترمذي', category: 'حديث', pages: 1800, rating: 4.9 },
-    { id: 25, title: 'سنن النسائي', author: 'النسائي', category: 'حديث', pages: 1900, rating: 4.9 },
-    { id: 26, title: 'سنن ابن ماجه', author: 'ابن ماجه', category: 'حديث', pages: 1700, rating: 4.8 },
-    { id: 27, title: 'موطأ مالك', author: 'مالك بن أنس', category: 'حديث', pages: 1500, rating: 4.9 },
-    { id: 28, title: 'رياض الصالحين', author: 'النووي', category: 'حديث', pages: 600, rating: 4.9 },
-    { id: 29, title: 'الأربعين النووية', author: 'النووي', category: 'حديث', pages: 100, rating: 4.9 },
-    { id: 30, title: 'بلوغ المرام', author: 'ابن حجر', category: 'حديث', pages: 450, rating: 4.8 },
-    // فقه
-    { id: 31, title: 'الفقه على المذاهب الأربعة', author: 'عبد الرحمن الجزيري', category: 'فقه', pages: 2000, rating: 4.7 },
-    { id: 32, title: 'المغني', author: 'ابن قدامة', category: 'فقه', pages: 4000, rating: 4.9 },
-    { id: 33, title: 'المجموع', author: 'النووي', category: 'فقه', pages: 3500, rating: 4.9 },
-    { id: 34, title: 'بداية المجتهد', author: 'ابن رشد', category: 'فقه', pages: 1200, rating: 4.8 },
-    { id: 35, title: 'الأم', author: 'الشافعي', category: 'فقه', pages: 2500, rating: 4.9 },
-    { id: 36, title: 'بدائع الصنائع', author: 'الكاساني', category: 'فقه', pages: 2200, rating: 4.8 },
-    { id: 37, title: 'الهداية', author: 'المرغيناني', category: 'فقه', pages: 1800, rating: 4.8 },
-    { id: 38, title: 'المدونة', author: 'مالك بن أنس', category: 'فقه', pages: 2800, rating: 4.9 },
-    { id: 39, title: 'كشاف القناع', author: 'البهوتي', category: 'فقه', pages: 2400, rating: 4.8 },
-    { id: 40, title: 'زاد المستقنع', author: 'الحجاوي', category: 'فقه', pages: 300, rating: 4.8 },
-    // سيرة وتاريخ
-    { id: 41, title: 'السيرة النبوية', author: 'ابن هشام', category: 'سيرة وتاريخ', pages: 1500, rating: 4.9 },
-    { id: 42, title: 'زاد المعاد', author: 'ابن القيم', category: 'سيرة وتاريخ', pages: 1800, rating: 4.9 },
-    { id: 43, title: 'الرحيق المختوم', author: 'المباركفوري', category: 'سيرة وتاريخ', pages: 550, rating: 4.9 },
-    { id: 44, title: 'فقه السيرة', author: 'الغزالي', category: 'سيرة وتاريخ', pages: 400, rating: 4.8 },
-    { id: 45, title: 'البداية والنهاية', author: 'ابن كثير', category: 'سيرة وتاريخ', pages: 5000, rating: 4.9 },
-    { id: 46, title: 'دلائل النبوة', author: 'البيهقي', category: 'سيرة وتاريخ', pages: 2000, rating: 4.8 },
-    { id: 47, title: 'الشمائل المحمدية', author: 'الترمذي', category: 'سيرة وتاريخ', pages: 350, rating: 4.9 },
-    { id: 48, title: 'السيرة النبوية', author: 'ابن كثير', category: 'سيرة وتاريخ', pages: 1200, rating: 4.9 },
-    { id: 49, title: 'نور اليقين', author: 'الخضري', category: 'سيرة وتاريخ', pages: 450, rating: 4.7 },
-    { id: 50, title: 'السيرة الحلبية', author: 'الحلبي', category: 'سيرة وتاريخ', pages: 1600, rating: 4.8 },
-    // تزكية وأخلاق
-    { id: 51, title: 'إحياء علوم الدين', author: 'الغزالي', category: 'تزكية وأخلاق', pages: 2500, rating: 4.8 },
-    { id: 52, title: 'مدارج السالكين', author: 'ابن القيم', category: 'تزكية وأخلاق', pages: 1200, rating: 4.9 },
-    { id: 53, title: 'الوابل الصيب', author: 'ابن القيم', category: 'تزكية وأخلاق', pages: 300, rating: 4.9 },
-    { id: 54, title: 'الفوائد', author: 'ابن القيم', category: 'تزكية وأخلاق', pages: 400, rating: 4.9 },
-    { id: 55, title: 'عدة الصابرين', author: 'ابن القيم', category: 'تزكية وأخلاق', pages: 350, rating: 4.8 },
-    { id: 56, title: 'مختصر منهاج القاصدين', author: 'ابن قدامة', category: 'تزكية وأخلاق', pages: 450, rating: 4.8 },
-    { id: 57, title: 'تهذيب مدارج السالكين', author: 'عبد المنعم العزي', category: 'تزكية وأخلاق', pages: 600, rating: 4.7 },
-    { id: 58, title: 'خلق المسلم', author: 'محمد الغزالي', category: 'تزكية وأخلاق', pages: 250, rating: 4.8 },
-    { id: 59, title: 'الأدب المفرد', author: 'البخاري', category: 'تزكية وأخلاق', pages: 500, rating: 4.9 },
-    { id: 60, title: 'حلية الأولياء', author: 'أبو نعيم', category: 'تزكية وأخلاق', pages: 3000, rating: 4.8 },
-    // فكر ودعوة
-    { id: 61, title: 'معالم في الطريق', author: 'سيد قطب', category: 'فكر ودعوة', pages: 200, rating: 4.7 },
-    { id: 62, title: 'ماذا خسر العالم بانحطاط المسلمين', author: 'الندوي', category: 'فكر ودعوة', pages: 350, rating: 4.8 },
-    { id: 63, title: 'الإسلام بين الشرق والغرب', author: 'علي عزت بيجوفيتش', category: 'فكر ودعوة', pages: 400, rating: 4.9 },
-    { id: 64, title: 'الطريق إلى القرآن', author: 'إبراهيم السكران', category: 'فكر ودعوة', pages: 150, rating: 4.9 },
-    { id: 65, title: 'رقائق القرآن', author: 'إبراهيم السكران', category: 'فكر ودعوة', pages: 180, rating: 4.9 },
-    { id: 66, title: 'لأنك الله', author: 'علي جابر الفيفي', category: 'فكر ودعوة', pages: 200, rating: 4.9 },
-    { id: 67, title: 'استمتع بحياتك', author: 'محمد العريفي', category: 'فكر ودعوة', pages: 350, rating: 4.8 },
-    { id: 68, title: 'لا تحزن', author: 'عائض القرني', category: 'فكر ودعوة', pages: 450, rating: 4.8 },
-    { id: 69, title: 'جدد حياتك', author: 'محمد الغزالي', category: 'فكر ودعوة', pages: 250, rating: 4.8 },
-    { id: 70, title: 'خواطر قرآنية', author: 'عمرو خالد', category: 'فكر ودعوة', pages: 300, rating: 4.7 },
-    // كتب متنوعة
-    { id: 71, title: 'فقه السنة', author: 'سيد سابق', category: 'كتب متنوعة', pages: 1000, rating: 4.8 },
-    { id: 72, title: 'الحلال والحرام', author: 'القرضاوي', category: 'كتب متنوعة', pages: 350, rating: 4.7 },
-    { id: 73, title: 'كيف تتعامل مع القرآن', author: 'يوسف القرضاوي', category: 'كتب متنوعة', pages: 250, rating: 4.7 },
-    { id: 74, title: 'قواعد التدبر الأمثل', author: 'عبد الرحمن الميداني', category: 'كتب متنوعة', pages: 300, rating: 4.8 },
-    { id: 75, title: 'أصول التفسير', author: 'ابن تيمية', category: 'كتب متنوعة', pages: 150, rating: 4.9 },
-    { id: 76, title: 'علوم القرآن', author: 'الزركشي', category: 'كتب متنوعة', pages: 800, rating: 4.8 },
-    { id: 77, title: 'البرهان في علوم القرآن', author: 'الزركشي', category: 'كتب متنوعة', pages: 1200, rating: 4.9 },
-    { id: 78, title: 'مناهل العرفان', author: 'الزرقاني', category: 'كتب متنوعة', pages: 900, rating: 4.8 },
-    { id: 79, title: 'القواعد الفقهية', author: 'الندوي', category: 'كتب متنوعة', pages: 400, rating: 4.8 },
-    { id: 80, title: 'الأشباه والنظائر', author: 'السيوطي', category: 'كتب متنوعة', pages: 600, rating: 4.8 },
-    // إضافي
-    { id: 81, title: 'الوصايا العشر', author: 'حسن البنا', category: 'إضافي', pages: 100, rating: 4.7 },
-    { id: 82, title: 'كتاب الزهد', author: 'ابن المبارك', category: 'إضافي', pages: 450, rating: 4.9 },
-    { id: 83, title: 'التذكرة', author: 'القرطبي', category: 'إضافي', pages: 800, rating: 4.8 },
-    { id: 84, title: 'التوابين', author: 'ابن قدامة', category: 'إضافي', pages: 350, rating: 4.8 },
-    { id: 85, title: 'الكبائر', author: 'الذهبي', category: 'إضافي', pages: 250, rating: 4.8 },
-    { id: 86, title: 'سير أعلام النبلاء', author: 'الذهبي', category: 'إضافي', pages: 6000, rating: 5.0 },
-    { id: 87, title: 'طبقات ابن سعد', author: 'ابن سعد', category: 'إضافي', pages: 4000, rating: 4.8 },
-    { id: 88, title: 'التاريخ الإسلامي', author: 'محمود شاكر', category: 'إضافي', pages: 3500, rating: 4.8 },
-    { id: 89, title: 'الفتوى الحموية', author: 'ابن تيمية', category: 'إضافي', pages: 150, rating: 4.9 },
-    { id: 90, title: 'رفع الملام', author: 'ابن تيمية', category: 'إضافي', pages: 100, rating: 4.9 },
-    // ختام القائمة
-    { id: 91, title: 'اقتضاء الصراط المستقيم', author: 'ابن تيمية', category: 'ختام القائمة', pages: 500, rating: 4.9 },
-    { id: 92, title: 'الصارم المسلول', author: 'ابن تيمية', category: 'ختام القائمة', pages: 600, rating: 4.9 },
-    { id: 93, title: 'مفتاح دار السعادة', author: 'ابن القيم', category: 'ختام القائمة', pages: 800, rating: 4.9 },
-    { id: 94, title: 'الروح', author: 'ابن القيم', category: 'ختام القائمة', pages: 450, rating: 4.8 },
-    { id: 95, title: 'عدة الصابرين', author: 'ابن القيم', category: 'ختام القائمة', pages: 350, rating: 4.8 },
-    { id: 96, title: 'أحكام القرآن', author: 'ابن العربي', category: 'ختام القائمة', pages: 1200, rating: 4.8 },
-    { id: 97, title: 'القواعد النورانية', author: 'ابن تيمية', category: 'ختام القائمة', pages: 300, rating: 4.9 },
-    { id: 98, title: 'الرسالة', author: 'الشافعي', category: 'ختام القائمة', pages: 400, rating: 4.9 },
-    { id: 99, title: 'الأدب الشرعي', author: 'ابن مفلح', category: 'ختام القائمة', pages: 900, rating: 4.8 },
-    { id: 100, title: 'جامع العلوم والحكم', author: 'ابن رجب', category: 'ختام القائمة', pages: 700, rating: 4.9 },
-  ];
-
-  const audios = [
-    { id: 1, title: 'شرح الأربعين النووية', speaker: 'الشيخ ابن عثيمين', duration: '45:00', type: 'درس' },
-    { id: 2, title: 'السيرة النبوية كاملة', speaker: 'د. طارق السويدان', duration: '1:20:00', type: 'محاضرة' },
-    { id: 3, title: 'تفسير سورة البقرة', speaker: 'الشيخ الشعراوي', duration: '55:30', type: 'تفسير' },
-  ];
-
-  const videos = [
-    { id: 1, title: 'قصة سيدنا إبراهيم', channel: 'قصص الأنبياء', duration: '15:20', views: '1.2M' },
-    { id: 2, title: 'كيف تخشع في صلاتك', channel: 'دروس إيمانية', duration: '12:45', views: '850K' },
-    { id: 3, title: 'علامات الساعة الكبرى', channel: 'محاضرات إسلامية', duration: '25:10', views: '2.1M' },
-  ];
-
-  const filteredBooks = books.filter(book => 
-    book.title.includes(searchQuery) || 
-    book.author.includes(searchQuery) || 
-    book.category.includes(searchQuery)
-  );
-
-  const groupedBooks = filteredBooks.reduce((acc, book) => {
-    if (!acc[book.category]) {
-      acc[book.category] = [];
-    }
-    acc[book.category].push(book);
-    return acc;
-  }, {} as Record<string, typeof books>);
+  const filteredBooks = BOOKS.filter(book => {
+    const matchesCategory = activeCategory === "الكل" || book.category === activeCategory;
+    const matchesSearch = book.title.includes(searchQuery) || book.author.includes(searchQuery) || book.description.includes(searchQuery);
+    return matchesCategory && matchesSearch;
+  });
 
   return (
-    <div className="max-w-md mx-auto p-4 pb-24 min-h-screen bg-slate-50 dark:bg-slate-950" dir="rtl">
+    <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100" dir="rtl">
       {/* Header */}
-      <div className="sticky top-0 z-20 py-4 flex flex-col gap-4 bg-slate-50 dark:bg-slate-950/80 backdrop-blur-md border-b border-black/10 dark:border-white/10">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={onBack}
-            className="p-2 hover:bg-black/5 dark:bg-white/5 rounded-full transition-colors border border-white/5 bg-white dark:bg-slate-900 shadow-[0_5px_15px_rgba(0,0,0,0.2)]"
-          >
-            <ArrowRight size={24} className="text-slate-500 dark:text-slate-400 hover:text-emerald-400" />
-          </button>
-          <h1 className="text-2xl font-bold font-serif text-emerald-400 drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">
-            المكتبة الإسلامية
-          </h1>
+      <div className="pt-12 pb-6 px-6 bg-[#0A1914] text-white rounded-b-[2.5rem] shadow-xl shrink-0 border-b border-emerald-900/30 relative overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none" 
+          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1542816417-0983cb9c62ce?auto=format&fit=crop&q=80&w=1200")' }}
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/30 to-teal-900/60 mix-blend-overlay"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -mr-20 -mt-20 blur-2xl"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-teal-500/10 rounded-full -ml-10 -mb-10 blur-2xl"></div>
+        
+        <div className="relative z-10 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={onBack}
+              className="p-2 hover:bg-white/10 rounded-full transition-colors backdrop-blur-md border border-white/10"
+            >
+               <ArrowRight size={24} />
+            </button>
+            <div>
+              <h1 className="text-2xl font-bold font-serif">المكتبة الإسلامية</h1>
+              <p className="text-emerald-200/80 text-sm mt-1">«اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ»</p>
+            </div>
+          </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="ابحث عن كتاب، درس، أو فيديو..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 rounded-2xl py-3 pr-12 pl-4 text-sm text-slate-800 dark:text-slate-100 placeholder:text-slate-500 dark:text-slate-400 focus:outline-none focus:border-emerald-400/50 focus:ring-1 focus:ring-emerald-400/50 transition-all shadow-[0_5px_15px_rgba(0,0,0,0.3)]"
-          />
-          <Search size={20} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-400" />
-        </div>
-
-        {/* Tabs */}
-        <div className="flex bg-white dark:bg-slate-900 rounded-2xl p-1.5 shadow-[0_5px_15px_rgba(0,0,0,0.2)] border border-black/5 dark:border-white/5">
-          <button
-            onClick={() => setActiveTab('books')}
-            className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-inner ${
-              activeTab === 'books' ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-emerald-400/50' : 'text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-emerald-400'
-            }`}
-          >
-            <Book size={18} />
-            كتب
-          </button>
-          <button
-            onClick={() => setActiveTab('audio')}
-            className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-inner ${
-              activeTab === 'audio' ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-emerald-400/50' : 'text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-emerald-400'
-            }`}
-          >
-            <Headphones size={18} />
-            صوتيات
-          </button>
-          <button
-            onClick={() => setActiveTab('video')}
-            className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-inner ${
-              activeTab === 'video' ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-[0_0_15px_rgba(212,175,55,0.4)] border border-emerald-400/50' : 'text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-emerald-400'
-            }`}
-          >
-            <PlayCircle size={18} />
-            مرئيات
-          </button>
+        {/* Search */}
+        <div className="relative z-10 mt-6 max-w-md mx-auto">
+          <div className="relative">
+            <input 
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="ابحث عن كتاب، مؤلف، أو موضوع..."
+              className="w-full bg-white/10 border border-white/20 rounded-2xl py-3 px-10 text-white placeholder-white/50 focus:outline-none focus:border-emerald-400 focus:bg-white/20 transition-all font-medium text-sm"
+            />
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50" size={18} />
+          </div>
         </div>
       </div>
 
-      <div className="mt-4">
-        <AnimatePresence mode="wait">
-          {activeTab === 'books' && (
-            <motion.div
-              key="books"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="space-y-8"
-            >
-              {Object.entries(groupedBooks).map(([category, categoryBooks]) => (
-                <div key={category}>
-                  <h2 className="text-xl font-bold font-serif text-emerald-400 mb-4 flex items-center gap-2">
-                    <span className="w-2 h-6 bg-emerald-500 rounded-full inline-block"></span>
-                    {category}
-                  </h2>
-                  <div className="grid grid-cols-2 gap-4">
-                    {categoryBooks.map((book) => (
-                      <div key={book.id} className="card-3d bg-white dark:bg-slate-900 rounded-3xl p-4 shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 flex flex-col items-center text-center hover:border-emerald-400/30 transition-all cursor-pointer group">
-                        <div className="w-24 h-32 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-[0_10px_20px_rgba(212,175,55,0.3)] mb-4 flex items-center justify-center text-white/20 group-hover:shadow-[0_15px_30px_rgba(212,175,55,0.5)] transition-all relative overflow-hidden border border-emerald-400/50 group-hover:scale-105">
-                          <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] opacity-10 mix-blend-overlay"></div>
-                          <Book size={48} className="relative z-10" />
-                        </div>
-                        <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm mb-1 line-clamp-2 group-hover:text-emerald-400 transition-colors">{book.title}</h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">{book.author}</p>
-                        <div className="flex items-center gap-1 text-emerald-400 text-xs font-bold mt-auto bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/20 shadow-inner">
-                          <Star size={14} className="fill-current" />
-                          {book.rating}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              {Object.keys(groupedBooks).length === 0 && (
-                <div className="text-center py-12 text-slate-500 dark:text-slate-400">
-                  <Book size={48} className="mx-auto mb-4 opacity-20" />
-                  <p>لم يتم العثور على كتب مطابقة للبحث</p>
-                </div>
-              )}
-            </motion.div>
-          )}
+      <div className="flex-1 overflow-y-auto">
+        {/* Categories */}
+        <div className="py-4 px-4 sticky top-0 bg-slate-50/90 dark:bg-slate-950/90 backdrop-blur-md z-10 border-b border-slate-200/50 dark:border-slate-800/50">
+          <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
+            {CATEGORIES.map(category => (
+               <button
+                 key={category}
+                 onClick={() => setActiveCategory(category)}
+                 className={`whitespace-nowrap px-4 py-2 rounded-xl text-sm transition-all shadow-sm ${
+                   activeCategory === category 
+                     ? 'bg-emerald-600 text-white font-bold shadow-emerald-600/30'
+                     : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 font-medium border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
+                 }`}
+               >
+                 {category}
+               </button>
+            ))}
+          </div>
+        </div>
 
-          {activeTab === 'audio' && (
-            <motion.div
-              key="audio"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="space-y-3"
-            >
-              {audios.map((audio) => (
-                <div key={audio.id} className="card-3d bg-white dark:bg-slate-900 rounded-3xl p-4 shadow-[0_5px_15px_rgba(0,0,0,0.3)] border border-white/5 flex items-center gap-4 hover:bg-white dark:bg-slate-900/80 hover:border-emerald-400/30 transition-all cursor-pointer group">
-                  <button className="w-14 h-14 bg-black/5 dark:bg-white/5 text-emerald-400 rounded-full flex items-center justify-center shrink-0 group-hover:bg-gradient-to-br group-hover:from-emerald-500 group-hover:to-emerald-600 group-hover:text-white transition-all border border-white/10 group-hover:border-emerald-400/50 shadow-inner group-hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] group-hover:scale-110">
-                    <PlayCircle size={28} />
-                  </button>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base mb-1 group-hover:text-emerald-400 transition-colors">{audio.title}</h3>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">{audio.speaker}</p>
-                  </div>
-                  <div className="text-xs text-emerald-400 font-mono bg-emerald-500/10 px-3 py-2 rounded-xl border border-emerald-500/20 shadow-inner">
-                    {audio.duration}
-                  </div>
-                </div>
-              ))}
-            </motion.div>
-          )}
+        {/* Books Grid */}
+        <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-24 max-w-7xl mx-auto">
+           <AnimatePresence>
+             {filteredBooks.length > 0 ? (
+               filteredBooks.map((book) => (
+                 <motion.div 
+                   key={book.id}
+                   layout
+                   initial={{ opacity: 0, scale: 0.95 }}
+                   animate={{ opacity: 1, scale: 1 }}
+                   exit={{ opacity: 0, scale: 0.95 }}
+                   transition={{ duration: 0.2 }}
+                   className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col relative group"
+                 >
+                   {/* Cover Image or Simulated Cover */}
+                   <div className="w-full bg-slate-100 dark:bg-slate-800 flex flex-col items-center justify-center p-6 border-b border-slate-200 dark:border-slate-700 min-h-[160px] relative overflow-hidden shrink-0">
+                     {book.image ? (
+                       <>
+                         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${book.image})` }}></div>
+                         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 to-slate-900/40"></div>
+                       </>
+                     ) : (
+                       <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)', backgroundSize: '16px 16px' }}></div>
+                     )}
+                     <Book className={`w-10 h-10 absolute top-4 left-4 z-20 ${book.image ? 'text-white/40' : 'text-emerald-600/40 dark:text-emerald-400/40'}`} />
+                     <div className="relative z-10 text-center w-full mt-4">
+                       <h3 className={`font-serif font-extrabold text-lg leading-tight ${book.image ? 'text-white drop-shadow-md' : 'text-slate-800 dark:text-slate-200'}`}>{book.title}</h3>
+                       <p className={`text-[11px] mt-2 font-medium ${book.image ? 'text-white/80' : 'text-slate-500 dark:text-slate-400'}`}>{book.author}</p>
+                     </div>
+                   </div>
 
-          {activeTab === 'video' && (
-            <motion.div
-              key="video"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="space-y-4"
-            >
-              {videos.map((video) => (
-                <div key={video.id} className="card-3d bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.5)] border border-white/5 cursor-pointer group hover:border-emerald-400/30 transition-all">
-                  <div className="relative h-48 bg-black/40 overflow-hidden">
-                    <img src={`https://picsum.photos/seed/video${video.id}/800/400`} alt={video.title} className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-transform duration-700" referrerPolicy="no-referrer" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f0d] via-black/40 to-transparent group-hover:from-black/90 transition-colors flex items-center justify-center">
-                      <div className="w-16 h-16 bg-black/60 backdrop- rounded-full flex items-center justify-center text-emerald-400 shadow-[0_5px_15px_rgba(0,0,0,0.5)] transform group-hover:scale-110 transition-all border border-white/20 group-hover:border-emerald-400/50 group-hover:bg-gradient-to-br group-hover:from-emerald-500 group-hover:to-emerald-600 group-hover:text-white group-hover:shadow-[0_0_25px_rgba(212,175,55,0.5)]">
-                        <PlayCircle size={36} className="ml-1" />
-                      </div>
-                    </div>
-                    <div className="absolute bottom-4 right-4 bg-black/60 backdrop- text-white text-xs font-mono px-3 py-1.5 rounded-xl border border-white/20 shadow-inner">
-                      {video.duration}
-                    </div>
-                  </div>
-                  <div className="p-5 bg-white dark:bg-slate-900">
-                    <h3 className="font-bold text-slate-800 dark:text-slate-100 text-base mb-3 group-hover:text-emerald-400 transition-colors">{video.title}</h3>
-                    <div className="flex justify-between items-center text-sm text-slate-500 dark:text-slate-400">
-                      <span className="bg-white/5 px-3 py-1.5 rounded-xl border border-white/5 shadow-inner">{video.channel}</span>
-                      <span className="flex items-center gap-1.5"><Eye size={16} /> {video.views}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
+                   <div className="p-5 flex-1 flex flex-col justify-between">
+                     <div>
+                       <div className="flex items-center justify-between mb-2">
+                         <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                           {book.category}
+                         </span>
+                       </div>
+                       <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed">
+                         {book.description}
+                       </p>
+                     </div>
+                     
+                     <div className="mt-5 flex items-center gap-2">
+                       <a 
+                         href={book.readUrl}
+                         target="_blank"
+                         rel="noopener noreferrer"
+                         className="flex-1 flex justify-center items-center gap-2 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold transition-colors shadow-sm"
+                       >
+                         <ExternalLink size={16} />
+                         اقرأ
+                       </a>
+                       {book.downloadUrl && (
+                         <a 
+                           href={book.downloadUrl}
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           className="flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-bold transition-colors border border-slate-200 dark:border-slate-700"
+                         >
+                           <Download size={18} />
+                         </a>
+                       )}
+                     </div>
+                   </div>
+                 </motion.div>
+               ))
+             ) : (
+               <motion.div 
+                 initial={{ opacity: 0 }} 
+                 animate={{ opacity: 1 }} 
+                 className="col-span-full py-20 text-center text-slate-500 dark:text-slate-400 flex flex-col items-center"
+               >
+                 <Book size={48} className="mb-4 opacity-20" />
+                 <p className="font-medium">لم يتم العثور على كتب تطابق بحثك</p>
+               </motion.div>
+             )}
+           </AnimatePresence>
+        </div>
       </div>
     </div>
   );

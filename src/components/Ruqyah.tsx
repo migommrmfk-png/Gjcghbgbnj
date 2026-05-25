@@ -59,7 +59,7 @@ const ruqyahText: RuqyahSection[] = [
   }
 ];
 
-export default function Ruqyah() {
+export default function Ruqyah({ onBack }: { onBack?: () => void }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeTab, setActiveTab] = useState<'text' | 'audio'>('text');
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -87,17 +87,32 @@ export default function Ruqyah() {
   return (
     <div className="h-full flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 overflow-hidden" dir="rtl">
       {/* Header */}
-      <div className="pt-12 pb-8 px-6 bg-gradient-to-bl from-emerald-600 via-emerald-700 to-teal-900 text-white rounded-b-[2.5rem] shadow-xl shrink-0 relative overflow-hidden border-b border-white/10">
+      <div className="pt-12 pb-8 px-6 bg-[#0A1914] text-white rounded-b-[2.5rem] shadow-xl shrink-0 relative overflow-hidden border-b border-white/10">
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none" 
+          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1584282869372-00b8e6bb2345?auto=format&fit=crop&q=80&w=1200")' }}
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-bl from-emerald-600/60 via-emerald-700/80 to-teal-900/90 mix-blend-overlay"></div>
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20  animate-pulse"></div>
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-black/20 rounded-full -ml-16 -mb-16 "></div>
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] opacity-10"></div>
         
-        <div className="relative z-10 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold font-serif mb-2 drop-shadow-md">الرقية الشرعية</h1>
-            <p className="text-emerald-100 text-sm md:text-base opacity-90">حصن نفسك وأهل بيتك بآيات الله</p>
+        <div className="relative z-10 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="p-2 hover:bg-white/10 rounded-full transition-colors border border-white/10 bg-white/5 shadow-sm"
+              >
+                <ArrowRight size={24} className="text-white" />
+              </button>
+            )}
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold font-serif mb-2 drop-shadow-md">الرقية الشرعية</h1>
+              <p className="text-emerald-100 text-sm md:text-base opacity-90">حصن نفسك وأهل بيتك بآيات الله</p>
+            </div>
           </div>
-          <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
+          <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.2)] shrink-0">
             <Shield size={32} className="text-emerald-300 drop-shadow-lg" />
           </div>
         </div>

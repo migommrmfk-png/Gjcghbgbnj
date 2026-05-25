@@ -54,6 +54,8 @@ const DreamInterpretation = lazy(() => import("./components/DreamInterpretation"
 
 const SelfAccounting = lazy(() => import("./components/SelfAccounting"));
 const Downloads = lazy(() => import("./components/Downloads"));
+const DawahGenerator = lazy(() => import("./components/DawahGenerator"));
+const IslamicLibrary = lazy(() => import("./components/IslamicLibrary"));
 const IslamicQuiz = lazy(() => import("./components/IslamicQuiz"));
 
 const NotificationsPage = lazy(() => import("./components/NotificationsPage"));
@@ -190,13 +192,13 @@ function AppContent() {
       case "names":
         return <NamesOfAllah onBack={handleBack} />;
       case "hadith":
-        return <Hadith />;
+        return <Hadith onBack={handleBack} />;
       case "duas":
-        return <Duas />;
+        return <Duas onBack={handleBack} />;
       case "calendar":
-        return <HijriCalendar />;
+        return <HijriCalendar onBack={handleBack} />;
       case "radio":
-        return <IslamicRadio />;
+        return <IslamicRadio onBack={handleBack} />;
       case "stories":
         return <ProphetStories onBack={handleBack} />;
       case "muslim-ai":
@@ -225,7 +227,7 @@ function AppContent() {
       case "auth":
         return <Auth onBack={handleBack} />;
       case "ruqyah":
-        return <Ruqyah />;
+        return <Ruqyah onBack={handleBack} />;
       case "inheritance":
         return <InheritanceCalculator onBack={handleBack} />;
       case "dreams":
@@ -237,8 +239,12 @@ function AppContent() {
         return <SelfAccounting onBack={handleBack} />;
       case "downloads":
         return <Downloads onBack={handleBack} />;
+      case "library":
+        return <IslamicLibrary onBack={handleBack} />;
       case "quiz":
         return <IslamicQuiz onBack={handleBack} />;
+      case "dawah":
+        return <DawahGenerator onBack={handleBack} />;
 
       case "notifications":
         return <NotificationsPage onBack={handleBack} />;

@@ -35,12 +35,24 @@ interface PrayerTimesContextType {
 const PrayerTimesContext = createContext<PrayerTimesContextType | undefined>(undefined);
 
 export const PrayerTimesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
-  const [hijriDate, setHijriDate] = useState<HijriDate | null>(null);
-  const [gregorianDate, setGregorianDate] = useState("");
-  const [locationName, setLocationName] = useState("مكة المكرمة");
+  const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(() => {
+    const cached = localStorage.getItem('prayerTimes');
+    return cached ? JSON.parse(cached) : null;
+  });
+  const [hijriDate, setHijriDate] = useState<HijriDate | null>(() => {
+    const cached = localStorage.getItem('hijriDate');
+    return cached ? JSON.parse(cached) : null;
+  });
+  const [gregorianDate, setGregorianDate] = useState(() => {
+    return localStorage.getItem('gregorianDate') || "";
+  });
+  const [locationName, setLocationName] = useState(() => {
+    return localStorage.getItem('locationName') || "مكة المكرمة";
+  });
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => {
+    return !localStorage.getItem('prayerTimes');
+  });
   const [error, setError] = useState<string | null>(null);
   
   const [autoAdhanEnabled, setAutoAdhanEnabledState] = useState<boolean>(() => {
@@ -88,12 +100,16 @@ export const PrayerTimesProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
         const data = await response.json();
         setPrayerTimes(data.data.timings);
+        localStorage.setItem('prayerTimes', JSON.stringify(data.data.timings));
         setHijriDate(data.data.date.hijri);
+        localStorage.setItem('hijriDate', JSON.stringify(data.data.date.hijri));
         setGregorianDate(data.data.date.gregorian.date);
+        localStorage.setItem('gregorianDate', data.data.date.gregorian.date);
 
         if (cityStr) {
           setLocationName(cityStr);
-        } else if (lat && lng && !locationName || locationName === "مكة المكرمة") {
+          localStorage.setItem('locationName', cityStr);
+        } else if (lat && lng && (!locationName || locationName === "مكة المكرمة")) {
           try {
             const geoRes = await fetch(
               `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=ar`
@@ -102,11 +118,15 @@ export const PrayerTimesProvider: React.FC<{ children: React.ReactNode }> = ({ c
             const geoData = await geoRes.json();
             if (geoData.city || geoData.locality || geoData.countryName) {
               const city = geoData.city || geoData.locality || geoData.countryName;
-              if (city) setLocationName(city);
+              if (city) {
+                setLocationName(city);
+                localStorage.setItem('locationName', city);
+              }
             }
           } catch (e) {
             console.error("Reverse geocoding failed", e);
             setLocationName("موقع غير معروف");
+            localStorage.setItem('locationName', "موقع غير معروف");
           }
         }
       } catch (err) {

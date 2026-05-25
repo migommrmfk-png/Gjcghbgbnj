@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BookOpen, Share2, Info, Star, CheckCircle2 } from "lucide-react";
+import { BookOpen, Share2, Info, Star, CheckCircle2, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 interface Hadith {
@@ -178,7 +178,7 @@ export const dailyHadiths: Hadith[] = [
   }
 ];
 
-export default function Hadith() {
+export default function Hadith({ onBack }: { onBack?: () => void }) {
   const [hadith, setHadith] = useState<Hadith | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
@@ -230,11 +230,25 @@ export default function Hadith() {
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-gradient-to-bl from-emerald-600 via-emerald-700 to-teal-900 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden text-center border border-white/20"
+        className="bg-[#0A1914] rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden text-center border border-white/20"
       >
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none" 
+          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1542816417-0983cb9c62ce?auto=format&fit=crop&q=80&w=1200")' }}
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-bl from-emerald-600/60 via-emerald-700/80 to-teal-900/90 mix-blend-overlay"></div>
         <div className="absolute right-0 top-0 w-48 h-48 bg-white/10 rounded-full -mr-12 -mt-12  animate-pulse"></div>
         <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/20 rounded-full -ml-12 -mb-12 "></div>
         <div className="relative z-10 flex flex-col items-center">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="absolute right-0 top-0 p-2 hover:bg-white/10 rounded-full transition-colors border border-white/10 bg-white/5 shadow-sm"
+              title="العودة"
+            >
+              <ArrowRight size={24} className="text-white" />
+            </button>
+          )}
           <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.2)] mb-4 transform rotate-3">
              <BookOpen size={32} className="text-white drop-shadow-md" />
           </div>

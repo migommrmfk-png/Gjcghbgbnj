@@ -18,6 +18,7 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { saveAudio } from "../lib/audioStore";
 import toast from 'react-hot-toast';
+import { DEFAULT_SURAHS } from "../data/surahs";
 
 interface Surah {
   number: number;
@@ -58,8 +59,8 @@ const TAFSIR_OPTIONS = [
 ];
 
 export default function Quran() {
-  const [surahs, setSurahs] = useState<Surah[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [surahs, setSurahs] = useState<Surah[]>(DEFAULT_SURAHS);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSurah, setSelectedSurah] = useState<SurahDetail | null>(null);
   const [loadingSurah, setLoadingSurah] = useState(false);
@@ -121,11 +122,14 @@ export default function Quran() {
             }));
             setSurahs(mappedSurahs);
             localStorage.setItem('quran_surahs', JSON.stringify(mappedSurahs));
+          } else {
+            setSurahs(DEFAULT_SURAHS);
           }
           setLoading(false);
         })
         .catch((err) => {
-          console.error(err);
+          console.error("Failed to fetch surahs, using offline fallback:", err);
+          setSurahs(DEFAULT_SURAHS);
           setLoading(false);
         });
     }
@@ -808,8 +812,13 @@ export default function Quran() {
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-gradient-to-bl from-emerald-600 via-emerald-700 to-teal-900 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden text-center border border-white/20"
+        className="bg-[#0A1914] rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden text-center border border-white/20"
       >
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none" 
+          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1542816417-0983cb9c62ce?auto=format&fit=crop&q=80&w=1200")' }}
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-bl from-emerald-600/60 via-emerald-700/80 to-teal-900/90 mix-blend-overlay"></div>
         <div className="absolute right-0 top-0 w-48 h-48 bg-white/5 rounded-full -mr-12 -mt-12 animate-pulse"></div>
         <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/10 rounded-full -ml-12 -mb-12"></div>
         <div className="relative z-10 flex flex-col items-center">

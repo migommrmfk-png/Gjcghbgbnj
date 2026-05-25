@@ -116,7 +116,7 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
       console.error(err);
       let msg = err?.message || 'حدث خطأ أثناء المتابعة كزائر.';
       if (msg.includes('Anonymous Sign-ins are disabled') || msg.includes('provider is not enabled')) {
-         msg = 'الدخول كزائر معطل في لوحة تحكم Supabase (Anonymous sign-ins).';
+         msg = 'الدخول كزائر معطل في الشجرة السحابية، يرجى تحديث الصفحة أو التسجيل.';
       }
       setError(msg);
     } finally {
@@ -140,6 +140,11 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
         background: 'linear-gradient(160deg, #0a1628 0%, #0d2137 30%, #0a2818 70%, #061a10 100%)',
       }}
     >
+      <div 
+        className="absolute inset-0 bg-cover bg-center opacity-10 mix-blend-screen pointer-events-none" 
+        style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1564121211835-e88c852648ab?q=80&w=2074&auto=format&fit=crop")' }}
+      />
+      <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
       {onBack && (
         <button
           onClick={onBack}
@@ -362,7 +367,7 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
                   <button
                     onClick={handleGuestLogin}
                     disabled={loading}
-                    className="w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-2 text-white disabled:opacity-50 border border-white/20 hover:bg-white/5"
+                    className="w-full py-3.5 rounded-xl font-bold text-base transition-all duration-300 flex items-center justify-center gap-2 text-emerald-400 bg-white/5 hover:bg-white/10 disabled:opacity-50 border border-emerald-500/20"
                   >
                     {loading ? <Loader className="animate-spin" size={20} /> : <><User size={20} /> الدخول كزائر</>}
                   </button>

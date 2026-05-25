@@ -1,7 +1,8 @@
 import { GoogleGenAI } from '@google/genai';
 
 export function getGeminiKey(): string {
-  return process.env.GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY || localStorage.getItem('userGeminiApiKey') || '';
+  const processKey = typeof process !== 'undefined' ? process.env.GEMINI_API_KEY : undefined;
+  return processKey || (import.meta.env.VITE_GEMINI_API_KEY as string) || localStorage.getItem('userGeminiApiKey') || '';
 }
 
 export function getGeminiClient() {

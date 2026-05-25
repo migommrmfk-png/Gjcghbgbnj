@@ -10,6 +10,7 @@ interface Story {
   fullStory: string[];
   lessons: string[];
   icon: string;
+  image?: string;
 }
 
 const stories: Story[] = [
@@ -19,6 +20,7 @@ const stories: Story[] = [
     title: "أبو البشر وأول الأنبياء",
     brief: "قصة خلق آدم عليه السلام، وسجود الملائكة له، وخروجه من الجنة.",
     icon: "🌍",
+    image: "https://images.unsplash.com/photo-1541180295175-3250b86a87c5?auto=format&fit=crop&q=80&w=600",
     fullStory: [
       "خلق الله تعالى آدم عليه السلام من طين، ونفخ فيه من روحه، وأمر الملائكة بالسجود له تكريماً، فسجدوا جميعاً إلا إبليس أبى واستكبر.",
       "أسكن الله آدم وزوجته حواء الجنة، وأباح لهما الأكل من كل ثمارها إلا شجرة واحدة. لكن إبليس وسوس لهما فأكلا منها.",
@@ -36,6 +38,7 @@ const stories: Story[] = [
     title: "أول رسل الله إلى الأرض",
     brief: "قصة دعوة نوح لقومه 950 سنة، وبناء السفينة، والطوفان العظيم.",
     icon: "⛵",
+    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600",
     fullStory: [
       "أرسل الله نوحاً عليه السلام إلى قوم عبدوا الأصنام، فدعاهم ليلاً ونهاراً، سراً وجهاراً لمدة 950 عاماً، ولم يؤمن معه إلا قليل.",
       "أوحى الله إليه ببناء سفينة عظيمة، فكان قومه يسخرون منه وهو يبنيها في الصحراء.",
@@ -53,6 +56,7 @@ const stories: Story[] = [
     title: "خليل الرحمن وأبو الأنبياء",
     brief: "قصة تحطيم الأصنام، والنجاة من النار، وبناء الكعبة المشرفة.",
     icon: "🔥",
+    image: "https://images.unsplash.com/photo-1542816417-0983cb9c62ce?auto=format&fit=crop&q=80&w=600",
     fullStory: [
       "نشأ إبراهيم عليه السلام في قوم يعبدون الأصنام والكواكب، فهداه الله للتوحيد. حطم أصنام قومه ليثبت لهم عجزها.",
       "ألقاه قومه في نار عظيمة، لكن الله أمر النار أن تكون برداً وسلاماً عليه.",
@@ -70,6 +74,7 @@ const stories: Story[] = [
     title: "كليم الله",
     brief: "قصة مواجهة فرعون، وانشقاق البحر، وتلقي التوراة.",
     icon: "🌊",
+    image: "https://images.unsplash.com/photo-1558500247-41489e2730da?auto=format&fit=crop&q=80&w=600",
     fullStory: [
       "وُلد موسى في عام يقتل فيه فرعون المواليد، فألقت به أمه في اليم، ليتربى في قصر فرعون نفسه.",
       "أرسله الله لدعوة فرعون وتحرير بني إسرائيل. أيده الله بمعجزات كالعصا التي تتحول لثعبان واليد البيضاء.",
@@ -87,6 +92,7 @@ const stories: Story[] = [
     title: "كلمة الله وروحه",
     brief: "قصة ولادته المعجزة، ومعجزاته في الشفاء، ورفعه إلى السماء.",
     icon: "✨",
+    image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=600",
     fullStory: [
       "ولد عيسى عليه السلام من مريم العذراء بمعجزة إلهية بدون أب، وتكلم في المهد ليبرئ أمه.",
       "أيده الله بمعجزات عظيمة كإبراء الأكمه والأبرص وإحياء الموتى بإذن الله.",
@@ -104,6 +110,7 @@ const stories: Story[] = [
     title: "خاتم الأنبياء والمرسلين",
     brief: "قصة نزول الوحي، والهجرة، وبناء الدولة الإسلامية.",
     icon: "🕋",
+    image: "https://images.unsplash.com/photo-1551041777-ed277b8dd348?auto=format&fit=crop&q=80&w=600",
     fullStory: [
       "نزل الوحي على النبي ﷺ في غار حراء وهو في الأربعين من عمره، وبدأ دعوته سراً ثم جهراً في مكة.",
       "واجه أذى شديداً من قريش، فهاجر إلى المدينة المنورة حيث أسس أول دولة إسلامية.",
@@ -121,6 +128,7 @@ const stories: Story[] = [
     title: "الصديق",
     brief: "قصة إلقائه في الجب، وسجنه، ثم توليه خزائن مصر.",
     icon: "👑",
+    image: "https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&q=80&w=600",
     fullStory: [
       "رأى يوسف في منامه أحد عشر كوكباً والشمس والقمر يسجدون له، فقص الرؤيا على أبيه يعقوب الذي حذره من إخوته.",
       "حسده إخوته وألقوه في البئر، ثم بيع كعبد في مصر، وتربى في بيت العزيز. تعرض لفتنة عظيمة فآثر السجن على المعصية.",
@@ -138,6 +146,7 @@ const stories: Story[] = [
     title: "ذو النون",
     brief: "قصة خروجه غاضباً من قومه، وابتلاع الحوت له، ثم نجاته.",
     icon: "🐋",
+    image: "https://images.unsplash.com/photo-1563854128549-012b1897d81a?auto=format&fit=crop&q=80&w=600",
     fullStory: [
       "دعا يونس قومه طويلاً فلم يستجيبوا، فغضب وخرج من بينهم قبل أن يأذن الله له.",
       "ركب سفينة وهاج البحر، فاقترعوا وألقوه في البحر، فابتلعه حوت عظيم بأمر الله.",
@@ -155,6 +164,7 @@ const stories: Story[] = [
     title: "رمز الصبر",
     brief: "قصة ابتلائه في ماله وولده وصحته، وصبره الجميل.",
     icon: "🤲",
+    image: "https://images.unsplash.com/photo-1504283896472-a1b41ec9cb0d?auto=format&fit=crop&q=80&w=600",
     fullStory: [
       "كان أيوب غنياً وله أولاد كثيرون، فابتلاه الله بفقد ماله وولده، ثم ابتلاه في جسده بمرض شديد طال سنوات.",
       "صبر أيوب صبراً عظيماً ولم يشتكِ إلا لله، وكانت زوجته وفية له تخدمه في مرضه.",
@@ -172,6 +182,7 @@ const stories: Story[] = [
     title: "الملك النبي",
     brief: "قصة ملكه العظيم، وتسخير الجن والطير والرياح له.",
     icon: "🏰",
+    image: "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=600",
     fullStory: [
       "ورث سليمان الملك والنبوة عن أبيه داود، وسأل الله ملكاً لا ينبغي لأحد من بعده، فاستجاب له.",
       "سخر الله له الرياح تجري بأمره، والجن يبنون له ما يشاء، وعلمه منطق الطير والحيوانات.",
@@ -189,6 +200,7 @@ const stories: Story[] = [
     title: "أول من خط بالقلم",
     brief: "قصة رفعه مكاناً علياً، واجتهاده في العبادة والدعوة.",
     icon: "✍️",
+    image: "https://images.unsplash.com/photo-1428278953961-ea8c6307f815?auto=format&fit=crop&q=80&w=600",
     fullStory: [
       "كان إدريس عليه السلام أول نبي بعد آدم وشيث، وأول من خط بالقلم وخاط الثياب ولبس المخيط.",
       "دعا قومه إلى الله بالحكمة والموعظة الحسنة، وكان كثير العبادة والصيام والقيام.",
@@ -206,6 +218,7 @@ const stories: Story[] = [
     title: "نبي عاد",
     brief: "قصة دعوته لقوم عاد أصحاب القوة والبطش، وإهلاكهم بالريح الصرصر.",
     icon: "🌪️",
+    image: "https://images.unsplash.com/photo-1463171515643-952cee54d42a?auto=format&fit=crop&q=80&w=600",
     fullStory: [
       "أرسل الله هوداً إلى قوم عاد الذين كانوا يتمتعون بقوة جسدية هائلة وبنوا إرم ذات العماد.",
       "دعاهم هود لعبادة الله وحده وترك الأصنام، لكنهم استكبروا واغتروا بقوتهم وقالوا: من أشد منا قوة؟",
@@ -223,6 +236,7 @@ const stories: Story[] = [
     title: "نبي ثمود",
     brief: "قصة الناقة المعجزة، وعقر قومه لها، والصيحة التي أهلكتهم.",
     icon: "🐪",
+    image: "https://images.unsplash.com/photo-1549479373-cf6786cc7dd7?auto=format&fit=crop&q=80&w=600",
     fullStory: [
       "أرسل الله صالحاً إلى قوم ثمود الذين كانوا ينحتون من الجبال بيوتاً، فدعاهم إلى التوحيد.",
       "طلبوا منه معجزة ليؤمنوا، فأخرج الله لهم ناقة عظيمة من صخرة، وأمرهم صالح ألا يمسوها بسوء.",
@@ -240,6 +254,7 @@ const stories: Story[] = [
     title: "نبي سدوم",
     brief: "قصة دعوته لقومه الذين أتوا الفاحشة، وإهلاكهم بحجارة من سجيل.",
     icon: "☄️",
+    image: "https://images.unsplash.com/photo-1601053075253-ab2eece444cd?auto=format&fit=crop&q=80&w=600",
     fullStory: [
       "أرسل الله لوطاً إلى قرية سدوم، وكان قومه يأتون فاحشة لم يسبقهم بها أحد من العالمين.",
       "نصحهم لوط وحذرهم من عذاب الله، لكنهم تمادوا في غيهم وحاولوا الاعتداء على ضيوفه (الملائكة).",
@@ -364,20 +379,26 @@ export default function ProphetStories({ onBack }: { onBack: () => void }) {
                   onClick={() => setSelectedStory(story)}
                   className="bg-white dark:bg-slate-900 rounded-3xl p-5 cursor-pointer hover:scale-[1.02] transition-all shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-black/5 dark:border-white/5 relative overflow-hidden group"
                 >
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-3xl shadow-[inset_0_2px_4px_rgba(255,255,255,0.3),0_10px_20px_rgba(27,67,50,0.4)] transform group-hover:rotate-6 group-hover:scale-110 transition-all border border-white/10 relative overflow-hidden">
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity z-20"></div>
+                  {story.image && (
+                     <div className="absolute inset-0 z-0">
+                       <div className="absolute inset-0 bg-cover bg-center opacity-10 mix-blend-luminosity group-hover:opacity-20 transition-opacity duration-300" style={{ backgroundImage: `url(${story.image})` }}></div>
+                       <div className="absolute inset-0 bg-gradient-to-l from-white/95 via-white/80 to-transparent dark:from-slate-900/95 dark:via-slate-900/80 dark:to-transparent"></div>
+                     </div>
+                  )}
+                  <div className="flex items-center gap-4 relative z-10">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-3xl shadow-[inset_0_2px_4px_rgba(255,255,255,0.3),0_10px_20px_rgba(27,67,50,0.4)] transform group-hover:rotate-6 group-hover:scale-110 transition-all border border-white/10 relative overflow-hidden shrink-0">
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                       <span className="relative z-10 drop-shadow-md">{story.icon}</span>
                     </div>
                     <div className="flex-1">
                       <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-1">{story.prophet}</h3>
-                      <p className="text-xs text-emerald-400 font-bold mb-2">{story.title}</p>
+                      <p className="text-xs text-emerald-600 dark:text-emerald-400 font-bold mb-2">{story.title}</p>
                       <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
                         {story.brief}
                       </p>
                     </div>
-                    <div className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors shrink-0">
                       <ChevronLeft size={18} />
                     </div>
                   </div>
@@ -401,7 +422,14 @@ export default function ProphetStories({ onBack }: { onBack: () => void }) {
               </button>
 
               <div className="card-3d bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 shadow-xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full -mr-20 -mt-20 "></div>
+                {selectedStory.image ? (
+                  <>
+                    <div className="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-luminosity pointer-events-none" style={{ backgroundImage: `url(${selectedStory.image})` }}></div>
+                    <div className="absolute inset-0 bg-gradient-to-b from-slate-50/90 via-white/95 to-white dark:from-slate-900/90 dark:via-slate-900/95 dark:to-slate-900"></div>
+                  </>
+                ) : (
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full -mr-20 -mt-20 "></div>
+                )}
                 
                 <div className="flex items-center gap-4 mb-8 relative z-10">
                   <div className="w-20 h-20 rounded-[1.5rem] bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-4xl shadow-[0_10px_30px_rgba(16,185,129,0.3)] border border-white/20">

@@ -10,12 +10,16 @@ export default function Splash({ onComplete }: SplashProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       onComplete();
-    }, 2500);
+    }, 1200);
     return () => clearTimeout(timer);
   }, [onComplete]);
 
   return (
     <div className="fixed inset-0 bg-white dark:bg-[#07130F] flex flex-col items-center justify-center overflow-hidden z-50">
+      <div 
+        className="absolute inset-0 bg-cover bg-center opacity-5 dark:opacity-10 mix-blend-multiply dark:mix-blend-screen pointer-events-none" 
+        style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1542816417-0983cb9c62ce?q=80&w=2000&auto=format&fit=crop")' }}
+      ></div>
       {/* Background glow effects */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-[#C6A45F]/10 rounded-full blur-[100px] pointer-events-none"></div>
       

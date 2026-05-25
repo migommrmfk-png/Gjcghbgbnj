@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe, TrendingUp, Play, Circle, Sun, Settings, Download, Crown, Award, Activity, Wind, TreePine, CheckCircle, Baby, Hourglass, History } from 'lucide-react';
+import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe, TrendingUp, Play, Circle, Sun, Settings, Download, Crown, Award, Activity, Wind, TreePine, CheckCircle, Baby, Hourglass, History, Share2 } from 'lucide-react';
 import { usePrayerTimes } from '../contexts/PrayerTimesContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -120,6 +120,7 @@ export default function MoreMenu({
       title: t('library_and_learning', 'المكتبة والتعلم'),
       image: 'https://i.pinimg.com/736x/87/1b/2f/871b2f81152a51f801a61327111b1511.jpg',
       items: [
+        { id: 'library', label: t('islamic_library', 'المكتبة الإسلامية'), icon: <Library size={24} />, color: 'bg-emerald-700', isNew: true },
         { id: 'muslim-ai', label: t('muslim_ai', 'الذكاء الاصطناعي'), icon: <Bot size={24} />, color: 'bg-indigo-500' },
         { id: 'dreams', label: t('dream_interpretation', 'تفسير الأحلام'), icon: <Moon size={24} />, color: 'bg-indigo-700' },
         { id: 'stories', label: t('prophet_stories', 'قصص الأنبياء'), icon: <BookOpen size={24} />, color: 'bg-purple-500' },
@@ -149,6 +150,7 @@ export default function MoreMenu({
       title: t('community_and_challenges', 'مجتمع وتحديات'),
       image: 'https://i.pinimg.com/736x/60/76/8b/60768b598b049d53c7a36e1c94411d73.jpg',
       items: [
+        { id: 'dawah', label: t('dawah', 'منبر دعوي'), icon: <Share2 size={24} />, color: 'bg-emerald-600', isNew: true },
         { id: 'garden', label: t('muslim_garden', 'بستان العبادات'), icon: <TreePine size={24} />, color: 'bg-emerald-600', isNew: true },
         { id: 'dua-wall', label: t('dua_wall', 'حائط الدعاء'), icon: <HandHeart size={24} />, color: 'bg-rose-500' },
         { id: 'mood-tracker', label: t('mood_tracker', 'تتبع المزاج'), icon: <Smile size={24} />, color: 'bg-indigo-500' },
@@ -237,11 +239,17 @@ export default function MoreMenu({
             transition={{ delay: catIndex * 0.1 }}
             className="space-y-4"
           >
-            <div className="flex items-center gap-3 px-2">
-              <div className="w-1.5 h-6 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(52,211,153,0.5)]"></div>
-              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 font-serif">
-                {category.title}
-              </h2>
+            <div className="relative overflow-hidden rounded-[24px] mb-4 shadow-sm border border-slate-200 dark:border-slate-800">
+              <div 
+                className="absolute inset-0 bg-cover bg-center"
+                style={{ backgroundImage: `url(${category.image})` }}
+              ></div>
+              <div className="absolute inset-0 bg-gradient-to-l from-slate-900/90 via-slate-900/60 to-transparent"></div>
+              <div className="relative z-10 px-6 py-5 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-white font-serif drop-shadow-md">
+                  {category.title}
+                </h2>
+              </div>
             </div>
             
             <div className="grid grid-cols-2 gap-4">

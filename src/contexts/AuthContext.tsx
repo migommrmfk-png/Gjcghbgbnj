@@ -84,7 +84,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Get initial session
     const initializeAuth = async () => {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000));
+        const authPromise = supabase.auth.getSession();
+        const { data: { session }, error } = await Promise.race([authPromise, timeoutPromise]) as any;
         if (error) {
           console.error("Supabase getSession error:", error);
           setError(error.message);
@@ -165,26 +167,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.error("Error fetching or creating user profile:", err);
       }
     } else {
-      setUser(null);
-      setUserData(null);
+      const isLocalGuest = localStorage.getItem('isLocalGuest') === 'true';
+      if (isLocalGuest) {
+        setUser({ id: 'local_guest', email: null, user_metadata: { name: 'زائر محلي' } } as any);
+        setUserData({
+          uid: 'local_guest',
+          email: null,
+          isAnonymous: true,
+          createdAt: new Date().toISOString(),
+          role: 'user',
+          xp: 0,
+          level: 1,
+          streak: 1,
+          badges: [],
+          displayName: 'زائر محلي'
+        });
+      } else {
+        setUser(null);
+        setUserData(null);
+      }
     }
     setLoading(false);
   };
 
   const signUp = async (email: string, pass: string, name: string) => {
     localStorage.removeItem('hasLoggedOut');
-    const { data, error } = await supabase.auth.signUp({
+    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000));
+    const authPromise = supabase.auth.signUp({
       email,
       password: pass,
       options: { data: { full_name: name } }
     });
+    const { data, error } = await Promise.race([authPromise, timeoutPromise]) as any;
     if (error) throw error;
     return data;
   };
 
   const signIn = async (email: string, pass: string) => {
     localStorage.removeItem('hasLoggedOut');
-    const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
+    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000));
+    const authPromise = supabase.auth.signInWithPassword({ email, password: pass });
+    const { error } = await Promise.race([authPromise, timeoutPromise]) as any;
     if (error) throw error;
   };
 
@@ -234,8 +257,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInAsGuest = async () => {
     localStorage.removeItem('hasLoggedOut');
-    const { error } = await supabase.auth.signInAnonymously();
-    if (error) throw error;
+    try {
+      // Race the anonymous signin with a 5 second timeout to prevent hangs
+      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000));
+      const authPromise = supabase.auth.signInAnonymously();
+      const { error } = await Promise.race([authPromise, timeoutPromise]) as any;
+      if (error) throw error;
+    } catch (err: any) {
+      console.warn("Supabase anonymous auth failed or timed out, falling back to local guest mode.", err);
+      // Fallback to local guest mode if Supabase anonymous auth is disabled or times out
+      localStorage.setItem('isLocalGuest', 'true');
+      await handleSession(null);
+    }
   };
 
   const linkWithGoogle = async () => {
@@ -255,8 +288,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     localStorage.setItem('hasLoggedOut', 'true');
+    localStorage.removeItem('isLocalGuest');
     setUserData(null);
     await supabase.auth.signOut();
+    handleSession(null);
   };
 
   const resetPassword = async (email: string) => {

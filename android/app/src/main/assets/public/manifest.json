@@ -1,0 +1,18 @@
+{
+  "name": "هذا ديني",
+  "short_name": "هذا ديني",
+  "description": "تطبيق إسلامي شامل يحتوي على القرآن، الأذكار، مواقيت الصلاة، والمزيد.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A3A2A",
+  "theme_color": "#0A3A2A",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

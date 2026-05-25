@@ -25,7 +25,8 @@ import {
   Hourglass,
   Baby,
   ImageIcon,
-  Bell
+  Bell,
+  Book
 } from "lucide-react";
 import { motion } from "motion/react";
 import { usePrayerTimes } from "../contexts/PrayerTimesContext";
@@ -60,6 +61,9 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   });
   const [lastReadQuran, setLastReadQuran] = useState<{ surahNumber: number, surahName: string } | null>(null);
   const [tasbeehProgress, setTasbeehProgress] = useState<{ count: number, target: number } | null>(null);
+  const [dailyNiyyah, setDailyNiyyah] = useState<string>("");
+  const [isEditingNiyyah, setIsEditingNiyyah] = useState<boolean>(false);
+
 
   useEffect(() => {
     const today = new Date().toDateString();
@@ -167,6 +171,18 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       if (count > 0) {
         setTasbeehProgress({ count, target });
       }
+    }
+
+    const niyyahSaved = localStorage.getItem('dailyNiyyah');
+    if (niyyahSaved) {
+      try {
+        const parsed = JSON.parse(niyyahSaved);
+        if (parsed.date === today) {
+          setDailyNiyyah(parsed.text);
+        } else {
+          setDailyNiyyah(""); // clear for new day
+        }
+      } catch(e){}
     }
   }, []);
 
@@ -525,7 +541,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         animate={{ y: 0, opacity: 1 }}
         className="relative overflow-hidden rounded-[32px] bg-[#0A1914] text-white shadow-2xl shadow-emerald-900/20"
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-teal-900/40"></div>
+        <div className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-luminosity pointer-events-none" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1609599006353-e629aaab31f5?auto=format&fit=crop&q=80&w=1000")' }}></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/30 to-teal-900/60 mix-blend-overlay"></div>
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/10 rounded-full -mr-20 -mt-20"></div>
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-teal-500/10 rounded-full -ml-10 -mb-10"></div>
         
@@ -583,6 +600,62 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         </div>
       </motion.div>
 
+      {/* Daily Niyyah (Intention) Tracker */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.05 }}
+        className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.08)] relative overflow-hidden group"
+      >
+        <div className="absolute top-0 right-0 w-32 h-32 bg-amber-50 dark:bg-amber-500/5 rounded-full -mr-10 -mt-10 blur-xl transition-transform group-hover:scale-110 duration-700"></div>
+        <div className="relative z-10">
+           <div className="flex items-center gap-3 mb-3">
+             <div className="w-10 h-10 bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center flex-shrink-0">
+               <Sparkles size={20} />
+             </div>
+             <div>
+               <h3 className="font-bold text-slate-800 dark:text-slate-100">نية اليوم</h3>
+               <p className="text-xs text-slate-500 dark:text-slate-400">إنما الأعمال بالنيات</p>
+             </div>
+           </div>
+           
+           {isEditingNiyyah ? (
+             <div className="flex gap-2">
+               <input 
+                 autoFocus
+                 type="text" 
+                 value={dailyNiyyah} 
+                 onChange={(e) => setDailyNiyyah(e.target.value)}
+                 className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-amber-500 text-slate-800 dark:text-slate-200 placeholder-slate-400"
+                 placeholder="اكتب هدفك الروحي لليوم..."
+                 onKeyDown={(e) => {
+                   if (e.key === 'Enter') {
+                     setIsEditingNiyyah(false);
+                     localStorage.setItem('dailyNiyyah', JSON.stringify({ date: new Date().toDateString(), text: dailyNiyyah }));
+                   }
+                 }}
+               />
+               <button 
+                 onClick={() => {
+                   setIsEditingNiyyah(false);
+                   localStorage.setItem('dailyNiyyah', JSON.stringify({ date: new Date().toDateString(), text: dailyNiyyah }));
+                 }}
+                 className="bg-amber-500 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-amber-600"
+               >
+                 حفظ
+               </button>
+             </div>
+           ) : (
+             <div 
+               onClick={() => setIsEditingNiyyah(true)}
+               className="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 font-medium cursor-text hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+             >
+               {dailyNiyyah || <span className="text-slate-400">اضغط هنا لكتابة نيتك أو هدفك الروحي لليوم...</span>}
+             </div>
+           )}
+        </div>
+      </motion.div>
+
       {/* Modern Quick Access */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
@@ -623,6 +696,38 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         transition={{ delay: 0.12 }}
         className="flex gap-3 overflow-x-auto hide-scrollbar pb-2 pt-1 px-1 -mx-1"
       >
+        {lastReadQuran && (
+          <button onClick={() => onNavigate("quran")} className="flex-shrink-0 flex items-center gap-2 bg-gradient-to-l from-emerald-600 to-emerald-800 pr-2 pl-4 py-2.5 rounded-full shadow-md hover:shadow-lg transition-shadow">
+            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white">
+              <BookOpen size={16} />
+            </div>
+            <div className="text-right">
+               <span className="block text-[10px] text-emerald-100/90 leading-none mb-0.5">تابع القراءة</span>
+               <span className="block text-[11px] font-bold text-white leading-none">{lastReadQuran.surahName}</span>
+            </div>
+          </button>
+        )}
+        <button onClick={() => onNavigate("library")} className="flex-shrink-0 flex items-center gap-2 bg-gradient-to-l from-emerald-700 to-teal-800 pr-2 pl-4 py-2.5 rounded-full shadow-md hover:shadow-lg transition-shadow">
+          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white">
+            <Book size={16} />
+          </div>
+          <span className="text-[11px] font-bold text-white">المكتبة</span>
+        </button>
+
+        <button onClick={() => onNavigate("mood-tracker")} className="flex-shrink-0 flex items-center gap-2 bg-gradient-to-l from-indigo-500 to-purple-500 pr-2 pl-4 py-2.5 rounded-full border border-indigo-400 shadow-md hover:shadow-lg transition-shadow">
+          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white">
+            <Sparkles size={16} />
+          </div>
+          <span className="text-[11px] font-bold text-white">ماذا أقرأ الآن؟</span>
+        </button>
+
+        <button onClick={() => onNavigate("dawah")} className="flex-shrink-0 flex items-center gap-2 bg-gradient-to-l from-emerald-500 to-teal-500 pr-2 pl-4 py-2.5 rounded-full border border-emerald-400 shadow-md hover:shadow-lg transition-shadow">
+          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white">
+            <Share2 size={16} />
+          </div>
+          <span className="text-[11px] font-bold text-white">شارك دعوة</span>
+        </button>
+
         <button onClick={() => onNavigate("radio")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
           <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400">
             <Radio size={16} />
@@ -681,6 +786,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         onClick={() => onNavigate("muslim-ai")}
         className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-indigo-500 to-blue-500 shadow-xl shadow-indigo-500/20 p-5 flex items-center justify-between cursor-pointer group active:scale-[0.98] transition-all"
       >
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-overlay pointer-events-none group-hover:scale-105 transition-transform duration-700" 
+          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=600")' }}
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/80 to-blue-500/80"></div>
         <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-10 -mt-10 blur-md group-hover:scale-125 transition-transform duration-700"></div>
         <div className="relative z-10 flex items-center gap-4">
           <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-[18px] flex items-center justify-center border border-white/20">
@@ -707,6 +817,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         onClick={() => onNavigate("sakina")}
         className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-teal-500 to-emerald-600 shadow-xl shadow-teal-500/20 p-5 flex items-center justify-between cursor-pointer group active:scale-[0.98] transition-all"
       >
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay pointer-events-none group-hover:scale-105 transition-transform duration-700" 
+          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1542816417-0983cb9c62ce?auto=format&fit=crop&q=80&w=600")' }}
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-teal-500/80 to-emerald-600/80"></div>
         <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-10 -mt-10 blur-sm group-hover:scale-125 transition-transform duration-700"></div>
         <div className="relative z-10 flex items-center gap-4">
           <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-[18px] flex items-center justify-center border border-white/20">
@@ -735,6 +850,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         onClick={() => onNavigate("garden")}
         className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-emerald-900 to-teal-950 shadow-xl shadow-emerald-900/20 p-6 flex flex-col justify-center cursor-pointer group active:scale-[0.98] transition-all border border-emerald-500/20"
       >
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay pointer-events-none group-hover:scale-105 transition-transform duration-700" 
+          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1542816417-0983cb9c62ce?auto=format&fit=crop&q=80&w=600")' }}
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/80 to-teal-950/80"></div>
         <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/leaves-pattern.png')] bg-repeat"></div>
         <div className="absolute top-1/2 right-0 -translate-y-1/2 w-48 h-48 bg-emerald-500/20 rounded-full blur-xl group-hover:scale-125 transition-transform duration-1000 pointer-events-none"></div>
         
@@ -905,6 +1025,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             onClick={() => onNavigate("calendar")}
             className="group relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 rounded-[24px] p-6 shadow-lg shadow-amber-500/20 cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-amber-400/50"
           >
+            <div 
+              className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay pointer-events-none group-hover:scale-105 transition-transform duration-700" 
+              style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1519406086208-cb2687c4f1c1?auto=format&fit=crop&q=80&w=600")' }}
+            ></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/80 to-orange-600/80"></div>
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-md group-hover:scale-150 transition-transform duration-700"></div>
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-orange-900/10 rounded-full -ml-10 -mb-10 blur-sm"></div>
             <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>

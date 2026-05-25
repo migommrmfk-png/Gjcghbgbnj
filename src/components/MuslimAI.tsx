@@ -114,7 +114,7 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
       };
 
       const response = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
+        model: "gemini-2.5-pro",
         contents: { parts: [audioPart, textPart] },
         config: {
           systemInstruction: "أنت مساعد إسلامي ذكي وموثوق وخبير في المقامات والتجويد. هدفك هو تقييم تلاوة المستخدم، وتوجيهه لتحسين صوته وأدائه. كن إيجابياً، مشجعاً، وقدم نصائح عملية للتدريب الصوتي.",

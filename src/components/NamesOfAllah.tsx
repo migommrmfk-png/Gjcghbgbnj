@@ -112,8 +112,13 @@ export default function NamesOfAllah({ onBack }: { onBack?: () => void }) {
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="bg-emerald-500 rounded-3xl p-8 text-white shadow-sm relative overflow-hidden border border-emerald-600"
+        className="bg-[#0A1914] rounded-3xl p-8 text-white shadow-sm relative overflow-hidden border border-emerald-800"
       >
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none" 
+          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1519817914152-2a241f6e2325?auto=format&fit=crop&q=80&w=1200")' }}
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/80 to-teal-700/80 mix-blend-overlay"></div>
         {onBack && (
           <button
             onClick={onBack}

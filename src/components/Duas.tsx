@@ -198,7 +198,7 @@ const duasCategories: DuaCategory[] = [
   }
 ];
 
-export default function Duas() {
+export default function Duas({ onBack }: { onBack?: () => void }) {
   const [activeCategory, setActiveCategory] = useState<string>(duasCategories[0].id);
 
   return (
@@ -206,7 +206,7 @@ export default function Duas() {
       {/* Header */}
       <div className="sticky top-0 z-20 py-4 flex items-center gap-4 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 px-4 -mx-4 mb-6">
         <button
-          onClick={() => window.history.back()}
+          onClick={onBack}
           className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm"
         >
           <ArrowRight size={24} className="text-slate-600 dark:text-slate-400" />

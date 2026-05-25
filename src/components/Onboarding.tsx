@@ -139,8 +139,12 @@ export default function Onboarding({ onComplete }: { onComplete: () => void }) {
   }));
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-b from-[var(--color-bg)] via-[#1a221d] to-[var(--color-bg)] z-50 overflow-x-hidden overflow-y-auto" dir="rtl">
-      <div className="min-h-[100dvh] flex flex-col items-center justify-between relative">
+    <div className="fixed inset-0 bg-gradient-to-b from-[#0a1628] via-[#0a2818] to-[#061a10] z-50 overflow-x-hidden overflow-y-auto" dir="rtl">
+      <div 
+        className="fixed inset-0 bg-cover bg-center opacity-[0.07] mix-blend-screen pointer-events-none" 
+        style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1590076215667-873dcb3f3fbb?q=80&w=2000&auto=format&fit=crop")' }}
+      ></div>
+      <div className="min-h-[100dvh] flex flex-col items-center justify-between relative z-10">
       {/* Animated Stars Background */}
       {mounted && stars.map((star) => (
         <motion.div

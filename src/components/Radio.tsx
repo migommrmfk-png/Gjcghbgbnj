@@ -6,7 +6,8 @@ import {
   Volume2,
   VolumeX,
   Search,
-  Tv
+  Tv,
+  ArrowRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -434,7 +435,7 @@ const TV_CHANNELS = [
   }
 ];
 
-export default function IslamicRadio() {
+export default function IslamicRadio({ onBack }: { onBack?: () => void }) {
   const [activeTab, setActiveTab] = useState<"radio" | "tv">("radio");
   const [stations, setStations] = useState<RadioStation[]>(STATIONS);
   const [currentStation, setCurrentStation] = useState<RadioStation | null>(null);
@@ -560,6 +561,16 @@ export default function IslamicRadio() {
       className="max-w-md mx-auto p-4 space-y-6 pb-32 min-h-screen bg-slate-50 dark:bg-slate-950"
       dir="rtl"
     >
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="mb-2 flex items-center justify-center p-3 hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm text-slate-600 dark:text-slate-300 w-max"
+        >
+          <ArrowRight size={20} className="ml-1" />
+          <span className="text-sm font-bold">العودة للرئيسية</span>
+        </button>
+      )}
+
       <audio 
         ref={audioRef} 
         onError={(e) => {

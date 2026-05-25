@@ -3,6 +3,7 @@ import {
   Calendar as CalendarIcon,
   ChevronLeft,
   ChevronRight,
+  ArrowRight,
 } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -42,7 +43,7 @@ const EVENTS = [
   { month: 8, day: 15, title: "النصف من شعبان" },
 ];
 
-export default function HijriCalendar() {
+export default function HijriCalendar({ onBack }: { onBack?: () => void }) {
   const [calendarData, setCalendarData] = useState<CalendarDay[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
@@ -110,6 +111,16 @@ export default function HijriCalendar() {
       className="max-w-md mx-auto p-4 space-y-6 pb-24 min-h-screen bg-slate-50 dark:bg-slate-950"
       dir="rtl"
     >
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="mb-2 flex items-center justify-center p-3 hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm text-slate-600 dark:text-slate-300 w-max"
+        >
+          <ArrowRight size={20} className="ml-1" />
+          <span className="text-sm font-bold">العودة للرئيسية</span>
+        </button>
+      )}
+
       {/* Header 3D */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
