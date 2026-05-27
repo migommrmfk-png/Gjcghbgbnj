@@ -466,6 +466,10 @@ export default function Azkar() {
     } else {
       if (audioRef.current) {
         audioRef.current.pause();
+        audioRef.current.src = "";
+        try {
+          audioRef.current.load();
+        } catch (e) {}
       }
       const audio = new Audio(zikr.audioUrl);
       
@@ -482,8 +486,9 @@ export default function Azkar() {
         });
         
         navigator.mediaSession.setActionHandler('play', () => {
-           audio.play();
-           setPlayingId(zikr.id);
+           audio.play().then(() => {
+             setPlayingId(zikr.id);
+           }).catch(console.error);
         });
         navigator.mediaSession.setActionHandler('pause', () => {
            audio.pause();
@@ -503,6 +508,11 @@ export default function Azkar() {
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
+        audioRef.current.src = "";
+        try {
+          audioRef.current.load();
+        } catch (e) {}
+        audioRef.current = null;
       }
     };
   }, [selectedCategory]);

@@ -20,7 +20,7 @@ const stories: Story[] = [
     title: "أبو البشر وأول الأنبياء",
     brief: "قصة خلق آدم عليه السلام، وسجود الملائكة له، وخروجه من الجنة.",
     icon: "🌍",
-    image: "https://images.unsplash.com/photo-1541180295175-3250b86a87c5?auto=format&fit=crop&q=80&w=600",
+    image: "/src/assets/images/prophet_adam_1779801968069.png",
     fullStory: [
       "خلق الله تعالى آدم عليه السلام من طين، ونفخ فيه من روحه، وأمر الملائكة بالسجود له تكريماً، فسجدوا جميعاً إلا إبليس أبى واستكبر.",
       "أسكن الله آدم وزوجته حواء الجنة، وأباح لهما الأكل من كل ثمارها إلا شجرة واحدة. لكن إبليس وسوس لهما فأكلا منها.",
@@ -38,7 +38,7 @@ const stories: Story[] = [
     title: "أول رسل الله إلى الأرض",
     brief: "قصة دعوة نوح لقومه 950 سنة، وبناء السفينة، والطوفان العظيم.",
     icon: "⛵",
-    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600",
+    image: "/src/assets/images/prophet_nuh_1779801987104.png",
     fullStory: [
       "أرسل الله نوحاً عليه السلام إلى قوم عبدوا الأصنام، فدعاهم ليلاً ونهاراً، سراً وجهاراً لمدة 950 عاماً، ولم يؤمن معه إلا قليل.",
       "أوحى الله إليه ببناء سفينة عظيمة، فكان قومه يسخرون منه وهو يبنيها في الصحراء.",
@@ -56,7 +56,7 @@ const stories: Story[] = [
     title: "خليل الرحمن وأبو الأنبياء",
     brief: "قصة تحطيم الأصنام، والنجاة من النار، وبناء الكعبة المشرفة.",
     icon: "🔥",
-    image: "https://images.unsplash.com/photo-1542816417-0983cb9c62ce?auto=format&fit=crop&q=80&w=600",
+    image: "/src/assets/images/prophet_ibrahim_1779802003890.png",
     fullStory: [
       "نشأ إبراهيم عليه السلام في قوم يعبدون الأصنام والكواكب، فهداه الله للتوحيد. حطم أصنام قومه ليثبت لهم عجزها.",
       "ألقاه قومه في نار عظيمة، لكن الله أمر النار أن تكون برداً وسلاماً عليه.",
@@ -74,7 +74,7 @@ const stories: Story[] = [
     title: "كليم الله",
     brief: "قصة مواجهة فرعون، وانشقاق البحر، وتلقي التوراة.",
     icon: "🌊",
-    image: "https://images.unsplash.com/photo-1558500247-41489e2730da?auto=format&fit=crop&q=80&w=600",
+    image: "/src/assets/images/prophet_musa_1779802023223.png",
     fullStory: [
       "وُلد موسى في عام يقتل فيه فرعون المواليد، فألقت به أمه في اليم، ليتربى في قصر فرعون نفسه.",
       "أرسله الله لدعوة فرعون وتحرير بني إسرائيل. أيده الله بمعجزات كالعصا التي تتحول لثعبان واليد البيضاء.",
@@ -92,7 +92,7 @@ const stories: Story[] = [
     title: "كلمة الله وروحه",
     brief: "قصة ولادته المعجزة، ومعجزاته في الشفاء، ورفعه إلى السماء.",
     icon: "✨",
-    image: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=600",
+    image: "/src/assets/images/prophet_isa_1779802038520.png",
     fullStory: [
       "ولد عيسى عليه السلام من مريم العذراء بمعجزة إلهية بدون أب، وتكلم في المهد ليبرئ أمه.",
       "أيده الله بمعجزات عظيمة كإبراء الأكمه والأبرص وإحياء الموتى بإذن الله.",
@@ -110,11 +110,11 @@ const stories: Story[] = [
     title: "خاتم الأنبياء والمرسلين",
     brief: "قصة نزول الوحي، والهجرة، وبناء الدولة الإسلامية.",
     icon: "🕋",
-    image: "https://images.unsplash.com/photo-1551041777-ed277b8dd348?auto=format&fit=crop&q=80&w=600",
+    image: "/src/assets/images/prophet_muhammad_1779802054739.png",
     fullStory: [
       "نزل الوحي على النبي ﷺ في غار حراء وهو في الأربعين من عمره، وبدأ دعوته سراً ثم جهراً في مكة.",
       "واجه أذى شديداً من قريش، فهاجر إلى المدينة المنورة حيث أسس أول دولة إسلامية.",
-      "عاد فاتحاً لمكة بعد سنوات، وعفا عن أهلها، وأكمل الله به الدين وأتم النعمة."
+      "عاد فاتحاً لمكة بعد سنوات، وعفا عن أهلها، وأكمال الله به الدين وأتم النعمة."
     ],
     lessons: [
       "الرحمة للعالمين والعفو عند المقدرة.",
@@ -126,9 +126,9 @@ const stories: Story[] = [
     id: "yusuf",
     prophet: "يوسف عليه السلام",
     title: "الصديق",
-    brief: "قصة إلقائه في الجب، وسجنه، ثم توليه خزائن مصر.",
+    brief: "قصة إلقائه في الجب, وسجنه، ثم توليه خزائن مصر.",
     icon: "👑",
-    image: "https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&q=80&w=600",
+    image: "/src/assets/images/prophet_yusuf_1779802073332.png",
     fullStory: [
       "رأى يوسف في منامه أحد عشر كوكباً والشمس والقمر يسجدون له، فقص الرؤيا على أبيه يعقوب الذي حذره من إخوته.",
       "حسده إخوته وألقوه في البئر، ثم بيع كعبد في مصر، وتربى في بيت العزيز. تعرض لفتنة عظيمة فآثر السجن على المعصية.",
@@ -146,7 +146,7 @@ const stories: Story[] = [
     title: "ذو النون",
     brief: "قصة خروجه غاضباً من قومه، وابتلاع الحوت له، ثم نجاته.",
     icon: "🐋",
-    image: "https://images.unsplash.com/photo-1563854128549-012b1897d81a?auto=format&fit=crop&q=80&w=600",
+    image: "/src/assets/images/prophet_yunus_1779802090194.png",
     fullStory: [
       "دعا يونس قومه طويلاً فلم يستجيبوا، فغضب وخرج من بينهم قبل أن يأذن الله له.",
       "ركب سفينة وهاج البحر، فاقترعوا وألقوه في البحر، فابتلعه حوت عظيم بأمر الله.",
@@ -164,7 +164,7 @@ const stories: Story[] = [
     title: "رمز الصبر",
     brief: "قصة ابتلائه في ماله وولده وصحته، وصبره الجميل.",
     icon: "🤲",
-    image: "https://images.unsplash.com/photo-1504283896472-a1b41ec9cb0d?auto=format&fit=crop&q=80&w=600",
+    image: "/src/assets/images/prophet_ayyub_1779802108779.png",
     fullStory: [
       "كان أيوب غنياً وله أولاد كثيرون، فابتلاه الله بفقد ماله وولده، ثم ابتلاه في جسده بمرض شديد طال سنوات.",
       "صبر أيوب صبراً عظيماً ولم يشتكِ إلا لله، وكانت زوجته وفية له تخدمه في مرضه.",
@@ -182,7 +182,7 @@ const stories: Story[] = [
     title: "الملك النبي",
     brief: "قصة ملكه العظيم، وتسخير الجن والطير والرياح له.",
     icon: "🏰",
-    image: "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&q=80&w=600",
+    image: "/src/assets/images/prophet_sulaiman_1779802125526.png",
     fullStory: [
       "ورث سليمان الملك والنبوة عن أبيه داود، وسأل الله ملكاً لا ينبغي لأحد من بعده، فاستجاب له.",
       "سخر الله له الرياح تجري بأمره، والجن يبنون له ما يشاء، وعلمه منطق الطير والحيوانات.",
@@ -200,7 +200,7 @@ const stories: Story[] = [
     title: "أول من خط بالقلم",
     brief: "قصة رفعه مكاناً علياً، واجتهاده في العبادة والدعوة.",
     icon: "✍️",
-    image: "https://images.unsplash.com/photo-1428278953961-ea8c6307f815?auto=format&fit=crop&q=80&w=600",
+    image: "/src/assets/images/prophet_idris_1779802142314.png",
     fullStory: [
       "كان إدريس عليه السلام أول نبي بعد آدم وشيث، وأول من خط بالقلم وخاط الثياب ولبس المخيط.",
       "دعا قومه إلى الله بالحكمة والموعظة الحسنة، وكان كثير العبادة والصيام والقيام.",
@@ -218,7 +218,7 @@ const stories: Story[] = [
     title: "نبي عاد",
     brief: "قصة دعوته لقوم عاد أصحاب القوة والبطش، وإهلاكهم بالريح الصرصر.",
     icon: "🌪️",
-    image: "https://images.unsplash.com/photo-1463171515643-952cee54d42a?auto=format&fit=crop&q=80&w=600",
+    image: "/src/assets/images/prophet_hud_1779802162051.png",
     fullStory: [
       "أرسل الله هوداً إلى قوم عاد الذين كانوا يتمتعون بقوة جسدية هائلة وبنوا إرم ذات العماد.",
       "دعاهم هود لعبادة الله وحده وترك الأصنام، لكنهم استكبروا واغتروا بقوتهم وقالوا: من أشد منا قوة؟",
@@ -236,7 +236,7 @@ const stories: Story[] = [
     title: "نبي ثمود",
     brief: "قصة الناقة المعجزة، وعقر قومه لها، والصيحة التي أهلكتهم.",
     icon: "🐪",
-    image: "https://images.unsplash.com/photo-1549479373-cf6786cc7dd7?auto=format&fit=crop&q=80&w=600",
+    image: "/src/assets/images/prophet_salih_1779802184298.png",
     fullStory: [
       "أرسل الله صالحاً إلى قوم ثمود الذين كانوا ينحتون من الجبال بيوتاً، فدعاهم إلى التوحيد.",
       "طلبوا منه معجزة ليؤمنوا، فأخرج الله لهم ناقة عظيمة من صخرة، وأمرهم صالح ألا يمسوها بسوء.",
@@ -254,7 +254,7 @@ const stories: Story[] = [
     title: "نبي سدوم",
     brief: "قصة دعوته لقومه الذين أتوا الفاحشة، وإهلاكهم بحجارة من سجيل.",
     icon: "☄️",
-    image: "https://images.unsplash.com/photo-1601053075253-ab2eece444cd?auto=format&fit=crop&q=80&w=600",
+    image: "/src/assets/images/prophet_lut_1779802202937.png",
     fullStory: [
       "أرسل الله لوطاً إلى قرية سدوم، وكان قومه يأتون فاحشة لم يسبقهم بها أحد من العالمين.",
       "نصحهم لوط وحذرهم من عذاب الله، لكنهم تمادوا في غيهم وحاولوا الاعتداء على ضيوفه (الملائكة).",
@@ -272,6 +272,7 @@ const stories: Story[] = [
     title: "خطيب الأنبياء",
     brief: "قصة دعوته لأهل مدين، ونهيهم عن التطفيف في المكيال والميزان.",
     icon: "⚖️",
+    image: "/src/assets/images/prophet_shuayb_1779802221816.png",
     fullStory: [
       "أرسل الله شعيباً إلى أهل مدين، وكانوا يعبدون الأيكة ويبخسون الناس أشياءهم ويطففون الكيل والميزان.",
       "دعاهم شعيب إلى التوحيد وإيفاء الكيل والميزان بالقسط، وحذرهم من الفساد في الأرض.",
@@ -289,6 +290,7 @@ const stories: Story[] = [
     title: "النبي الملك",
     brief: "قصة قتله لجالوت، وإلانة الحديد له، وتسبيح الجبال والطير معه.",
     icon: "🛡️",
+    image: "/src/assets/images/prophet_dawud_1779802236780.png",
     fullStory: [
       "كان داود جندياً في جيش طالوت، وقتل جالوت الجبار بحجر من مقلاعه، فآتاه الله الملك والحكمة.",
       "ألان الله له الحديد فكان يصنع منه الدروع السابغات، وكان يصوم يوماً ويفطر يوماً، ويقوم نصف الليل.",
@@ -306,6 +308,7 @@ const stories: Story[] = [
     title: "كافل مريم",
     brief: "قصة كفالته لمريم، ودعائه ربه ليهب له ولداً في كبره.",
     icon: "🕌",
+    image: "/src/assets/images/hajj_kaaba_dome_1779803270795.png",
     fullStory: [
       "كان زكريا نبياً ونجاراً، وكفل مريم العذراء في المحراب، وكان كلما دخل عليها وجد عندها رزقاً.",
       "دعا ربه نداءً خفياً أن يهب له ولياً يرث النبوة، رغم كبر سنه وعقم زوجته.",
@@ -323,6 +326,7 @@ const stories: Story[] = [
     title: "الحصور العفيف",
     brief: "قصة إيتائه الحكم صبياً، وبره بوالديه، واستشهاده.",
     icon: "📜",
+    image: "/src/assets/images/hadith_scroll_background_1779805688768.png",
     fullStory: [
       "آتى الله يحيى الحكم والنبوة وهو صبي، وكان تقياً باراً بوالديه، ولم يكن جباراً عصياً.",
       "كان يدعو إلى الله ويأمر بالمعروف وينهى عن المنكر، وكان حصوراً لا يقرب الذنوب.",
@@ -387,9 +391,19 @@ export default function ProphetStories({ onBack }: { onBack: () => void }) {
                      </div>
                   )}
                   <div className="flex items-center gap-4 relative z-10">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-3xl shadow-[inset_0_2px_4px_rgba(255,255,255,0.3),0_10px_20px_rgba(27,67,50,0.4)] transform group-hover:rotate-6 group-hover:scale-110 transition-all border border-white/10 relative overflow-hidden shrink-0">
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                      <span className="relative z-10 drop-shadow-md">{story.icon}</span>
+                    <div className="w-16 h-16 rounded-2xl bg-slate-900 border border-emerald-500/20 flex items-center justify-center shadow-lg transform group-hover:rotate-3 group-hover:scale-110 transition-all relative overflow-hidden shrink-0">
+                      {story.image ? (
+                        <img 
+                          src={story.image} 
+                          alt={story.prophet} 
+                          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 to-teal-800 flex items-center justify-center font-bold text-white text-lg">
+                          {story.prophet[0]}
+                        </div>
+                      )}
                     </div>
                     <div className="flex-1">
                       <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-1">{story.prophet}</h3>
@@ -432,8 +446,19 @@ export default function ProphetStories({ onBack }: { onBack: () => void }) {
                 )}
                 
                 <div className="flex items-center gap-4 mb-8 relative z-10">
-                  <div className="w-20 h-20 rounded-[1.5rem] bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-4xl shadow-[0_10px_30px_rgba(16,185,129,0.3)] border border-white/20">
-                    {selectedStory.icon}
+                  <div className="w-20 h-20 rounded-[1.5rem] bg-slate-900 border border-emerald-500/20 flex items-center justify-center shadow-lg relative overflow-hidden shrink-0">
+                    {selectedStory.image ? (
+                      <img 
+                        src={selectedStory.image} 
+                        alt={selectedStory.prophet} 
+                        className="absolute inset-0 w-full h-full object-cover" 
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 to-teal-800 flex items-center justify-center font-bold text-white text-xl">
+                        {selectedStory.prophet[0]}
+                      </div>
+                    )}
                   </div>
                   <div>
                     <h2 className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-2">{selectedStory.prophet}</h2>

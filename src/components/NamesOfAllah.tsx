@@ -116,7 +116,7 @@ export default function NamesOfAllah({ onBack }: { onBack?: () => void }) {
       >
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none" 
-          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1519817914152-2a241f6e2325?auto=format&fit=crop&q=80&w=1200")' }}
+          style={{ backgroundImage: 'url("/src/assets/images/names_allah_background_1779805712797.png")' }}
         ></div>
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/80 to-teal-700/80 mix-blend-overlay"></div>
         {onBack && (

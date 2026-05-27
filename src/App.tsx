@@ -47,6 +47,7 @@ const DuaWall = lazy(() => import("./components/DuaWall"));
 const ZakatCalculator = lazy(() => import("./components/ZakatCalculator"));
 const HajjUmrahGuide = lazy(() => import("./components/HajjUmrahGuide"));
 const Auth = lazy(() => import("./components/Auth"));
+const EidAdhaSpecial = lazy(() => import("./components/EidAdhaSpecial"));
 
 const Ruqyah = lazy(() => import("./components/Ruqyah"));
 const InheritanceCalculator = lazy(() => import("./components/InheritanceCalculator"));
@@ -55,14 +56,10 @@ const DreamInterpretation = lazy(() => import("./components/DreamInterpretation"
 const SelfAccounting = lazy(() => import("./components/SelfAccounting"));
 const Downloads = lazy(() => import("./components/Downloads"));
 const DawahGenerator = lazy(() => import("./components/DawahGenerator"));
-const IslamicLibrary = lazy(() => import("./components/IslamicLibrary"));
 const IslamicQuiz = lazy(() => import("./components/IslamicQuiz"));
 
 const NotificationsPage = lazy(() => import("./components/NotificationsPage"));
 const MoodTracker = lazy(() => import("./components/MoodTracker"));
-const Sakina = lazy(() => import("./components/Sakina"));
-
-const MuslimGarden = lazy(() => import("./components/MuslimGarden"));
 
 const IslamicEvents = lazy(() => import("./components/IslamicEvents"));
 const HalalChecker = lazy(() => import("./components/HalalChecker"));
@@ -223,6 +220,8 @@ function AppContent() {
         return <ZakatCalculator onBack={handleBack} />;
       case "hajj":
         return <HajjUmrahGuide onBack={handleBack} />;
+      case "eid-special":
+        return <EidAdhaSpecial onBack={handleBack} />;
 
       case "auth":
         return <Auth onBack={handleBack} />;
@@ -239,8 +238,6 @@ function AppContent() {
         return <SelfAccounting onBack={handleBack} />;
       case "downloads":
         return <Downloads onBack={handleBack} />;
-      case "library":
-        return <IslamicLibrary onBack={handleBack} />;
       case "quiz":
         return <IslamicQuiz onBack={handleBack} />;
       case "dawah":
@@ -248,11 +245,7 @@ function AppContent() {
 
       case "notifications":
         return <NotificationsPage onBack={handleBack} />;
-      case "sakina":
-        return <Sakina onBack={handleBack} />;
 
-      case "garden":
-        return <MuslimGarden onBack={handleBack} />;
       case "mood-tracker":
         return (
           <div className="p-4 pb-24 max-w-md mx-auto pt-8 min-h-screen" dir="rtl">

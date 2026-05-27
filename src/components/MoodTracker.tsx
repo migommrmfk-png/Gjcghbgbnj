@@ -5,8 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { db, auth as firebaseAuth } from '../firebase';
 import { collection, addDoc, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
-import { Type } from '@google/genai';
-import { getGeminiClient } from '../lib/gemini';
+import { Type, getGeminiClient } from '../lib/gemini';
 import toast from 'react-hot-toast';
 
 const moods = [
@@ -85,7 +84,7 @@ export default function MoodTracker() {
       }`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.5-flash',
         contents: prompt,
         config: {
           responseMimeType: 'application/json',
@@ -101,7 +100,8 @@ export default function MoodTracker() {
         }
       });
 
-      const data = JSON.parse(response.text || '{}');
+      const textClean = (response.text || '{}').replace(/\`\`\`json|\`\`\`/g, "").trim();
+      const data = JSON.parse(textClean);
       setSuggestion(data);
 
     } catch (error) {

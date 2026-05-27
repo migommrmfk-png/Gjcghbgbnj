@@ -10,7 +10,12 @@ export default function DownloadAppBanner() {
   };
 
   const proceedToDownload = () => {
-    window.open('https://www.mediafire.com/file/5ffg5lqeh6nutw8/app3952997-3tpsyv_%25281%2529.apk/file', '_blank');
+    const link = document.createElement('a');
+    link.href = '/Haza_Deeni.apk';
+    link.download = 'Haza_Deeni.apk';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     setShowWarning(false);
   };
 

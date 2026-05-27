@@ -234,7 +234,7 @@ export default function Hadith({ onBack }: { onBack?: () => void }) {
       >
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none" 
-          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1542816417-0983cb9c62ce?auto=format&fit=crop&q=80&w=1200")' }}
+          style={{ backgroundImage: 'url("/src/assets/images/hadith_scroll_background_1779805688768.png")' }}
         ></div>
         <div className="absolute inset-0 bg-gradient-to-bl from-emerald-600/60 via-emerald-700/80 to-teal-900/90 mix-blend-overlay"></div>
         <div className="absolute right-0 top-0 w-48 h-48 bg-white/10 rounded-full -mr-12 -mt-12  animate-pulse"></div>

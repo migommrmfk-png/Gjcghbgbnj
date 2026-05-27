@@ -164,7 +164,7 @@ export default function Games({ onBack }: { onBack: () => void }) {
       }
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-3.5-flash",
         contents: prompt + "\n\nيجب أن يكون الرد عبارة عن مصفوفة JSON صالحة فقط ولا شيء غير ذلك. (Array of objects).",
         config: {
           temperature: 0.9,

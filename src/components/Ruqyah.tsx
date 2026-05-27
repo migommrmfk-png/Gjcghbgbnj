@@ -80,7 +80,14 @@ export default function Ruqyah({ onBack }: { onBack?: () => void }) {
     if (audio) {
       const handleEnded = () => setIsPlaying(false);
       audio.addEventListener('ended', handleEnded);
-      return () => audio.removeEventListener('ended', handleEnded);
+      return () => {
+        audio.removeEventListener('ended', handleEnded);
+        audio.pause();
+        audio.src = "";
+        try {
+          audio.load();
+        } catch (e) {}
+      };
     }
   }, []);
 
@@ -101,7 +108,16 @@ export default function Ruqyah({ onBack }: { onBack?: () => void }) {
           <div className="flex items-center gap-3">
             {onBack && (
               <button
-                onClick={onBack}
+                onClick={() => {
+                  if (audioRef.current) {
+                    audioRef.current.pause();
+                    audioRef.current.src = "";
+                    try {
+                      audioRef.current.load();
+                    } catch (e) {}
+                  }
+                  if (onBack) onBack();
+                }}
                 className="p-2 hover:bg-white/10 rounded-full transition-colors border border-white/10 bg-white/5 shadow-sm"
               >
                 <ArrowRight size={24} className="text-white" />

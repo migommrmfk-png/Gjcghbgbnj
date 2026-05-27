@@ -69,7 +69,7 @@ export default function DawahGenerator({ onBack }: { onBack: () => void }) {
       <div className="pt-12 pb-6 px-6 bg-[#0A1914] text-white rounded-b-[2.5rem] shadow-xl shrink-0 border-b border-emerald-900/30 relative overflow-hidden">
          <div 
            className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none" 
-           style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1564121211835-e88c852648ab?auto=format&fit=crop&q=80&w=1200")' }}
+           style={{ backgroundImage: 'url("/src/assets/images/names_allah_background_1779805712797.png")' }}
          ></div>
          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/30 to-teal-900/60 mix-blend-overlay"></div>
          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full -mr-20 -mt-20 blur-2xl"></div>

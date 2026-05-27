@@ -95,6 +95,18 @@ export default function Quran() {
   const ayahRefs = useRef<{ [key: number]: HTMLSpanElement | null }>({});
 
   useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+        try {
+          audioRef.current.load();
+        } catch (e) {}
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
     }
@@ -586,9 +598,15 @@ export default function Quran() {
         <div className="sticky top-0 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md shadow-sm z-20 px-4 py-3 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
           <button
             onClick={() => {
-              setSelectedSurah(null);
-              audioRef.current?.pause();
+              if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.src = "";
+                try {
+                  audioRef.current.load();
+                } catch (e) {}
+              }
               setIsPlaying(false);
+              setSelectedSurah(null);
             }}
             className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm"
           >
@@ -816,7 +834,7 @@ export default function Quran() {
       >
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none" 
-          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1542816417-0983cb9c62ce?auto=format&fit=crop&q=80&w=1200")' }}
+          style={{ backgroundImage: 'url("/src/assets/images/quran_gold_light_1779803230036.png")' }}
         ></div>
         <div className="absolute inset-0 bg-gradient-to-bl from-emerald-600/60 via-emerald-700/80 to-teal-900/90 mix-blend-overlay"></div>
         <div className="absolute right-0 top-0 w-48 h-48 bg-white/5 rounded-full -mr-12 -mt-12 animate-pulse"></div>

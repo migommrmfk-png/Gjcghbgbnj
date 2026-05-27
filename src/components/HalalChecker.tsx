@@ -33,14 +33,15 @@ export default function HalalChecker({ onBack }: { onBack: () => void }) {
       `;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.5-flash',
         contents: prompt,
         config: {
           responseMimeType: 'application/json',
         }
       });
 
-      const data = JSON.parse(response.text || '{}');
+      const textClean = (response.text || '{}').replace(/\`\`\`json|\`\`\`/g, "").trim();
+      const data = JSON.parse(textClean);
       setResult(data);
     } catch (error) {
       console.error(error);

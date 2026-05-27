@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, BookOpen, PenTool, Search, BookMarked, Sparkles } from 'lucide-react';
 import { useTranslation } from "react-i18next";
 import { getGeminiClient } from '../lib/gemini';
 
 const CATEGORIES = [
-  { id: "tafseer", label: "تفسير الآيات", icon: "📖" },
-  { id: "complete", label: "أكمل الآية", icon: "✍️" },
-  { id: "surah", label: "اسم السورة", icon: "🔍" },
-  { id: "hukm", label: "أحكام التجويد", icon: "🎵" },
+  { id: "tafseer", label: "تفسير الآيات", icon: "book-open" },
+  { id: "complete", label: "أكمل الآية", icon: "pen-tool" },
+  { id: "surah", label: "اسم السورة", icon: "search" },
+  { id: "hukm", label: "أحكام التجويد", icon: "book-marked" },
 ];
 
 const DIFFICULTIES = [
@@ -100,7 +100,7 @@ export default function IslamicQuiz({ onBack }: { onBack: () => void }) {
       تأكد أن الأسئلة متنوعة ومختلفة في كل مرة ولم تسألني إياه في هذه الجلسة. الرقم العشوائي للتميز: ${Math.random()}`;
 
       const res = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
+          model: 'gemini-3.5-flash',
           contents: prompt,
           config: {
               systemInstruction: SYSTEM_PROMPT,
@@ -180,7 +180,9 @@ export default function IslamicQuiz({ onBack }: { onBack: () => void }) {
           <div style={styles.header}>
             <div style={styles.logoWrap}>
               <span style={styles.logoAr}>بِسْمِ اللَّهِ</span>
-              <div style={styles.logoIcon}>🕌</div>
+              <div style={styles.logoIcon}>
+                <Sparkles size={28} className="text-[#fbbf24]" />
+              </div>
             </div>
             <h1 style={styles.title}>مسابقة القرآن الكريم</h1>
             <p style={styles.subtitle}>اختبر معلوماتك القرآنية بمساعدة الذكاء الاصطناعي</p>
@@ -199,7 +201,12 @@ export default function IslamicQuiz({ onBack }: { onBack: () => void }) {
                   }}
                   onClick={() => setCategory(c.id)}
                 >
-                  <span style={styles.cardIcon}>{c.icon}</span>
+                  <span style={styles.cardIcon}>
+                    {c.icon === "book-open" && <BookOpen size={24} />}
+                    {c.icon === "pen-tool" && <PenTool size={24} />}
+                    {c.icon === "search" && <Search size={24} />}
+                    {c.icon === "book-marked" && <BookMarked size={24} />}
+                  </span>
                   <span style={styles.cardLabel}>{c.label}</span>
                 </button>
               ))}

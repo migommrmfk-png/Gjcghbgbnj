@@ -120,7 +120,6 @@ export default function MoreMenu({
       title: t('library_and_learning', 'المكتبة والتعلم'),
       image: 'https://i.pinimg.com/736x/87/1b/2f/871b2f81152a51f801a61327111b1511.jpg',
       items: [
-        { id: 'library', label: t('islamic_library', 'المكتبة الإسلامية'), icon: <Library size={24} />, color: 'bg-emerald-700', isNew: true },
         { id: 'muslim-ai', label: t('muslim_ai', 'الذكاء الاصطناعي'), icon: <Bot size={24} />, color: 'bg-indigo-500' },
         { id: 'dreams', label: t('dream_interpretation', 'تفسير الأحلام'), icon: <Moon size={24} />, color: 'bg-indigo-700' },
         { id: 'stories', label: t('prophet_stories', 'قصص الأنبياء'), icon: <BookOpen size={24} />, color: 'bg-purple-500' },
@@ -134,7 +133,6 @@ export default function MoreMenu({
       title: t('tools_and_seasons', 'أدوات ومواسم'),
       image: 'https://i.pinimg.com/736x/3f/8b/77/3f8b77626915152a54b38d7c49b6b801.jpg',
       items: [
-        { id: 'sakina', label: t('sakina', 'خيمة السكينة'), icon: <Wind size={24} />, color: 'bg-emerald-500' },
         { id: 'tasbeeh', label: t('tasbeeh', 'السبحة الإلكترونية'), icon: <Circle size={24} />, color: 'bg-indigo-500' },
         { id: 'ruqyah', label: t('ruqyah', 'الرقية الشرعية'), icon: <Shield size={24} />, color: 'bg-teal-500' },
         { id: 'qibla', label: t('qibla', 'اتجاه القبلة'), icon: <Compass size={24} />, color: 'bg-orange-500' },
@@ -151,7 +149,6 @@ export default function MoreMenu({
       image: 'https://i.pinimg.com/736x/60/76/8b/60768b598b049d53c7a36e1c94411d73.jpg',
       items: [
         { id: 'dawah', label: t('dawah', 'منبر دعوي'), icon: <Share2 size={24} />, color: 'bg-emerald-600', isNew: true },
-        { id: 'garden', label: t('muslim_garden', 'بستان العبادات'), icon: <TreePine size={24} />, color: 'bg-emerald-600', isNew: true },
         { id: 'dua-wall', label: t('dua_wall', 'حائط الدعاء'), icon: <HandHeart size={24} />, color: 'bg-rose-500' },
         { id: 'mood-tracker', label: t('mood_tracker', 'تتبع المزاج'), icon: <Smile size={24} />, color: 'bg-indigo-500' },
         { id: 'accounting', label: t('self_accounting', 'ورد المحاسبة'), icon: <TrendingUp size={24} />, color: 'bg-teal-600' },

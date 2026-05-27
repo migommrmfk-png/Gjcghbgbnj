@@ -87,7 +87,7 @@ export default function SelfAccounting({ onBack }: { onBack?: () => void }) {
       <div className="pt-12 pb-6 px-6 bg-[#0A1914] text-white rounded-b-[2.5rem] shadow-lg shrink-0 relative overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none" 
-          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1542816417-0983cb9c62ce?auto=format&fit=crop&q=80&w=1200")' }}
+          style={{ backgroundImage: 'url("/src/assets/images/quran_gold_light_1779803230036.png")' }}
         ></div>
         <div className="absolute inset-0 bg-gradient-to-b from-teal-700/80 to-teal-900/90 mix-blend-overlay"></div>
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] opacity-10"></div>

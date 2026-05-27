@@ -35,14 +35,15 @@ export default function IslamicNames({ onBack }: { onBack: () => void }) {
       `;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.5-flash',
         contents: prompt,
         config: {
           responseMimeType: 'application/json',
         }
       });
 
-      const data = JSON.parse(response.text || '{}');
+      const textClean = (response.text || '{}').replace(/\`\`\`json|\`\`\`/g, "").trim();
+      const data = JSON.parse(textClean);
       if (data.names) {
         setResults(data.names);
       }
@@ -59,7 +60,7 @@ export default function IslamicNames({ onBack }: { onBack: () => void }) {
       <div className="bg-[#0A1914] text-white p-4 sticky top-0 z-10 shadow-md relative overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none" 
-          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1542816417-0983cb9c62ce?auto=format&fit=crop&q=80&w=1200")' }}
+          style={{ backgroundImage: 'url("/src/assets/images/muslim_baby_background_1779805731640.png")' }}
         ></div>
         <div className="absolute inset-0 bg-gradient-to-r from-emerald-600/80 to-teal-800/80 mix-blend-overlay"></div>
         <div className="relative z-10 flex items-center gap-3">

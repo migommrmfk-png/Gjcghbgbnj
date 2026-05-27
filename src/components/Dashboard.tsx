@@ -35,6 +35,8 @@ import { supabase } from '../supabase';
 import DownloadAppBanner from "./DownloadAppBanner";
 import MoodTracker from "./MoodTracker";
 import { useTranslation } from 'react-i18next';
+import { getGeminiClient } from "../lib/gemini";
+import { CheckCircle2, RefreshCw, AlertCircle, Sparkles as SparklesIcon, Trash2, Sliders, ChevronRight as ChevronRightIcon } from "lucide-react";
 
 interface DashboardProps {
   onNavigate: (tab: string) => void;
@@ -63,6 +65,183 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   const [tasbeehProgress, setTasbeehProgress] = useState<{ count: number, target: number } | null>(null);
   const [dailyNiyyah, setDailyNiyyah] = useState<string>("");
   const [isEditingNiyyah, setIsEditingNiyyah] = useState<boolean>(false);
+
+  // AI Personalization Onboarding State
+  const [userRoutine, setUserRoutine] = useState<string[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user_custom_ai_routine") || "[]");
+    } catch { return []; }
+  });
+  const [routineChecked, setRoutineChecked] = useState<{ [key: string]: boolean }>(() => {
+    try {
+      const today = new Date().toDateString();
+      const parsed = JSON.parse(localStorage.getItem("user_custom_ai_routine_checked") || "{}");
+      if (parsed.date === today) return parsed.checked || {};
+    } catch {}
+    return {};
+  });
+  const [quizStep, setQuizStep] = useState(0);
+  const [quizAnswers, setQuizAnswers] = useState({ goal: "", time: "", level: "" });
+  const [aiLoading, setAiLoading] = useState(false);
+  const [showAiOnboarding, setShowAiOnboarding] = useState(() => {
+    return !localStorage.getItem("user_custom_ai_routine");
+  });
+
+  // Daily Quranic Khatmah State
+  const [quranPlanData, setQuranPlanData] = useState<any>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("quranPlan") || "null");
+    } catch { return null; }
+  });
+
+  // What should I read today state handles
+  const [whatToReadOpen, setWhatToReadOpen] = useState(false);
+  const [selectedSpiritualState, setSelectedSpiritualState] = useState<string | null>(null);
+  const [aiPrescription, setAiPrescription] = useState("");
+  const [aiPrescriptionLoading, setAiPrescriptionLoading] = useState(false);
+
+  const handleSaveRoutineChecked = (updatedChecked: { [key: string]: boolean }) => {
+    const today = new Date().toDateString();
+    setRoutineChecked(updatedChecked);
+    localStorage.setItem("user_custom_ai_routine_checked", JSON.stringify({ date: today, checked: updatedChecked }));
+  };
+
+  const handleCompleteQuranPlanDay = (dayIndex: number) => {
+    if (!quranPlanData) return;
+    const newPlan = [...quranPlanData.plan];
+    newPlan[dayIndex].status = "completed";
+    
+    // Set next pending to current
+    const nextPendingIndex = newPlan.findIndex((p: any, i: number) => i > dayIndex && p.status === "pending");
+    if (nextPendingIndex !== -1) {
+      newPlan[nextPendingIndex].status = "current";
+    }
+    
+    const updated = { ...quranPlanData, plan: newPlan };
+    setQuranPlanData(updated);
+    localStorage.setItem("quranPlan", JSON.stringify(updated));
+  };
+
+  const handleGenerateAiRoutine = async () => {
+    setAiLoading(true);
+    
+    const goalMap: any = {
+      quran: "تلاوة وحفظ القرآن الكريم 📖",
+      prayers: "المواظبة والخشوع في الصلوات والسنن الرواتب 🕌",
+      knowledge: "التفقه في الدين والحديث الشريف والسيرة النبوية 📚",
+      peace: "السكينة والأدعية وأذكار التحصين والرقية 🌿"
+    };
+
+    const timeMap: any = {
+      "10m": "١٠ دقائق خفيفة ومستمرة ⏱️",
+      "30m": "٣٠ دقيقة خاشعة متكاملة ⏳",
+      "1h": "ساعة فأكثر للاستثمار الإيماني 🕋"
+    };
+
+    const levelMap: any = {
+      beginner: "مبتدئ يبحث عن الأساسيات وبناء العادة 🌟",
+      mid: "متوسط يبحث عن تكثيف الأوردة والمحافظة 📈",
+      advanced: "متقدم يسعى للتفكر العميق والمراجعة الدؤوبة 🎓"
+    };
+
+    const goalLabel = goalMap[quizAnswers.goal] || "التقرب إلى الله";
+    const timeLabel = timeMap[quizAnswers.time] || "وقت مرن";
+    const levelLabel = levelMap[quizAnswers.level] || "عام";
+
+    // Standard high-quality fallback lists to guarantee zero-failure robustness
+    const fallbackMap: any = {
+      quran: {
+        "10m": ["تلاوة صفحتين من القرآن الكريم بتمعن بعد صلاة الفجر", "تصفح معاني آية واحدة مع التفسير الميسر", "ترديد أذكار الصباح كاملة والحمد لله"],
+        "30m": ["تلاوة ٥ صفحات من القرآن الكريم بتدبر هادئ", "تنبيه النفس لتعديل مقدار ورد التلاوة اليومي", "سماع تلاوة مرتلة خاشعة لعشر دقائق"],
+        "1h": ["تلاوة حزب كامل من الذكر الحكيم يومياً", "مراجعة خمسة صفحات من محفوظاتك القرآنية السابقة", "حفظ ٣ آيات جديدة مع تدبر تفسير السعدي المبارك"]
+      },
+      prayers: {
+        "10m": ["المحافظة على صلاة الوتر ولو ركعة واحدة قبل المنام", "ترديد أذكار ما بعد الصلاة مباشرة بدقة خاشعة", "المحافظة على تكبيرة الإحرام بالمسجد"],
+        "30m": ["تأدية بعض السنن الرواتب المرفقة بالفرائض الخمس", "جلسة استغفار خاشعة وتوبة صادقة لمدة ٥ دقائق كاملة", "صلاة ركعتي الضحى لفتح أبواب البركة لنهارك"],
+        "1h": ["المحافظة التامة على الرواتب الاثني عشر والضحى والوتر", "الاستغفار بالأسحار والتهجد بركعتين قبل صلاة الفجر", "جلسة تدبر ودعاء مباركة بين الأذان والإقامة بمسجد الحي"]
+      },
+      knowledge: {
+        "10m": ["قراءة حديث شريف واحد من الأربعين النووية بشرح مختصر", "التفكر بوعي في معاني اسم واحد من أسماء الله الحسنى", "قراءة صفحة من كتاب في تفاسير الآيات العطرة"],
+        "30m": ["قراءة باب نافع من رياض الصالحين والمداومة عليه", "الاستماع لمقطع فقهي توعوي أو سلسلة مواعظ إيمانية", "مراجعة أحكام طهارة القلوب وتزكية النفس"],
+        "1h": ["دراسة صفحتين من كتاب في الفقه الميسر أو أصول السيرة", "الاستماع لدرس شرعي متكامل ميسر", "حفظ حديث شريف وصياغة فوائده الشرعية لنشره"]
+      },
+      peace: {
+        "10m": ["الالتزام الكامل بقراءة أذكار الصباح في وقتها الأصلي", "تلاوة آية الكرسي والمعوذات للتحصين دبر كل مكتوبة", "جلسة استغفار خاشعة ١٠٠ مرة لرفع الكروب والهموم"],
+        "30m": ["تلاوة أذكار الصباح والمساء كاملة بخشوع وحضور قلب", "سماع الرقية الشرعية المسكّنة لطرد الوساوس وطلي العافية", "المحافظة على قول لا حول ولا قوة إلا بالله ١٠٠ مرة بيقين"],
+        "1h": ["ورد صلاة على النبي ﷺ ١٠٠٠ مرة لفتح بركات الدنيا والآخرة", "تلاوة سورة الملك المنجية من عذاب القبر قبل النوم برضا", "جلسة مناجاة طويلة وبوح لله تعالى بجميع الأمنيات بدعاء خاشع"]
+      }
+    };
+
+    let generatedRoutine: string[] = [];
+
+    // Attempt actual Gemini generation
+    try {
+      const client = getGeminiClient();
+      const prompt = `أنا مستخدم مسلم. إجابات التخصيص الإيماني الخاصة بي:
+- هدفي الإيماني الأكبر: ${goalLabel}
+- الوقت اليومي المتاح: ${timeLabel}
+- مستواي الحالي: ${levelLabel}
+
+اكتب لي برنامجاً يومياً إيمانياً مخصصاً مبهجاً ومقنعاً وعملياً جداً مكون من 3 أو 4 بنود عملية يومية واضحة ومحددة تناسب الوقت والمستوى والهدف تماماً. اكتب الرد كقائمة JSON تحتوي مصفوفة من السلاسل النصية "tasks" فقط كالمثال التالي: {"tasks": ["بند 1", "بند 2"]}. لا تكتب أي كلام آخر خارج سياق الرد أو وسوم ماركداون لكي أستطيع تحليله بشكل مباشر وموثوق.`;
+      
+      const res = await client.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: [{ role: "user", parts: [{ text: prompt }] }]
+      });
+
+      if (res && res.text) {
+        const cleanedText = res.text.replace(/```json/g, "").replace(/```/g, "").trim();
+        const parsed = JSON.parse(cleanedText);
+        if (parsed && Array.isArray(parsed.tasks)) {
+          generatedRoutine = parsed.tasks;
+        }
+      }
+    } catch (e) {
+      console.warn("Gemini personalization call missed, loading local smart synthesis fallback:", e);
+    }
+
+    if (generatedRoutine.length === 0) {
+      const goalKey = quizAnswers.goal || "peace";
+      const timeKey = quizAnswers.time || "30m";
+      generatedRoutine = fallbackMap[goalKey]?.[timeKey] || fallbackMap["peace"]["30m"];
+    }
+
+    setUserRoutine(generatedRoutine);
+    localStorage.setItem("user_custom_ai_routine", JSON.stringify(generatedRoutine));
+    handleSaveRoutineChecked({});
+    setShowAiOnboarding(false);
+    setAiLoading(false);
+  };
+
+  const handleResetRoutine = () => {
+    localStorage.removeItem("user_custom_ai_routine");
+    setUserRoutine([]);
+    setShowAiOnboarding(true);
+    setQuizStep(0);
+    setQuizAnswers({ goal: "", time: "", level: "" });
+  };
+
+  const handleAskAiPrescription = async (moodKey: string, verseText: string) => {
+    setAiPrescriptionLoading(true);
+    setAiPrescription("");
+    try {
+      const client = getGeminiClient();
+      const prompt = `بصفتك واعظ روحي إسلامي رقيق القلب ومحب، وبناء على اختيار المستخدم لمشاعر: "${moodKey}" وتلاوته للآية الكريمة: "${verseText}". اكتب له رسالة مبهجة، دافئة جداً، وقصيرة من 2-3 أسطر تعيد الطمأنينة لقلبه وتوضح له كيف يعيش ببركة هذه الآية اليوم مجسداً معانيها. قل له كلمات تلمس فؤاده بلغة عربية عذبة فصيحة ومثيرة للتفاؤل والسكون العجيب.`;
+      
+      const res = await client.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: [{ role: "user", parts: [{ text: prompt }] }]
+      });
+
+      if (res && res.text) {
+        setAiPrescription(res.text);
+      }
+    } catch (e) {
+      setAiPrescription("أبشر وتفاءل يا أخي الطيب وحليفك الصبر والإيمان؛ آيات الله ملاذك الآمن وحصنك المتين في كل حال. تأمل هذه الآية ورددها بيقين تفرج الكرب وتزول المتاعب.");
+    } finally {
+      setAiPrescriptionLoading(false);
+    }
+  };
 
 
   useEffect(() => {
@@ -541,7 +720,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         animate={{ y: 0, opacity: 1 }}
         className="relative overflow-hidden rounded-[32px] bg-[#0A1914] text-white shadow-2xl shadow-emerald-900/20"
       >
-        <div className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-luminosity pointer-events-none" style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1609599006353-e629aaab31f5?auto=format&fit=crop&q=80&w=1000")' }}></div>
+        <div className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-luminosity pointer-events-none" style={{ backgroundImage: 'url("/src/assets/images/hajj_kaaba_dome_1779803270795.png")' }}></div>
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/30 to-teal-900/60 mix-blend-overlay"></div>
         <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/10 rounded-full -mr-20 -mt-20"></div>
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-teal-500/10 rounded-full -ml-10 -mb-10"></div>
@@ -597,6 +776,382 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
               </p>
             </div>
           </div>
+        </div>
+      </motion.div>
+
+      {/* Eid al-Adha Special Interactive Event Banner */}
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.03 }}
+        onClick={() => onNavigate("eid-special")}
+        className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-amber-600 via-amber-700 to-emerald-800 shadow-xl shadow-amber-500/10 p-5 flex items-center justify-between cursor-pointer group active:scale-[0.98] transition-all border border-amber-400/30"
+      >
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay pointer-events-none group-hover:scale-105 transition-transform duration-700" 
+          style={{ backgroundImage: 'url("/src/assets/images/eid_adha_greeting_1779803251178.png")' }}
+        ></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-900/80 to-emerald-950/95"></div>
+        <div className="absolute -top-10 -right-10 w-32 h-32 bg-amber-400/10 rounded-full blur-xl animate-pulse"></div>
+        
+        <div className="relative z-10 flex items-center gap-4">
+          <div className="w-12 h-12 bg-amber-500/20 backdrop-blur-md rounded-[18px] flex items-center justify-center border border-amber-400/30 text-amber-300">
+             <span className="text-2xl animate-bounce">🐏</span>
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-white mb-0.5 tracking-wide flex items-center gap-1.5 font-serif">
+              بوابة عيد الأضحى المبارك
+              <span className="bg-amber-400 text-amber-950 text-[9px] px-2 py-0.5 rounded-full font-black tracking-widest animate-pulse">نشط الآن</span>
+            </h3>
+            <p className="text-emerald-200 text-xs font-medium">تكبيرات العيد • صانع بطاقات التهنئة • طاعات عرفة</p>
+          </div>
+        </div>
+        <div className="relative z-10 w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20 group-hover:bg-amber-500 group-hover:text-amber-950 transition-colors">
+          <ChevronLeft size={16} className={isRTL ? '' : 'rotate-180'} />
+        </div>
+      </motion.div>
+
+      {/* Interactive AI Personalization Onboarding / Customized Routine Checklist */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.04 }}
+        className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.08)] relative overflow-hidden group"
+      >
+        <div className="absolute top-0 left-0 w-32 h-32 bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full -ml-10 -mt-10 blur-xl pointer-events-none"></div>
+        <div className="relative z-10 space-y-4">
+          
+          {/* Header Title of AI Routine Section */}
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center">
+                <Bot size={20} className="animate-pulse" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-[#0A1914] dark:text-emerald-50 text-sm font-serif">
+                  منهج التقوى المخصص بالذكاء الاصطناعي
+                </h3>
+                <p className="text-[10px] text-slate-400 font-medium">خطتك المبرمجة ديناميكياً لليوم</p>
+              </div>
+            </div>
+            {!showAiOnboarding && (
+              <button
+                onClick={handleResetRoutine}
+                className="text-xs font-bold text-indigo-500 hover:text-indigo-600 flex items-center gap-1 bg-indigo-50 dark:bg-indigo-500/10 px-2.5 py-1.5 rounded-xl transition-colors"
+                title="إعادة التخصيص"
+              >
+                <Sliders size={13} />
+                <span>تعديل</span>
+              </button>
+            )}
+          </div>
+
+          {/* ONBOARDING QUIZ */}
+          {showAiOnboarding ? (
+            <div className="space-y-4 bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-100 dark:border-slate-800/60">
+              <div className="flex justify-between items-center pb-2 border-b border-slate-200/50 dark:border-slate-700/50">
+                <span className="text-xs font-black text-rose-500">مطلوب التخصيص الإيماني</span>
+                <span className="text-[10px] font-mono text-slate-400">سؤال {quizStep + 1} من ٣</span>
+              </div>
+
+              {quizStep === 0 && (
+                <div className="space-y-3">
+                  <p className="text-xs font-bold text-slate-700 dark:text-slate-300">١. ما هو هدفك الإيماني الأكبر حالياً لكي نركز عليه؟</p>
+                  <div className="grid gap-2">
+                    {[
+                      { id: "quran", label: "تلاوة وحفظ القرآن الكريم 📖" },
+                      { id: "prayers", label: "المواظبة والخشوع في الصلوات والسنن الرواتب 🕌" },
+                      { id: "knowledge", label: "التفقه في الدين والحديث الشريف والسيرة النبوية 📚" },
+                      { id: "peace", label: "السكينة والأدعية وأذكار التحصين والرقية 🌿" }
+                    ].map((opt) => (
+                      <button
+                        key={opt.id}
+                        onClick={() => setQuizAnswers({ ...quizAnswers, goal: opt.id })}
+                        className={`text-right p-3 rounded-xl text-xs font-bold transition-all border ${
+                          quizAnswers.goal === opt.id
+                            ? "bg-indigo-500 text-white border-indigo-500 shadow-md shadow-indigo-500/20"
+                            : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-700 dark:text-slate-300"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {quizStep === 1 && (
+                <div className="space-y-3">
+                  <p className="text-xs font-bold text-slate-700 dark:text-slate-300">٢. ما هو الوقت الذي تستطيع التزامه يومياً في تطبيق اليقين؟</p>
+                  <div className="grid gap-2">
+                    {[
+                      { id: "10m", label: "١٠ دقائق خفيفة ومستمرة يومياً ⏱️" },
+                      { id: "30m", label: "٣٠ dقيقة مباركة هادئة خاشعة ⏳" },
+                      { id: "1h", label: "ساعة مباركة فأكثر للاستثمار الإيماني العميق 🕋" }
+                    ].map((opt) => (
+                      <button
+                        key={opt.id}
+                        onClick={() => setQuizAnswers({ ...quizAnswers, time: opt.id })}
+                        className={`text-right p-3 rounded-xl text-xs font-bold transition-all border ${
+                          quizAnswers.time === opt.id
+                            ? "bg-indigo-500 text-white border-indigo-500 shadow-md shadow-indigo-500/20"
+                            : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-700 dark:text-slate-300"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {quizStep === 2 && (
+                <div className="space-y-3">
+                  <p className="text-xs font-bold text-slate-700 dark:text-slate-300">٣. كيف تعرّف خلفيتك في العلوم الشرعية والعبادات حالياً؟</p>
+                  <div className="grid gap-2">
+                    {[
+                      { id: "beginner", label: "مبتدئ يبحث عن الأساسيات وبناء العادة والالتزام 🌟" },
+                      { id: "mid", label: "متوسط يبحث عن تكثيف الأوردة والمحافظة والتفسير 📈" },
+                      { id: "advanced", label: "متقدم يسعى للتفكر العميق ومراجعة محفوظات المتون 🎓" }
+                    ].map((opt) => (
+                      <button
+                        key={opt.id}
+                        onClick={() => setQuizAnswers({ ...quizAnswers, level: opt.id })}
+                        className={`text-right p-3 rounded-xl text-xs font-bold transition-all border ${
+                          quizAnswers.level === opt.id
+                            ? "bg-indigo-500 text-white border-indigo-500 shadow-md shadow-indigo-500/20"
+                            : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-700 dark:text-slate-300"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Quiz Navigation Trigger Bar */}
+              <div className="flex justify-between items-center pt-2">
+                {quizStep > 0 ? (
+                  <button
+                    onClick={() => setQuizStep(quizStep - 1)}
+                    className="text-xs font-bold text-slate-400 hover:text-slate-600 px-3 py-1 bg-slate-100 dark:bg-slate-900 rounded-lg"
+                  >
+                    السابق
+                  </button>
+                ) : (
+                  <div></div>
+                )}
+
+                {quizStep < 2 ? (
+                  <button
+                    onClick={() => setQuizStep(quizStep + 1)}
+                    disabled={
+                      (quizStep === 0 && !quizAnswers.goal) ||
+                      (quizStep === 1 && !quizAnswers.time)
+                    }
+                    className="text-xs font-bold text-white bg-indigo-500 hover:bg-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed px-4 py-2 rounded-xl transition-all shadow-md shadow-indigo-500/10"
+                  >
+                    التالي
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleGenerateAiRoutine}
+                    disabled={!quizAnswers.level || aiLoading}
+                    className="text-xs font-black text-white bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 px-5 py-2 rounded-xl transition-all shadow-lg flex items-center gap-1.5"
+                  >
+                    {aiLoading ? (
+                      <>
+                        <RefreshCw size={14} className="animate-spin" />
+                        <span>جاري صياغة خطتك...</span>
+                      </>
+                    ) : (
+                      <>
+                        <SparklesIcon size={14} />
+                        <span>تأكيد وصياغة كإضافة بالذكاء الاصطناعي ✨</span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : (
+            /* COMPLIMENTARY REGISTERED GOALS */
+            <div className="space-y-3">
+              <div className="grid gap-2">
+                {userRoutine.map((task, index) => {
+                  const isChecked = !!routineChecked[index];
+                  return (
+                    <motion.div
+                      key={index}
+                      whileHover={{ scale: 1.01 }}
+                      onClick={() => {
+                        const copy = { ...routineChecked };
+                        copy[index] = !copy[index];
+                        handleSaveRoutineChecked(copy);
+                      }}
+                      className={`flex gap-3 items-center p-3 rounded-2xl cursor-pointer border transition-all ${
+                        isChecked
+                          ? "bg-emerald-50/50 dark:bg-emerald-500/5 text-slate-400 border-emerald-400/40 line-through"
+                          : "bg-slate-50 dark:bg-slate-800/40 text-[#0A1914] dark:text-slate-100 border-slate-100 dark:border-slate-800 hover:border-indigo-500/30"
+                      }`}
+                    >
+                      <button
+                        className={`w-5.5 h-5.5 rounded-lg flex items-center justify-center transition-colors border-2 shrink-0 ${
+                          isChecked
+                            ? "bg-emerald-500 border-emerald-500 text-white shadow-xs"
+                            : "bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700"
+                        }`}
+                      >
+                        {isChecked && (
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                        )}
+                      </button>
+                      <span className="text-xs font-serif leading-relaxed font-bold flex-1 text-right">{task}</span>
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+              {/* Progress metrics */}
+              {userRoutine.length > 0 && (
+                <div className="flex justify-between items-center bg-indigo-50/40 dark:bg-[#111827] p-3 rounded-2xl border border-indigo-100/50 dark:border-slate-800">
+                  <div className="text-right">
+                    <span className="block text-[10px] text-slate-400">معدل الانجاز لجرعة اليوم:</span>
+                    <span className="text-xs font-serif font-black text-indigo-500">
+                      {Object.keys(routineChecked).filter(k => routineChecked[k]).length} من {userRoutine.length} طاعات مكتملة
+                    </span>
+                  </div>
+                  {Object.keys(routineChecked).filter(k => routineChecked[k]).length === userRoutine.length ? (
+                    <span className="text-[10px] font-black text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-lg animate-bounce">
+                      طوبى لك مكتمل تماماً! 🎉
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-bold text-indigo-400 font-serif">ثابر لتحقيق طموحاتك</span>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+        </div>
+      </motion.div>
+
+      {/* Structured Quranic Khatmah Dashboard Integration */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.05 }}
+        className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.08)] relative overflow-hidden group"
+      >
+        <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full -mr-10 -mt-10 blur-xl pointer-events-none"></div>
+        <div className="relative z-10 space-y-3.5">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center">
+                <BookOpen size={20} />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-[#0A1914] dark:text-emerald-50 text-sm font-serif">
+                  صيانة الورد والختمة القرآنية المقررة
+                </h3>
+                <p className="text-[10px] text-slate-400 font-medium">الورد الإلزامي والورد اليومي المبارك</p>
+              </div>
+            </div>
+            {quranPlanData && (
+              <button
+                onClick={() => onNavigate("quran-plan")}
+                className="text-xs font-bold text-amber-500 hover:text-amber-600 flex items-center gap-1 bg-amber-50 dark:bg-amber-500/10 px-2.5 py-1.5 rounded-xl transition-colors"
+              >
+                <span>إدارة الخطة</span>
+                <ChevronLeft size={13} />
+              </button>
+            )}
+          </div>
+
+          {!quranPlanData ? (
+            /* CTA to build a Quran plan */
+            <div className="bg-amber-50 dark:bg-amber-950/20 p-4 border border-dashed border-amber-300 dark:border-amber-500/20 rounded-2xl text-center space-y-3">
+              <div className="text-amber-500 animate-bounce flex justify-center"><AlertCircle size={28} /></div>
+              <p className="text-xs font-bold text-slate-700 dark:text-slate-300 max-w-xs mx-auto leading-relaxed">
+                🚨 لم تقم بإعداد خطة ختمة قرآنية تلتزم بها يومياً بعد! صمّم خطتك الآن في ثوانٍ لتحافظ على ورد تلاوتك وتفادي الهجر.
+              </p>
+              <button
+                onClick={() => onNavigate("quran-plan")}
+                className="w-full bg-amber-500 text-white hover:bg-amber-600 transition-colors py-2.5 rounded-xl font-bold text-xs shadow-md shadow-amber-500/20"
+              >
+                تخصيص وبرمجة خطة ختمتي الآن 📖
+              </button>
+            </div>
+          ) : (
+            /* Show actual Khatmah track details */
+            (() => {
+              // Find the active 'current' target
+              const planArray = quranPlanData.plan || [];
+              const currIdx = planArray.findIndex((p: any) => p.status === "current");
+              const completedCount = planArray.filter((p: any) => p.status === "completed").length;
+              const totalDays = planArray.length;
+              const progressPercentage = totalDays > 0 ? Math.round((completedCount / totalDays) * 100) : 0;
+
+              if (currIdx === -1) {
+                // All items completed
+                return (
+                  <div className="bg-emerald-500/10 dark:bg-emerald-500/5 p-4 border border-emerald-500/20 rounded-2xl text-center space-y-2">
+                    <p className="text-xs font-black text-emerald-600 dark:text-emerald-400 leading-relaxed">
+                      🎉 هنيئاً لك! لقد تم إكمال الختمة المباركة بالكامل ومصادقة التلاوات كاملة. نسأل الله القبول والثبات.
+                    </p>
+                    <button
+                      onClick={() => onNavigate("quran-plan")}
+                      className="text-xs font-bold bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl transition-all"
+                    >
+                      ابدأ ختمة جديدة ببركة ومستوى آخر 📖
+                    </button>
+                  </div>
+                );
+              }
+
+              const activeDay = planArray[currIdx];
+
+              return (
+                <div className="space-y-3">
+                  
+                  {/* Strict Red Pulsing Banner to enforce reading Khatmah */}
+                  <div className="bg-red-500/10 dark:bg-red-500/5 border border-red-500/20 text-red-600 dark:text-red-400 p-3 rounded-2xl flex items-center gap-3 text-xs">
+                    <AlertCircle size={20} className="shrink-0 animate-pulse text-red-500" />
+                    <p className="font-extrabold leading-normal font-serif text-[11px] block">
+                      انتبه: لم تسجل إكمال ورد تلاوة القرآن ومراجعتك المقررة لهذا اليوم بعد! لا تهجر كتابك الحكيم وبادر الآن لتبلغ الأجور.
+                    </p>
+                  </div>
+
+                  {/* Active target display & checking option */}
+                  <div className="bg-slate-50 dark:bg-slate-800/40 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800/80 flex justify-between items-center">
+                    <div className="text-right">
+                      <span className="block text-[10px] text-slate-400 font-mono">اليوم المقرّر {activeDay.day} من {totalDays}</span>
+                      <span className="text-xs font-bold text-[#0A1914] dark:text-slate-100 font-serif block mt-0.5">{activeDay.target}</span>
+                    </div>
+                    <button
+                      onClick={() => handleCompleteQuranPlanDay(currIdx)}
+                      className="bg-emerald-500 hover:bg-emerald-600 transition-colors text-white font-black text-[11px] px-3.5 py-2 rounded-xl shadow-md shadow-emerald-500/10"
+                    >
+                      تمت القراءة ✔️
+                    </button>
+                  </div>
+
+                  {/* Overall Khatmah target progress bar */}
+                  <div className="space-y-1.5 px-0.5">
+                    <div className="flex justify-between items-center text-[10px] text-slate-400">
+                      <span>إجمالي رصيد الإنجاز في الختمة:</span>
+                      <span className="font-bold text-amber-500">{progressPercentage}%</span>
+                    </div>
+                    <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                      <div className="bg-amber-500 h-full transition-all duration-500" style={{ width: `${progressPercentage}%` }}></div>
+                    </div>
+                  </div>
+
+                </div>
+              );
+            })()
+          )}
         </div>
       </motion.div>
 
@@ -707,14 +1262,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             </div>
           </button>
         )}
-        <button onClick={() => onNavigate("library")} className="flex-shrink-0 flex items-center gap-2 bg-gradient-to-l from-emerald-700 to-teal-800 pr-2 pl-4 py-2.5 rounded-full shadow-md hover:shadow-lg transition-shadow">
-          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white">
-            <Book size={16} />
-          </div>
-          <span className="text-[11px] font-bold text-white">المكتبة</span>
-        </button>
 
-        <button onClick={() => onNavigate("mood-tracker")} className="flex-shrink-0 flex items-center gap-2 bg-gradient-to-l from-indigo-500 to-purple-500 pr-2 pl-4 py-2.5 rounded-full border border-indigo-400 shadow-md hover:shadow-lg transition-shadow">
+        <button onClick={() => setWhatToReadOpen(true)} className="flex-shrink-0 flex items-center gap-2 bg-gradient-to-l from-indigo-500 to-purple-500 pr-2 pl-4 py-2.5 rounded-full border border-indigo-400 shadow-md hover:shadow-lg transition-shadow">
           <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white">
             <Sparkles size={16} />
           </div>
@@ -788,7 +1337,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       >
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-overlay pointer-events-none group-hover:scale-105 transition-transform duration-700" 
-          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=600")' }}
+          style={{ backgroundImage: 'url("/src/assets/images/names_allah_background_1779805712797.png")' }}
         ></div>
         <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/80 to-blue-500/80"></div>
         <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-10 -mt-10 blur-md group-hover:scale-125 transition-transform duration-700"></div>
@@ -808,70 +1357,6 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           <ChevronLeft size={16} className={isRTL ? '' : 'rotate-180'} />
         </div>
       </motion.div>
-
-      {/* Sakina Banner */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.18 }}
-        onClick={() => onNavigate("sakina")}
-        className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-teal-500 to-emerald-600 shadow-xl shadow-teal-500/20 p-5 flex items-center justify-between cursor-pointer group active:scale-[0.98] transition-all"
-      >
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay pointer-events-none group-hover:scale-105 transition-transform duration-700" 
-          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1542816417-0983cb9c62ce?auto=format&fit=crop&q=80&w=600")' }}
-        ></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-teal-500/80 to-emerald-600/80"></div>
-        <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-10 -mt-10 blur-sm group-hover:scale-125 transition-transform duration-700"></div>
-        <div className="relative z-10 flex items-center gap-4">
-          <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-[18px] flex items-center justify-center border border-white/20">
-            <Wind size={24} className="text-white" />
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-white mb-0.5 tracking-wide flex items-center gap-2">
-              خيمة السكينة
-              <span className="bg-white/20 px-2 py-0.5 rounded-md text-[10px] uppercase font-black tracking-wider text-teal-100">ميزة جديدة ومبتكرة</span>
-            </h3>
-            <p className="text-teal-50 text-xs font-medium opacity-90">دمج التأمل الإسلامي مع مؤثرات الطبيعة</p>
-          </div>
-        </div>
-        <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 group-hover:bg-white group-hover:text-teal-600 transition-colors">
-          <ChevronLeft size={16} className={isRTL ? '' : 'rotate-180'} />
-        </div>
-      </motion.div>
-
-
-
-      {/* Muslim Garden Banner */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.22 }}
-        onClick={() => onNavigate("garden")}
-        className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-emerald-900 to-teal-950 shadow-xl shadow-emerald-900/20 p-6 flex flex-col justify-center cursor-pointer group active:scale-[0.98] transition-all border border-emerald-500/20"
-      >
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay pointer-events-none group-hover:scale-105 transition-transform duration-700" 
-          style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1542816417-0983cb9c62ce?auto=format&fit=crop&q=80&w=600")' }}
-        ></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/80 to-teal-950/80"></div>
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/leaves-pattern.png')] bg-repeat"></div>
-        <div className="absolute top-1/2 right-0 -translate-y-1/2 w-48 h-48 bg-emerald-500/20 rounded-full blur-xl group-hover:scale-125 transition-transform duration-1000 pointer-events-none"></div>
-        
-        <div className="relative z-10 flex items-center gap-4 text-white">
-          <div className="w-14 h-14 bg-emerald-500/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-emerald-400/30 group-hover:bg-emerald-500/40 transition-colors shadow-inner">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-300 drop-shadow-md"><path d="M12 22v-3"/><path d="m11 19-3-3"/><path d="m13 19 3-3"/><path d="m7 16-2-2"/><path d="m17 16 2-2"/><path d="M12 2l3 3-3 3-3-3 3-3z"/><path d="m9 5-2-2"/><path d="m15 5 2-2"/><path d="m7 9-2-2"/><path d="m17 9 2-2"/></svg>
-          </div>
-          <div className="flex-1">
-            <h3 className="text-lg font-bold mb-1 flex items-center gap-2 drop-shadow-md">
-              بستان العبادات 
-              <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-md text-[10px] uppercase font-black tracking-wider">حصري</span>
-            </h3>
-            <p className="text-emerald-100/70 text-xs font-medium">كل طاعة زرعة في بستانك</p>
-          </div>
-        </div>
-      </motion.div>
-
 
 
       {/* Prayers Row */}
@@ -1027,7 +1512,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           >
             <div 
               className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay pointer-events-none group-hover:scale-105 transition-transform duration-700" 
-              style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1519406086208-cb2687c4f1c1?auto=format&fit=crop&q=80&w=600")' }}
+              style={{ backgroundImage: 'url("/src/assets/images/hadith_scroll_background_1779805688768.png")' }}
             ></div>
             <div className="absolute inset-0 bg-gradient-to-br from-amber-500/80 to-orange-600/80"></div>
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-md group-hover:scale-150 transition-transform duration-700"></div>
@@ -1141,6 +1626,210 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             ))}
           </div>
         </motion.div>
+
+      {/* Dynamic Spiritual Diagnosis & Quran Recommender Drawer/Modal */}
+      {whatToReadOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white dark:bg-slate-900 rounded-[32px] w-full max-w-lg overflow-hidden border border-slate-100 dark:border-slate-800 shadow-2xl relative"
+          >
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white text-right relative">
+              <button
+                onClick={() => {
+                  setWhatToReadOpen(false);
+                  setSelectedSpiritualState(null);
+                  setAiPrescription("");
+                }}
+                className="absolute top-4 left-4 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 transition-all text-sm font-bold"
+              >
+                ✕
+              </button>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+                  <SparklesIcon size={20} className="text-amber-300 animate-spin" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black font-serif">ماذا أقرأ اليوم؟ • الطبيب القرآني الذكي</h3>
+                  <p className="text-[11px] text-indigo-100 font-medium">اختر حالتك النفسية أو الروحية لنصف لك الدواء الإشعاعي</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 space-y-5 text-right overflow-y-auto max-h-[70vh]">
+              {!selectedSpiritualState ? (
+                /* Select Spiritual Mood state */
+                <div className="space-y-4">
+                  <p className="text-xs font-bold text-slate-500">من فضلك كيف تجد فؤادك الآن؟</p>
+                  <div className="grid gap-2.5">
+                    {[
+                      { id: "anxious", label: "أشعر بالقلق والتوتر وتشتت التفكير 😰", color: "hover:border-blue-500 bg-blue-50/20 dark:bg-blue-950/20" },
+                      { id: "sad", label: "أشعر بالحزن والضيق وانكسار الصدر 😞", color: "hover:border-rose-500 bg-rose-50/20 dark:bg-rose-950/20" },
+                      { id: "gratitude", label: "أعيش في شكر ونعمة وفرح بفضل ربي 🥰", color: "hover:border-emerald-500 bg-emerald-50/20 dark:bg-emerald-950/20" },
+                      { id: "sluggish", label: "أجد كسلاً وفتوراً عن العبادة والواجبات 🥱", color: "hover:border-amber-500 bg-amber-50/20 dark:bg-amber-950/20" },
+                      { id: "guidance", label: "أطلب الهداية واليقين وزيادة الثبات 🕋", color: "hover:border-purple-500 bg-purple-50/20 dark:bg-purple-950/20" }
+                    ].map((m) => (
+                      <button
+                        key={m.id}
+                        onClick={() => {
+                          setSelectedSpiritualState(m.id);
+                          setAiPrescription("");
+                        }}
+                        className={`w-full p-4 rounded-2xl text-xs font-bold transition-all border border-slate-100 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-right flex items-center justify-between ${m.color}`}
+                      >
+                        <span className="font-serif font-black">{m.label}</span>
+                        <ChevronLeft size={16} className="text-slate-400" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                /* Mood Recommendation Results screen */
+                (() => {
+                  const moodRecommendations: { [key: string]: { title: string, text: string, surah: string, explanation: string, page: number } } = {
+                    anxious: {
+                      title: "علاج القلق والتوتر بآيات السكينة",
+                      text: "الَّذِينَ آمَنُوا وَتَطْمَئِنُّ قُلُوبُهُم بِذِكْرِ اللَّهِ ۗ أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
+                      surah: "سورة الرعد - آية ٢٨",
+                      explanation: "هذه الآية الكريمة تطمئن القلوب وتذهب الروع والوجل بمجرد الذكر والتسبيح والثقة بجبر الله للنفوس الضعيفة الواجلة.",
+                      page: 253
+                    },
+                    sad: {
+                      title: "علاج الحزن والضيق بآيات الانشراح واليسر",
+                      text: "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا • إِنَّ مَعَ الْعُسْرِ يُسْرًا",
+                      surah: "سورة الشرح - آية ٥-٦",
+                      explanation: "تأكيد رباني قاطع بأن العسر لا يغلب يسرين، وأن بعد كل انقباض في الصدر تساع وفرج عظيم يمسح دمعة المحزونين.",
+                      page: 596
+                    },
+                    gratitude: {
+                      title: "آيات الشكر واستدامة النعم وزيادتها",
+                      text: "وَإِذْ تَأَذَّنَ رَبُّكُمْ لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ ۖ وَلَئِن كَفَرْتُمْ إِنَّ عَذَابِي لَشَدِيدٌ",
+                      surah: "سورة إبراهيم - آية ٧",
+                      explanation: "قانون رباني واضح ومؤكد؛ شكر الله على نعمة الصحة، الإسلام، والتوفيق هو مفتاح الاستدامة والزيادة الدائمة في الخيرات.",
+                      page: 256
+                    },
+                    sluggish: {
+                      title: "علاج الكسل وفتور العبادة بآيات الشوق للجنة",
+                      text: "وَسَارِعُوا إِلَىٰ مَغْفِرَةٍ مِّن رَّبِّكُمْ وَجَنَّةٍ عَرْضُهَا السَّمَاوَاتُ وَالْأَرْضُ أُعِدَّتْ لِلْمُتَّقِينَ",
+                      surah: "سورة آل عمران - آية ١٣٣",
+                      explanation: "دعوة ملؤها المحبة والشغف من علام الغيوب، تحث المسافر إلى ربه على الإسراع والمنافسة في جني الحسنات وبلوغ درجات الفردوس.",
+                      page: 66
+                    },
+                    guidance: {
+                      title: "آيات طلب الهداية واليقين وسؤال الثبات",
+                      text: "اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ • صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ",
+                      surah: "سورة الفاتحة - آية ٦-٧",
+                      explanation: "أعظم دعاء يكرره المسلم في كل ركعة، يسأل فيه ربه الهداية لسبل السلام والتمسك بالحق حتى الممات.",
+                      page: 1
+                    }
+                  };
+
+                  const rec = moodRecommendations[selectedSpiritualState];
+                  if (!rec) return null;
+                  return (
+                    <div className="space-y-5">
+                      
+                      {/* Back handle */}
+                      <button
+                        onClick={() => {
+                          setSelectedSpiritualState(null);
+                          setAiPrescription("");
+                        }}
+                        className="text-xs font-bold text-indigo-500 hover:underline flex items-center gap-1"
+                      >
+                        <ChevronRightIcon size={14} />
+                        <span>العودة لقائمة الحالات</span>
+                      </button>
+
+                      {/* Spiritual Prescription Main Verse */}
+                      <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 p-5 rounded-3xl text-center space-y-3 shadow-inner">
+                        <span className="bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 text-[10px] font-black px-2.5 py-1 rounded-full">{rec.title}</span>
+                        <p className="text-base text-slate-900 dark:text-emerald-100 font-serif font-extrabold leading-loose py-2">
+                          「 {rec.text} 」
+                        </p>
+                        <p className="text-[11px] font-black text-slate-400 font-serif">{rec.surah}</p>
+                      </div>
+
+                      {/* Human Explanation brief */}
+                      <div className="bg-emerald-500/5 border border-emerald-500/10 p-4 rounded-2xl">
+                        <h4 className="text-xs font-black text-emerald-600 dark:text-emerald-400 mb-1 font-serif">💡 أثر وتفسير الآية لشفائك:</h4>
+                        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-serif font-bold">
+                          {rec.explanation}
+                        </p>
+                      </div>
+
+                      {/* Interactive AI Prescriber Button with live Gemini SDK proxy */}
+                      <div className="space-y-3 border-t border-slate-100 dark:border-slate-800/60 pt-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[11px] font-bold text-slate-400">استشارة الطبيب الإيماني بالذكاء الاصطناعي:</span>
+                          <button
+                            onClick={() => handleAskAiPrescription(selectedSpiritualState, rec.text)}
+                            disabled={aiPrescriptionLoading}
+                            className="bg-indigo-500 hover:bg-indigo-600 text-white font-extrabold text-[10px] px-3.5 py-2 rounded-xl transition-all shadow-md shadow-indigo-500/10 flex items-center gap-1 disabled:opacity-50"
+                          >
+                            {aiPrescriptionLoading ? (
+                              <>
+                                <RefreshCw size={12} className="animate-spin" />
+                                <span>جاري تحضير البلسم...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Bot size={12} />
+                                <span>اطلب مواساة روحية خاصة ✨</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+
+                        {aiPrescription && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-indigo-50/50 dark:bg-indigo-500/5 border border-indigo-200/30 p-4 rounded-2xl"
+                          >
+                            <p className="text-xs text-slate-700 dark:text-indigo-100 leading-relaxed font-serif font-bold whitespace-pre-wrap">
+                              {aiPrescription}
+                            </p>
+                          </motion.div>
+                        )}
+                      </div>
+
+                      {/* Primary Navigation to Read full Pages button */}
+                      <button
+                        onClick={() => {
+                          setWhatToReadOpen(false);
+                          onNavigate("quran");
+                        }}
+                        className="w-full bg-emerald-500 hover:bg-emerald-600 text-white transition-colors py-3 rounded-2xl font-black text-xs shadow-lg shadow-emerald-500/15"
+                      >
+                        اذهب لتصفح السورة كاملة بالقرآن العظيم 📖
+                      </button>
+
+                    </div>
+                  );
+                })()
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="bg-slate-50 dark:bg-slate-800/40 px-6 py-4 flex justify-end border-t border-slate-100 dark:border-slate-800/60">
+              <button
+                onClick={() => {
+                  setWhatToReadOpen(false);
+                  setSelectedSpiritualState(null);
+                  setAiPrescription("");
+                }}
+                className="text-xs font-bold text-slate-500 hover:text-slate-600 px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl"
+              >
+                إغلاق
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }

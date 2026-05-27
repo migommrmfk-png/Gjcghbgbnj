@@ -420,18 +420,33 @@ const STATIONS: RadioStation[] = [
 const TV_CHANNELS = [
   {
     id: "tv1",
-    name: "قناة القرآن الكريم - مكة المكرمة",
-    videoId: "5qap5aO4i9A", // Makkah Live
+    name: "البث المباشر للحرم المكي الشريف - مكة المكرمة",
+    videoId: "g0S_fMeeS4E", // Saudi Quran Live Stream
   },
   {
     id: "tv2",
-    name: "قناة السنة النبوية - المدينة المنورة",
-    videoId: "a1aB5m-c1O0", // Madinah Live
+    name: "البث المباشر للمسجد النبوي الشريف - المدينة المنورة",
+    videoId: "XmGv7yP-N7I", // Madinah Live Stream
   },
   {
-    id: "tv3",
-    name: "إذاعة القرآن الكريم من القاهرة - بث مباشر",
-    videoId: "fZvuHkHYaXk", // Cairo Quran Radio Live
+    id: "tv-guide-hajj",
+    name: "رحلة الحج خطوة بخطوة (كيف تؤدي مناسك الحج بالتفصيل؟)",
+    videoId: "P1A75IeM_t0",
+  },
+  {
+    id: "tv-arafah",
+    name: "يوم عرفة .. فضل خير يوم طلعت فيه الشمس والعتق من النار",
+    videoId: "M5u8a23UfU4",
+  },
+  {
+    id: "tv-recreation",
+    name: "تلاوة خاشعة كأنك تسمعها لأول مرة - القارئ رعد الكردي",
+    videoId: "C4X66gS4j-c",
+  },
+  {
+    id: "tv-kaaba-doc",
+    name: "مقطع مذهل: في أعماق الكعبة المشرفة وتفاصيل تاريخ الكسوة العظيمة",
+    videoId: "7i3X-r-eLvs",
   }
 ];
 
@@ -477,6 +492,18 @@ export default function IslamicRadio({ onBack }: { onBack?: () => void }) {
       audioRef.current.muted = isMuted;
     }
   }, [volume, isMuted]);
+
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+        try {
+          audioRef.current.load();
+        } catch (e) {}
+      }
+    };
+  }, []);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -563,7 +590,16 @@ export default function IslamicRadio({ onBack }: { onBack?: () => void }) {
     >
       {onBack && (
         <button
-          onClick={onBack}
+          onClick={() => {
+            if (audioRef.current) {
+              audioRef.current.pause();
+              audioRef.current.src = "";
+              try {
+                audioRef.current.load();
+              } catch (e) {}
+            }
+            if (onBack) onBack();
+          }}
           className="mb-2 flex items-center justify-center p-3 hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm text-slate-600 dark:text-slate-300 w-max"
         >
           <ArrowRight size={20} className="ml-1" />
