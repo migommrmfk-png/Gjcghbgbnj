@@ -4,7 +4,7 @@ import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette,
 import { usePrayerTimes } from '../contexts/PrayerTimesContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { useTheme } from './ThemeProvider';
+import { useTheme, NEON_COLORS } from './ThemeProvider';
 
 export default function MoreMenu({ 
   onNavigate, 
@@ -19,7 +19,8 @@ export default function MoreMenu({
   const { autoAdhanEnabled, setAutoAdhanEnabled, calculationMethod, setCalculationMethod, asrMethod, setAsrMethod } = usePrayerTimes();
   const { user, userData, logout, linkWithGoogle, linkWithGithub } = useAuth();
   const { t, i18n } = useTranslation();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, accent, setAccent } = useTheme();
+  const [showNeonModal, setShowNeonModal] = useState(false);
   const [linking, setLinking] = useState(false);
   const [linkMethod, setLinkMethod] = useState<'google' | 'github'>('google');
 
@@ -120,6 +121,7 @@ export default function MoreMenu({
       title: t('library_and_learning', 'المكتبة والتعلم'),
       image: 'https://i.pinimg.com/736x/87/1b/2f/871b2f81152a51f801a61327111b1511.jpg',
       items: [
+        { id: 'islamic-gallery', label: 'المعرض والخلفيات الإسلامية', icon: <ImageIcon size={24} />, color: 'bg-emerald-600', isNew: true },
         { id: 'muslim-ai', label: t('muslim_ai', 'الذكاء الاصطناعي'), icon: <Bot size={24} />, color: 'bg-indigo-500' },
         { id: 'dreams', label: t('dream_interpretation', 'تفسير الأحلام'), icon: <Moon size={24} />, color: 'bg-indigo-700' },
         { id: 'stories', label: t('prophet_stories', 'قصص الأنبياء'), icon: <BookOpen size={24} />, color: 'bg-purple-500' },
@@ -173,6 +175,7 @@ export default function MoreMenu({
       image: 'https://i.pinimg.com/736x/d4/ec/c9/d4ecc94676a666d6911d5167e424458d.jpg',
       items: [
         { id: 'theme', label: theme === 'dark' ? t('light_mode', 'الوضع النهاري') : t('dark_mode', 'الوضع الليلي'), icon: theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />, color: 'bg-slate-700' },
+        { id: 'neon-accent', label: 'لون النيون الفوسفوري', icon: <Palette size={24} />, color: 'bg-emerald-500' },
         { id: 'prayer-settings', label: t('prayer_settings', 'إعدادات الصلاة'), icon: <Settings size={24} />, color: 'bg-emerald-600' },
         { id: 'notifications', label: notificationsEnabled ? t('disable_notifications', 'إيقاف الإشعارات') : t('enable_notifications', 'تفعيل الإشعارات'), icon: notificationsEnabled ? <BellOff size={24} /> : <Bell size={24} />, color: notificationsEnabled ? 'bg-gray-500' : 'bg-yellow-500' },
         { id: 'auto-adhan', label: autoAdhanEnabled ? t('disable_auto_adhan', 'إيقاف الأذان التلقائي') : t('enable_auto_adhan', 'تفعيل الأذان التلقائي'), icon: autoAdhanEnabled ? <VolumeX size={24} /> : <Volume2 size={24} />, color: autoAdhanEnabled ? 'bg-gray-500' : 'bg-emerald-500' },
@@ -267,6 +270,8 @@ export default function MoreMenu({
                       setAutoAdhanEnabled(!autoAdhanEnabled);
                     } else if (item.id === 'theme') {
                       toggleTheme();
+                    } else if (item.id === 'neon-accent') {
+                      setShowNeonModal(true);
                     } else if (item.id === 'prayer-settings') {
                       setShowPrayerSettingsModal(true);
                     } else if (item.id === 'language') {
@@ -312,6 +317,68 @@ export default function MoreMenu({
           >
             <BellOff size={20} />
             <span className="font-bold">يرجى تفعيل الإشعارات من إعدادات المتصفح</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showNeonModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-55 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+            onClick={() => setShowNeonModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 max-w-sm w-full shadow-xl"
+              onClick={e => e.stopPropagation()}
+            >
+              <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2 text-center font-serif">لون النيون الفوسفوري الخاص بك ✨</h3>
+              <p className="text-slate-400 text-xs text-center mb-5">اختر درجة النيون اللامعة والمريحة للعين لتطبيقها كسمة عامة</p>
+              
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                {Object.entries(NEON_COLORS).map(([key, value]) => (
+                  <button
+                    key={key}
+                    onClick={() => {
+                      setAccent(key);
+                    }}
+                    className={`p-3.5 rounded-2xl border text-right transition-all flex flex-col gap-2.5 items-center justify-center relative ${
+                      accent === key 
+                        ? 'ring-2 ring-emerald-500 border-transparent bg-slate-50 dark:bg-slate-950 shadow-md' 
+                        : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 bg-white dark:bg-slate-900'
+                    }`}
+                  >
+                    <div 
+                      className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-black shadow-lg"
+                      style={{ 
+                        backgroundColor: value.config.primary,
+                        boxShadow: `0 4px 14px ${value.config.primary}50` 
+                      }}
+                    >
+                      <Palette size={18} />
+                    </div>
+                    <span className="text-xs font-black text-slate-700 dark:text-slate-205">
+                      {value.name.split(" ")[0]}
+                    </span>
+                    {accent === key && (
+                      <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center text-white text-[10px]">✓</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+              
+              <button
+                onClick={() => setShowNeonModal(false)}
+                className="w-full py-3 rounded-xl font-black text-xs text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-md"
+              >
+                تطبيق وحفظ السمة المصممة 👍
+              </button>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

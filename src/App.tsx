@@ -48,6 +48,7 @@ const ZakatCalculator = lazy(() => import("./components/ZakatCalculator"));
 const HajjUmrahGuide = lazy(() => import("./components/HajjUmrahGuide"));
 const Auth = lazy(() => import("./components/Auth"));
 const EidAdhaSpecial = lazy(() => import("./components/EidAdhaSpecial"));
+const MemorizationHub = lazy(() => import("./components/MemorizationHub"));
 
 const Ruqyah = lazy(() => import("./components/Ruqyah"));
 const InheritanceCalculator = lazy(() => import("./components/InheritanceCalculator"));
@@ -68,6 +69,7 @@ const IslamicTimeline = lazy(() => import("./components/IslamicTimeline"));
 
 const IslamicNames = lazy(() => import("./components/IslamicNames"));
 const QazaTracker = lazy(() => import("./components/QazaTracker"));
+const IslamicGallery = lazy(() => import("./components/IslamicGallery"));
 import InstallPrompt from "./components/InstallPrompt";
 import ChatOverlay from "./components/ChatOverlay";
 
@@ -186,6 +188,8 @@ function AppContent() {
         return <MoreMenu onNavigate={handleNavigate} notificationsEnabled={notificationsEnabled} onToggleNotifications={toggleNotifications} />;
       case "qibla":
         return <Qibla />;
+      case "memorization-hub":
+        return <MemorizationHub onBack={handleBack} />;
       case "names":
         return <NamesOfAllah onBack={handleBack} />;
       case "hadith":
@@ -270,6 +274,8 @@ function AppContent() {
 
       case "islamic-names":
         return <IslamicNames onBack={handleBack} />;
+      case "islamic-gallery":
+        return <IslamicGallery onBack={handleBack} />;
       default:
         return <Dashboard onNavigate={handleNavigate} />;
     }

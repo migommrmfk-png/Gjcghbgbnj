@@ -33,6 +33,8 @@ import { usePrayerTimes } from "../contexts/PrayerTimesContext";
 import { useAuth } from "../contexts/AuthContext";
 import { supabase } from '../supabase';
 import DownloadAppBanner from "./DownloadAppBanner";
+import CharityToday from "./CharityToday";
+import ArabicWidget from "./ArabicWidget";
 import MoodTracker from "./MoodTracker";
 import { useTranslation } from 'react-i18next';
 import { getGeminiClient } from "../lib/gemini";
@@ -1211,6 +1213,40 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         </div>
       </motion.div>
 
+      {/* Daily Good Deeds & Charity Booster */}
+      <CharityToday />
+
+      {/* Quran Memorization Entry Card */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.1 }}
+        onClick={() => onNavigate("memorization-hub")}
+        className="relative overflow-hidden rounded-[2rem] bg-gradient-to-r from-teal-700 via-teal-800 to-emerald-900 text-white p-5 shadow-lg shadow-emerald-950/10 cursor-pointer group hover:shadow-xl transition-all border border-white/10"
+      >
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform duration-700"></div>
+        <div className="relative z-10 flex items-center justify-between">
+          <div className="flex items-center gap-3.5 text-right">
+            <div className="w-11 h-11 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/25 text-white">
+              <span className="text-xl">🕌</span>
+            </div>
+            <div>
+              <h4 className="font-extrabold text-[13.5px] font-serif tracking-wide text-white leading-snug flex items-center gap-1.5 flex-wrap">
+                مِحراب حفظ القرآن الكريم ومراجعته
+                <span className="bg-amber-400 text-[#07130F] font-black text-[8px] px-2 py-0.5 rounded-full animate-pulse uppercase tracking-widest">ميزة جديدة</span>
+              </h4>
+              <p className="text-emerald-100/90 text-xs mt-0.5 font-medium">سجل وردك اليومي • اصنع وتشارك بطاقات الحفظ لأحبابك 🌸</p>
+            </div>
+          </div>
+          <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/15 group-hover:bg-amber-400 group-hover:text-black transition-colors shrink-0">
+            <ChevronLeft size={16} className="rotate-180" />
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Arabic Widget */}
+      <ArabicWidget onNavigate={onNavigate} />
+
       {/* Modern Quick Access */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
@@ -1268,6 +1304,13 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             <Sparkles size={16} />
           </div>
           <span className="text-[11px] font-bold text-white">ماذا أقرأ الآن؟</span>
+        </button>
+
+        <button onClick={() => onNavigate("islamic-gallery")} className="flex-shrink-0 flex items-center gap-2 bg-gradient-to-l from-emerald-600 to-emerald-700 pr-2 pl-4 py-2.5 rounded-full border border-emerald-500 shadow-md hover:shadow-lg transition-shadow">
+          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white">
+            <ImageIcon size={16} />
+          </div>
+          <span className="text-[11px] font-bold text-white">معرض الصور والخلفيات ✨</span>
         </button>
 
         <button onClick={() => onNavigate("dawah")} className="flex-shrink-0 flex items-center gap-2 bg-gradient-to-l from-emerald-500 to-teal-500 pr-2 pl-4 py-2.5 rounded-full border border-emerald-400 shadow-md hover:shadow-lg transition-shadow">

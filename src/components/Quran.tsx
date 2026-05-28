@@ -13,7 +13,8 @@ import {
   VolumeX,
   Loader,
   Download,
-  BookOpen
+  BookOpen,
+  Check
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { saveAudio } from "../lib/audioStore";
@@ -58,13 +59,53 @@ const TAFSIR_OPTIONS = [
   { id: 'ibn_kathir', name: 'تفسير ابن كثير (إنجليزي)' },
 ];
 
+const THEMES = {
+  light: {
+    bg: "bg-white",
+    containerBg: "bg-[#FCFBF9]",
+    text: "text-slate-900",
+    border: "border-emerald-600/20",
+    name: "فاتح"
+  },
+  sepia: {
+    bg: "bg-[#FAFAF5]",
+    containerBg: "bg-[#FAF4E6]",
+    text: "text-amber-950",
+    border: "border-amber-600/30",
+    name: "دافئ مريح"
+  },
+  dark: {
+    bg: "bg-slate-950",
+    containerBg: "bg-slate-900/60 border border-slate-800/80",
+    text: "text-slate-100",
+    border: "border-slate-800",
+    name: "داكن خافت"
+  },
+  midnight: {
+    bg: "bg-[#020617]",
+    containerBg: "bg-[#091124] border border-[#064E3B]",
+    text: "text-emerald-100",
+    border: "border-[#064E3B]",
+    name: "ليلي أخضر"
+  }
+};
+
 export default function Quran() {
   const [surahs, setSurahs] = useState<Surah[]>(DEFAULT_SURAHS);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSurah, setSelectedSurah] = useState<SurahDetail | null>(null);
   const [loadingSurah, setLoadingSurah] = useState(false);
-  const [fontSize, setFontSize] = useState(36);
+  const [fontSize, setFontSize] = useState<number>(() => {
+    return parseInt(localStorage.getItem('quran_font_size') || '36', 10);
+  });
+  const [readingMode, setReadingMode] = useState<'mushaf' | 'list'>(() => {
+    return (localStorage.getItem('quran_reading_mode') || 'mushaf') as 'mushaf' | 'list';
+  });
+  const [readingTheme, setReadingTheme] = useState<'light' | 'sepia' | 'dark' | 'midnight'>(() => {
+    return (localStorage.getItem('quran_reading_theme') || 'sepia') as 'light' | 'sepia' | 'dark' | 'midnight';
+  });
+  const [showSettingsDrawer, setShowSettingsDrawer] = useState(false);
   
   const [reciters, setReciters] = useState<ReciterOption[]>([]);
   const [selectedReciterServer, setSelectedReciterServer] = useState("");
@@ -111,6 +152,18 @@ export default function Quran() {
       audioRef.current.volume = volume;
     }
   }, [volume]);
+
+  useEffect(() => {
+    localStorage.setItem('quran_font_size', fontSize.toString());
+  }, [fontSize]);
+
+  useEffect(() => {
+    localStorage.setItem('quran_reading_mode', readingMode);
+  }, [readingMode]);
+
+  useEffect(() => {
+    localStorage.setItem('quran_reading_theme', readingTheme);
+  }, [readingTheme]);
 
   useEffect(() => {
     // Check cache first
@@ -595,7 +648,7 @@ export default function Quran() {
         </AnimatePresence>
 
         {/* Header */}
-        <div className="sticky top-0 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-md shadow-sm z-20 px-4 py-3 flex items-center justify-between border-b border-slate-200 dark:border-slate-800">
+        <div className={`sticky top-0 border-b backdrop-blur-md shadow-sm z-25 px-4 py-3 flex items-center justify-between transition-all duration-300 ${THEMES[readingTheme].bg}/90 ${THEMES[readingTheme].border}`}>
           <button
             onClick={() => {
               if (audioRef.current) {
@@ -608,42 +661,49 @@ export default function Quran() {
               setIsPlaying(false);
               setSelectedSurah(null);
             }}
-            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm"
+            className="p-2 hover:opacity-85 rounded-full transition-all border bg-white/10 dark:bg-slate-900/40 shadow-sm animate-in fade-in zoom-in-50"
+            style={{ borderColor: readingTheme === 'light' || readingTheme === 'sepia' ? '#e2e8f0' : '#1e293b' }}
           >
-            <ArrowRight size={24} className="text-slate-600 dark:text-slate-400" />
+            <ArrowRight size={22} className={readingTheme === 'light' || readingTheme === 'sepia' ? 'text-slate-700' : 'text-slate-300'} />
           </button>
           <div className="flex-1 flex flex-col items-center justify-center">
-            <div className="px-6 py-1 border border-emerald-200 dark:border-emerald-800 rounded-full bg-emerald-50 dark:bg-emerald-900/30">
-              <h1 className="text-xl font-bold font-quran text-emerald-700 dark:text-emerald-300">
+            <div className="px-5 py-1 border border-emerald-500/20 rounded-full bg-emerald-500/10">
+              <h1 className="text-lg font-black font-quran text-emerald-600 dark:text-emerald-400">
                 سُورَةُ {selectedSurah.name.replace('سُورَةُ ', '')}
               </h1>
             </div>
           </div>
           <button
-            onClick={() => setFontSize((prev) => (prev < 60 ? prev + 4 : 24))}
-            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm"
+            onClick={() => setShowSettingsDrawer(true)}
+            className="p-2 hover:opacity-85 rounded-full transition-all border bg-white/10 dark:bg-slate-900/40 shadow-sm flex items-center justify-center"
+            style={{ borderColor: readingTheme === 'light' || readingTheme === 'sepia' ? '#e2e8f0' : '#1e293b' }}
+            title="الإعدادات المتقدمة"
           >
-            <Settings size={24} className="text-slate-600 dark:text-slate-400" />
+            <Settings size={22} className={readingTheme === 'light' || readingTheme === 'sepia' ? 'text-slate-700' : 'text-slate-300'} />
           </button>
         </div>
 
-        {/* Content - Mushaf Style */}
-        <div className="p-2 sm:p-6 min-h-screen bg-slate-50 dark:bg-slate-950">
-          <div className="bg-[#FAF4E6] dark:bg-slate-900 border-8 border-emerald-500/30 rounded-3xl p-4 sm:p-8 shadow-sm relative overflow-hidden">
-            {/* Decorative corners */}
-            <div className="absolute top-2 right-2 w-12 h-12 border-t-4 border-r-4 border-emerald-500/60 rounded-tr-xl"></div>
-            <div className="absolute top-2 left-2 w-12 h-12 border-t-4 border-l-4 border-emerald-500/60 rounded-tl-xl"></div>
-            <div className="absolute bottom-2 right-2 w-12 h-12 border-b-4 border-r-4 border-emerald-500/60 rounded-br-xl"></div>
-            <div className="absolute bottom-2 left-2 w-12 h-12 border-b-4 border-l-4 border-emerald-500/60 rounded-bl-xl"></div>
+        {/* Content - Adaptive Reading Styles */}
+        <div className={`p-2 sm:p-6 min-h-screen transition-all duration-300 ${THEMES[readingTheme].bg}`}>
+          <div className={`${THEMES[readingTheme].containerBg} ${readingMode === 'mushaf' ? 'border-8' : 'border'} ${THEMES[readingTheme].border} rounded-[2rem] p-4 sm:p-7 shadow-xs relative overflow-hidden transition-all duration-300`}>
+            {/* Decorative corners - only show in Mushaf mode */}
+            {readingMode === 'mushaf' && (
+              <>
+                <div className="absolute top-2 right-2 w-12 h-12 border-t-4 border-r-4 border-emerald-500/40 rounded-tr-xl"></div>
+                <div className="absolute top-2 left-2 w-12 h-12 border-t-4 border-l-4 border-emerald-500/40 rounded-tl-xl"></div>
+                <div className="absolute bottom-2 right-2 w-12 h-12 border-b-4 border-r-4 border-emerald-500/40 rounded-br-xl"></div>
+                <div className="absolute bottom-2 left-2 w-12 h-12 border-b-4 border-l-4 border-emerald-500/40 rounded-bl-xl"></div>
+              </>
+            )}
             
             {/* Subtle background pattern */}
             <div className="absolute inset-0 opacity-[0.02] bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat pointer-events-none"></div>
 
             <div
-              className="font-quran text-center text-slate-800 dark:text-slate-100 relative z-10"
+              className={`font-quran relative z-10 ${THEMES[readingTheme].text}`}
               style={{ 
                 fontSize: `${fontSize}px`, 
-                lineHeight: '2.4',
+                lineHeight: '2.5',
                 wordSpacing: '0.15em'
               }}
             >
@@ -653,7 +713,7 @@ export default function Quran() {
                   animate={{ scale: 1, opacity: 1 }}
                   className="mb-8 mt-4 flex justify-center"
                 >
-                  <div className="px-10 py-3 border-y-2 border-emerald-500/40 text-emerald-700 dark:text-emerald-400" style={{ fontSize: `${fontSize * 1.1}px` }}>
+                  <div className="px-8 py-2.5 border-y-2 border-emerald-500/30 text-emerald-600 dark:text-emerald-400" style={{ fontSize: `${fontSize * 1.1}px` }}>
                     بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
                   </div>
                 </motion.div>
@@ -663,10 +723,9 @@ export default function Quran() {
                 <div className="flex justify-center py-12">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
                 </div>
-              ) : (
-                <div className="text-justify" dir="rtl" style={{ textAlignLast: 'center' }}>
+              ) : readingMode === 'mushaf' ? (
+                <div className="text-justify font-serif" dir="rtl" style={{ textAlignLast: 'center' }}>
                   {selectedSurah.ayahs.map((ayah) => {
-                    // Pre-process text to remove Bismillah if it's the first ayah of a surah (except Al-Fatiha and At-Tawba)
                     let text = ayah.text;
                     if (
                       selectedSurah.number !== 1 &&
@@ -678,20 +737,19 @@ export default function Quran() {
                       text = text.replace(/^بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\s*/, "");
                     }
 
-                    // Convert English numbers to Arabic numbers
                     const arabicNumber = ayah.numberInSurah.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
 
                     return (
                       <span
                         key={ayah.number}
                         ref={(el) => { ayahRefs.current[ayah.numberInSurah] = el; }}
-                        className={`inline cursor-pointer hover:bg-emerald-500/10 transition-colors rounded px-1 leading-loose ${lastRead?.surahNumber === selectedSurah.number && lastRead?.ayahNumber === ayah.numberInSurah ? 'bg-emerald-500/10' : ''}`}
+                        className={`inline cursor-pointer hover:bg-emerald-500/10 transition-colors rounded px-1.5 py-1 leading-loose ${lastRead?.surahNumber === selectedSurah.number && lastRead?.ayahNumber === ayah.numberInSurah ? 'bg-emerald-500/15 ring-1 ring-emerald-500/20' : ''}`}
                         onClick={() => fetchTafsir(ayah.number, text, ayah.numberInSurah)}
                       >
                         {text}
-                        <span className="inline-flex items-center justify-center relative mx-2 text-emerald-700 dark:text-emerald-400 opacity-90 select-none">
+                        <span className="inline-flex items-center justify-center relative mx-1.5 text-emerald-600 dark:text-emerald-400 opacity-95 select-none font-bold">
                           <span style={{ fontSize: `${fontSize * 1.2}px` }}>۝</span>
-                          <span className="absolute inset-0 flex items-center justify-center font-sans font-bold" style={{ fontSize: `${fontSize * 0.4}px`, marginTop: '2px' }}>
+                          <span className="absolute inset-0 flex items-center justify-center font-sans font-black" style={{ fontSize: `${fontSize * 0.38}px`, marginTop: '3px' }}>
                             {arabicNumber}
                           </span>
                         </span>
@@ -699,10 +757,193 @@ export default function Quran() {
                     );
                   })}
                 </div>
+              ) : (
+                <div className="flex flex-col gap-4 text-right" dir="rtl">
+                  {selectedSurah.ayahs.map((ayah) => {
+                    let text = ayah.text;
+                    if (
+                      selectedSurah.number !== 1 &&
+                      selectedSurah.number !== 9 &&
+                      ayah.numberInSurah === 1
+                    ) {
+                      text = text.replace(/^بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\s*/, "");
+                      text = text.replace(/^بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\s*/, "");
+                      text = text.replace(/^بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\s*/, "");
+                    }
+
+                    const arabicNumber = ayah.numberInSurah.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+                    const isLastRead = lastRead?.surahNumber === selectedSurah.number && lastRead?.ayahNumber === ayah.numberInSurah;
+
+                    return (
+                      <div
+                        key={ayah.number}
+                        ref={(el) => { ayahRefs.current[ayah.numberInSurah] = el; }}
+                        onClick={() => fetchTafsir(ayah.number, text, ayah.numberInSurah)}
+                        className={`p-4 rounded-2xl border transition-all duration-200 cursor-pointer text-justify hover:bg-emerald-500/5 ${
+                          isLastRead 
+                            ? 'bg-emerald-500/15 border-emerald-500/30 shadow-xs ring-1 ring-emerald-500/20' 
+                            : 'bg-black/5 dark:bg-white/5 border-transparent'
+                        }`}
+                      >
+                        <div className="flex gap-4 items-start justify-between">
+                          <p className="font-quran flex-1 leading-loose" style={{ fontSize: `${fontSize}px` }}>
+                            {text}
+                          </p>
+                          <span className="w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs font-black shrink-0 mt-3 border border-emerald-500/20 select-none">
+                            {arabicNumber}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </div>
           </div>
         </div>
+
+        {/* Settings bottom sheet drawer */}
+        <AnimatePresence>
+          {showSettingsDrawer && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-xs p-4"
+              onClick={() => setShowSettingsDrawer(false)}
+            >
+              <motion.div
+                initial={{ y: "100%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "100%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 220 }}
+                className="bg-white dark:bg-slate-900 w-full max-w-md rounded-t-[2.5rem] p-6 shadow-2xl border border-slate-100 dark:border-slate-800 max-h-[85vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header inside settings */}
+                <div className="flex justify-between items-center mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                      <Settings size={20} />
+                    </div>
+                    <div className="text-right">
+                      <h3 className="text-base font-black text-slate-800 dark:text-white font-serif">
+                        إعدادات التلاوة والقراءة
+                      </h3>
+                      <p className="text-[10px] text-slate-400">خصص مظهر وحجم ولون خط المصحف</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setShowSettingsDrawer(false)} 
+                    className="p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-all"
+                  >
+                    <X size={18} className="text-slate-500" />
+                  </button>
+                </div>
+
+                <div className="space-y-6">
+                  {/* FONT SIZE SETTING */}
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center text-xs font-bold text-slate-600 dark:text-slate-300">
+                      <span>حجم خط القرآن والآيات:</span>
+                      <span className="px-2.5 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg font-mono">
+                        {fontSize}px
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span className="text-xs text-slate-400 font-bold">أصغر</span>
+                      <input 
+                        type="range"
+                        min={20}
+                        max={54}
+                        step={2}
+                        value={fontSize}
+                        onChange={(e) => setFontSize(Number(e.target.value))}
+                        className="flex-1 h-2 bg-slate-150 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                      />
+                      <span className="text-lg text-slate-855 dark:text-slate-100 font-bold font-serif">أكبر</span>
+                    </div>
+                    {/* Size Reset */}
+                    <button
+                      onClick={() => setFontSize(36)}
+                      className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 hover:underline block text-right"
+                    >
+                      إعادة تعيين الحجم الافتراضي (36px)
+                    </button>
+                  </div>
+
+                  {/* READING MODE SETTING */}
+                  <div className="space-y-3">
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300 block">وضع قراءة المصحف الشريف:</span>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        onClick={() => setReadingMode('mushaf')}
+                        className={`flex flex-col items-center gap-2 p-3.5 rounded-2xl border transition-all text-center ${
+                          readingMode === 'mushaf' 
+                            ? 'bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-xs' 
+                            : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-805 text-slate-600 dark:text-slate-400'
+                        }`}
+                      >
+                        <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                          <BookOpen size={18} />
+                        </div>
+                        <span className="text-xs font-black">وضع المصحف المتصل</span>
+                        <span className="text-[9px] text-slate-400">قراءة متصلة ومريحة للختم</span>
+                      </button>
+
+                      <button
+                        onClick={() => setReadingMode('list')}
+                        className={`flex flex-col items-center gap-2 p-3.5 rounded-2xl border transition-all text-center ${
+                          readingMode === 'list' 
+                            ? 'bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-xs' 
+                            : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-805 text-slate-600 dark:text-slate-400'
+                        }`}
+                      >
+                        <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                          <Book size={18} />
+                        </div>
+                        <span className="text-xs font-black">وضع السرد (آية بآية)</span>
+                        <span className="text-[9px] text-slate-400">تسهل التركيز والتفسير المباشر</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* READING THEME SETTING */}
+                  <div className="space-y-3">
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300 block">سمات القراءة (مظهر الخلفية):</span>
+                    <div className="grid grid-cols-2 gap-2.5">
+                      {Object.entries(THEMES).map(([key, value]) => (
+                        <button
+                          key={key}
+                          onClick={() => setReadingTheme(key as any)}
+                          className={`p-3 rounded-2xl border text-right transition-all flex items-center gap-2.5 ${
+                            readingTheme === key 
+                              ? 'ring-2 ring-emerald-500 border-transparent shadow-md' 
+                              : 'border-slate-200 dark:border-slate-800'
+                          } ${key === 'light' ? 'bg-white text-slate-900 shadow-inner' : key === 'sepia' ? 'bg-[#FAF4E6] text-[#2c1c04]' : key === 'dark' ? 'bg-slate-900 border border-slate-800 text-slate-100' : 'bg-[#091124] border border-[#064E3B] text-emerald-100'}`}
+                        >
+                          <span className={`w-4 h-4 rounded-full border border-black/10 flex items-center justify-center ${readingTheme === key ? 'bg-emerald-500 text-white' : 'bg-transparent'}`}>
+                            {readingTheme === key && <Check size={10} />}
+                          </span>
+                          <span className="text-xs font-black">
+                            {value.name}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setShowSettingsDrawer(false)}
+                  className="w-full mt-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-2xl shadow-md transition-all active:scale-[0.98]"
+                >
+                  تأكيد وحفظ الخيارات 👍
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Audio Player */}
         <motion.div
