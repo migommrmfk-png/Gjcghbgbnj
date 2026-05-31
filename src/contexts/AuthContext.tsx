@@ -84,17 +84,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Get initial session
     const initializeAuth = async () => {
       try {
-        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000));
-        const authPromise = supabase.auth.getSession();
-        const { data: { session }, error } = await Promise.race([authPromise, timeoutPromise]) as any;
+        const timeoutPromise = new Promise(resolve => setTimeout(() => resolve({ timeout: true }), 8000));
+        const authPromise = supabase.auth.getSession().then(res => ({ ...res, timeout: false })).catch(err => {
+          // Prevent unhandled promise rejection if background execution fails/times out
+          return { data: { session: null }, error: err, timeout: false };
+        });
+        const result = await Promise.race([authPromise, timeoutPromise]) as any;
+        if (result && result.timeout) {
+          throw new Error('timeout');
+        }
+        const { data: { session }, error } = result;
         if (error) {
-          console.error("Supabase getSession error:", error);
+          console.warn("Supabase getSession error:", error);
           setError(error.message);
         }
         await handleSession(session);
-      } catch (err) {
-        console.error("Unhandled error in getSession:", err);
-        await handleSession(null);
+      } catch (err: any) {
+        if (err?.message === 'timeout') {
+          console.warn("Supabase getSession timeout, falling back.");
+          // Attempt directory fallback from local storage
+          let localSession = null;
+          try {
+            for (let i = 0; i < localStorage.length; i++) {
+              const key = localStorage.key(i);
+              if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
+                const tokenData = localStorage.getItem(key);
+                if (tokenData) {
+                  const parsed = JSON.parse(tokenData);
+                  if (parsed && parsed.user) {
+                    localSession = parsed;
+                    break;
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            console.warn("Fallback local storage session logic parsing failed:", e);
+          }
+          await handleSession(localSession);
+        } else {
+          console.warn("Error in getSession:", err);
+          await handleSession(null);
+        }
       }
     };
 
@@ -197,18 +228,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email,
       password: pass,
       options: { data: { full_name: name } }
+    }).catch(err => {
+      return { data: { user: null, session: null }, error: err };
     });
-    const { data, error } = await Promise.race([authPromise, timeoutPromise]) as any;
-    if (error) throw error;
-    return data;
+    const result = await Promise.race([authPromise, timeoutPromise]) as any;
+    if (result.error) throw result.error;
+    return result;
   };
 
   const signIn = async (email: string, pass: string) => {
     localStorage.removeItem('hasLoggedOut');
     const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000));
-    const authPromise = supabase.auth.signInWithPassword({ email, password: pass });
-    const { error } = await Promise.race([authPromise, timeoutPromise]) as any;
-    if (error) throw error;
+    const authPromise = supabase.auth.signInWithPassword({ email, password: pass }).catch(err => {
+      return { data: { user: null, session: null }, error: err };
+    });
+    const result = await Promise.race([authPromise, timeoutPromise]) as any;
+    if (result.error) throw result.error;
   };
 
   const signInWithGoogle = async () => {
@@ -260,9 +295,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // Race the anonymous signin with a 5 second timeout to prevent hangs
       const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000));
-      const authPromise = supabase.auth.signInAnonymously();
-      const { error } = await Promise.race([authPromise, timeoutPromise]) as any;
-      if (error) throw error;
+      const authPromise = supabase.auth.signInAnonymously().catch(err => {
+        return { data: { user: null, session: null }, error: err };
+      });
+      const result = await Promise.race([authPromise, timeoutPromise]) as any;
+      if (result.error) throw result.error;
     } catch (err: any) {
       console.warn("Supabase anonymous auth failed or timed out, falling back to local guest mode.", err);
       // Fallback to local guest mode if Supabase anonymous auth is disabled or times out

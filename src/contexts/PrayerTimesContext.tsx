@@ -30,6 +30,9 @@ interface PrayerTimesContextType {
   setCalculationMethod: (method: number) => void;
   asrMethod: number;
   setAsrMethod: (method: number) => void;
+  updateLocation: (lat: number, lon: number, name: string) => void;
+  detectLocation: () => Promise<void>;
+  resetToDefault: () => void;
 }
 
 const PrayerTimesContext = createContext<PrayerTimesContextType | undefined>(undefined);
@@ -49,7 +52,10 @@ export const PrayerTimesProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [locationName, setLocationName] = useState(() => {
     return localStorage.getItem('locationName') || "مكة المكرمة";
   });
-  const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const [userLocation, setUserLocationState] = useState<{ lat: number; lon: number } | null>(() => {
+    const cached = localStorage.getItem('userLocation');
+    return cached ? JSON.parse(cached) : null;
+  });
   const [loading, setLoading] = useState(() => {
     return !localStorage.getItem('prayerTimes');
   });
@@ -82,6 +88,51 @@ export const PrayerTimesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     localStorage.setItem('asrMethod', method.toString());
   };
 
+  const updateLocation = (lat: number, lon: number, name: string) => {
+    setUserLocationState({ lat, lon });
+    localStorage.setItem('userLocation', JSON.stringify({ lat, lon }));
+    setLocationName(name);
+    localStorage.setItem('locationName', name);
+  };
+
+  const resetToDefault = () => {
+    setUserLocationState(null);
+    localStorage.removeItem('userLocation');
+    setLocationName("مكة المكرمة");
+    localStorage.setItem('locationName', "مكة المكرمة");
+  };
+
+  const detectLocation = (): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("تحديد الموقع الجغرافي غير مدعوم في هذا المتصفح/الجهاز"));
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          try {
+            const geoRes = await fetch(
+              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=ar`
+            );
+            const geoData = await geoRes.json();
+            const city = geoData.city || geoData.locality || geoData.countryName || "موقعي الحالي";
+            updateLocation(lat, lon, city);
+            resolve();
+          } catch (e) {
+            updateLocation(lat, lon, "موقعي الحالي");
+            resolve();
+          }
+        },
+        (err) => {
+          reject(err);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    });
+  };
+
   useEffect(() => {
     const fetchPrayerTimes = async (lat?: number, lng?: number, cityStr?: string) => {
       try {
@@ -89,10 +140,9 @@ export const PrayerTimesProvider: React.FC<{ children: React.ReactNode }> = ({ c
         let url =
           `https://api.aladhan.com/v1/timingsByCity?city=Makkah&country=Saudi Arabia&method=${calculationMethod}&school=${asrMethod}`;
 
-        if (lat && lng) {
+        if (lng !== undefined && lat !== undefined) {
           const timestamp = Math.floor(Date.now() / 1000);
           url = `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${lat}&longitude=${lng}&method=${calculationMethod}&school=${asrMethod}`;
-          setUserLocation({ lat, lon: lng });
         }
 
         const response = await fetch(url);
@@ -109,7 +159,7 @@ export const PrayerTimesProvider: React.FC<{ children: React.ReactNode }> = ({ c
         if (cityStr) {
           setLocationName(cityStr);
           localStorage.setItem('locationName', cityStr);
-        } else if (lat && lng && (!locationName || locationName === "مكة المكرمة")) {
+        } else if (lat !== undefined && lng !== undefined && (!locationName || locationName === "مكة المكرمة")) {
           try {
             const geoRes = await fetch(
               `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=ar`
@@ -164,28 +214,34 @@ export const PrayerTimesProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
     if (userLocation) {
       fetchPrayerTimes(userLocation.lat, userLocation.lon, locationName);
-    } else if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          fetchPrayerTimes(position.coords.latitude, position.coords.longitude);
-        },
-        (error) => {
-          console.warn("Geolocation error:", error.message);
-          fetchByIP();
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-      );
     } else {
-      fetchByIP();
+      // If there is no cached location, let's try browser geolocation first, then fallback to IP
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            fetchPrayerTimes(position.coords.latitude, position.coords.longitude);
+          },
+          (err) => {
+            console.warn("Geolocation error:", err.message);
+            fetchByIP();
+          },
+          { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+        );
+      } else {
+        fetchByIP();
+      }
     }
-  }, [calculationMethod, asrMethod]); // Re-fetch when settings change
+  }, [calculationMethod, asrMethod, userLocation, locationName]);
 
   return (
     <PrayerTimesContext.Provider value={{ 
       prayerTimes, hijriDate, gregorianDate, locationName, userLocation, loading, error, 
       autoAdhanEnabled, setAutoAdhanEnabled,
       calculationMethod, setCalculationMethod,
-      asrMethod, setAsrMethod
+      asrMethod, setAsrMethod,
+      updateLocation,
+      detectLocation,
+      resetToDefault
     }}>
       {children}
     </PrayerTimesContext.Provider>

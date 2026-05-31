@@ -175,6 +175,44 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 opacity-50"></div>
           <div className="absolute inset-2 rounded-[2.5rem] border border-slate-100/50 dark:border-slate-800/50 shadow-inner"></div>
 
+          {/* Pearl Prayer beads rendering decorations (3D layered style) */}
+          <div className="absolute inset-0 overflow-hidden opacity-30 dark:opacity-40 select-none pointer-events-none z-0">
+            <motion.svg 
+              animate={{ 
+                x: [0, -10, 0],
+                y: [0, 8, 0]
+              }}
+              transition={{ 
+                duration: 12, 
+                repeat: Infinity, 
+                ease: "easeInOut" 
+              }}
+              viewBox="0 0 100 100" 
+              className="absolute -right-10 -bottom-10 w-full h-full"
+            >
+              <path d="M10,95 Q50,40 90,5" fill="none" stroke="#e2e8f0" strokeWidth="1" strokeDasharray="4 4" className="dark:stroke-slate-700" />
+              {/* Pearls Along the Path with 3D Radial Gradients */}
+              <circle cx="15" cy="90" r="8" fill="url(#pearl3D)" filter="url(#dropShadow)" />
+              <circle cx="32" cy="74" r="8.5" fill="url(#pearl3D)" filter="url(#dropShadow)" />
+              <circle cx="50" cy="58" r="9" fill="url(#pearl3D)" filter="url(#dropShadow)" />
+              <circle cx="68" cy="42" r="9.5" fill="url(#pearl3D)" filter="url(#dropShadow)" />
+              <circle cx="85" cy="26" r="10" fill="url(#pearl3D)" filter="url(#dropShadow)" />
+              <circle cx="95" cy="10" r="11" fill="url(#pearl3D)" filter="url(#dropShadow)" />
+              
+              <defs>
+                <radialGradient id="pearl3D" cx="35%" cy="35%" r="65%">
+                  <stop offset="0%" stopColor="#ffffff" />
+                  <stop offset="25%" stopColor="#fef08a" />
+                  <stop offset="70%" stopColor="#eab308" />
+                  <stop offset="100%" stopColor="#854d0e" />
+                </radialGradient>
+                <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="2" dy="4" stdDeviation="3" floodColor="#854d0e" floodOpacity="0.25" />
+                </filter>
+              </defs>
+            </motion.svg>
+          </div>
+
           {/* Progress Ring */}
           <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none drop-shadow-md z-10" viewBox="0 0 100 100">
             <rect
@@ -253,13 +291,26 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
           </div>
 
           {/* Main Count Button */}
-          <div className="absolute bottom-8 z-30">
+          <div className="absolute bottom-8 z-30 flex items-center justify-center">
+            {/* Pressure-burst neon dynamic glow */}
+            <AnimatePresence>
+              {isPressed && (
+                <motion.div 
+                  initial={{ scale: 0.9, opacity: 0.8 }}
+                  animate={{ scale: 1.4, opacity: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
+                  className="absolute w-36 h-36 rounded-full bg-gradient-to-br from-yellow-300 via-[#10b981] to-teal-400 blur-xl pointer-events-none z-0"
+                />
+              )}
+            </AnimatePresence>
+
             <button
               onPointerDown={handlePress}
-              className={`w-36 h-36 rounded-full flex items-center justify-center relative outline-none select-none transition-all duration-100 ${
+              className={`w-36 h-36 rounded-full flex items-center justify-center relative outline-none select-none transition-all duration-100 z-10 ${
                 isPressed 
                   ? 'bg-gradient-to-br from-emerald-600 to-teal-700 shadow-[inset_0_10px_20px_rgba(0,0,0,0.4),0_2px_5px_rgba(16,185,129,0.3)] translate-y-[8px]' 
-                  : 'bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 shadow-[0_15px_0_#065f46,0_25px_35px_rgba(16,185,129,0.4),inset_0_2px_5px_rgba(255,255,255,0.4)] hover:-translate-y-1 hover:shadow-[0_18px_0_#065f46,0_30px_40px_rgba(16,185,129,0.5),inset_0_2px_5px_rgba(255,255,255,0.4)]'
+                  : 'bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 shadow-[0_15px_0_#065f46,0_25px_35px_rgba(16,185,129,0.4),inset_0_2px_5px_rgba(255,255,255,0.4)] hover:-translate-y-1 hover:shadow-[0_18px_0_#065f46,0_30px_40px_rgba(16,185,129,0.5),inset_0_2px_5px_rgba(255,255,255,0.4)] shadow-md'
               }`}
               style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
             >

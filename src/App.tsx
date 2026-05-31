@@ -43,33 +43,22 @@ const SupportApp = lazy(() => import("./components/SupportApp"));
 const WorshipTracker = lazy(() => import("./components/WorshipTracker"));
 const QuranPlan = lazy(() => import("./components/QuranPlan"));
 const SocialChallenges = lazy(() => import("./components/SocialChallenges"));
-const DuaWall = lazy(() => import("./components/DuaWall"));
 const ZakatCalculator = lazy(() => import("./components/ZakatCalculator"));
 const HajjUmrahGuide = lazy(() => import("./components/HajjUmrahGuide"));
 const Auth = lazy(() => import("./components/Auth"));
-const EidAdhaSpecial = lazy(() => import("./components/EidAdhaSpecial"));
 const MemorizationHub = lazy(() => import("./components/MemorizationHub"));
 
 const Ruqyah = lazy(() => import("./components/Ruqyah"));
-const InheritanceCalculator = lazy(() => import("./components/InheritanceCalculator"));
-const DreamInterpretation = lazy(() => import("./components/DreamInterpretation"));
-
-const SelfAccounting = lazy(() => import("./components/SelfAccounting"));
 const Downloads = lazy(() => import("./components/Downloads"));
-const DawahGenerator = lazy(() => import("./components/DawahGenerator"));
-const IslamicQuiz = lazy(() => import("./components/IslamicQuiz"));
 
 const NotificationsPage = lazy(() => import("./components/NotificationsPage"));
-const MoodTracker = lazy(() => import("./components/MoodTracker"));
 
-const IslamicEvents = lazy(() => import("./components/IslamicEvents"));
 const HalalChecker = lazy(() => import("./components/HalalChecker"));
 const QuranReflection = lazy(() => import("./components/QuranReflection"));
-const IslamicTimeline = lazy(() => import("./components/IslamicTimeline"));
 
-const IslamicNames = lazy(() => import("./components/IslamicNames"));
 const QazaTracker = lazy(() => import("./components/QazaTracker"));
-const IslamicGallery = lazy(() => import("./components/IslamicGallery"));
+const AudioCircles = lazy(() => import("./components/AudioCircles"));
+const FatwaLibrary = lazy(() => import("./components/FatwaLibrary"));
 import InstallPrompt from "./components/InstallPrompt";
 import ChatOverlay from "./components/ChatOverlay";
 
@@ -218,64 +207,38 @@ function AppContent() {
         return <QuranPlan onBack={handleBack} />;
       case "social":
         return <SocialChallenges onBack={handleBack} />;
-      case "dua-wall":
-        return <DuaWall onBack={handleBack} />;
       case "zakat":
         return <ZakatCalculator onBack={handleBack} />;
       case "hajj":
         return <HajjUmrahGuide onBack={handleBack} />;
-      case "eid-special":
-        return <EidAdhaSpecial onBack={handleBack} />;
 
       case "auth":
         return <Auth onBack={handleBack} />;
       case "ruqyah":
         return <Ruqyah onBack={handleBack} />;
-      case "inheritance":
-        return <InheritanceCalculator onBack={handleBack} />;
-      case "dreams":
-        return <DreamInterpretation onBack={handleBack} />;
       case "qaza-tracker":
         return <QazaTracker onBack={handleBack} />;
 
       case "accounting":
-        return <SelfAccounting onBack={handleBack} />;
+        return <WorshipTracker onBack={handleBack} />;
       case "downloads":
         return <Downloads onBack={handleBack} />;
       case "quiz":
-        return <IslamicQuiz onBack={handleBack} />;
-      case "dawah":
-        return <DawahGenerator onBack={handleBack} />;
+        return <Games onBack={handleBack} />;
+      case "audio-circles":
+        return <AudioCircles onBack={handleBack} />;
+      case "competitions":
+        return <Games onBack={handleBack} />;
+      case "fatwas":
+        return <FatwaLibrary onBack={handleBack} onNavigateToAi={() => handleNavigate("muslim-ai")} />;
 
       case "notifications":
         return <NotificationsPage onBack={handleBack} />;
 
-      case "mood-tracker":
-        return (
-          <div className="p-4 pb-24 max-w-md mx-auto pt-8 min-h-screen" dir="rtl">
-            <button
-              onClick={handleBack}
-              className="mb-4 flex items-center justify-center p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors border border-black/5 dark:border-white/5 bg-white dark:bg-slate-900 shadow-[0_5px_15px_rgba(0,0,0,0.2)] w-max"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-500 dark:text-slate-400 rotate-180"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
-            </button>
-            <MoodTracker />
-          </div>
-        );
-
-      case "events":
-        return <IslamicEvents onBack={handleBack} />;
       case "halal-checker":
         return <HalalChecker onBack={handleBack} />;
       case "quran-reflection":
         return <QuranReflection onBack={handleBack} />;
-      case "timeline":
-        return <IslamicTimeline onBack={handleBack} />;
-
-      case "islamic-names":
-        return <IslamicNames onBack={handleBack} />;
-      case "islamic-gallery":
-        return <IslamicGallery onBack={handleBack} />;
       default:
         return <Dashboard onNavigate={handleNavigate} />;
     }

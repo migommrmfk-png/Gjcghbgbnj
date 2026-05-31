@@ -190,7 +190,7 @@ export default function Auth({ onBack }: { onBack?: () => void }) {
             </div>
           </div>
           <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Georgia, serif', textShadow: '0 0 30px rgba(16,185,129,0.4)' }}>
-            اليقين
+            يقين
           </h1>
           <p className="text-emerald-400/60 text-sm">التطبيق الإسلامي الشامل</p>
         </motion.div>

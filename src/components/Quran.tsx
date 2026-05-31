@@ -14,12 +14,18 @@ import {
   Loader,
   Download,
   BookOpen,
-  Check
+  Check,
+  Brain,
+  Calendar,
+  Sparkles
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { saveAudio } from "../lib/audioStore";
 import toast from 'react-hot-toast';
 import { DEFAULT_SURAHS } from "../data/surahs";
+import MemorizationHub from "./MemorizationHub";
+import QuranPlan from "./QuranPlan";
+import QuranReflection from "./QuranReflection";
 
 interface Surah {
   number: number;
@@ -91,6 +97,7 @@ const THEMES = {
 };
 
 export default function Quran() {
+  const [subTab, setSubTab] = useState<'read' | 'memorize' | 'plans' | 'reflections'>('read');
   const [surahs, setSurahs] = useState<Surah[]>(DEFAULT_SURAHS);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -1065,6 +1072,18 @@ export default function Quran() {
     );
   }
 
+  if (subTab === 'memorize') {
+    return <MemorizationHub onBack={() => setSubTab('read')} />;
+  }
+
+  if (subTab === 'plans') {
+    return <QuranPlan onBack={() => setSubTab('read')} />;
+  }
+
+  if (subTab === 'reflections') {
+    return <QuranReflection onBack={() => setSubTab('read')} />;
+  }
+
   return (
     <div className="max-w-md mx-auto p-4 space-y-6 pb-28 min-h-screen" dir="rtl">
       {/* Header */}
@@ -1088,6 +1107,53 @@ export default function Quran() {
             القرآن الكريم
           </h1>
           <p className="text-emerald-50 text-sm font-bold bg-black/20 px-4 py-2 rounded-full backdrop-blur-md border border-white/10 mt-2">اقرأ وارتقِ</p>
+        </div>
+      </motion.div>
+
+      {/* 360° Quran Dimensions Bento Hub */}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.05 }}
+        className="space-y-3"
+      >
+        <span className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mr-2">أبعاد القرآن الشامل ٣٦٠° 🌟</span>
+        <div className="grid grid-cols-3 gap-2.5">
+          <button
+            type="button"
+            onClick={() => setSubTab('memorize')}
+            className="flex flex-col items-center justify-center p-3 text-center bg-gradient-to-b from-emerald-50/50 to-emerald-100/20 dark:from-slate-900 dark:to-slate-900/60 border border-emerald-500/10 dark:border-slate-800 rounded-[2rem] hover:border-emerald-500/30 dark:hover:border-emerald-500/20 active:scale-95 transition-all shadow-xs group cursor-pointer"
+          >
+            <div className="w-9 h-9 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
+              <Brain size={18} />
+            </div>
+            <span className="text-[11px] font-black text-slate-800 dark:text-slate-100">التسميع الذكي</span>
+            <span className="text-[8px] text-slate-400 font-bold mt-0.5 leading-none">مراجعة وحفظ</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSubTab('plans')}
+            className="flex flex-col items-center justify-center p-3 text-center bg-gradient-to-b from-amber-50/50 to-amber-100/20 dark:from-slate-900 dark:to-slate-900/60 border border-amber-500/10 dark:border-slate-800 rounded-[2rem] hover:border-amber-500/30 dark:hover:border-amber-500/20 active:scale-95 transition-all shadow-xs group cursor-pointer"
+          >
+            <div className="w-9 h-9 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
+              <Calendar size={18} />
+            </div>
+            <span className="text-[11px] font-black text-slate-800 dark:text-slate-100">خطط الختم</span>
+            <span className="text-[8px] text-slate-400 font-bold mt-0.5 leading-none">ورد مخصص</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSubTab('reflections')}
+            className="flex flex-col items-center justify-center p-3 text-center bg-gradient-to-b from-teal-50/50 to-teal-100/20 dark:from-slate-900 dark:to-slate-900/60 border border-teal-500/10 dark:border-slate-800 rounded-[2rem] hover:border-teal-500/30 dark:hover:border-teal-500/20 active:scale-95 transition-all shadow-xs group cursor-pointer"
+          >
+            <div className="w-9 h-9 rounded-2xl bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
+              <Sparkles size={18} />
+            </div>
+            <span className="text-[11px] font-black text-slate-800 dark:text-slate-100">تدبر وتعلم</span>
+            <span className="text-[8px] text-slate-400 font-bold mt-0.5 leading-none">تأمل الآيات</span>
+          </button>
         </div>
       </motion.div>
 

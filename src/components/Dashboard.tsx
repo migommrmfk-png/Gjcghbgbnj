@@ -16,6 +16,9 @@ import {
   Mic,
   Target,
   Radio,
+  Trophy,
+  ShieldCheck,
+  Volume2,
   Flame,
   Info,
   Puzzle,
@@ -35,21 +38,84 @@ import { supabase } from '../supabase';
 import DownloadAppBanner from "./DownloadAppBanner";
 import CharityToday from "./CharityToday";
 import ArabicWidget from "./ArabicWidget";
-import MoodTracker from "./MoodTracker";
 import { useTranslation } from 'react-i18next';
 import { getGeminiClient } from "../lib/gemini";
-import { CheckCircle2, RefreshCw, AlertCircle, Sparkles as SparklesIcon, Trash2, Sliders, ChevronRight as ChevronRightIcon } from "lucide-react";
+import toast from 'react-hot-toast';
+import { CheckCircle2, RefreshCw, AlertCircle, Sparkles as SparklesIcon, Trash2, Sliders, ChevronRight as ChevronRightIcon, ChevronDown, Search, Globe, Key } from "lucide-react";
+
+export const POPULAR_CITIES = [
+  { name: "مكة المكرمة", lat: 21.4225, lon: 39.8262, country: "المملكة العربية السعودية" },
+  { name: "المدينة المنورة", lat: 24.4672, lon: 39.6111, country: "المملكة العربية السعودية" },
+  { name: "القاهرة", lat: 30.0444, lon: 31.2357, country: "مصر" },
+  { name: "الرياض", lat: 24.7136, lon: 46.6753, country: "المملكة العربية السعودية" },
+  { name: "جدة", lat: 21.4858, lon: 39.1925, country: "المملكة العربية السعودية" },
+  { name: "القدس الشريف", lat: 31.7683, lon: 35.2137, country: "فلسطين المحتلة" },
+  { name: "بغداد", lat: 33.3152, lon: 44.3661, country: "العراق" },
+  { name: "عمان", lat: 31.9539, lon: 35.9106, country: "الأردن" },
+  { name: "الإسكندرية", lat: 31.2001, lon: 29.9187, country: "مصر" },
+  { name: "دبي", lat: 25.2048, lon: 55.2708, country: "الإمارات العربية المتحدة" },
+  { name: "الكويت", lat: 29.3759, lon: 47.9774, country: "الكويت" },
+  { name: "المنامة", lat: 26.2285, lon: 50.586, country: "البحرين" },
+  { name: "الدوحة", lat: 25.2854, lon: 51.531, country: "قطر" },
+  { name: "مسقط", lat: 23.5859, lon: 58.4059, country: "عمان" },
+  { name: "صنعاء", lat: 15.3694, lon: 44.191, country: "اليمن" },
+  { name: "الخرطوم", lat: 15.5007, lon: 32.5599, country: "السودان" },
+  { name: "طرابلس", lat: 32.8872, lon: 13.1913, country: "ليبيا" },
+  { name: "تونس", lat: 36.8065, lon: 10.1815, country: "تونس" },
+  { name: "الجزائر", lat: 36.7525, lon: 3.042, country: "الجزائر" },
+  { name: "الدار البيضاء", lat: 33.5731, lon: -7.5898, country: "المغرب" }
+];
+
+export function calculateDistanceToKaaba(lat: number, lon: number): number {
+  const R = 6371; // نصف قطر الأرض بالكيلومترات
+  const dLat = (21.4225 - lat) * Math.PI / 180;
+  const dLon = (39.8262 - lon) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat * Math.PI / 180) * Math.cos(21.4225 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return Math.round(R * c);
+}
 
 interface DashboardProps {
   onNavigate: (tab: string) => void;
 }
 
 export default function Dashboard({ onNavigate }: DashboardProps) {
-  const { prayerTimes, hijriDate, gregorianDate, locationName, loading, error } = usePrayerTimes();
+  const { 
+    prayerTimes, 
+    hijriDate, 
+    gregorianDate, 
+    locationName, 
+    userLocation, 
+    loading, 
+    error, 
+    updateLocation, 
+    detectLocation, 
+    resetToDefault 
+  } = usePrayerTimes();
   const { user } = useAuth();
   const { t, i18n } = useTranslation();
   const [nextPrayerTime, setNextPrayerTime] = useState<string>("");
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Location Modal States
+  const [locationModalOpen, setLocationModalOpen] = useState(false);
+  const [searchCityQuery, setSearchCityQuery] = useState("");
+  const [customLat, setCustomLat] = useState("");
+  const [customLon, setCustomLon] = useState("");
+  const [customLocName, setCustomLocName] = useState("");
+  const [locateState, setLocateState] = useState<"idle" | "locating" | "success" | "error">("idle");
+  const [locateError, setLocateError] = useState("");
+
+  useEffect(() => {
+    if (userLocation) {
+      setCustomLat(userLocation.lat.toString());
+      setCustomLon(userLocation.lon.toString());
+      setCustomLocName(locationName);
+    }
+  }, [userLocation, locationName, locationModalOpen]);
   const [dailyAyah, setDailyAyah] = useState<{text: string, surah: string} | null>(null);
   const [dailyHadith, setDailyHadith] = useState<{text: string, narrator: string} | null>(null);
   const [dailyDua, setDailyDua] = useState<{text: string, source: string} | null>(null);
@@ -67,6 +133,55 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   const [tasbeehProgress, setTasbeehProgress] = useState<{ count: number, target: number } | null>(null);
   const [dailyNiyyah, setDailyNiyyah] = useState<string>("");
   const [isEditingNiyyah, setIsEditingNiyyah] = useState<boolean>(false);
+  const [niyyahLoading, setNiyyahLoading] = useState<boolean>(false);
+  const [niyyahSuggestions, setNiyyahSuggestions] = useState<string[]>([]);
+  const [niyyahError, setNiyyahError] = useState<string>("");
+  const [isKeyModalOpen, setIsKeyModalOpen] = useState<boolean>(false);
+  const [keyInput, setKeyInput] = useState<string>(() => localStorage.getItem('user_custom_gemini_key') || '');
+  const [hasCustomKey, setHasCustomKey] = useState<boolean>(() => !!localStorage.getItem('user_custom_gemini_key'));
+
+  const handleGenerateNiyyah = async () => {
+    setNiyyahLoading(true);
+    setNiyyahError("");
+    setNiyyahSuggestions([]);
+    try {
+      const prompt = `اقترح 3 نوايا إيمانية أو سلوكية دينية قصيرة ومجاهدة ومؤثرة لليوم باللغة العربية المشرقة والربانية الصادقة، تعزز التقوى والإخلاص وحسن الخلق ومحبة الخير وصنائع المعروف للناس. الأوراد والعبادات. أرجع الإجابة كصيغة JSON صالحة تماماً مكوّنة من مصفوفة نصوص تسمى "intentions":
+{
+  "intentions": [
+    "النية المقترحة الأولى بأسلوب رباني رائع ومحبب للقلوب",
+    "النية المقترحة الثانية بأسلوب رائع وجميل ومبتكر",
+    "النية المقترحة الثالثة بأسلوب رائع"
+  ]
+}
+لا تضع أي نصوص أخرى خارج الـ JSON.`;
+
+      const ai = getGeminiClient();
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.5-flash',
+        contents: [{ parts: [{ text: prompt }] }],
+        config: {
+          responseMimeType: "application/json"
+        }
+      });
+
+      const parsed = JSON.parse(response.text);
+      if (parsed && Array.isArray(parsed.intentions)) {
+        setNiyyahSuggestions(parsed.intentions);
+      } else {
+        throw new Error("تنسيق الرد غير صالح");
+      }
+    } catch (err: any) {
+      console.error(err);
+      // Beautiful fallback intentions
+      setNiyyahSuggestions([
+        "تجديد الإخلاص لله في القول والعمل ومراقبة خطرات الصدر والقلب التزاماً بالسنة المباركة.",
+        "جبر خواطر العباد بابتسامة دافئة وكلمة طيبة وإماطة الأذى عن طرقات المسلمين بغية مرضاة الخالق.",
+        "الاستكثار من زاد الآخرة بالبقاء على وضوء طيلة اليوم والمداومة على أوراد صيانة القرآن والذكر الرباني."
+      ]);
+    } finally {
+      setNiyyahLoading(false);
+    }
+  };
 
   // AI Personalization Onboarding State
   const [userRoutine, setUserRoutine] = useState<string[]>(() => {
@@ -731,10 +846,15 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           <div className="flex justify-between items-start">
             <div>
               <h2 className="text-xl font-medium text-emerald-50 tracking-wide">{getGreeting()}</h2>
-              <div className="flex items-center gap-1.5 mt-1 text-emerald-200/80 text-xs font-medium">
-                <MapPin size={12} />
+              <button 
+                onClick={() => setLocationModalOpen(true)}
+                className="flex items-center gap-1.5 mt-1 text-emerald-250 hover:text-white bg-white/10 dark:bg-white/5 hover:bg-white/20 transition-all px-3 py-1 rounded-full border border-white/10 active:scale-95 text-xs font-semibold shadow-sm"
+                title="تعديل أو تحديد الموقع الجغرافي"
+              >
+                <MapPin size={11} className="text-emerald-400 animate-pulse animate-duration-3000" />
                 <span>{locationName || t('locating')}</span>
-              </div>
+                <ChevronDown size={11} className="text-emerald-300/80" />
+              </button>
             </div>
             <div className="flex items-center gap-2">
               {streak > 0 && (
@@ -743,6 +863,23 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                   <span>{streak} {t('days_streak')}</span>
                 </div>
               )}
+              <button 
+                onClick={() => {
+                  setKeyInput(localStorage.getItem('user_custom_gemini_key') || '');
+                  setIsKeyModalOpen(true);
+                }}
+                className={`relative p-2 rounded-full border transition-all ${
+                  hasCustomKey 
+                    ? 'bg-amber-400/25 border-amber-400/40 text-amber-300 hover:bg-amber-400/40 active:scale-95' 
+                    : 'bg-white/10 border-white/10 text-white hover:bg-white/20 active:scale-95'
+                }`}
+                title="إعداد الذكاء الاصطناعي ومفتاح الـ API"
+              >
+                <Key size={18} className={hasCustomKey ? "animate-pulse" : ""} />
+                {hasCustomKey && (
+                  <span className="absolute top-0 right-0 w-2 h-2 bg-emerald-400 rounded-full border border-[#0A1914]"></span>
+                )}
+              </button>
               <button 
                 onClick={() => onNavigate("notifications")}
                 className="relative bg-white/10 backdrop-blur-md p-2 rounded-full border border-white/10 text-white hover:bg-white/20 transition-colors"
@@ -781,37 +918,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         </div>
       </motion.div>
 
-      {/* Eid al-Adha Special Interactive Event Banner */}
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.03 }}
-        onClick={() => onNavigate("eid-special")}
-        className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-amber-600 via-amber-700 to-emerald-800 shadow-xl shadow-amber-500/10 p-5 flex items-center justify-between cursor-pointer group active:scale-[0.98] transition-all border border-amber-400/30"
-      >
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay pointer-events-none group-hover:scale-105 transition-transform duration-700" 
-          style={{ backgroundImage: 'url("/src/assets/images/eid_adha_greeting_1779803251178.png")' }}
-        ></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-900/80 to-emerald-950/95"></div>
-        <div className="absolute -top-10 -right-10 w-32 h-32 bg-amber-400/10 rounded-full blur-xl animate-pulse"></div>
-        
-        <div className="relative z-10 flex items-center gap-4">
-          <div className="w-12 h-12 bg-amber-500/20 backdrop-blur-md rounded-[18px] flex items-center justify-center border border-amber-400/30 text-amber-300">
-             <span className="text-2xl animate-bounce">🐏</span>
-          </div>
-          <div>
-            <h3 className="text-sm font-bold text-white mb-0.5 tracking-wide flex items-center gap-1.5 font-serif">
-              بوابة عيد الأضحى المبارك
-              <span className="bg-amber-400 text-amber-950 text-[9px] px-2 py-0.5 rounded-full font-black tracking-widest animate-pulse">نشط الآن</span>
-            </h3>
-            <p className="text-emerald-200 text-xs font-medium">تكبيرات العيد • صانع بطاقات التهنئة • طاعات عرفة</p>
-          </div>
-        </div>
-        <div className="relative z-10 w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20 group-hover:bg-amber-500 group-hover:text-amber-950 transition-colors">
-          <ChevronLeft size={16} className={isRTL ? '' : 'rotate-180'} />
-        </div>
-      </motion.div>
+
 
       {/* Interactive AI Personalization Onboarding / Customized Routine Checklist */}
       <motion.div
@@ -1166,14 +1273,27 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       >
         <div className="absolute top-0 right-0 w-32 h-32 bg-amber-50 dark:bg-amber-500/5 rounded-full -mr-10 -mt-10 blur-xl transition-transform group-hover:scale-110 duration-700"></div>
         <div className="relative z-10">
-           <div className="flex items-center gap-3 mb-3">
-             <div className="w-10 h-10 bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center flex-shrink-0">
-               <Sparkles size={20} />
+           <div className="flex items-center justify-between gap-3 mb-3">
+             <div className="flex items-center gap-3">
+               <div className="w-10 h-10 bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center flex-shrink-0">
+                 <Sparkles size={20} className={niyyahLoading ? "animate-spin" : ""} />
+               </div>
+               <div>
+                 <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm">نية اليوم</h3>
+                 <p className="text-[10px] text-slate-400 font-medium">إنما الأعمال بالنيات وصحة النية أساس العمل</p>
+               </div>
              </div>
-             <div>
-               <h3 className="font-bold text-slate-800 dark:text-slate-100">نية اليوم</h3>
-               <p className="text-xs text-slate-500 dark:text-slate-400">إنما الأعمال بالنيات</p>
-             </div>
+             
+             {!isEditingNiyyah && (
+               <button
+                 onClick={handleGenerateNiyyah}
+                 disabled={niyyahLoading}
+                 className="text-[10px] bg-amber-500/10 hover:bg-amber-500/20 text-[#be8113] dark:text-amber-300 px-3 py-1.5 rounded-full font-black flex items-center gap-1.5 transition-all"
+               >
+                 <span>💡</span>
+                 <span>{niyyahLoading ? "جاري الاقتراح..." : "اقتراح نيات بالذكاء الاصطناعي"}</span>
+               </button>
+             )}
            </div>
            
            {isEditingNiyyah ? (
@@ -1183,7 +1303,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                  type="text" 
                  value={dailyNiyyah} 
                  onChange={(e) => setDailyNiyyah(e.target.value)}
-                 className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-amber-500 text-slate-800 dark:text-slate-200 placeholder-slate-400"
+                 className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-amber-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 font-bold"
                  placeholder="اكتب هدفك الروحي لليوم..."
                  onKeyDown={(e) => {
                    if (e.key === 'Enter') {
@@ -1197,17 +1317,42 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                    setIsEditingNiyyah(false);
                    localStorage.setItem('dailyNiyyah', JSON.stringify({ date: new Date().toDateString(), text: dailyNiyyah }));
                  }}
-                 className="bg-amber-500 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-md hover:bg-amber-600"
+                 className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-black shadow-md transition-colors"
                >
                  حفظ
                </button>
              </div>
            ) : (
-             <div 
-               onClick={() => setIsEditingNiyyah(true)}
-               className="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/50 rounded-xl px-4 py-3 text-sm text-slate-700 dark:text-slate-300 font-medium cursor-text hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-             >
-               {dailyNiyyah || <span className="text-slate-400">اضغط هنا لكتابة نيتك أو هدفك الروحي لليوم...</span>}
+             <div className="space-y-4">
+               <div 
+                 onClick={() => setIsEditingNiyyah(true)}
+                 className="bg-slate-50 dark:bg-slate-850 border border-slate-100 dark:border-slate-700/50 rounded-2xl px-4 py-3 text-xs text-slate-700 dark:text-slate-300 font-bold cursor-text hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors leading-5"
+               >
+                 {dailyNiyyah || <span className="text-slate-400">اضغط هنا لكتابة نيتك أو هدفك لليوم، أو انقر اقتراح بالذكاء الاصطناعي...</span>}
+               </div>
+
+               {niyyahSuggestions.length > 0 && (
+                 <motion.div 
+                   initial={{ opacity: 0, y: 10 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   className="space-y-2 border-t border-black/5 dark:border-white/5 pt-3.5"
+                 >
+                   <span className="block text-[10px] text-slate-400 font-black mb-1">اختر من النوايا الربانية المقترحة لليوم:</span>
+                   {niyyahSuggestions.map((suggestion, idx) => (
+                     <button
+                       key={idx}
+                       onClick={() => {
+                         setDailyNiyyah(suggestion);
+                         localStorage.setItem('dailyNiyyah', JSON.stringify({ date: new Date().toDateString(), text: suggestion }));
+                         setNiyyahSuggestions([]);
+                       }}
+                       className="w-full text-right p-3 bg-amber-500/5 hover:bg-amber-500/10 border border-amber-500/10 hover:border-amber-500/25 rounded-2xl text-[11px] font-bold text-slate-700 dark:text-slate-300 transition-all duration-200 block"
+                     >
+                       {suggestion}
+                     </button>
+                   ))}
+                 </motion.div>
+               )}
              </div>
            )}
         </div>
@@ -1243,6 +1388,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           </div>
         </div>
       </motion.div>
+
+
 
       {/* Arabic Widget */}
       <ArabicWidget onNavigate={onNavigate} />
@@ -1306,20 +1453,6 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           <span className="text-[11px] font-bold text-white">ماذا أقرأ الآن؟</span>
         </button>
 
-        <button onClick={() => onNavigate("islamic-gallery")} className="flex-shrink-0 flex items-center gap-2 bg-gradient-to-l from-emerald-600 to-emerald-700 pr-2 pl-4 py-2.5 rounded-full border border-emerald-500 shadow-md hover:shadow-lg transition-shadow">
-          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white">
-            <ImageIcon size={16} />
-          </div>
-          <span className="text-[11px] font-bold text-white">معرض الصور والخلفيات ✨</span>
-        </button>
-
-        <button onClick={() => onNavigate("dawah")} className="flex-shrink-0 flex items-center gap-2 bg-gradient-to-l from-emerald-500 to-teal-500 pr-2 pl-4 py-2.5 rounded-full border border-emerald-400 shadow-md hover:shadow-lg transition-shadow">
-          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white">
-            <Share2 size={16} />
-          </div>
-          <span className="text-[11px] font-bold text-white">شارك دعوة</span>
-        </button>
-
         <button onClick={() => onNavigate("radio")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
           <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400">
             <Radio size={16} />
@@ -1346,13 +1479,6 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             <Target size={16} />
           </div>
           <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">الخطة الذكية</span>
-        </button>
-
-        <button onClick={() => onNavigate("dreams")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
-          <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-            <Moon size={16} />
-          </div>
-          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">تفسير الأحلام</span>
         </button>
 
         <button onClick={() => onNavigate("names")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
@@ -1518,29 +1644,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         </motion.div>
       )}
 
-      {/* Quick Dua Wall Preview */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.4 }}
-      >
-        <div className="bg-white dark:bg-slate-900 rounded-[32px] p-5 border border-slate-100 dark:border-slate-800 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.06)] hover:shadow-xl transition-all cursor-pointer group" onClick={() => onNavigate("dua-wall")}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-rose-50 dark:bg-rose-900/30 rounded-[20px] flex items-center justify-center text-rose-500 group-hover:scale-110 transition-transform">
-                <Heart size={20} className="fill-current" />
-              </div>
-              <div>
-                <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100 font-serif">حائط الدعاء</h2>
-                <p className="text-[11px] text-slate-500 font-medium mt-0.5">شارك دعاءك مع المجتمع</p>
-              </div>
-            </div>
-            <div className="text-[10px] font-bold bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 px-3 py-1.5 rounded-full group-hover:bg-rose-100 dark:group-hover:bg-rose-900/50 transition-colors">
-              تصفح
-            </div>
-          </div>
-        </div>
-      </motion.div>
+
 
       {/* Highlighted Hijri Calendar Preview */}
         <motion.div
@@ -1637,38 +1741,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           </div>
         </motion.div>
 
-        {/* Main Features Grid */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="col-span-1 sm:col-span-2 md:col-span-3 mt-4"
-        >
-          <div className="flex items-center gap-2 mb-4 px-2">
-            <Compass size={20} className="text-emerald-500" />
-            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">{t('explore_more')}</h2>
-          </div>
-          <div className="grid grid-cols-3 gap-4">
-            {menuItems.map((item, index) => (
-              <motion.button
-                key={item.id}
-                whileHover={{ scale: 1.05, y: -4 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => onNavigate(item.id)}
-                className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[24px] flex flex-col items-center justify-center p-5 gap-3 aspect-square group shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] transition-all duration-300"
-              >
-                <div
-                  className={`w-14 h-14 rounded-[16px] ${item.bg} ${item.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
-                >
-                  {item.icon}
-                </div>
-                <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200 text-center leading-tight">
-                  {item.title}
-                </span>
-              </motion.button>
-            ))}
-          </div>
-        </motion.div>
+
 
       {/* Dynamic Spiritual Diagnosis & Quran Recommender Drawer/Modal */}
       {whatToReadOpen && (
@@ -1858,7 +1931,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             </div>
 
             {/* Modal Footer */}
-            <div className="bg-slate-50 dark:bg-slate-800/40 px-6 py-4 flex justify-end border-t border-slate-100 dark:border-slate-800/60">
+            <div className="bg-slate-50 dark:bg-slate-800/40 px-6 py-4 flex justify-end border-t border-slate-100 dark:border-slate-800/60 font-black">
               <button
                 onClick={() => {
                   setWhatToReadOpen(false);
@@ -1869,6 +1942,312 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
               >
                 إغلاق
               </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* ================= SMART LOCATION OVERLAY ================= */}
+      {locationModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0, y: 15 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2.5rem] max-w-sm w-full shadow-2xl p-6 space-y-5 text-right overflow-hidden relative"
+            dir="rtl"
+          >
+            {/* Header decor */}
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-amber-500"></div>
+
+            <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-800 dark:text-white font-serif flex items-center gap-1.5 font-black">
+                  <Globe className="text-emerald-500 animate-spin-slow text-emerald-650" size={16} />
+                  <span>مستكشف ومحرر الموقع الجغرافي ✨</span>
+                </h3>
+                <span className="block text-[9px] text-slate-400 font-medium leading-relaxed">اختر مدينتك لتعديل مواقيت الصلاة والقبلة تلقائياً</span>
+              </div>
+              <button 
+                onClick={() => {
+                  setLocationModalOpen(false);
+                  setLocateError("");
+                  setLocateState("idle");
+                }} 
+                className="text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 text-xs font-bold bg-slate-100 dark:bg-slate-800 p-1.5 rounded-full leading-none h-6 w-6 flex items-center justify-center"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Quick Kaaba Distance Tracker */}
+            {userLocation && (
+              <div className="p-3.5 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-2xl border border-emerald-500/10 text-center space-y-1">
+                <div className="text-[10px] font-bold text-slate-400 dark:text-emerald-300/80">الموقع الحالي: {locationName}</div>
+                <div className="text-[11px] font-black text-slate-800 dark:text-emerald-100 flex flex-wrap items-center justify-center gap-0.5 leading-relaxed">
+                  <span>أنت تبعد حالياً</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 text-xs font-black underline decoration-wavy decoration-amber-400 decoration-1 mx-0.5">
+                    {calculateDistanceToKaaba(userLocation.lat, userLocation.lon).toLocaleString('ar-EG')} كم
+                  </span>
+                  <span>عن الكعبة المشرفة بمكة 🕋</span>
+                </div>
+              </div>
+            )}
+
+            {/* Auto Detect Button */}
+            <div className="space-y-1.5">
+              <button
+                type="button"
+                onClick={async () => {
+                  setLocateState("locating");
+                  setLocateError("");
+                  try {
+                    await detectLocation();
+                    setLocateState("success");
+                    setTimeout(() => {
+                      setLocateState("idle");
+                    }, 1500);
+                  } catch (err: any) {
+                    setLocateState("error");
+                    setLocateError(err.message || "فشلت عملية تحديد الموقع التلقائية");
+                  }
+                }}
+                disabled={locateState === "locating"}
+                className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-2xl font-black text-xs flex items-center justify-center gap-2 shadow-md shadow-emerald-500/10 cursor-pointer disabled:opacity-50 active:scale-95 transition-all"
+              >
+                <MapPin size={14} className={locateState === "locating" ? "animate-bounce" : ""} />
+                <span>
+                  {locateState === "locating" 
+                    ? "جاري تحديد إحداثياتك الحالية..." 
+                    : locateState === "success" 
+                    ? "✅ تم تحديد موقعك وتحديث المواقيت!" 
+                    : "تحديد موقعي الجغرافي تلقائياً (GPS) 📡"}
+                </span>
+              </button>
+              {locateError && (
+                <div className="text-[10px] text-rose-500 bg-rose-50 dark:bg-rose-950/20 p-2 rounded-xl text-center font-bold flex items-center justify-center gap-1">
+                  <AlertCircle size={11} />
+                  <span>{locateError}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Search City Row */}
+            <div className="space-y-2">
+              <span className="block text-[10px] font-black text-slate-400">ابحث عن مدينة إسلامية مشهورة:</span>
+              <div className="relative">
+                <Search size={13} className="absolute right-3 top-3 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="مثال: القاهرة، المدينة المنورة، القدس..."
+                  value={searchCityQuery}
+                  onChange={(e) => setSearchCityQuery(e.target.value)}
+                  className="w-full pl-3 pr-8 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 text-slate-800 dark:text-white rounded-xl text-xs focus:ring-1 focus:ring-emerald-500"
+                />
+              </div>
+
+              {/* Grid of Cities */}
+              <div className="grid grid-cols-2 gap-2 max-h-36 overflow-y-auto pr-1">
+                {POPULAR_CITIES.filter(city => 
+                  city.name.includes(searchCityQuery) || 
+                  city.country.includes(searchCityQuery)
+                ).map(city => {
+                  const dist = calculateDistanceToKaaba(city.lat, city.lon);
+                  const isSelected = locationName === city.name;
+                  return (
+                    <button
+                      key={city.name}
+                      onClick={() => {
+                        updateLocation(city.lat, city.lon, city.name);
+                        setSearchCityQuery("");
+                        setLocateState("success");
+                        setTimeout(() => {
+                          setLocateState("idle");
+                          setLocationModalOpen(false);
+                        }, 800);
+                      }}
+                      className={`p-2 rounded-xl border text-right transition-all text-[10px] font-black flex flex-col justify-between cursor-pointer ${
+                        isSelected 
+                          ? 'bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-inner' 
+                          : 'bg-white dark:bg-slate-850 border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                      }`}
+                    >
+                      <div className="flex justify-between items-center w-full">
+                        <span className="font-extrabold">{city.name}</span>
+                        <span className="text-[8px] text-slate-400 font-normal">{city.country}</span>
+                      </div>
+                      <span className="text-[8px] text-slate-400 mt-0.5">تبعد {dist.toLocaleString('ar-EG')} كم 🕋</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Custom Coordinates Inputs (Collapsible/Advanced) */}
+            <div className="pt-3.5 border-t border-slate-105 dark:border-slate-805/80 space-y-2">
+              <span className="block text-[10px] font-black text-slate-400">إدخال إحداثيات مخصصة (متقدم):</span>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-[8px] text-slate-400 mb-0.5">خط العرض (Latitude):</label>
+                  <input
+                    type="number"
+                    step="any"
+                    placeholder="30.0444"
+                    value={customLat}
+                    onChange={(e) => setCustomLat(e.target.value)}
+                    className="w-full text-center p-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 text-slate-800 dark:text-white rounded-xl text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[8px] text-slate-400 mb-0.5">خط الطول (Longitude):</label>
+                  <input
+                    type="number"
+                    step="any"
+                    placeholder="31.2357"
+                    value={customLon}
+                    onChange={(e) => setCustomLon(e.target.value)}
+                    className="w-full text-center p-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 text-slate-800 dark:text-white rounded-xl text-xs"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-[8px] text-slate-400 mb-0.5">اسم الموقع المخصص:</label>
+                <input
+                  type="text"
+                  placeholder="مثال: مكتبي بجدة / بيت جدي"
+                  value={customLocName}
+                  onChange={(e) => setCustomLocName(e.target.value)}
+                  className="w-full p-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 text-slate-800 dark:text-white rounded-xl text-xs"
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const lat = parseFloat(customLat);
+                    const lon = parseFloat(customLon);
+                    if (isNaN(lat) || isNaN(lon) || !customLocName.trim()) {
+                      alert("نرجو إدخال خط طول وعرض صحيحين مع اسم للبلد!");
+                      return;
+                    }
+                    updateLocation(lat, lon, customLocName.trim());
+                    setLocationModalOpen(false);
+                  }}
+                  className="flex-1 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-xl font-bold text-[10px] transition-colors cursor-pointer"
+                >
+                  حفظ الموقع المخصص 💾
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    resetToDefault();
+                    setLocationModalOpen(false);
+                  }}
+                  className="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 rounded-xl font-black text-[10px] transition-colors cursor-pointer"
+                >
+                  الرجوع للرسمي 🕋
+                </button>
+              </div>
+            </div>
+
+            <div className="text-[8px] text-center text-slate-400 pt-1 leading-normal">
+              يتم تخزين الإعدادات محلياً لتخصيص كامل تجربة طاعاتك ومواقيتك 🌸
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* ================= AI KEY CONFIGURATION OVERLAY ================= */}
+      {isKeyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0, y: 15 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2.5rem] max-w-sm w-full shadow-2xl p-6 space-y-5 text-right overflow-hidden relative"
+            dir="rtl"
+          >
+            {/* Header decor */}
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600"></div>
+
+            <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <h3 className="text-sm font-extrabold text-slate-800 dark:text-white font-serif flex items-center gap-1.5 font-black">
+                  <Key className="text-amber-500 text-amber-650" size={16} />
+                  <span>تفعيل الذكاء الاصطناعي الإيماني ✨</span>
+                </h3>
+                <span className="block text-[9px] text-slate-400 font-medium leading-relaxed">أدخل مفتاح الـ API الخاص بك لتشغيل ميزات الذكاء الاصطناعي بشكل دائم ومجاني</span>
+              </div>
+              <button 
+                onClick={() => setIsKeyModalOpen(false)} 
+                className="text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 text-xs font-bold bg-slate-100 dark:bg-slate-800 p-1.5 rounded-full leading-none h-6 w-6 flex items-center justify-center"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-3.5 bg-amber-500/5 dark:bg-amber-500/10 rounded-2xl border border-amber-500/10 text-right space-y-2">
+              <p className="text-[10px] text-amber-850 dark:text-amber-305 leading-relaxed font-semibold">
+                ⚠️ عذراً، لقد تم إيقاف مفتاح الـ API الافتراضي المشترك الخاص بالتطبيق بسبب قيام Google بحظره لتسريبه. لتتمكن من استخدام ميزة تسميع القرآن بالذكاء الاصطناعي، ومولد النوايا الإيمانية المخصصة اليومية، واقترحات الصدقات، ومرافقة الواعظ الذكي، يرجى تزويد مفتاح خاص بك.
+              </p>
+              <div className="text-[9px] text-slate-500 dark:text-slate-400 leading-normal">
+                الخطوات مجانية ١٠٠٪ وبدقيقتين فقط:
+                <br />
+                ١. افتح موقع <a href="https://aistudio.google.com/" target="_blank" rel="noreferrer" className="text-amber-605 hover:underline font-bold">Google AI Studio</a> وسجل دخولك
+                <br />
+                ٢. انقر على <b>Create API Key</b> وانسخ المفتاح الذي يبدأ بـ <code>AIzaSy...</code> ثم الصقه هنا بالأسفل.
+              </div>
+            </div>
+
+            <div className="space-y-1.5 text-right">
+              <label className="block text-[10px] font-black text-slate-400">مفتاح الـ API للذكاء الاصطناعي (Gemini أو OpenAI):</label>
+              <input
+                type="password"
+                placeholder="مثال: AIzaSyBgDbX..."
+                value={keyInput}
+                onChange={(e) => setKeyInput(e.target.value)}
+                className="w-full text-center p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-850 text-slate-800 dark:text-white rounded-xl text-xs font-mono select-all focus:outline-none focus:ring-1 focus:ring-amber-500"
+              />
+            </div>
+
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const trimmed = keyInput.trim();
+                  if (!trimmed) {
+                    alert("نرجو إدخال مفتاح API صحيح!");
+                    return;
+                  }
+                  localStorage.setItem('user_custom_gemini_key', trimmed);
+                  setHasCustomKey(true);
+                  setIsKeyModalOpen(false);
+                  toast.success("تم تفعيل طاقات الذكاء الاصطناعي المخصصة بنجاح! طاعات مقبولة بإذن الله.");
+                }}
+                className="flex-1 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-900 rounded-xl font-bold text-[10px] transition-colors cursor-pointer text-center"
+              >
+                حفظ الرمز وتفعيل الميزات 💾
+              </button>
+              
+              {hasCustomKey && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    localStorage.removeItem('user_custom_gemini_key');
+                    setKeyInput('');
+                    setHasCustomKey(false);
+                    setIsKeyModalOpen(false);
+                    toast.success("تم مسح المفتاح المخصص.");
+                  }}
+                  className="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 rounded-xl font-black text-[10px] transition-colors cursor-pointer text-center"
+                  title="مسح المفتاح المخصص"
+                >
+                  حذف المفتاح 🗑️
+                </button>
+              )}
+            </div>
+
+            <div className="text-[8px] text-center text-slate-400 pt-1 leading-normal">
+              🔒 يتم تخزين الرمز على متصفحك الشخصي محلياً بكل أمان ولا يتم تداوله على أي خوادم أخرى.
             </div>
           </motion.div>
         </div>

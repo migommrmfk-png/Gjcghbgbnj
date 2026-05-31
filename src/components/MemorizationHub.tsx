@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { BookOpen, Target, Sparkles, Plus, Trash2, Share2, Award, Flame, CheckCircle, Search, Edit3, Calendar, Download, RefreshCw, Star } from 'lucide-react';
+import { getGeminiClient } from '../lib/gemini';
+import { BookOpen, Target, Sparkles, Plus, Trash2, Share2, Award, Flame, CheckCircle, Search, Edit3, Calendar, Download, RefreshCw, Star, Mic, MicOff, Lock, Play, Pause, Heart, MessageCircle } from 'lucide-react';
 
 interface MemorizedPortion {
   id: string;
@@ -10,6 +11,7 @@ interface MemorizedPortion {
   endVerse: number;
   status: 'memorizing' | 'memorized' | 'needs_revision';
   dateAdded: string;
+  lastRevisedDate?: string; // date string or ISO string representing the last revision
   notes?: string;
 }
 
@@ -131,12 +133,100 @@ const SURAHS_METADATA = [
   { number: 114, name: "الناس", verses: 6 }
 ];
 
+const POPULAR_SURAHS_TEXT: Record<number, string> = {
+  1: "الحمد لله رب العالمين الرحمن الرحيم مالك يوم الدين إياك نعبد وإياك نستعين اهدنا الصراط المستقيم صراط الذين أنعمت عليهم غير المغضوب عليهم ولا الضالين",
+  108: "إنا أعطيناك الكوثر فصل لربك وانحر إن شانئك هو الأبتر",
+  103: "والعصر إن الإنسان لفي خسر إلا الذين آمنوا وعملوا الصالحات وتواصوا بالحق وتواصوا بالصبر",
+  110: "إذا جاء نصر الله والفتح ورأيت الناس يدخلون في دين الله أفواجا فسبح بحمد ربك واستغفره إنه كان توابا",
+  112: "قل هو الله أحد الله الصمد لم يلد ولم يولد ولم يكن له كفوا أحد",
+  113: "قل أعوذ برب الفلق من شر ما خلق ومن شر غاسق إذا وقب ومن شر النفاثات في العقد ومن شر حاسد إذا حسد",
+  114: "قل أعوذ برب الناس ملك الناس إله الناس من شر الوسواس الخناس الذي يوسوس في صدور الناس من الجنة والناس",
+  97: "إنا أنزلناه في ليلة القدر وما أدراك ما ليلة القدر ليلة القدر خير من ألف شهر تنزل الملائكة والروح فيها بإذن ربهم من كل أمر سلام هي حتى مطلع الفجر",
+  67: "تبارك الذي بيده الملك وهو على كل شيء قدير الذي خلق الموت والحياة ليبلوكم أيكم أحسن عملا وهو العزيز الغفور",
+  78: "عم يتساءلون عن النبأ العظيم الذي هم فيه مختلفون كلا سيعلمون ثم كلا سيعلمون ألم نجعل الأرض مهادا والجبال أوتادا وخلقناكم أزواجا",
+  36: "يس والقرآن الحكيم إنك لمن المرسلين على صراط مستقيم تنزيل العزيز الرحيم لتنذر قوما ما أنذر آباؤهم فهم غافلون",
+  18: "الحمد لله الذي أنزل على عبده الكتاب ولم يجعل له عوجا قيما لينذر بأسا شديدا من لدنه ويبشر المؤمنين الذين يعملون الصالحات أن لهم أجرا حسنا"
+};
+
+function normalizeArabic(text: string): string {
+  if (!text) return "";
+  return text
+    .replace(/[\u064B-\u065F]/g, "") // Strip diacritics / harakat
+    .replace(/[أإآ]/g, "ا")             // Normalize Alifs
+    .replace(/ة/g, "ه")                // Normalize Ta Marbuta
+    .replace(/ى/g, "ي")                // Normalize Ya/Alif Layyinah
+    .replace(/\s+/g, " ")              // Normalize space
+    .trim();
+}
+
+function matchSpokenWords(actualText: string, spokenText: string): { text: string; correct: boolean | null }[] {
+  const actualWords = actualText.split(/\s+/);
+  const spokenWords = normalizeArabic(spokenText).split(/\s+/);
+  
+  return actualWords.map((word, i) => {
+    const normActual = normalizeArabic(word);
+    
+    // Check if the actual word is "الم"
+    if (normActual === "الم") {
+      // Allow phonetic variations like "الف لام ميم" or "الف" "لام" "ميم"
+      const windowSpoken = spokenWords.slice(Math.max(0, i-1), i+5).join(" ");
+      if (windowSpoken.includes("الف لام ميم") || windowSpoken.includes("ألم") || windowSpoken.includes("الم") || windowSpoken.includes("الف") || windowSpoken.includes("ميم")) {
+        return { text: word, correct: true };
+      }
+    }
+
+    // Try to find if this word exists in the spoken words (with dynamic windowing match)
+    const matched = spokenWords.some(sw => {
+      if (normActual.length <= 2) {
+        return sw === normActual;
+      }
+      return sw === normActual || sw.includes(normActual) || normActual.includes(sw);
+    });
+
+    return {
+      text: word,
+      correct: matched ? true : (i < spokenWords.length ? false : null)
+    };
+  });
+}
+
 export default function MemorizationHub({ onBack }: { onBack?: () => void }) {
   const [portions, setPortions] = useState<MemorizedPortion[]>([]);
   const [streak, setStreak] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredSurahs, setFilteredSurahs] = useState(SURAHS_METADATA);
   
+  // Custom states for premium sub-tabs
+  const [activeTab, setActiveTab] = useState<'tracker' | 'recitation' | 'revision-planner'>('tracker');
+
+  const playChime = () => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+      osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+      osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.6);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // AI Recitation States
+  const [recitationSurah, setRecitationSurah] = useState<number>(1); // Default Al-Fatihah
+  const [isListening, setIsListening] = useState(false);
+  const [spokenText, setSpokenText] = useState('');
+  const [recognition, setRecognition] = useState<any>(null);
+  const [aiReviewLoading, setAiReviewLoading] = useState(false);
+  const [aiReviewResult, setAiReviewResult] = useState<string | null>(null);
+
   // Form State
   const [selectedSurah, setSelectedSurah] = useState(SURAHS_METADATA[29]); // Default to Spider or Al-Mulk
   const [startVerse, setStartVerse] = useState(1);
@@ -151,6 +241,18 @@ export default function MemorizationHub({ onBack }: { onBack?: () => void }) {
   const [shareTheme, setShareTheme] = useState<'emerald' | 'amber' | 'indigo' | 'slate'>('emerald');
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Popular Surahs mapping values 
+  const popularSurahs = [
+    { number: 1, name: "الفاتحة", verses: 7 },
+    { number: 18, name: "الكهف", verses: 110 },
+    { number: 36, name: "يس", verses: 83 },
+    { number: 67, name: "الملك", verses: 30 },
+    { number: 78, name: "النبأ", verses: 40 },
+    { number: 97, name: "القدر", verses: 5 },
+    { number: 108, name: "الكوثر", verses: 3 },
+    { number: 112, name: "الإخلاص", verses: 4 }
+  ];
 
   useEffect(() => {
     // Load memorization list
@@ -205,6 +307,33 @@ export default function MemorizationHub({ onBack }: { onBack?: () => void }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+
+
+  useEffect(() => {
+    // Initialize standard Browser Web Speech recognition
+    const SpeechLib = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechLib) {
+      const recInstance = new SpeechLib();
+      recInstance.continuous = true;
+      recInstance.interimResults = true;
+      recInstance.lang = 'ar-EG';
+
+      recInstance.onresult = (event: any) => {
+        let textResult = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          textResult += event.results[i][0].transcript;
+        }
+        setSpokenText(textResult);
+      };
+
+      recInstance.onerror = (err: any) => {
+        console.error("Speech Recognition Engine Error:", err);
+      };
+
+      setRecognition(recInstance);
+    }
+  }, []);
+
   const savePortionsList = (newList: MemorizedPortion[]) => {
     setPortions(newList);
     localStorage.setItem('memorized_portions', JSON.stringify(newList));
@@ -228,6 +357,7 @@ export default function MemorizationHub({ onBack }: { onBack?: () => void }) {
       endVerse,
       status,
       dateAdded: new Date().toLocaleDateString('ar-EG'),
+      lastRevisedDate: new Date().toISOString(),
       notes: notes.trim() !== '' ? notes : undefined
     };
 
@@ -259,6 +389,24 @@ export default function MemorizationHub({ onBack }: { onBack?: () => void }) {
     }
   };
 
+  const handleRevisePortion = (id: string) => {
+    const updated = portions.map(p => {
+      if (p.id === id) {
+        return { ...p, lastRevisedDate: new Date().toISOString() };
+      }
+      return p;
+    });
+    savePortionsList(updated);
+    playChime();
+    
+    // Add 50 bonus points to charity points!
+    const savedPoints = parseInt(localStorage.getItem('charity_points') || '0');
+    const newPoints = savedPoints + 50;
+    localStorage.setItem('charity_points', newPoints.toString());
+    
+    alert(`الحمد لله! تمّت مراجعة الورد وصيانته بنجاح، ورُفعت حصانته الإيمانية إلى 100%، وتم منحك ميزة +50 نقطة في سجل البر! 🌟`);
+  };
+
   // Stats calculators
   const getTotalVersesCount = () => {
     return portions
@@ -274,7 +422,7 @@ export default function MemorizationHub({ onBack }: { onBack?: () => void }) {
 
   const notifyShare = () => {
     const versesStr = getTotalVersesCount();
-    const shareText = `🕌 بفضل الله وعونه، أنجزت حفظ ومراجعة { ${versesStr} آية } من كتاب الله العزيز عبر تطبيق (الحق)! \n✨ سلسلة الطاعة الحالية: ${streak} أيام متواصلة.\n🌸 شاركني الأجور وانخرط في منهج التقوى الآن!`;
+    const shareText = `🕌 بفضل الله وعونه، أنجزت حفظ ومراجعة { ${versesStr} آية } من كتاب الله العزيز عبر تطبيق (زاد الذاكرين)! \n✨ سلسلة الطاعة الحالية: ${streak} أيام متواصلة.\n🌸 شاركني الأجور وانخرط في منهج التقوى الآن!`;
     
     if (navigator.share) {
       navigator.share({
@@ -286,6 +434,102 @@ export default function MemorizationHub({ onBack }: { onBack?: () => void }) {
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2500);
     }
+  };
+
+  // Web Speech triggers
+  const startReciting = () => {
+    if (!recognition) {
+      alert("ملاحظة: ميزة تحويل الصوت إلى كلام غير مدعومة بالكامل على متصفحك الحالي، يرجى تكرار المحاولة على متصفح Chrome أو متصفح يدعم Web Speech API.");
+      return;
+    }
+    setSpokenText('');
+    setAiReviewResult(null);
+    setIsListening(true);
+    try {
+      recognition.start();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const stopReciting = () => {
+    if (recognition) {
+      try {
+        recognition.stop();
+      } catch (e) {}
+    }
+    setIsListening(false);
+  };
+
+  const handleAIReview = async () => {
+    if (!spokenText.trim()) return;
+    setAiReviewLoading(true);
+    setAiReviewResult(null);
+    try {
+      const actualText = POPULAR_SURAHS_TEXT[recitationSurah] || "تسميع آيات عشوائية";
+      const prompt = `أنت مصحّح تلاوة خبير ومدرس أحكام تجويد وصوتيات فذ ومحبب للقرآن الكريم.
+لقد قام طالب بقراءة سورة قرآنية، وكان النص النموذجي الفعلي هو:
+"${actualText}"
+أما النص المقروء الذي التقطه المحول الصوتي فهو:
+"${spokenText}"
+
+يرجى تحليل النص المقروء مقارنة بالنموذجي وتقديم:
+1. جودة الحفظ بنسبة مئوية (مثال: 95%).
+2. قائمة بالأخطاء المرتكبة (مثل كلمات مفقودة أو مبدلة).
+3. نصائح تجويد هامة وودودة لنطق الأحرف والكلمات بصوت جميل ورتل هادئ ومتقبس العاطفة والإيمان.
+
+اجعل أسلوبك عربياً بليغاً ومحفزاً وممتعاً جداً. رتب الإجابة بتنسيق Markdown غني وواضح ومريح للعين.`;
+
+      const ai = getGeminiClient();
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.5-flash',
+        contents: [{ parts: [{ text: prompt }] }]
+      });
+
+      setAiReviewResult(response.text);
+    } catch (error) {
+      console.error(error);
+      setAiReviewResult("حدث خطأ أثناء فحص التسميع.");
+    } finally {
+      setAiReviewLoading(false);
+    }
+  };
+
+
+
+  // Rendering Helper: render custom matched words
+  const renderMatchedWords = () => {
+    const actualText = POPULAR_SURAHS_TEXT[recitationSurah];
+    if (!actualText) return null;
+    
+    const matched = matchSpokenWords(actualText, spokenText);
+    return (
+      <div className="flex flex-wrap gap-2 justify-center p-5 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-3xl [direction:rtl] text-right font-serif relative" style={{ fontSize: '1.25rem', lineHeight: '2.5rem' }}>
+        <div className="absolute top-1.5 right-3 text-[9px] font-bold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-full">القرآن النموذجي (تسميع حي)</div>
+        {matched.map((item, index) => {
+          let text = item.text;
+          let colorClass = "text-slate-400 dark:text-slate-600"; // not spoken yet
+          if (item.correct === true) {
+            colorClass = "text-emerald-650 dark:text-emerald-400 font-extrabold bg-emerald-500/10 px-1.5 rounded-md border border-emerald-500/15";
+          } else if (item.correct === false) {
+            colorClass = "text-rose-500 dark:text-rose-450 font-black bg-rose-500/10 px-1.5 rounded-md border border-rose-500/15 decoration-wavy line-through";
+          }
+          return (
+            <span key={index} className={`transition-all duration-300 ${colorClass}`}>
+              {text}
+            </span>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const matchedScore = () => {
+    const actualText = POPULAR_SURAHS_TEXT[recitationSurah];
+    if (!actualText || !spokenText.trim()) return 0;
+    const matched = matchSpokenWords(actualText, spokenText);
+    const correct = matched.filter(w => w.correct === true).length;
+    return Math.round((correct / matched.length) * 100);
   };
 
   // Colors based on customizable card themes
@@ -361,222 +605,523 @@ export default function MemorizationHub({ onBack }: { onBack?: () => void }) {
         </div>
       </div>
 
-      {/* Button to quickly open Share Card overlay */}
-      {portions.length > 0 && (
-        <motion.button
-          whileHover={{ y: -2 }}
-          onClick={() => setShowShareModal(true)}
-          className="w-full py-4 bg-gradient-to-l from-amber-500 to-yellow-600 text-[#0a1914] rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/15"
+      {/* Premium Multi-Tab System Navigation */}
+      <div className="flex bg-slate-100 dark:bg-slate-900 rounded-2xl p-1 shadow-inner border border-black/5 dark:border-white/5 gap-1">
+        <button
+          onClick={() => setActiveTab('tracker')}
+          className={`flex-1 py-2.5 text-[10px] font-black rounded-xl transition-all ${
+            activeTab === 'tracker' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-705 dark:text-slate-200'
+          }`}
         >
-          <Share2 size={18} />
-          <span>تصدير بطاقة مشاركة تقدّم الحفظ الفخمة ✨</span>
-        </motion.button>
+          سجل الحفظ
+        </button>
+        <button
+          onClick={() => setActiveTab('recitation')}
+          className={`flex-1 py-2.5 text-[10px] font-black rounded-xl transition-all ${
+            activeTab === 'recitation' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-705 dark:text-slate-200'
+          }`}
+        >
+          التسميع الصوتي 🎙️
+        </button>
+        <button
+          onClick={() => setActiveTab('revision-planner')}
+          className={`flex-1 py-2.5 text-[10px] font-black rounded-xl transition-all ${
+            activeTab === 'revision-planner' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-705 dark:text-slate-200'
+          }`}
+        >
+          صيانة الحفظ المكرر 🛡️
+        </button>
+      </div>
+
+      {/* --- SUB TAB 1: SILENT TRACKER --- */}
+      {activeTab === 'tracker' && (
+        <div className="space-y-6">
+
+          {/* Form to insert new portion */}
+          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] p-6 shadow-md space-y-4">
+            <h3 className="text-md font-extrabold text-[#0a1914] dark:text-white flex items-center gap-2 border-b border-black/5 dark:border-white/5 pb-3">
+              <Plus size={18} className="text-emerald-500" />
+              <span>تسجيل ورد حفظ أو مراجعة جديد</span>
+            </h3>
+
+            <form onSubmit={handleAddPortion} className="space-y-4">
+              
+              {/* Custom Surah Search Selector Dropdown with Ref */}
+              <div className="relative" ref={dropdownRef}>
+                <label className="block text-xs font-bold text-slate-500 mb-1.5">اختر السورة الكريمة</label>
+                <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 px-3 py-2.5">
+                  <Search size={16} className="text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="ابحث باسم السورة (مثال: الكهف أو 18)..."
+                    value={searchQuery}
+                    onFocus={() => setIsDropdownOpen(true)}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setIsDropdownOpen(true);
+                    }}
+                    className="flex-1 text-sm bg-transparent outline-none text-slate-800 dark:text-slate-100 placeholder-slate-400 font-bold"
+                  />
+                  <span className="text-xs bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-full font-black">
+                    {selectedSurah.name} ({selectedSurah.verses} آية)
+                  </span>
+                </div>
+
+                {/* Render absolute searchable dropdown item list */}
+                {isDropdownOpen && (
+                  <div className="absolute z-40 w-full mt-2.5 max-h-48 overflow-y-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl py-2 divide-y divide-black/5 dark:divide-white/5">
+                    {filteredSurahs.map((s) => (
+                      <button
+                        key={s.number}
+                        type="button"
+                        onClick={() => {
+                          setSelectedSurah(s);
+                          setStartVerse(1);
+                          setEndVerse(s.verses);
+                          setSearchQuery(s.name);
+                          setIsDropdownOpen(false);
+                        }}
+                        className="w-full text-right px-4 py-2.5 text-xs font-bold hover:bg-emerald-500 hover:text-white transition-colors flex justify-between dark:hover:bg-emerald-600"
+                      >
+                        <span>{s.number}. سورة {s.name}</span>
+                        <span>{s.verses} آية</span>
+                      </button>
+                    ))}
+                    {filteredSurahs.length === 0 && (
+                      <div className="text-center py-4 text-xs text-slate-400 font-medium">لم يتم العثور على نتائج للتسمية</div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Verses Range Input Grid */}
+              <div className="grid grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1.5">من الآية</label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={selectedSurah.verses}
+                    value={startVerse}
+                    onChange={(e) => setStartVerse(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-sm font-black text-center"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 mb-1.5">إلى الآية</label>
+                  <input
+                    type="number"
+                    min={startVerse}
+                    max={selectedSurah.verses}
+                    value={endVerse}
+                    onChange={(e) => setEndVerse(Math.min(selectedSurah.verses, parseInt(e.target.value) || selectedSurah.verses))}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-sm font-black text-center"
+                  />
+                </div>
+              </div>
+
+              {/* Status Segment Control Toggle */}
+              <div>
+                <label className="block text-xs font-bold text-slate-500 mb-2">الحالة الإيمانية الحالية للورد</label>
+                <div className="grid grid-cols-3 gap-2 p-1.5 bg-slate-100 dark:bg-slate-800 rounded-2xl">
+                  <button
+                    type="button"
+                    onClick={() => setStatus('memorized')}
+                    className={`py-2 text-[10px] font-black rounded-xl transition-all ${
+                      status === 'memorized' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    تـمّ الحفظ بنجاح
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => setStatus('memorizing')}
+                    className={`py-2 text-[10px] font-black rounded-xl transition-all ${
+                      status === 'memorizing' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    جاري الحفظ الآن
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setStatus('needs_revision')}
+                    className={`py-2 text-[10px] font-black rounded-xl transition-all ${
+                      status === 'needs_revision' ? 'bg-amber-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                    }`}
+                  >
+                    يحتاج تكرار ومراجعة
+                  </button>
+                </div>
+              </div>
+
+              {/* Optional notes section */}
+              <div>
+                <label className="block text-xs font-bold text-slate-500 mb-1.5">ملاحظات أو وقفات تدبرية (اختياري)</label>
+                <textarea
+                  placeholder="مثال: واجهت صعوبة في الربط بين الآية 12 و13، تم التثبيت بالتكرار..."
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-xs font-bold"
+                  rows={2}
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-xs transition-colors shadow-md flex items-center justify-center gap-1.5"
+              >
+                <CheckCircle size={16} />
+                <span>حفظ هذا الورد الجديد في سجل التقوى 📖</span>
+              </button>
+            </form>
+          </div>
+
+          {/* History Ledger List of registered items */}
+          <div className="space-y-4">
+            <h3 className="text-md font-extrabold text-[#0a1914] dark:text-white flex items-center justify-between pb-1">
+              <span>سجل محفوظات القرآن الكريم ومراجعاتك:</span>
+              <span className="text-xs font-bold text-slate-400 bg-black/5 dark:bg-white/5 px-3 py-1 rounded-full">{portions.length} أوراد مسجلة</span>
+            </h3>
+
+            {portions.length === 0 ? (
+              <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-8 text-center text-slate-400 text-xs font-medium relative overflow-hidden flex flex-col items-center">
+                <BookOpen size={40} className="text-slate-300 dark:text-slate-800 mb-3" />
+                <span>سجلّ الحفظ فارغ حالياً. باشر تلاوة جزء عم أو السور التي تحفظها وسجّلها لتتابع سلسلة تقدّمك اليومي!</span>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {portions.map((item) => (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex justify-between items-center relative overflow-hidden group"
+                  >
+                    {/* Visual Accent Colored strip based on status */}
+                    <div className={`absolute top-0 right-0 w-1.5 h-full ${
+                      item.status === 'memorized' ? 'bg-emerald-500' : item.status === 'memorizing' ? 'bg-blue-500' : 'bg-amber-500'
+                    }`}></div>
+
+                    <div className="pr-2 space-y-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm font-black text-slate-800 dark:text-slate-100 font-serif">سورة {item.surahName}</span>
+                        <span className="text-[10px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-500 font-bold">
+                          {item.startVerse === item.endVerse ? `الآية ${item.startVerse}` : `الآيات ${item.startVerse} - ${item.endVerse}`}
+                        </span>
+                      </div>
+
+                      {item.notes && (
+                        <p className="text-[11px] text-slate-400 bg-slate-50 dark:bg-slate-950 p-2 rounded-lg font-mono">
+                          {item.notes}
+                        </p>
+                      )}
+
+                      <div className="flex gap-2 text-[10px] text-slate-400 font-bold">
+                        <span>تاريخ الإضافة: {item.dateAdded}</span>
+                        <span>•</span>
+                        <span className={`${
+                          item.status === 'memorized' ? 'text-emerald-500' : item.status === 'memorizing' ? 'text-blue-500' : 'text-amber-500'
+                        }`}>
+                          {item.status === 'memorized' ? 'تم الحفظ ✔️' : item.status === 'memorizing' ? 'قيد الحفظ ⏳' : 'تحتاج مراجعة 🚨'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleDeletePortion(item.id)}
+                      className="p-2 ml-1 text-slate-300 hover:text-red-500 transition-colors bg-slate-50 dark:bg-slate-800 hover:bg-red-500/10 dark:hover:bg-red-500/20 rounded-xl"
+                      title="حذف الورد"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       )}
 
-      {/* Form to insert new portion */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] p-6 shadow-md space-y-4">
-        <h3 className="text-md font-extrabold text-[#0a1914] dark:text-white flex items-center gap-2 border-b border-black/5 dark:border-white/5 pb-3">
-          <Plus size={18} className="text-emerald-500" />
-          <span>تسجيل ورد حفظ أو مراجعة جديد</span>
-        </h3>
-
-        <form onSubmit={handleAddPortion} className="space-y-4">
-          
-          {/* Custom Surah Search Selector Dropdown with Ref */}
-          <div className="relative" ref={dropdownRef}>
-            <label className="block text-xs font-bold text-slate-500 mb-1.5">اختر السورة الكريمة</label>
-            <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 px-3 py-2.5">
-              <Search size={16} className="text-slate-400" />
-              <input
-                type="text"
-                placeholder="ابحث باسم السورة (مثال: الكهف أو 18)..."
-                value={searchQuery}
-                onFocus={() => setIsDropdownOpen(true)}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setIsDropdownOpen(true);
-                }}
-                className="flex-1 text-sm bg-transparent outline-none text-slate-800 dark:text-slate-100 placeholder-slate-400 font-bold"
-              />
-              <span className="text-xs bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-full font-black">
-                {selectedSurah.name} ({selectedSurah.verses} آية)
-              </span>
+      {/* --- SUB TAB 2: AI RECITATION COMPANION --- */}
+      {activeTab === 'recitation' && (
+        <div className="space-y-6 animate-fade-in">
+          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] p-6 shadow-md space-y-4">
+            <div className="flex items-center gap-2 border-b border-black/5 dark:border-white/5 pb-3">
+              <span className="p-1.5 bg-emerald-500/10 rounded-lg text-emerald-600 font-black">🎙️</span>
+              <h3 className="text-md font-extrabold text-[#0a1914] dark:text-white">المصحّح والتسميع الصوتي بالذكاء الاصطناعي</h3>
             </div>
 
-            {/* Render absolute searchable dropdown item list */}
-            {isDropdownOpen && (
-              <div className="absolute z-40 w-full mt-2.5 max-h-48 overflow-y-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl py-2 divide-y divide-black/5 dark:divide-white/5">
-                {filteredSurahs.map((s) => (
+            <p className="text-[11px] text-slate-400 leading-relaxed leading-5">
+              اختر السورة المُراد تسميعها عن ظهر قلب وباشر التلاوة بصوتك العذب. يقوم النظام المحلي بتمثيل الحفظ ومطابقة مخارج الكلمات (مع مطابقة ذكية للكلمات الصعبة مثل <strong>الم</strong> لتفهم الأحرف المتقطعة)، ومن ثمّ يمكنك طلب تقييم تجويد وتأصيل كامل بالذكاء الاصطناعي!
+            </p>
+
+            {/* Popular Surah choosing grid */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-slate-400">اختر السورة للبدء بالتسميع:</label>
+              <div className="grid grid-cols-4 gap-1.5">
+                {popularSurahs.map((ps) => (
                   <button
-                    key={s.number}
-                    type="button"
+                    key={ps.number}
                     onClick={() => {
-                      setSelectedSurah(s);
-                      setStartVerse(1);
-                      setEndVerse(s.verses);
-                      setSearchQuery(s.name);
-                      setIsDropdownOpen(false);
+                      setRecitationSurah(ps.number);
+                      setSpokenText('');
+                      setAiReviewResult(null);
                     }}
-                    className="w-full text-right px-4 py-2.5 text-xs font-bold hover:bg-emerald-500 hover:text-white transition-colors flex justify-between dark:hover:bg-emerald-600"
+                    className={`py-2 text-[10px] font-black rounded-xl border transition-all ${
+                      recitationSurah === ps.number
+                        ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white shadow-sm border-transparent'
+                        : 'border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-650 dark:text-slate-300'
+                    }`}
                   >
-                    <span>{s.number}. سورة {s.name}</span>
-                    <span>{s.verses} آية</span>
+                    {ps.name}
                   </button>
                 ))}
-                {filteredSurahs.length === 0 && (
-                  <div className="text-center py-4 text-xs text-slate-400 font-medium">لم يتم العثور على نتائج للتسمية</div>
-                )}
+              </div>
+            </div>
+
+            {/* Live Visual Speech Comparison Panel */}
+            {POPULAR_SURAHS_TEXT[recitationSurah] && (
+              <div className="space-y-3">
+                {renderMatchedWords()}
+              </div>
+            )}
+
+            {/* Live spoken tracking bubble */}
+            <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 min-h-[70px] flex flex-col justify-between">
+              <span className="text-[9px] font-bold text-slate-400 mb-1 block">النص الملتقط من تلاوتك الآن:</span>
+              <p className="text-xs font-semibold text-slate-700 dark:text-slate-100 italic leading-5">
+                {spokenText || "تلاوتك العطرة ستظهر هنا كلمة بكلمة فور قيامك بالبدء والتحدث..."}
+              </p>
+              {spokenText.trim() !== '' && (
+                <div className="mt-3 pt-2.5 border-t border-black/5 dark:border-white/5 flex justify-between items-center text-[10px] font-bold">
+                  <span className="text-slate-400">دقة مطابقة الحفظ التقريبية:</span>
+                  <span className="text-emerald-500 text-sm font-black">{matchedScore()}%</span>
+                </div>
+              )}
+            </div>
+
+            {/* Action buttons triggers */}
+            <div className="flex gap-2.5">
+              {!isListening ? (
+                <button
+                  type="button"
+                  onClick={startReciting}
+                  className="flex-1 py-3.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white rounded-2xl font-black text-xs flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/10"
+                >
+                  <span className="w-2.5 h-2.5 bg-white rounded-full animate-ping"></span>
+                  <span>ابدأ التسميع الصوتي المباشر 🎙️</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={stopReciting}
+                  className="flex-1 py-3.5 bg-rose-600 hover:bg-rose-700 text-white rounded-2xl font-black text-xs flex items-center justify-center gap-1.5 shadow-md shadow-rose-500/10"
+                >
+                  <span className="w-2.5 h-2.5 bg-white rounded-full"></span>
+                  <span>إنهاء وحفظ التسميع الحالي ⏹️</span>
+                </button>
+              )}
+            </div>
+
+            {/* Dynamic AI Detailed grading trigger */}
+            {spokenText.trim() !== '' && (
+              <div className="pt-2 border-t border-black/5 dark:border-white/5">
+                <button
+                  type="button"
+                  onClick={handleAIReview}
+                  disabled={aiReviewLoading}
+                  className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 text-slate-950 rounded-2xl font-black text-xs flex items-center justify-center gap-1.5 shadow-md disabled:opacity-50"
+                >
+                  <Sparkles size={16} />
+                  <span>{aiReviewLoading ? "جاري تدقيق مخارج التلاوة بالذكاء الاصطناعي..." : "طلب تدقيق تجويدي كامل بالذكاء الاصطناعي ✨"}</span>
+                </button>
               </div>
             )}
           </div>
 
-          {/* Verses Range Input Grid */}
-          <div className="grid grid-cols-2 gap-3.5">
-            <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1.5">من الآية</label>
-              <input
-                type="number"
-                min={1}
-                max={selectedSurah.verses}
-                value={startVerse}
-                onChange={(e) => setStartVerse(Math.max(1, parseInt(e.target.value) || 1))}
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-sm font-black text-center"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-500 mb-1.5">إلى الآية</label>
-              <input
-                type="number"
-                min={startVerse}
-                max={selectedSurah.verses}
-                value={endVerse}
-                onChange={(e) => setEndVerse(Math.min(selectedSurah.verses, parseInt(e.target.value) || selectedSurah.verses))}
-                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2.5 text-sm font-black text-center"
-              />
-            </div>
+          {/* AI Markdown response Card */}
+          {aiReviewResult && (
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-gradient-to-tr from-slate-900 to-slate-950 border border-emerald-500/20 rounded-[2.2rem] p-6 text-white shadow-xl space-y-4"
+            >
+              <div className="flex items-center gap-2 pb-2 border-b border-white/5">
+                <span className="text-amber-400">✨</span>
+                <h4 className="text-sm font-extrabold text-amber-300">تقرير أحكام التجويد والضبط القرآني للمقرئ:</h4>
+              </div>
+
+              <div className="text-xs leading-6 text-slate-200 space-y-3 font-serif whitespace-pre-line text-right">
+                {aiReviewResult}
+              </div>
+
+              <div className="text-[10px] text-slate-400 bg-white/5 py-2 px-4 rounded-xl text-center">
+                هذا التقرير تم إعداده باستخدام نموذج الذكاء الاصطناعي لمساعدتك في ترتيل الذكر الحكيم 🌸
+              </div>
+            </motion.div>
+          )}
+        </div>
+      )}
+
+      {/* --- SUB TAB 3: REVISION PLANNER --- */}
+      {activeTab === 'revision-planner' && (
+        <div className="space-y-6">
+          {/* Encouraging preservation banner */}
+          <div className="bg-gradient-to-br from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-[2rem] p-5 text-right relative overflow-hidden">
+            <span className="absolute left-4 top-4 text-3xl opacity-20">🛡️</span>
+            <h4 className="font-bold text-xs text-amber-700 dark:text-amber-400 mb-1 font-serif">مبدأ صيانة تفلت المحفوظ</h4>
+            <p className="text-[10px] text-slate-500 dark:text-slate-300 leading-relaxed font-bold">
+              قال رسول الله ﷺ: «تعاهدوا هذا القرآن، فوالذي نفس محمد بيده لَهُوَ أشدّ تفلُّتاً من الإبل في عُقُلها».
+              يقوم التطبيق بحساب "مؤشر المناعة وصيانة الحفظ" تلقائياً؛ ينخفض المؤشر تدريجياً بنسبة تفلت يومية قدرها 5% للتثبيت، ومراجعة الورد تعيده فوراً للحصانة التامة 100%.
+            </p>
           </div>
 
-          {/* Status Segment Control Toggle */}
-          <div>
-            <label className="block text-xs font-bold text-slate-500 mb-2">الحالة الإيمانية الحالية للورد</label>
-            <div className="grid grid-cols-3 gap-2 p-1.5 bg-slate-100 dark:bg-slate-800 rounded-2xl">
-              <button
-                type="button"
-                onClick={() => setStatus('memorized')}
-                className={`py-2 text-[10px] font-black rounded-xl transition-all ${
-                  status === 'memorized' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
-                }`}
-              >
-                تـمّ الحفظ بنجاح
-              </button>
-              
-              <button
-                type="button"
-                onClick={() => setStatus('memorizing')}
-                className={`py-2 text-[10px] font-black rounded-xl transition-all ${
-                  status === 'memorizing' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
-                }`}
-              >
-                جاري الحفظ الآن
-              </button>
+          {/* Daily Priority target card */}
+          {portions.length > 0 && (() => {
+            const compiledPortions = portions.map(p => {
+              const lastRevDate = p.lastRevisedDate ? new Date(p.lastRevisedDate) : new Date(p.id ? parseInt(p.id) : Date.now());
+              const daysDiff = Math.max(0, Math.floor((Date.now() - lastRevDate.getTime()) / (1000 * 60 * 60 * 24)));
+              const immunity = Math.max(10, 100 - daysDiff * 5);
+              return { ...p, daysDiff, immunity };
+            });
 
-              <button
-                type="button"
-                onClick={() => setStatus('needs_revision')}
-                className={`py-2 text-[10px] font-black rounded-xl transition-all ${
-                  status === 'needs_revision' ? 'bg-amber-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
-                }`}
-              >
-                يحتاج تكرار ومراجعة
-              </button>
-            </div>
-          </div>
+            const priorityPortion = compiledPortions.reduce((acc, curr) => curr.immunity < acc.immunity ? curr : acc, compiledPortions[0]);
 
-          {/* Optional notes section */}
-          <div>
-            <label className="block text-xs font-bold text-slate-500 mb-1.5">ملاحظات أو وقفات تدبرية (اختياري)</label>
-            <textarea
-              placeholder="مثال: واجهت صعوبة في الربط بين الآية 12 و13، تم التثبيت بالتكرار..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-xs font-bold"
-              rows={2}
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-xs transition-colors shadow-md flex items-center justify-center gap-1.5"
-          >
-            <CheckCircle size={16} />
-            <span>حفظ هذا الورد الجديد في سجل التقوى 📖</span>
-          </button>
-        </form>
-      </div>
-
-      {/* History Ledger List of registered items */}
-      <div className="space-y-4">
-        <h3 className="text-md font-extrabold text-[#0a1914] dark:text-white flex items-center justify-between pb-1">
-          <span>سجل محفوظات القرآن الكريم ومراجعاتك:</span>
-          <span className="text-xs font-bold text-slate-400 bg-black/5 dark:bg-white/5 px-3 py-1 rounded-full">{portions.length} أوراد مسجلة</span>
-        </h3>
-
-        {portions.length === 0 ? (
-          <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-8 text-center text-slate-400 text-xs font-medium relative overflow-hidden flex flex-col items-center">
-            <BookOpen size={40} className="text-slate-300 dark:text-slate-800 mb-3" />
-            <span>سجلّ الحفظ فارغ حالياً. باشر تلاوة جزء عم أو السور التي تحفظها وسجّلها لتتابع سلسلة تقدّمك اليومي!</span>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {portions.map((item) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex justify-between items-center relative overflow-hidden group"
-              >
-                {/* Visual Accent Colored strip based on status */}
-                <div className={`absolute top-0 right-0 w-1.5 h-full ${
-                  item.status === 'memorized' ? 'bg-emerald-500' : item.status === 'memorizing' ? 'bg-blue-500' : 'bg-amber-500'
-                }`}></div>
-
-                <div className="pr-2 space-y-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-sm font-black text-slate-800 dark:text-slate-100 font-serif">سورة {item.surahName}</span>
-                    <span className="text-[10px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-500 font-bold">
-                      {item.startVerse === item.endVerse ? `الآية ${item.startVerse}` : `الآيات ${item.startVerse} - ${item.endVerse}`}
+            if (priorityPortion && priorityPortion.immunity < 95) {
+              return (
+                <div className="bg-rose-500/5 dark:bg-rose-500/10 border border-rose-500/20 p-4 rounded-[2rem] space-y-2.5">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[9px] bg-rose-500/15 text-rose-600 dark:text-rose-400 px-2 py-0.5 rounded-full font-black">
+                      ورد الحفظ المستعجل لليوم 🚨
                     </span>
+                    <span className="text-[9px] font-bold text-rose-500">منخفض المناعة!</span>
                   </div>
-
-                  {item.notes && (
-                    <p className="text-[11px] text-slate-400 bg-slate-50 dark:bg-slate-950 p-2 rounded-lg font-mono">
-                      {item.notes}
-                    </p>
-                  )}
-
-                  <div className="flex gap-2 text-[10px] text-slate-400 font-bold">
-                    <span>تاريخ الإضافة: {item.dateAdded}</span>
-                    <span>•</span>
-                    <span className={`${
-                      item.status === 'memorized' ? 'text-emerald-500' : item.status === 'memorizing' ? 'text-blue-500' : 'text-amber-500'
-                    }`}>
-                      {item.status === 'memorized' ? 'تم الحفظ ✔️' : item.status === 'memorizing' ? 'قيد الحفظ ⏳' : 'تحتاج مراجعة 🚨'}
-                    </span>
-                  </div>
+                  <p className="text-xs text-slate-800 dark:text-slate-100 font-bold">
+                    سورة <span className="font-serif font-black text-rose-600 dark:text-rose-400 text-sm">{priorityPortion.surahName}</span> (الآيات من {priorityPortion.startVerse} إلى {priorityPortion.endVerse})
+                  </p>
+                  <p className="text-[10px] text-slate-400 font-medium">آخر مراجعة كانت منذ {priorityPortion.daysDiff} أيام. مؤشّر تفلّت السورة من صدرك في خطر وهن!</p>
+                  <button
+                    onClick={() => handleRevisePortion(priorityPortion.id)}
+                    className="w-full py-2 bg-gradient-to-r from-rose-500 to-amber-600 hover:from-rose-600 hover:to-amber-700 text-white rounded-xl text-[10px] font-black flex items-center justify-center gap-1.5 shadow-md"
+                  >
+                    <RefreshCw size={12} />
+                    <span>مراجعة الورد وتثبيته الآن (+50 ن)</span>
+                  </button>
                 </div>
+              );
+            }
+            return null;
+          })()}
 
-                <button
-                  onClick={() => handleDeletePortion(item.id)}
-                  className="p-2 ml-1 text-slate-300 hover:text-red-500 transition-colors bg-slate-50 dark:bg-slate-800 hover:bg-red-500/10 dark:hover:bg-red-500/20 rounded-xl"
-                  title="حذف الورد"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </motion.div>
-            ))}
+          {/* Core Portions revision list */}
+          <div className="space-y-4">
+            <h4 className="font-bold text-xs text-slate-400 mr-1 flex justify-between items-center">
+              <span>سجلات حصانة أوراد ومحفوظات صدرك:</span>
+              <span className="text-[10px] text-emerald-500 font-black">إجمالي الأوراد: {portions.length}</span>
+            </h4>
+
+            {portions.length === 0 ? (
+              <div className="bg-slate-50 dark:bg-slate-900 border border-dashed border-slate-200 dark:border-slate-800 p-8 rounded-[2rem] text-center space-y-2">
+                <span className="block text-2xl">🌱</span>
+                <p className="text-xs text-slate-500 font-black">صدرك فارغ من الأوراد المسجّلة للآن في التطبيق!</p>
+                <p className="text-[10px] text-slate-400 font-medium max-w-[280px] mx-auto leading-relaxed">
+                  اذهب للعلامة "سجل الحفظ" وأضف السور والأوراد التي تقوم بحفظها أو مراجعتها لتراقب نسبة تماسكها وتلقى الإرشادات المعينة.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {portions.map((p) => {
+                  const lastRevDate = p.lastRevisedDate ? new Date(p.lastRevisedDate) : new Date(p.id ? parseInt(p.id) : Date.now());
+                  const daysDiff = Math.max(0, Math.floor((Date.now() - lastRevDate.getTime()) / (1000 * 60 * 60 * 24)));
+                  const immunity = Math.max(10, 100 - daysDiff * 5);
+
+                  let colorClass = "bg-emerald-500";
+                  let bgBlock = "bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400";
+                  let statusTitle = "مـحفوظ ومثبّت متيـن 🟢";
+
+                  if (immunity <= 50) {
+                    colorClass = "bg-rose-500";
+                    bgBlock = "bg-rose-500/10 border-rose-500/20 text-rose-600 dark:text-rose-400";
+                    statusTitle = "ضعيف جداً - تفلّت وجوبي 🔴";
+                  } else if (immunity <= 80) {
+                    colorClass = "bg-amber-500";
+                    bgBlock = "bg-amber-500/10 border-amber-500/20 text-amber-600 dark:text-amber-400";
+                    statusTitle = "آذن بالتفلت - تكرار كافٍ 🟡";
+                  }
+
+                  return (
+                    <div 
+                      key={p.id}
+                      className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 rounded-[2rem] space-y-3 shadow-sm relative group overflow-hidden"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="text-right">
+                          <h5 className="font-extrabold text-slate-800 dark:text-slate-100 text-sm font-serif">
+                            سورة {p.surahName}
+                          </h5>
+                          <p className="text-[10px] text-slate-400 font-bold mt-0.5">
+                            الآيات: من {p.startVerse} إلى {p.endVerse} • {p.endVerse - p.startVerse + 1} آيات
+                          </p>
+                        </div>
+
+                        <span className={`text-[9px] px-2.5 py-1 border rounded-full font-black ${bgBlock}`}>
+                          {statusTitle}
+                        </span>
+                      </div>
+
+                      {/* Immunity Meter bar */}
+                      <div className="space-y-1">
+                        <div className="flex justify-between items-center text-[9px] text-slate-400 font-black">
+                          <span>حصانة ومناعة الحفظ من السوء:</span>
+                          <span className={`font-mono font-black ${immunity <= 50 ? 'text-rose-500' : immunity <= 80 ? 'text-amber-500' : 'text-emerald-500'}`}>
+                            {immunity}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-slate-50 dark:bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-100 dark:border-slate-800">
+                          <div 
+                            className={`h-full ${colorClass} transition-all duration-500`}
+                            style={{ width: `${immunity}%` }}
+                          />
+                        </div>
+                        <p className="text-[8px] text-slate-400 text-right mt-0.5 h-3">
+                          {daysDiff === 0 
+                            ? "تمّت مراجعته اليوم بحمد الله، الحفظ في أمان الله." 
+                            : `آخر مراجعة تمت منذ ${daysDiff} أيام.`
+                          }
+                        </p>
+                      </div>
+
+                      {/* Action trigger row */}
+                      <div className="pt-2.5 border-t border-black/5 dark:border-white/5 flex gap-2">
+                        <button
+                          onClick={() => handleRevisePortion(p.id)}
+                          className="flex-1 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-600 rounded-xl text-[10px] font-black text-slate-600 dark:text-slate-350 transition-all flex items-center justify-center gap-1"
+                        >
+                          <CheckCircle size={12} />
+                          <span>قرأت وكررت هذا الورد لتثبيته 🔁</span>
+                        </button>
+                        
+                        <button
+                          onClick={() => {
+                            setRecitationSurah(p.surahNumber);
+                            setActiveTab('recitation');
+                          }}
+                          className="p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-600 rounded-xl text-slate-400 hover:text-white transition-colors"
+                          title="تسميع صوتي مباشر"
+                        >
+                          <Mic size={13} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {onBack && (
         <button
@@ -586,107 +1131,6 @@ export default function MemorizationHub({ onBack }: { onBack?: () => void }) {
           العودة لوحة التحكم الرائدة
         </button>
       )}
-
-      {/* Visual Overlay of the Share progress Card Creator */}
-      <AnimatePresence>
-        {showShareModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto"
-            onClick={() => setShowShareModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-[2rem] p-6 max-w-sm w-full shadow-2xl space-y-5"
-              onClick={e => e.stopPropagation()}
-            >
-              <div className="flex justify-between items-center border-b border-black/5 dark:border-white/5 pb-3">
-                <h3 className="text-md font-extrabold text-[#0a1914] dark:text-white font-serif">صانع بطاقة مشاركة التقدم الإيمانية ✨</h3>
-                <button onClick={() => setShowShareModal(false)} className="text-slate-400 hover:text-slate-600 text-xs font-black">إغلاق</button>
-              </div>
-
-              {/* Theme customization row selection */}
-              <div className="space-y-1.5">
-                <span className="block text-xs font-bold text-slate-400">اختر طابع البطاقة البصري:</span>
-                <div className="flex gap-2">
-                  {Object.keys(themeStyles).map((t) => (
-                    <button
-                      key={t}
-                      onClick={() => setShareTheme(t as any)}
-                      className={`flex-1 py-1.5 text-[10px] font-black rounded-lg border uppercase transition-all ${
-                        shareTheme === t 
-                          ? 'bg-emerald-500 border-none text-white font-black' 
-                          : 'border-slate-200 dark:border-slate-800 text-slate-500 bg-transparent'
-                      }`}
-                    >
-                      {t === 'emerald' ? 'زبرجد' : t === 'amber' ? 'كهرمان' : t === 'indigo' ? 'ياقوت' : 'رمادي ملحمي'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Interactive Visual Share Card - Perfectly styled to emulate high-end graphic design */}
-              <div className={`p-6 rounded-[2.5rem] border ${themeStyles[shareTheme].border} ${themeStyles[shareTheme].bg} relative overflow-hidden shadow-xl text-center self-center`}>
-                {/* Decorative Geometric Overlays */}
-                <div className="absolute top-0 right-0 w-44 h-44 bg-white/5 rounded-full -mr-16 -mt-16 border border-white/5"></div>
-                <div className="absolute bottom-0 left-0 w-36 h-36 bg-black/10 rounded-full -ml-16 -mb-16"></div>
-
-                <div className="relative z-10 space-y-4">
-                  {/* Arabic Icon Frame */}
-                  <div className="w-12 h-12 bg-white/10 rounded-2xl mx-auto flex items-center justify-center border border-white/20 shadow-md">
-                    <Star size={24} className="text-amber-400 animate-pulse" />
-                  </div>
-
-                  <div className="space-y-1">
-                    <h4 className="text-lg font-extrabold font-serif tracking-wide text-white">بطاقة تقدّم مَحراب التقوى</h4>
-                    <span className="block text-[10px] text-slate-300 font-medium">خطوة بخطوة نحو ختم كتاب الله الجليل</span>
-                  </div>
-
-                  {/* Highlights statistics list */}
-                  <div className="p-4 bg-black/20 rounded-2xl border border-white/5 divide-y divide-white/5 text-right space-y-2 text-xs font-bold font-serif shadow-inner">
-                    <div className="flex justify-between py-1 items-center">
-                      <span className="text-slate-300">إجمالي الآيات المحفوظة:</span>
-                      <span className="text-sm font-black text-white">{getTotalVersesCount()} آيات</span>
-                    </div>
-                    <div className="flex justify-between py-1.5 items-center">
-                      <span className="text-slate-300">نسبة الإنجاز الفعلي للقرآن:</span>
-                      <span className={`text-sm font-black ${themeStyles[shareTheme].accent}`}>{getProgressPercent()}%</span>
-                    </div>
-                    <div className="flex justify-between py-1 items-center">
-                      <span className="text-slate-300">سلسلة الورد المتتالية:</span>
-                      <span className="text-sm font-black text-amber-300">{streak} أيام طاعة</span>
-                    </div>
-                  </div>
-
-                  <p className="text-[10px] text-slate-300/80 leading-relaxed font-mono antialiased px-2">
-                    "يقال لصاحب القرآن اقرأ وارق ورتل كما كنت ترتل في الدنيا فإن منزلتك عند آخر آية تقرؤها"
-                  </p>
-
-                  <div className="text-[9px] bg-white/10 backdrop-blur-md py-1 px-4 rounded-full inline-block border border-white/15">
-                     صُنعت بـ حُب وتدبر عبر تطبيق الحق 🕌
-                  </div>
-                </div>
-              </div>
-
-              {/* Share copy button trigger */}
-              <div className="space-y-2.5">
-                <button
-                  onClick={notifyShare}
-                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-xs transition-colors shadow-md flex items-center justify-center gap-1.5"
-                >
-                  <Share2 size={16} />
-                  <span>{copiedLink ? 'تم نسخ التقديم لقلبك! 👍' : 'نسخ نص التقدم للمشاركة'}</span>
-                </button>
-                <p className="text-[10px] text-center text-slate-400 font-medium">تستطيع مشاركتها مع أهلك وأصحابك ومجموعات الواتساب تشجيعاً وتحفيزاً للقرآن</p>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
       
     </div>
   );

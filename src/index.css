@@ -60,7 +60,8 @@ html, body {
 
 body {
   font-family: var(--font-sans);
-  @apply bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100;
+  background-color: var(--color-bg);
+  color: var(--color-text);
   -webkit-tap-highlight-color: transparent;
   user-select: none;
   -webkit-user-select: none;

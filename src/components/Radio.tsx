@@ -6,7 +6,6 @@ import {
   Volume2,
   VolumeX,
   Search,
-  Tv,
   ArrowRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
@@ -417,42 +416,27 @@ const STATIONS: RadioStation[] = [
   },
 ];
 
-const TV_CHANNELS = [
-  {
-    id: "tv1",
-    name: "البث المباشر للحرم المكي الشريف - مكة المكرمة",
-    videoId: "g0S_fMeeS4E", // Saudi Quran Live Stream
-  },
-  {
-    id: "tv2",
-    name: "البث المباشر للمسجد النبوي الشريف - المدينة المنورة",
-    videoId: "XmGv7yP-N7I", // Madinah Live Stream
-  },
-  {
-    id: "tv-guide-hajj",
-    name: "رحلة الحج خطوة بخطوة (كيف تؤدي مناسك الحج بالتفصيل؟)",
-    videoId: "P1A75IeM_t0",
-  },
-  {
-    id: "tv-arafah",
-    name: "يوم عرفة .. فضل خير يوم طلعت فيه الشمس والعتق من النار",
-    videoId: "M5u8a23UfU4",
-  },
-  {
-    id: "tv-recreation",
-    name: "تلاوة خاشعة كأنك تسمعها لأول مرة - القارئ رعد الكردي",
-    videoId: "C4X66gS4j-c",
-  },
-  {
-    id: "tv-kaaba-doc",
-    name: "مقطع مذهل: في أعماق الكعبة المشرفة وتفاصيل تاريخ الكسوة العظيمة",
-    videoId: "7i3X-r-eLvs",
-  }
-];
+const cleanRadioUrl = (url: string) => {
+  let cleaned = url.replace("http://", "https://");
+  cleaned = cleaned.replace("https://qurango.net/", "https://backup.qurango.net/");
+  cleaned = cleaned.replace("athkar_masaa", "athkar_masa");
+  cleaned = cleaned.replace("takbeer", "eid");
+  cleaned = cleaned.replace("saad_alghamidi", "saad_alghamdi");
+  cleaned = cleaned.replace("maher_almuaiqly", "maher");
+  cleaned = cleaned.replace("abu_bakr_alshatri", "shaik_abu_bakr_al_shatri");
+  cleaned = cleaned.replace("salah_bukhatir", "slaah_bukhatir");
+  cleaned = cleaned.replace("bandar_balila", "bandar_balilah");
+  cleaned = cleaned.replace("mohammad_al_tablaway", "mohammad_altablaway");
+  return cleaned;
+};
 
 export default function IslamicRadio({ onBack }: { onBack?: () => void }) {
-  const [activeTab, setActiveTab] = useState<"radio" | "tv">("radio");
-  const [stations, setStations] = useState<RadioStation[]>(STATIONS);
+  const [stations, setStations] = useState<RadioStation[]>(() =>
+    STATIONS.map((s) => ({
+      ...s,
+      url: cleanRadioUrl(s.url),
+    }))
+  );
   const [currentStation, setCurrentStation] = useState<RadioStation | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -469,12 +453,16 @@ export default function IslamicRadio({ onBack }: { onBack?: () => void }) {
           const fetchedStations = data.radios.map((r: any) => ({
             id: `api_${r.id}`,
             name: r.name,
-            url: r.url,
+            url: cleanRadioUrl(r.url),
             type: "قراء و منوعات"
           }));
           
           // merge avoiding duplicates by name
-          const finalStations = [...STATIONS];
+          const finalStations = STATIONS.map((s) => ({
+            ...s,
+            url: cleanRadioUrl(s.url),
+          }));
+          
           fetchedStations.forEach((fs: any) => {
              if (!finalStations.find(s => s.name === fs.name)) {
                 finalStations.push(fs);
@@ -627,47 +615,16 @@ export default function IslamicRadio({ onBack }: { onBack?: () => void }) {
         <div className="absolute inset-0 opacity-5 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat"></div>
         <div className="relative z-10">
           <h1 className="text-3xl font-bold font-serif mb-2 flex justify-center items-center gap-3 drop-shadow-[0_0_10px_rgba(212,175,55,0.3)] text-emerald-400">
-            {activeTab === "radio" ? <RadioIcon size={32} /> : <Tv size={32} />}
-            {activeTab === "radio" ? "الإذاعة الإسلامية" : "البث التلفزيوني"}
+            <RadioIcon size={32} />
+            الإذاعة الإسلامية
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
+          <p className="text-slate-300 dark:text-slate-400 text-sm font-medium">
             بث مباشر على مدار الساعة
           </p>
         </div>
       </motion.div>
 
-      {/* Tabs */}
-      <div className="flex bg-white dark:bg-slate-900 p-1 rounded-2xl shadow-sm border border-black/5 dark:border-white/5">
-        <button
-          onClick={() => setActiveTab("radio")}
-          className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-            activeTab === "radio"
-              ? "bg-emerald-500 text-white shadow-md"
-              : "text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5"
-          }`}
-        >
-          <RadioIcon size={18} />
-          الإذاعة
-        </button>
-        <button
-          onClick={() => {
-            setActiveTab("tv");
-            if (isPlaying) togglePlay();
-          }}
-          className={`flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${
-            activeTab === "tv"
-              ? "bg-emerald-500 text-white shadow-md"
-              : "text-slate-500 dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5"
-          }`}
-        >
-          <Tv size={18} />
-          التلفزيون
-        </button>
-      </div>
-
-      {activeTab === "radio" ? (
-        <>
-          {/* Search Bar */}
+      {/* Search Bar */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -844,35 +801,6 @@ export default function IslamicRadio({ onBack }: { onBack?: () => void }) {
           </motion.div>
         )}
       </AnimatePresence>
-      </>
-      ) : (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-6"
-        >
-          {TV_CHANNELS.map((channel) => (
-            <div key={channel.id} className="card-3d overflow-hidden rounded-3xl bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 shadow-lg">
-              <div className="p-4 border-b border-black/5 dark:border-white/5">
-                <h3 className="font-bold font-serif text-lg text-emerald-500 flex items-center gap-2">
-                  <Tv size={20} />
-                  {channel.name}
-                </h3>
-              </div>
-              <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-                <iframe
-                  className="absolute top-0 left-0 w-full h-full"
-                  src={`https://www.youtube.com/embed/${channel.videoId}?autoplay=0&mute=0&controls=1&rel=0`}
-                  title={channel.name}
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              </div>
-            </div>
-          ))}
-        </motion.div>
-      )}
     </div>
   );
 }

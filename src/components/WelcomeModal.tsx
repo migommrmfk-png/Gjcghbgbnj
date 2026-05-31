@@ -68,11 +68,11 @@ export default function WelcomeModal({ onEnableNotifications }: WelcomeModalProp
               <Logo className="w-24 h-24 mb-4" />
               
               <h2 className="text-2xl font-bold text-emerald-600 font-serif mb-2">
-                مرحباً بك في اليقين
+                مرحباً بك في تطبيق يقين
               </h2>
               
               <p className="text-gray-600 leading-relaxed mb-6 font-sans">
-                تطبيقك الإسلامي الشامل، صُمم بحب ليكون رفيقك اليومي في الطاعات. نسأل الله أن يتقبل منا ومنكم صالح الأعمال.
+                تطبيقك الإسلامي الشامل دليلك اليومي الموثوق في العبادات والطاعات وأعمال البر ومتابعة حفظ القرآن والذكر والقبلة. نسأل الله أن يتقبل منا ومنكم صالح الأعمال.
               </p>
               
               <div className="bg-gray-50 p-4 rounded-2xl w-full mb-6 border border-gray-100">

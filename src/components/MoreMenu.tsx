@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe, TrendingUp, Play, Circle, Sun, Settings, Download, Crown, Award, Activity, Wind, TreePine, CheckCircle, Baby, Hourglass, History, Share2 } from 'lucide-react';
+import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe, TrendingUp, Play, Circle, Sun, Settings, Download, Crown, Award, Activity, Wind, TreePine, CheckCircle, Baby, Hourglass, History, Share2, VideoOff } from 'lucide-react';
 import { usePrayerTimes } from '../contexts/PrayerTimesContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +27,95 @@ export default function MoreMenu({
   const [showLangModal, setShowLangModal] = useState(false);
   const [showPrayerSettingsModal, setShowPrayerSettingsModal] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
+  const [customAvatar, setCustomAvatar] = useState(() => localStorage.getItem('customUserAvatar') || 'initial');
+  const [reelsLocked, setReelsLocked] = useState(() => localStorage.getItem('reels_locked') === 'true');
+
+  const defaultAvatars = [
+    { id: 'initial', name: 'رمز الحرف الأول' },
+    { id: 'classic-man', name: 'الرمز الرجالي الكلاسيكي' },
+    { id: 'modern-man', name: 'الرمز الرجالي العصري' },
+    { id: 'modest-woman', name: 'الرمز النسائي المحتشم' },
+    { id: 'abaya-woman', name: 'الرمز النسائي العباءة' },
+    { id: 'spiritual-lunar', name: 'الرمز الروحاني العام' },
+  ];
+
+  const renderAvatarSvg = (id: string, name: string) => {
+    const firstLetter = name ? name.trim().charAt(0) : 'ص';
+    switch (id) {
+      case 'initial':
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <circle cx="50" cy="50" r="48" fill="#14b8a6" />
+            <circle cx="50" cy="50" r="44" fill="none" stroke="#2dd4bf" strokeWidth="1" strokeDasharray="3 3" />
+            <text x="50" y="60" fill="#fef08a" fontSize="33" fontWeight="bold" textAnchor="middle" fontFamily="sans-serif">{firstLetter}</text>
+          </svg>
+        );
+      case 'classic-man':
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <ellipse cx="50" cy="50" r="48" fill="#1e293b" />
+            <path d="M44,65 L56,65 L54,75 L46,75 Z" fill="#e0a96d" />
+            <ellipse cx="50" cy="46" rx="18" ry="22" fill="#e0a96d" />
+            <path d="M30,85 C30,70 40,68 50,68 C60,68 70,70 70,85 Z" fill="#ffffff" />
+            <line x1="50" y1="68" x2="50" y2="85" stroke="#f59e0b" strokeWidth="2.5" />
+            <path d="M42,68 L50,75 L58,68" fill="none" stroke="#f59e0b" strokeWidth="1.5" />
+          </svg>
+        );
+      case 'modern-man':
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <ellipse cx="50" cy="50" r="48" fill="#0f172a" />
+            <rect x="45" y="60" width="10" height="15" fill="#f5b08c" />
+            <ellipse cx="50" cy="45" rx="17" ry="20" fill="#f5b08c" />
+            <path d="M30,38 C30,30 40,25 50,25 C60,25 70,30 70,38 C70,38 66,31 50,31 C34,31 30,38 30,38 Z" fill="#1e1e1e" />
+            <rect x="36" y="42" width="12" height="8" rx="2" fill="none" stroke="#fecdd3" strokeWidth="2" />
+            <rect x="52" y="42" width="12" height="8" rx="2" fill="none" stroke="#fecdd3" strokeWidth="2" />
+            <line x1="48" y1="46" x2="52" y2="46" stroke="#fecdd3" strokeWidth="2.5" />
+            <line x1="33" y1="44" x2="36" y2="44" stroke="#fecdd3" strokeWidth="1.5" />
+            <line x1="64" y1="44" x2="67" y2="44" stroke="#fecdd3" strokeWidth="1.5" />
+            <path d="M28,82 C28,70 38,68 50,68 C62,68 72,70 72,82 Z" fill="#047857" />
+            <path d="M44,68 L50,76 L56,68 Z" fill="#ffffff" />
+          </svg>
+        );
+      case 'modest-woman':
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <ellipse cx="50" cy="50" r="48" fill="#faf5ff" />
+            <circle cx="50" cy="50" r="46" fill="none" stroke="#fbcfe8" strokeWidth="1" />
+            <ellipse cx="50" cy="52" rx="26" ry="32" fill="#f472b6" />
+            <ellipse cx="50" cy="46" rx="14" ry="17" fill="#fed7aa" />
+            <path d="M34,42 C34,28 42,23 50,23 C58,23 66,28 66,42 C66,56 58,68 50,68 C42,68 34,56 34,42 Z" fill="#fbcfe8" fillOpacity="0.9" />
+            <path d="M42,28 C46,25 54,25 58,28" fill="none" stroke="#db2777" strokeWidth="2" />
+            <path d="M22,83 C22,70 35,66 50,66 C65,66 78,70 78,83 Z" fill="#f472b6" />
+          </svg>
+        );
+      case 'abaya-woman':
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <ellipse cx="50" cy="50" r="48" fill="#1e1b4b" />
+            <path d="M32,48 C32,32 40,24 50,24 C60,24 68,32 68,48 C68,54 60,64 50,64 C40,64 32,54 32,48 Z" fill="#111827" />
+            <circle cx="50" cy="27" r="1.5" fill="#fbbf24" />
+            <path d="M48,27 L52,27" stroke="#fbbf24" strokeWidth="0.5" />
+            <path d="M20,85 C20,68 30,64 50,64 C70,64 80,68 80,85 Z" fill="#030712" />
+            <path d="M48,64 C48,70 44,78 40,85 M52,64 C52,70 56,78 60,85" stroke="#fbbf24" strokeWidth="1" strokeOpacity="0.4" fill="none" />
+          </svg>
+        );
+      case 'spiritual-lunar':
+        return (
+          <svg viewBox="0 0 100 100" className="w-full h-full">
+            <ellipse cx="50" cy="50" r="48" fill="#0f172a" />
+            <circle cx="50" cy="50" r="45" fill="none" stroke="#334155" strokeWidth="1.5" />
+            <path d="M42,32 C58,32 65,45 65,58 C65,71 52,80 38,78 C48,76 56,66 56,55 C56,44 48,34 38,33 C39.5,32.5 41,32 42,32 Z" fill="#e2e8f0" />
+            <g transform="translate(68, 30) scale(0.6)">
+              <polygon points="10,0 12,7 19,7 13,11 15,18 10,14 5,18 7,11 1,7 8,7" fill="#fbbf24" />
+            </g>
+          </svg>
+        );
+      default:
+        return null;
+    }
+  };
 
   const handleLogout = async () => {
     if (userData?.isAnonymous) {
@@ -92,6 +181,12 @@ export default function MoreMenu({
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
+  const toggleReelsLock = () => {
+    const newVal = !reelsLocked;
+    setReelsLocked(newVal);
+    localStorage.setItem('reels_locked', String(newVal));
+  };
+
   const languages = [
     { code: 'ar', name: 'العربية', nativeName: 'العربية' },
     { code: 'en', name: 'English', nativeName: 'English' },
@@ -121,9 +216,7 @@ export default function MoreMenu({
       title: t('library_and_learning', 'المكتبة والتعلم'),
       image: 'https://i.pinimg.com/736x/87/1b/2f/871b2f81152a51f801a61327111b1511.jpg',
       items: [
-        { id: 'islamic-gallery', label: 'المعرض والخلفيات الإسلامية', icon: <ImageIcon size={24} />, color: 'bg-emerald-600', isNew: true },
         { id: 'muslim-ai', label: t('muslim_ai', 'الذكاء الاصطناعي'), icon: <Bot size={24} />, color: 'bg-indigo-500' },
-        { id: 'dreams', label: t('dream_interpretation', 'تفسير الأحلام'), icon: <Moon size={24} />, color: 'bg-indigo-700' },
         { id: 'stories', label: t('prophet_stories', 'قصص الأنبياء'), icon: <BookOpen size={24} />, color: 'bg-purple-500' },
         { id: 'prayer-guide', label: t('prayer_guide', 'كيفية الصلاة'), icon: <BookOpen size={24} />, color: 'bg-amber-600' },
         { id: 'names', label: t('names_of_allah', 'أسماء الله الحسنى'), icon: <Heart size={24} />, color: 'bg-pink-500' },
@@ -141,7 +234,6 @@ export default function MoreMenu({
         { id: 'qaza-tracker', label: t('qaza_tracker', 'قضاء الفوائت'), icon: <History size={24} />, color: 'bg-rose-600', isNew: true },
         { id: 'calendar', label: t('hijri_calendar', 'التقويم الهجري'), icon: <Calendar size={24} />, color: 'bg-blue-500' },
         { id: 'zakat', label: t('zakat_calculator', 'حاسبة الزكاة'), icon: <Calculator size={24} />, color: 'bg-emerald-600' },
-        { id: 'inheritance', label: t('inheritance_calculator', 'حاسبة المواريث'), icon: <Calculator size={24} />, color: 'bg-emerald-800' },
         { id: 'hajj', label: t('hajj_guide', 'دليل الحج والعمرة'), icon: <Map size={24} />, color: 'bg-amber-700' },
         { id: 'halal-checker', label: t('halal_checker', 'المدقق الحلال'), icon: <CheckCircle size={24} />, color: 'bg-green-600' },
       ]
@@ -150,16 +242,8 @@ export default function MoreMenu({
       title: t('community_and_challenges', 'مجتمع وتحديات'),
       image: 'https://i.pinimg.com/736x/60/76/8b/60768b598b049d53c7a36e1c94411d73.jpg',
       items: [
-        { id: 'dawah', label: t('dawah', 'منبر دعوي'), icon: <Share2 size={24} />, color: 'bg-emerald-600', isNew: true },
-        { id: 'dua-wall', label: t('dua_wall', 'حائط الدعاء'), icon: <HandHeart size={24} />, color: 'bg-rose-500' },
-        { id: 'mood-tracker', label: t('mood_tracker', 'تتبع المزاج'), icon: <Smile size={24} />, color: 'bg-indigo-500' },
-        { id: 'accounting', label: t('self_accounting', 'ورد المحاسبة'), icon: <TrendingUp size={24} />, color: 'bg-teal-600' },
         { id: 'quran-plan', label: t('quran_plan', 'خطة القرآن'), icon: <BookOpen size={24} />, color: 'bg-emerald-500' },
-        { id: 'quiz', label: t('islamic_quiz', 'اختبر معلوماتك'), icon: <Award size={24} />, color: 'bg-indigo-600' },
-        { id: 'games', label: t('games_and_challenges', 'ألعاب وتحديات'), icon: <Puzzle size={24} />, color: 'bg-teal-500' },
-        { id: 'islamic-names', label: t('islamic_names', 'مستشار الأسماء'), icon: <Baby size={24} />, color: 'bg-indigo-400' },
-        { id: 'timeline', label: t('timeline', 'خط الزمن الإسلامي'), icon: <Hourglass size={24} />, color: 'bg-orange-400' },
-        { id: 'events', label: t('events', 'المناسبات'), icon: <Calendar size={24} />, color: 'bg-rose-400' },
+        { id: 'games', label: t('games_and_challenges', 'المسابقات والألعاب الدينية'), icon: <Trophy size={24} />, color: 'bg-amber-600' },
       ]
     },
     {
@@ -179,6 +263,7 @@ export default function MoreMenu({
         { id: 'prayer-settings', label: t('prayer_settings', 'إعدادات الصلاة'), icon: <Settings size={24} />, color: 'bg-emerald-600' },
         { id: 'notifications', label: notificationsEnabled ? t('disable_notifications', 'إيقاف الإشعارات') : t('enable_notifications', 'تفعيل الإشعارات'), icon: notificationsEnabled ? <BellOff size={24} /> : <Bell size={24} />, color: notificationsEnabled ? 'bg-gray-500' : 'bg-yellow-500' },
         { id: 'auto-adhan', label: autoAdhanEnabled ? t('disable_auto_adhan', 'إيقاف الأذان التلقائي') : t('enable_auto_adhan', 'تفعيل الأذان التلقائي'), icon: autoAdhanEnabled ? <VolumeX size={24} /> : <Volume2 size={24} />, color: autoAdhanEnabled ? 'bg-gray-500' : 'bg-emerald-500' },
+        { id: 'lock-reels', label: reelsLocked ? 'تفعيل مقاطع التلاوة (الريلز)' : 'قفل مقاطع التلاوة (منع التشتيت)', icon: <VideoOff size={24} />, color: reelsLocked ? 'bg-emerald-600' : 'bg-red-500' },
         { id: 'language', label: t('change_language', 'تغيير اللغة'), icon: <Globe size={24} />, color: 'bg-indigo-600' },
         { id: 'support', label: t('support_app', 'ادعم التطبيق'), icon: <HandHeart size={24} />, color: 'bg-rose-500' },
         { id: 'whatsapp', label: t('contact_us', 'تواصل معنا'), icon: <MessageCircle size={24} />, color: 'bg-[#25D366]' },
@@ -199,14 +284,18 @@ export default function MoreMenu({
         <div className="absolute right-0 top-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20"></div>
         <div className="relative z-10 text-center flex flex-col items-center">
           {user ? (
-            <div className="flex flex-col items-center gap-3 w-full">
-              {userData?.photoURL ? (
-                <img src={userData.photoURL} alt="Profile" className="w-20 h-20 rounded-full border-2 border-white/30 shadow-md object-cover mb-2" referrerPolicy="no-referrer" loading="lazy" />
-              ) : (
-                <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center border-2 border-white/30 shadow-md mb-2">
-                  <User size={40} className="text-emerald-50" />
+            <div className="flex flex-col items-center gap-3 w-full animate-fade-in">
+              <div 
+                onClick={() => setShowAvatarModal(true)}
+                className="relative cursor-pointer group mb-2 hover:scale-105 transition-transform duration-300"
+              >
+                <div className="w-20 h-20 rounded-full border-2 border-white/30 shadow-md bg-white/5 overflow-hidden flex items-center justify-center">
+                  {renderAvatarSvg(customAvatar, userData?.displayName || user.user_metadata?.name || 'مستخدم')}
                 </div>
-              )}
+                <div className="absolute -bottom-1 -right-1 bg-yellow-500 text-slate-950 p-1.5 rounded-full border border-emerald-600 shadow-md hover:bg-yellow-400">
+                  <Palette size={12} className="text-white fill-current" />
+                </div>
+              </div>
               <div>
                 <h1 className="text-2xl font-bold font-serif text-white mb-1">
                   {userData?.isAnonymous ? 'حساب زائر' : (userData?.displayName || user.user_metadata?.name || 'مستخدم')}
@@ -270,6 +359,8 @@ export default function MoreMenu({
                       setAutoAdhanEnabled(!autoAdhanEnabled);
                     } else if (item.id === 'theme') {
                       toggleTheme();
+                    } else if (item.id === 'lock-reels') {
+                      toggleReelsLock();
                     } else if (item.id === 'neon-accent') {
                       setShowNeonModal(true);
                     } else if (item.id === 'prayer-settings') {
@@ -539,6 +630,65 @@ export default function MoreMenu({
                 className="w-full mt-6 py-3 rounded-xl font-bold text-white bg-emerald-500 hover:bg-emerald-600 transition-colors"
               >
                 حفظ وإغلاق
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showAvatarModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-55 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+            onClick={() => setShowAvatarModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-6 max-w-sm w-full shadow-2xl relative animate-in zoom-in-95 duration-200"
+              onClick={e => e.stopPropagation()}
+            >
+              <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2 text-center font-serif">اختر رمز حسابك الافتراضي 📿</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-xs text-center mb-6 leading-relaxed">
+                اضبط صورتك الرمزية المتطابقة مع بيئة التطبيق الشرعية السليمة والمريحة
+              </p>
+              
+              <div className="grid grid-cols-3 gap-3 mb-6">
+                {defaultAvatars.map((av) => (
+                  <button
+                    key={av.id}
+                    onClick={() => {
+                      localStorage.setItem('customUserAvatar', av.id);
+                      setCustomAvatar(av.id);
+                    }}
+                    className={`p-2 rounded-2xl border transition-all flex flex-col gap-2 items-center justify-center relative ${
+                      customAvatar === av.id 
+                        ? 'ring-2 ring-emerald-500 border-transparent bg-slate-50 dark:bg-slate-950 shadow-md' 
+                        : 'border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 bg-white dark:bg-slate-900'
+                    }`}
+                  >
+                    <div className="w-14 h-14 rounded-full overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-slate-850">
+                      {renderAvatarSvg(av.id, userData?.displayName || user?.user_metadata?.name || 'مستخدم')}
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 text-center leading-tight">
+                      {av.name.split(" ")[1] || av.name}
+                    </span>
+                    {customAvatar === av.id && (
+                      <span className="absolute top-1 right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center text-white text-[8px] font-black">✓</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+              
+              <button
+                onClick={() => setShowAvatarModal(false)}
+                className="w-full py-3.5 rounded-xl font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-sm"
+              >
+                تطبيق وحفظ التغييرات 👍
               </button>
             </motion.div>
           </motion.div>

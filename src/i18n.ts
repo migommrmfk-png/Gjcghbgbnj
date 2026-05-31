@@ -5,7 +5,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 const resources = {
   ar: {
     translation: {
-      "app_name": "اليقين",
+      "app_name": "يقين",
       "quran": "القرآن",
       "azkar": "الأذكار",
       "tasbeeh": "السبحة",
@@ -14,7 +14,7 @@ const resources = {
       "daily_hadith": "الحديث اليومي",
       "duas": "الأدعية",
       "prophet_stories": "قصص الأنبياء",
-      "radio": "إذاعة وتلفزيون",
+      "radio": "الإذاعة الإسلامية",
       "muslim_ai": "المساعد الإسلامي",
       "settings": "الإعدادات",
       "language": "اللغة",
@@ -65,7 +65,7 @@ const resources = {
   },
   en: {
     translation: {
-      "app_name": "Al-Yaqeen",
+      "app_name": "Yaqeen",
       "quran": "Quran",
       "azkar": "Azkar",
       "tasbeeh": "Tasbeeh",
@@ -74,7 +74,7 @@ const resources = {
       "daily_hadith": "Daily Hadith",
       "duas": "Duas",
       "prophet_stories": "Prophet Stories",
-      "radio": "Radio & TV",
+      "radio": "Islamic Radio",
       "muslim_ai": "Muslim AI",
       "settings": "Settings",
       "language": "Language",
@@ -125,7 +125,7 @@ const resources = {
   },
   fr: {
     translation: {
-      "app_name": "Al-Yaqeen",
+      "app_name": "Yaqeen",
       "quran": "Coran",
       "azkar": "Azkar",
       "tasbeeh": "Tasbeeh",
@@ -134,7 +134,7 @@ const resources = {
       "daily_hadith": "Hadith quotidien",
       "duas": "Invocations",
       "prophet_stories": "Histoires des Prophètes",
-      "radio": "Radio & TV",
+      "radio": "Radio Islamique",
       "muslim_ai": "IA Musulmane",
       "settings": "Paramètres",
       "language": "Langue",
@@ -185,7 +185,7 @@ const resources = {
   },
   ur: {
     translation: {
-      "app_name": "الیقین",
+      "app_name": "يقين",
       "quran": "قرآن",
       "azkar": "اذکار",
       "tasbeeh": "تسبیح",
@@ -194,7 +194,7 @@ const resources = {
       "daily_hadith": "روزانہ کی حدیث",
       "duas": "دعائیں",
       "prophet_stories": "انبیاء کے قصے",
-      "radio": "ریڈیو اور ٹی وی",
+      "radio": "اسلامی ریڈیو",
       "muslim_ai": "مسلم اے آئی",
       "settings": "ترتیبات",
       "language": "زبان",
@@ -245,7 +245,7 @@ const resources = {
   },
   id: {
     translation: {
-      "app_name": "Al-Yaqeen",
+      "app_name": "Yaqeen",
       "quran": "Al-Qur'an",
       "azkar": "Dzikir",
       "tasbeeh": "Tasbih",
@@ -254,7 +254,7 @@ const resources = {
       "daily_hadith": "Hadits Harian",
       "duas": "Doa",
       "prophet_stories": "Kisah Nabi",
-      "radio": "Radio & TV",
+      "radio": "Radio Islami",
       "muslim_ai": "AI Muslim",
       "settings": "Pengaturan",
       "language": "Bahasa",
@@ -305,7 +305,7 @@ const resources = {
   },
   es: {
     translation: {
-      "app_name": "Al-Yaqeen",
+      "app_name": "Yaqeen",
       "quran": "Corán",
       "azkar": "Azkar",
       "tasbeeh": "Tasbih",
@@ -314,7 +314,7 @@ const resources = {
       "daily_hadith": "Hadiz Diario",
       "duas": "Súplicas",
       "prophet_stories": "Historias de los Profetas",
-      "radio": "Radio y TV",
+      "radio": "Radio Islámica",
       "muslim_ai": "IA Musulmana",
       "settings": "Ajustes",
       "language": "Idioma",
@@ -365,7 +365,7 @@ const resources = {
   },
   tr: {
     translation: {
-      "app_name": "Al-Yaqeen",
+      "app_name": "Yaqeen",
       "quran": "Kuran",
       "azkar": "Zikirler",
       "tasbeeh": "Tesbih",
@@ -374,7 +374,7 @@ const resources = {
       "daily_hadith": "Günün Hadisi",
       "duas": "Dualar",
       "prophet_stories": "Peygamber Kıssaları",
-      "radio": "Radyo ve TV",
+      "radio": "İslami Radyo",
       "muslim_ai": "Müslüman Yapay Zeka",
       "settings": "Ayarlar",
       "language": "Dil",
@@ -425,7 +425,7 @@ const resources = {
   },
   bn: {
     translation: {
-      "app_name": "আল-ইয়াকিন",
+      "app_name": "يقين",
       "quran": "কুরআন",
       "azkar": "জিকির",
       "tasbeeh": "তাসবিহ",
@@ -434,7 +434,7 @@ const resources = {
       "daily_hadith": "দৈনিক হাদিস",
       "duas": "দোয়া",
       "prophet_stories": "নবীদের কাহিনী",
-      "radio": "রেডিও এবং টিভি",
+      "radio": "ইসলামিক রেডিও",
       "muslim_ai": "মুসলিম এআই",
       "settings": "সেটিংস",
       "language": "ভাষা",
