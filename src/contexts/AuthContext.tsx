@@ -1,6 +1,17 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '../supabase';
+import { 
+  User, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  signOut, 
+  onAuthStateChanged,
+  sendPasswordResetEmail,
+  signInAnonymously,
+  updateProfile,
+  signInWithPopup
+} from 'firebase/auth';
+import { doc, getDoc, setDoc, onSnapshot, getDocFromServer } from 'firebase/firestore';
+import { auth, db, googleProvider, OperationType, handleFirestoreError } from '../firebase';
 
 interface UserData {
   uid: string;
@@ -60,280 +71,256 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Validate Firestore Connection on mount
   useEffect(() => {
-    // Check for OAuth errors in the URL hash or search params
-    const hashParams = new URLSearchParams(window.location.hash.substring(window.location.hash.indexOf('#') + 1));
-    const searchParams = new URLSearchParams(window.location.search);
-    
-    const errorParam = hashParams.get('error') || searchParams.get('error');
-    const errorDesc = hashParams.get('error_description') || searchParams.get('error_description');
-    
-    if (errorParam || errorDesc) {
-      if (errorDesc) {
-        let desc = decodeURIComponent(errorDesc.replace(/\+/g, ' '));
-        if (desc.includes('Database error saving new user')) {
-          desc = 'هذا البريد الإلكتروني مسجل مسبقاً. يرجى تسجيل الدخول بحسابك القديم (جوجل مثلاً) ثم ربط هذا الحساب من الإعدادات.';
-        }
-        setError(desc);
-      } else {
-        setError(errorParam || 'Authentication failed');
-      }
-      window.history.replaceState(null, '', window.location.pathname);
-    }
-
-    // Get initial session
-    const initializeAuth = async () => {
+    async function testConnection() {
       try {
-        const timeoutPromise = new Promise(resolve => setTimeout(() => resolve({ timeout: true }), 8000));
-        const authPromise = supabase.auth.getSession().then(res => ({ ...res, timeout: false })).catch(err => {
-          // Prevent unhandled promise rejection if background execution fails/times out
-          return { data: { session: null }, error: err, timeout: false };
-        });
-        const result = await Promise.race([authPromise, timeoutPromise]) as any;
-        if (result && result.timeout) {
-          throw new Error('timeout');
-        }
-        const { data: { session }, error } = result;
-        if (error) {
-          console.warn("Supabase getSession error:", error);
-          setError(error.message);
-        }
-        await handleSession(session);
+        await getDocFromServer(doc(db, 'test', 'connection'));
       } catch (err: any) {
-        if (err?.message === 'timeout') {
-          console.warn("Supabase getSession timeout, falling back.");
-          // Attempt directory fallback from local storage
-          let localSession = null;
-          try {
-            for (let i = 0; i < localStorage.length; i++) {
-              const key = localStorage.key(i);
-              if (key && key.startsWith('sb-') && key.endsWith('-auth-token')) {
-                const tokenData = localStorage.getItem(key);
-                if (tokenData) {
-                  const parsed = JSON.parse(tokenData);
-                  if (parsed && parsed.user) {
-                    localSession = parsed;
-                    break;
-                  }
-                }
-              }
-            }
-          } catch (e) {
-            console.warn("Fallback local storage session logic parsing failed:", e);
-          }
-          await handleSession(localSession);
-        } else {
-          console.warn("Error in getSession:", err);
-          await handleSession(null);
+        if (err instanceof Error && err.message.includes('offline')) {
+          console.warn("Fallback offline mode: Firestore client offline check.");
         }
       }
-    };
-
-    initializeAuth();
-
-    // Listen to changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      // Avoid fetching if it's the exact same session (fast refresh)
-      handleSession(session);
-    });
-
-    return () => subscription.unsubscribe();
+    }
+    testConnection();
   }, []);
 
-  const handleSession = async (session: Session | null) => {
-    if (session?.user) {
-      setUser(session.user);
-      try {
-        const { data, error } = await supabase
-          .from('users')
-          .select('*')
-          .eq('uid', session.user.id)
-          .single();
+  useEffect(() => {
+    let unsubscribeSnapshot: (() => void) | null = null;
 
-        if (error && error.code !== 'PGRST116') {
-          console.warn("Failed to get user data:", error);
-          // Fallback user data
-          setUserData({
-            uid: session.user.id,
-            email: session.user.email || null,
-            isAnonymous: session.user.is_anonymous || false,
-            createdAt: new Date().toISOString(),
-            role: 'user',
-            xp: 0,
-            level: 1,
-            streak: 0,
-            badges: []
-          });
-          return setLoading(false);
-        }
+    // Listen to Firebase auth changes
+    const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
+      setLoading(true);
+      setError(null);
 
-        if (!data) {
-          const newUserData: UserData = {
-            uid: session.user.id,
-            email: session.user.email || null,
-            isAnonymous: session.user.is_anonymous || false,
-            createdAt: new Date().toISOString(),
-            role: 'user',
-            xp: 0,
-            level: 1,
-            streak: 0,
-            badges: []
-          };
-          if (session.user.user_metadata?.full_name) {
-             newUserData.displayName = session.user.user_metadata.full_name;
-          }
-          if (session.user.user_metadata?.avatar_url) {
-             newUserData.photoURL = session.user.user_metadata.avatar_url;
-          }
-
-          const { error: insertError } = await supabase.from('users').insert([newUserData]);
-          if (insertError) {
-             console.error("Error creating user profile", insertError);
-          }
-          setUserData(newUserData);
-        } else {
-          setUserData(data);
-        }
-      } catch (err) {
-        console.error("Error fetching or creating user profile:", err);
+      // Clean up previous real-time snapshot listeners
+      if (unsubscribeSnapshot) {
+        unsubscribeSnapshot();
+        unsubscribeSnapshot = null;
       }
-    } else {
-      const isLocalGuest = localStorage.getItem('isLocalGuest') === 'true';
-      if (isLocalGuest) {
-        setUser({ id: 'local_guest', email: null, user_metadata: { name: 'زائر محلي' } } as any);
-        setUserData({
-          uid: 'local_guest',
-          email: null,
-          isAnonymous: true,
-          createdAt: new Date().toISOString(),
-          role: 'user',
-          xp: 0,
-          level: 1,
-          streak: 1,
-          badges: [],
-          displayName: 'زائر محلي'
+
+      if (firebaseUser) {
+        setUser(firebaseUser);
+        const userDocRef = doc(db, 'users', firebaseUser.uid);
+
+        // Listen in real-time to user profile in Firestore
+        unsubscribeSnapshot = onSnapshot(userDocRef, async (docSnap) => {
+          if (docSnap.exists()) {
+            setUserData(docSnap.data() as UserData);
+            setLoading(false);
+          } else {
+            // Document doesn't exist yet, provision a professional default config
+            const newUserData: UserData = {
+              uid: firebaseUser.uid,
+              email: firebaseUser.email || null,
+              isAnonymous: firebaseUser.isAnonymous,
+              createdAt: new Date().toISOString(),
+              role: 'user',
+              xp: 0,
+              level: 1,
+              streak: 0,
+              badges: [],
+              displayName: firebaseUser.displayName || 'مستخدم جديد',
+              photoURL: firebaseUser.photoURL || ''
+            };
+
+            try {
+              await setDoc(userDocRef, newUserData);
+              setUserData(newUserData);
+            } catch (errSnap) {
+              console.error("Error creating user document in Firestore on login:", errSnap);
+              handleFirestoreError(errSnap, OperationType.WRITE, `users/${firebaseUser.uid}`);
+            }
+            setLoading(false);
+          }
+        }, (errSnap) => {
+          console.error("Firestore onSnapshot subscription failed:", errSnap);
+          handleFirestoreError(errSnap, OperationType.GET, `users/${firebaseUser.uid}`);
+          setLoading(false);
         });
+
       } else {
-        setUser(null);
-        setUserData(null);
+        // Handle local guest fallback
+        const isLocalGuest = localStorage.getItem('isLocalGuest') === 'true';
+        if (isLocalGuest) {
+          setUser({
+            uid: 'local_guest',
+            email: null,
+            displayName: 'زائر محلي',
+            isAnonymous: true,
+            photoURL: ''
+          } as any);
+          setUserData({
+            uid: 'local_guest',
+            email: null,
+            isAnonymous: true,
+            createdAt: new Date().toISOString(),
+            role: 'user',
+            xp: 0,
+            level: 1,
+            streak: 1,
+            badges: [],
+            displayName: 'زائر محلي'
+          });
+        } else {
+          setUser(null);
+          setUserData(null);
+        }
+        setLoading(false);
       }
+    });
+
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeSnapshot) {
+        unsubscribeSnapshot();
+      }
+    };
+  }, []);
+
+  const signIn = async (email: string, pass: string) => {
+    localStorage.removeItem('hasLoggedOut');
+    localStorage.removeItem('isLocalGuest');
+    setError(null);
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+    } catch (err: any) {
+      console.error("Sign in error:", err);
+      let arabicError = 'فشل تسجيل الدخول. يرجى التحقق من البريد الإلكتروني وكلمة المرور.';
+      if (err?.code === 'auth/user-not-found' || err?.code === 'auth/wrong-password' || err?.code === 'auth/invalid-credential') {
+        arabicError = 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+      } else if (err?.code === 'auth/invalid-email') {
+        arabicError = 'صيغة البريد الإلكتروني غير صالحة.';
+      }
+      setError(arabicError);
+      throw err;
     }
-    setLoading(false);
   };
 
   const signUp = async (email: string, pass: string, name: string) => {
     localStorage.removeItem('hasLoggedOut');
-    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000));
-    const authPromise = supabase.auth.signUp({
-      email,
-      password: pass,
-      options: { data: { full_name: name } }
-    }).catch(err => {
-      return { data: { user: null, session: null }, error: err };
-    });
-    const result = await Promise.race([authPromise, timeoutPromise]) as any;
-    if (result.error) throw result.error;
-    return result;
-  };
-
-  const signIn = async (email: string, pass: string) => {
-    localStorage.removeItem('hasLoggedOut');
-    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000));
-    const authPromise = supabase.auth.signInWithPassword({ email, password: pass }).catch(err => {
-      return { data: { user: null, session: null }, error: err };
-    });
-    const result = await Promise.race([authPromise, timeoutPromise]) as any;
-    if (result.error) throw result.error;
+    localStorage.removeItem('isLocalGuest');
+    setError(null);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+      if (userCredential.user) {
+        await updateProfile(userCredential.user, { displayName: name });
+        // Set document explicitly to trigger the snapshot
+        const userDocRef = doc(db, 'users', userCredential.user.uid);
+        const newUserData: UserData = {
+          uid: userCredential.user.uid,
+          email: email,
+          isAnonymous: false,
+          createdAt: new Date().toISOString(),
+          role: 'user',
+          xp: 20, // bonus on signup
+          level: 1,
+          streak: 1,
+          badges: ['welcome'],
+          displayName: name,
+        };
+        await setDoc(userDocRef, newUserData);
+      }
+      return userCredential;
+    } catch (err: any) {
+      console.error("Sign up error:", err);
+      let arabicError = 'فشل إنشاء الحساب. قد يكون هذا الحساب مسجلاً مسبقاً أو كلمة المرور ضعيفة.';
+      if (err?.code === 'auth/email-already-in-use') {
+        arabicError = 'هذا البريد الإلكتروني مستخدم بالفعل.';
+      } else if (err?.code === 'auth/weak-password') {
+        arabicError = 'كلمة المرور ضعيفة جداً. يجب أن تتكون من 6 أحرف على الأقل.';
+      }
+      setError(arabicError);
+      throw err;
+    }
   };
 
   const signInWithGoogle = async () => {
     localStorage.removeItem('hasLoggedOut');
-    const { error } = await supabase.auth.signInWithOAuth({ 
-      provider: 'google',
-      options: {
-        redirectTo: window.location.origin
-      }
-    });
-    if (error) throw error;
+    localStorage.removeItem('isLocalGuest');
+    setError(null);
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (err: any) {
+      console.error("Google sign in error:", err);
+      setError('فشلت عملية تسجيل الدخول بواسطة حساب Google.');
+      throw err;
+    }
   };
 
+  // Unsupported OAuth handlers formatted neatly with simple client guidelines
   const signInWithGithub = async () => {
-    localStorage.removeItem('hasLoggedOut');
-    const { error } = await supabase.auth.signInWithOAuth({ 
-      provider: 'github',
-      options: {
-        redirectTo: window.location.origin
-      }
-    });
-    if (error) throw error;
+    setError('تسجيل الدخول عبر GitHub غير مفعل حالياً. يرجى استخدام Google أو البريد الإلكتروني.');
   };
 
   const signInWithFacebook = async () => {
-    localStorage.removeItem('hasLoggedOut');
-    const { error } = await supabase.auth.signInWithOAuth({ 
-      provider: 'facebook',
-      options: {
-        redirectTo: window.location.origin
-      }
-    });
-    if (error) throw error;
+    setError('تسجيل الدخول عبر Facebook غير مفعل حالياً. يرجى استخدام Google أو البريد الإلكتروني.');
   };
 
   const signInWithTwitter = async () => {
-    localStorage.removeItem('hasLoggedOut');
-    const { error } = await supabase.auth.signInWithOAuth({ 
-      provider: 'twitter',
-      options: {
-        redirectTo: window.location.origin
-      }
-    });
-    if (error) throw error;
+    setError('تسجيل الدخول عبر Twitter غير مفعل حالياً. يرجى استخدام Google أو البريد الإلكتروني.');
   };
 
   const signInAsGuest = async () => {
     localStorage.removeItem('hasLoggedOut');
+    localStorage.removeItem('isLocalGuest');
+    setError(null);
     try {
-      // Race the anonymous signin with a 5 second timeout to prevent hangs
-      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000));
-      const authPromise = supabase.auth.signInAnonymously().catch(err => {
-        return { data: { user: null, session: null }, error: err };
-      });
-      const result = await Promise.race([authPromise, timeoutPromise]) as any;
-      if (result.error) throw result.error;
+      await signInAnonymously(auth);
     } catch (err: any) {
-      console.warn("Supabase anonymous auth failed or timed out, falling back to local guest mode.", err);
-      // Fallback to local guest mode if Supabase anonymous auth is disabled or times out
+      console.warn("Firebase anonymous auth failed on project, launching secure local guest mode:", err);
       localStorage.setItem('isLocalGuest', 'true');
-      await handleSession(null);
+      setUser({
+        uid: 'local_guest',
+        email: null,
+        displayName: 'زائر محلي',
+        isAnonymous: true,
+        photoURL: ''
+      } as any);
+      setUserData({
+        uid: 'local_guest',
+        email: null,
+        isAnonymous: true,
+        createdAt: new Date().toISOString(),
+        role: 'user',
+        xp: 0,
+        level: 1,
+        streak: 1,
+        badges: [],
+        displayName: 'زائر محلي'
+      });
     }
   };
 
   const linkWithGoogle = async () => {
-    const { error } = await supabase.auth.linkIdentity({ provider: 'google' });
-    if (error) throw error;
+    setError('ربط الحساب التفصيلي يتم تلقائياً عند تسجيل الدخول باستخدام حساب Google الموحد.');
   };
 
   const linkWithGithub = async () => {
-    const { error } = await supabase.auth.linkIdentity({ provider: 'github' });
-    if (error) throw error;
+    setError('ربط حساب GitHub غير مفعل في المنصة الحالية.');
   };
 
   const linkWithEmail = async (email: string, pass: string, name: string) => {
-    const { error } = await supabase.auth.updateUser({ email, password: pass, data: { full_name: name }});
-    if (error) throw error;
+    setError('التسجيل بالبريد وربطه متاح بشكل كامل عبر واجهة الدخول.');
   };
 
   const logout = async () => {
     localStorage.setItem('hasLoggedOut', 'true');
     localStorage.removeItem('isLocalGuest');
     setUserData(null);
-    await supabase.auth.signOut();
-    handleSession(null);
+    await signOut(auth);
+    setUser(null);
   };
 
   const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
-    if (error) throw error;
+    setError(null);
+    try {
+      await sendPasswordResetEmail(auth, email);
+    } catch (err: any) {
+      console.error("Password reset error:", err);
+      setError('فشل إرسال بريد إعادة التعيين. يرجى التحقق من البريد مجدداً.');
+      throw err;
+    }
   };
 
   const value = {

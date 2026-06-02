@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, Suspense, lazy } from "react";
+import React, { useState, useEffect, useCallback, Suspense, lazy, useRef } from "react";
 import { Toaster } from 'react-hot-toast';
 import {
   Home,
@@ -41,26 +41,25 @@ const Games = lazy(() => import("./components/Games"));
 const PrayerGuide = lazy(() => import("./components/PrayerGuide"));
 const SupportApp = lazy(() => import("./components/SupportApp"));
 const WorshipTracker = lazy(() => import("./components/WorshipTracker"));
-const QuranPlan = lazy(() => import("./components/QuranPlan"));
 const SocialChallenges = lazy(() => import("./components/SocialChallenges"));
 const ZakatCalculator = lazy(() => import("./components/ZakatCalculator"));
 const HajjUmrahGuide = lazy(() => import("./components/HajjUmrahGuide"));
 const Auth = lazy(() => import("./components/Auth"));
-const MemorizationHub = lazy(() => import("./components/MemorizationHub"));
-
 const Ruqyah = lazy(() => import("./components/Ruqyah"));
 const Downloads = lazy(() => import("./components/Downloads"));
 
 const NotificationsPage = lazy(() => import("./components/NotificationsPage"));
+const AdvancedNotificationsSettings = lazy(() => import("./components/AdvancedNotificationsSettings"));
+const PrivacySettings = lazy(() => import("./components/PrivacySettings"));
 
 const HalalChecker = lazy(() => import("./components/HalalChecker"));
-const QuranReflection = lazy(() => import("./components/QuranReflection"));
 
 const QazaTracker = lazy(() => import("./components/QazaTracker"));
 const AudioCircles = lazy(() => import("./components/AudioCircles"));
 const FatwaLibrary = lazy(() => import("./components/FatwaLibrary"));
 import InstallPrompt from "./components/InstallPrompt";
 import ChatOverlay from "./components/ChatOverlay";
+import AppPinLockScreen from "./components/AppPinLockScreen";
 
 // Loading fallback for Suspense
 const LoadingFallback = () => (
@@ -76,6 +75,20 @@ function AppContent() {
   const [previousTab, setPreviousTab] = useState("home");
   const [adhanData, setAdhanData] = useState<{ prayerName: string, time: string, step?: string } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isLocked, setIsLocked] = useState(() => {
+    const pinEnabled = localStorage.getItem("app_pin_lock_enabled") === "true";
+    const sessionUnlocked = sessionStorage.getItem("app_session_unlocked") === "true";
+    return pinEnabled && !sessionUnlocked;
+  });
+
+  const mainRef = useRef<HTMLElement | null>(null);
+
+  // Smooth scroll container to the top on tab changes
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTo(0, 0);
+    }
+  }, [activeTab]);
 
   useEffect(() => {
     const locked = localStorage.getItem('currentPrayerLock');
@@ -147,13 +160,6 @@ function AppContent() {
     if (!hasOnboarded) {
       setShowOnboarding(true);
     }
-    
-    // Auto sign in to Firebase anonymously for DB operations
-    import('./firebase').then(({ auth }) => {
-      import('firebase/auth').then(({ signInAnonymously }) => {
-        signInAnonymously(auth).catch((e) => console.log('Firebase anon auth failed:', e));
-      });
-    });
   }, []);
 
   const handleOnboardingComplete = () => {
@@ -177,8 +183,6 @@ function AppContent() {
         return <MoreMenu onNavigate={handleNavigate} notificationsEnabled={notificationsEnabled} onToggleNotifications={toggleNotifications} />;
       case "qibla":
         return <Qibla />;
-      case "memorization-hub":
-        return <MemorizationHub onBack={handleBack} />;
       case "names":
         return <NamesOfAllah onBack={handleBack} />;
       case "hadith":
@@ -201,10 +205,6 @@ function AppContent() {
         return <SupportApp onBack={handleBack} />;
       case "worship-tracker":
         return <WorshipTracker onBack={handleBack} />;
-      case "quran-plan":
-        return <QuranPlan onBack={handleBack} />;
-      case "smart-plan":
-        return <QuranPlan onBack={handleBack} />;
       case "social":
         return <SocialChallenges onBack={handleBack} />;
       case "zakat":
@@ -235,10 +235,14 @@ function AppContent() {
       case "notifications":
         return <NotificationsPage onBack={handleBack} />;
 
+      case "advanced-notifications":
+        return <AdvancedNotificationsSettings onBack={handleBack} />;
+
+      case "privacy-settings":
+        return <PrivacySettings onBack={handleBack} />;
+
       case "halal-checker":
         return <HalalChecker onBack={handleBack} />;
-      case "quran-reflection":
-        return <QuranReflection onBack={handleBack} />;
       default:
         return <Dashboard onNavigate={handleNavigate} />;
     }
@@ -254,6 +258,10 @@ function AppContent() {
 
   if (!user) {
     return <Auth />;
+  }
+
+  if (isLocked) {
+    return <AppPinLockScreen onUnlock={() => setIsLocked(false)} />;
   }
 
   return (
@@ -278,7 +286,7 @@ function AppContent() {
       </AnimatePresence>
 
       {/* Main Content Area */}
-      <main className="flex-1 overflow-y-auto pb-28 relative">
+      <main ref={mainRef} className="flex-1 overflow-y-auto pb-28 relative scroll-smooth-container">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}

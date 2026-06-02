@@ -191,7 +191,23 @@ export default function AdhanOverlay({
       return;
     }
     
-    const audio = new Audio('https://server11.mp3quran.net/adhan/1.mp3');
+    const keyMap: Record<string, string> = {
+      'الفجر': 'Fajr',
+      'الظهر': 'Dhuhr',
+      'العصر': 'Asr',
+      'المغرب': 'Maghrib',
+      'العشاء': 'Isha'
+    };
+    const englishName = keyMap[prayerName] || 'Dhuhr';
+    const savedSound = localStorage.getItem(`adhan_sound_${englishName}`) || 'https://server11.mp3quran.net/adhan/1.mp3';
+
+    let audio: HTMLAudioElement;
+    if (savedSound === 'silent' || savedSound === 'disabled') {
+      audio = new Audio();
+      setMuted(true);
+    } else {
+      audio = new Audio(savedSound);
+    }
     audioRef.current = audio;
 
     audio.addEventListener('playing', () => setAudioPlaying(true));

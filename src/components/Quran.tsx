@@ -139,6 +139,27 @@ export default function Quran() {
     return saved ? JSON.parse(saved) : null;
   });
 
+  const [cachedSurahs, setCachedSurahs] = useState<number[]>([]);
+
+  const checkAndLoadedCachedQuranList = () => {
+    const list: number[] = [];
+    for (let i = 1; i <= 114; i++) {
+      if (localStorage.getItem(`quran_surah_${i}`)) {
+        list.push(i);
+      }
+    }
+    setCachedSurahs(list);
+  };
+
+  useEffect(() => {
+    const targetSubTab = localStorage.getItem("quran_sub_tab");
+    if (targetSubTab) {
+      setSubTab(targetSubTab as any);
+      localStorage.removeItem("quran_sub_tab");
+    }
+    checkAndLoadedCachedQuranList();
+  }, []);
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const ayahRefs = useRef<{ [key: number]: HTMLSpanElement | null }>({});
 
@@ -290,6 +311,7 @@ export default function Quran() {
         }
         try {
           localStorage.setItem(cacheKey, JSON.stringify(surahData));
+          checkAndLoadedCachedQuranList();
         } catch (e) {
           console.warn("Could not cache surah, storage might be full");
         }
@@ -1220,28 +1242,6 @@ export default function Quran() {
         </div>
       </motion.div>
 
-      {/* Continue Reading */}
-      {lastRead && !searchQuery && (
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.15 }}
-          className="card-3d p-4 flex items-center justify-between cursor-pointer hover:border-emerald-500/30 group"
-          onClick={() => fetchSurah(lastRead.surahNumber, lastRead.surahName, lastRead.ayahNumber)}
-        >
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
-              <Book size={24} />
-            </div>
-            <div>
-              <h3 className="font-bold text-slate-800 dark:text-slate-100 text-sm">متابعة القراءة</h3>
-              <p className="text-xs text-emerald-600 dark:text-emerald-400 font-bold mt-1">{lastRead.surahName} {lastRead.ayahNumber ? `(آية ${lastRead.ayahNumber})` : ''}</p>
-            </div>
-          </div>
-          <ArrowRight size={20} className="text-emerald-500/50 group-hover:translate-x-1 group-hover:text-emerald-500 transition-all" />
-        </motion.div>
-      )}
-
       {/* Search Results */}
       {searchMode === 'ayah' && searchQuery.length >= 3 && (
         <motion.div
@@ -1311,6 +1311,12 @@ export default function Quran() {
                 <p className="text-[9px] text-slate-400 uppercase tracking-widest font-bold mt-1">
                   {surah.englishNameTranslation}
                 </p>
+                {cachedSurahs.includes(surah.number) && (
+                  <span className="text-[9.5px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded-md mt-1.5 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    محملة ومتاحة أوفلاين ✓
+                  </span>
+                )}
               </div>
             </motion.button>
           ))}

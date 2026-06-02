@@ -34,12 +34,14 @@ import {
 import { motion } from "motion/react";
 import { usePrayerTimes } from "../contexts/PrayerTimesContext";
 import { useAuth } from "../contexts/AuthContext";
-import { supabase } from '../supabase';
+import { db, OperationType, handleFirestoreError } from '../firebase';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import DownloadAppBanner from "./DownloadAppBanner";
 import CharityToday from "./CharityToday";
 import ArabicWidget from "./ArabicWidget";
 import { useTranslation } from 'react-i18next';
 import { getGeminiClient } from "../lib/gemini";
+import { requestNotificationPermission } from "../services/NotificationService";
 import toast from 'react-hot-toast';
 import { CheckCircle2, RefreshCw, AlertCircle, Sparkles as SparklesIcon, Trash2, Sliders, ChevronRight as ChevronRightIcon, ChevronDown, Search, Globe, Key } from "lucide-react";
 
@@ -139,6 +141,37 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   const [isKeyModalOpen, setIsKeyModalOpen] = useState<boolean>(false);
   const [keyInput, setKeyInput] = useState<string>(() => localStorage.getItem('user_custom_gemini_key') || '');
   const [hasCustomKey, setHasCustomKey] = useState<boolean>(() => !!localStorage.getItem('user_custom_gemini_key'));
+
+  const [showNotificationRequest, setShowNotificationRequest] = useState<boolean>(() => {
+    if (typeof window !== "undefined" && "Notification" in window) {
+      const alreadyDismissed = localStorage.getItem("dismissed_notification_request") === "true";
+      return !alreadyDismissed && Notification.permission !== "granted";
+    }
+    return false;
+  });
+
+  const handleRequestNotifications = async () => {
+    if (typeof window !== "undefined" && "Notification" in window) {
+      const granted = await requestNotificationPermission();
+      if (granted) {
+        localStorage.setItem("prayerNotificationsEnabled", "true");
+        localStorage.setItem("autoAdhanEnabled", "true");
+        window.dispatchEvent(new Event("storage"));
+        toast.success("تم تفعيل إشعارات الأذان الإيمانية بنجاح! 🔔");
+      } else {
+        localStorage.setItem("prayerNotificationsEnabled", "false");
+        toast.error("لم يتم منح إذن الإشعارات من المتصفح.");
+      }
+      setShowNotificationRequest(false);
+    } else {
+      toast.error("هذا المتصفح لا يدعم الإشعارات.");
+    }
+  };
+
+  const handleDismissNotificationRequest = () => {
+    localStorage.setItem("dismissed_notification_request", "true");
+    setShowNotificationRequest(false);
+  };
 
   const handleGenerateNiyyah = async () => {
     setNiyyahLoading(true);
@@ -424,29 +457,39 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     setStreak(currentStreak);
 
     // Sync with Firestore if logged in
-    if (user && streakUpdated) {
+    if (user && user.uid !== 'local_guest' && streakUpdated) {
       const syncStreak = async () => {
         try {
-          const { data, error } = await supabase.from('users').select('streak').eq('uid', user.id).single();
-          if (data && data.streak !== currentStreak) {
-            await supabase.from('users').update({ streak: currentStreak }).eq('uid', user.id);
+          const userDocRef = doc(db, 'users', user.uid);
+          const docSnap = await getDoc(userDocRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            if (data && data.streak !== currentStreak) {
+              await updateDoc(userDocRef, { streak: currentStreak });
+            }
           }
         } catch (err: any) {
           console.error("Error syncing streak:", err);
+          handleFirestoreError(err, OperationType.UPDATE, `users/${user.uid}`);
         }
       };
       syncStreak();
-    } else if (user && !streakUpdated) {
+    } else if (user && user.uid !== 'local_guest' && !streakUpdated) {
       // Just fetch it to make sure it matches
       const fetchStreak = async () => {
         try {
-          const { data, error } = await supabase.from('users').select('streak').eq('uid', user.id).single();
-          if (data && data.streak && data.streak > currentStreak) {
-            setStreak(data.streak);
-            localStorage.setItem('appStreak', data.streak.toString());
+          const userDocRef = doc(db, 'users', user.uid);
+          const docSnap = await getDoc(userDocRef);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            if (data && data.streak && data.streak > currentStreak) {
+              setStreak(data.streak);
+              localStorage.setItem('appStreak', data.streak.toString());
+            }
           }
         } catch (err: any) {
           console.error("Error fetching streak:", err);
+          handleFirestoreError(err, OperationType.GET, `users/${user.uid}`);
         }
       };
       fetchStreak();
@@ -480,6 +523,22 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         }
       } catch(e){}
     }
+  }, []);
+
+  const [activeFlagshipIcon, setActiveFlagshipIcon] = useState(() => {
+    return localStorage.getItem('user_favorite_flagship_icon') || 'dua';
+  });
+
+  useEffect(() => {
+    const handleUpdateIcon = () => {
+      setActiveFlagshipIcon(localStorage.getItem('user_favorite_flagship_icon') || 'dua');
+    };
+    window.addEventListener('storage', handleUpdateIcon);
+    const interval = setInterval(handleUpdateIcon, 1500);
+    return () => {
+      window.removeEventListener('storage', handleUpdateIcon);
+      clearInterval(interval);
+    };
   }, []);
 
   useEffect(() => {
@@ -721,21 +780,21 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   };
 
   const getBackgroundStyle = () => {
-    if (!nextPrayer) return "bg-gradient-to-br from-emerald-500 to-teal-700";
+    if (!nextPrayer) return "bg-gradient-to-br from-[#0D5C4D] to-[#073B31]";
     switch (nextPrayer.id) {
       case "Fajr":
       case "Sunrise":
-        return "bg-gradient-to-br from-indigo-500 to-blue-700";
+        return "bg-gradient-to-br from-[#073B31] via-[#0D5C4D] to-[#C59F60]";
       case "Dhuhr":
-        return "bg-gradient-to-br from-teal-400 to-emerald-600";
+        return "bg-gradient-to-br from-[#0D5C4D] to-[#1D8A74]";
       case "Asr":
-        return "bg-gradient-to-br from-amber-400 to-orange-600";
+        return "bg-gradient-to-br from-[#9F793E] to-[#C59F60]";
       case "Maghrib":
-        return "bg-gradient-to-br from-rose-500 to-pink-700";
+        return "bg-gradient-to-br from-[#0D5C4D] via-[#E2A247] to-[#9F793E]";
       case "Isha":
-        return "bg-gradient-to-br from-slate-800 to-indigo-950";
+        return "bg-gradient-to-br from-[#073B31] to-[#090E0C]";
       default:
-        return "bg-gradient-to-br from-emerald-500 to-teal-700";
+        return "bg-gradient-to-br from-[#0D5C4D] to-[#073B31]";
     }
   };
 
@@ -919,6 +978,48 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       </motion.div>
 
 
+      {/* Custom Designed Notification Permission Banner */}
+      {showNotificationRequest && (
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="bg-white dark:bg-slate-900 border border-emerald-500/10 dark:border-emerald-500/20 rounded-3xl p-5 shadow-[0_8px_30px_-12px_rgba(16,185,129,0.15)] relative overflow-hidden text-right"
+        >
+          <div className="absolute top-0 left-0 w-24 h-24 bg-emerald-500/5 rounded-full -ml-8 -mt-8 pointer-events-none"></div>
+          <div className="relative z-10 flex gap-4 items-start">
+            <div className="w-11 h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 flex flex-shrink-0 items-center justify-center text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30">
+              <span className="relative flex h-5 w-5 justify-center items-center">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <Bell size={20} className="relative z-10 animate-bounce text-emerald-600" />
+              </span>
+            </div>
+            <div className="space-y-1.5 flex-1">
+              <h3 className="text-sm font-extrabold text-slate-800 dark:text-emerald-50 font-serif leading-tight">
+                تفعيل تنبيهات الأذان والإشعارات الإيمانية 🔔
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-sans">
+                احصل على تنبيهات الأذان في مواقيتها الدقيقة وتذكيرات الأذكار اليومية لتعمر يومك بذكر الله واليقين.
+              </p>
+              <div className="flex items-center gap-3 pt-3">
+                <button
+                  onClick={handleRequestNotifications}
+                  className="px-5 py-2 text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition-all rounded-xl shadow-md cursor-pointer"
+                >
+                  تفعيل الآن (سماح)
+                </button>
+                <button
+                  onClick={handleDismissNotificationRequest}
+                  className="px-3 py-2 text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer"
+                >
+                  لاحقاً بالمساء
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+
 
       {/* Interactive AI Personalization Onboarding / Customized Routine Checklist */}
       <motion.div
@@ -927,13 +1028,13 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         transition={{ delay: 0.04 }}
         className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.08)] relative overflow-hidden group"
       >
-        <div className="absolute top-0 left-0 w-32 h-32 bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full -ml-10 -mt-10 blur-xl pointer-events-none"></div>
+        <div className="absolute top-0 left-0 w-32 h-32 bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full -ml-10 -mt-10 blur-xl pointer-events-none"></div>
         <div className="relative z-10 space-y-4">
           
           {/* Header Title of AI Routine Section */}
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center">
+              <div className="w-9 h-9 bg-emerald-100 dark:bg-emerald-950 text-[#0D5C4D] dark:text-emerald-400 rounded-xl flex items-center justify-center">
                 <Bot size={20} className="animate-pulse" />
               </div>
               <div>
@@ -946,7 +1047,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             {!showAiOnboarding && (
               <button
                 onClick={handleResetRoutine}
-                className="text-xs font-bold text-indigo-500 hover:text-indigo-600 flex items-center gap-1 bg-indigo-50 dark:bg-indigo-500/10 px-2.5 py-1.5 rounded-xl transition-colors"
+                className="text-xs font-bold text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950 px-2.5 py-1.5 rounded-xl transition-colors"
                 title="إعادة التخصيص"
               >
                 <Sliders size={13} />
@@ -959,7 +1060,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           {showAiOnboarding ? (
             <div className="space-y-4 bg-slate-50 dark:bg-slate-800/40 p-4 rounded-2xl border border-slate-100 dark:border-slate-800/60">
               <div className="flex justify-between items-center pb-2 border-b border-slate-200/50 dark:border-slate-700/50">
-                <span className="text-xs font-black text-rose-500">مطلوب التخصيص الإيماني</span>
+                <span className="text-xs font-black text-amber-500 dark:text-amber-400">مطلوب التخصيص الإيماني</span>
                 <span className="text-[10px] font-mono text-slate-400">سؤال {quizStep + 1} من ٣</span>
               </div>
 
@@ -978,7 +1079,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                         onClick={() => setQuizAnswers({ ...quizAnswers, goal: opt.id })}
                         className={`text-right p-3 rounded-xl text-xs font-bold transition-all border ${
                           quizAnswers.goal === opt.id
-                            ? "bg-indigo-500 text-white border-indigo-500 shadow-md shadow-indigo-500/20"
+                            ? "bg-[#0D5C4D] text-white border-[#0D5C4D] shadow-md shadow-emerald-500/20"
                             : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-700 dark:text-slate-300"
                         }`}
                       >
@@ -1003,7 +1104,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                         onClick={() => setQuizAnswers({ ...quizAnswers, time: opt.id })}
                         className={`text-right p-3 rounded-xl text-xs font-bold transition-all border ${
                           quizAnswers.time === opt.id
-                            ? "bg-indigo-500 text-white border-indigo-500 shadow-md shadow-indigo-500/20"
+                            ? "bg-[#0D5C4D] text-white border-[#0D5C4D] shadow-md shadow-emerald-500/20"
                             : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-700 dark:text-slate-300"
                         }`}
                       >
@@ -1028,7 +1129,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                         onClick={() => setQuizAnswers({ ...quizAnswers, level: opt.id })}
                         className={`text-right p-3 rounded-xl text-xs font-bold transition-all border ${
                           quizAnswers.level === opt.id
-                            ? "bg-indigo-500 text-white border-indigo-500 shadow-md shadow-indigo-500/20"
+                            ? "bg-[#0D5C4D] text-white border-[#0D5C4D] shadow-md shadow-emerald-500/20"
                             : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/80 text-slate-700 dark:text-slate-300"
                         }`}
                       >
@@ -1059,7 +1160,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                       (quizStep === 0 && !quizAnswers.goal) ||
                       (quizStep === 1 && !quizAnswers.time)
                     }
-                    className="text-xs font-bold text-white bg-indigo-500 hover:bg-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed px-4 py-2 rounded-xl transition-all shadow-md shadow-indigo-500/10"
+                    className="text-xs font-bold text-white bg-[#0D5C4D] hover:bg-emerald-700 disabled:opacity-40 disabled:cursor-not-allowed px-4 py-2 rounded-xl transition-all shadow-md"
                   >
                     التالي
                   </button>
@@ -1067,7 +1168,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                   <button
                     onClick={handleGenerateAiRoutine}
                     disabled={!quizAnswers.level || aiLoading}
-                    className="text-xs font-black text-white bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 px-5 py-2 rounded-xl transition-all shadow-lg flex items-center gap-1.5"
+                    className="text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 px-5 py-2 rounded-xl transition-all shadow-lg flex items-center gap-1.5"
                   >
                     {aiLoading ? (
                       <>
@@ -1102,7 +1203,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                       className={`flex gap-3 items-center p-3 rounded-2xl cursor-pointer border transition-all ${
                         isChecked
                           ? "bg-emerald-50/50 dark:bg-emerald-500/5 text-slate-400 border-emerald-400/40 line-through"
-                          : "bg-slate-50 dark:bg-slate-800/40 text-[#0A1914] dark:text-slate-100 border-slate-100 dark:border-slate-800 hover:border-indigo-500/30"
+                          : "bg-slate-50 dark:bg-slate-800/40 text-[#0A1914] dark:text-slate-100 border-slate-100 dark:border-slate-800 hover:border-emerald-500/30"
                       }`}
                     >
                       <button
@@ -1124,10 +1225,10 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
               {/* Progress metrics */}
               {userRoutine.length > 0 && (
-                <div className="flex justify-between items-center bg-indigo-50/40 dark:bg-[#111827] p-3 rounded-2xl border border-indigo-100/50 dark:border-slate-800">
+                <div className="flex justify-between items-center bg-emerald-500/5 dark:bg-[#111A16] p-3 rounded-2xl border border-emerald-500/10 dark:border-slate-800">
                   <div className="text-right">
                     <span className="block text-[10px] text-slate-400">معدل الانجاز لجرعة اليوم:</span>
-                    <span className="text-xs font-serif font-black text-indigo-500">
+                    <span className="text-xs font-serif font-black text-[#0D5C4D] dark:text-emerald-400">
                       {Object.keys(routineChecked).filter(k => routineChecked[k]).length} من {userRoutine.length} طاعات مكتملة
                     </span>
                   </div>
@@ -1136,7 +1237,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                       طوبى لك مكتمل تماماً! 🎉
                     </span>
                   ) : (
-                    <span className="text-[10px] font-bold text-indigo-400 font-serif">ثابر لتحقيق طموحاتك</span>
+                    <span className="text-[10px] font-bold text-emerald-500 font-serif">ثابر لتحقيق طموحاتك</span>
                   )}
                 </div>
               )}
@@ -1169,7 +1270,10 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             </div>
             {quranPlanData && (
               <button
-                onClick={() => onNavigate("quran-plan")}
+                onClick={() => {
+                  localStorage.setItem("quran_sub_tab", "plans");
+                  onNavigate("quran");
+                }}
                 className="text-xs font-bold text-amber-500 hover:text-amber-600 flex items-center gap-1 bg-amber-50 dark:bg-amber-500/10 px-2.5 py-1.5 rounded-xl transition-colors"
               >
                 <span>إدارة الخطة</span>
@@ -1186,7 +1290,10 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                 🚨 لم تقم بإعداد خطة ختمة قرآنية تلتزم بها يومياً بعد! صمّم خطتك الآن في ثوانٍ لتحافظ على ورد تلاوتك وتفادي الهجر.
               </p>
               <button
-                onClick={() => onNavigate("quran-plan")}
+                onClick={() => {
+                  localStorage.setItem("quran_sub_tab", "plans");
+                  onNavigate("quran");
+                }}
                 className="w-full bg-amber-500 text-white hover:bg-amber-600 transition-colors py-2.5 rounded-xl font-bold text-xs shadow-md shadow-amber-500/20"
               >
                 تخصيص وبرمجة خطة ختمتي الآن 📖
@@ -1206,11 +1313,14 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                 // All items completed
                 return (
                   <div className="bg-emerald-500/10 dark:bg-emerald-500/5 p-4 border border-emerald-500/20 rounded-2xl text-center space-y-2">
-                    <p className="text-xs font-black text-emerald-600 dark:text-emerald-400 leading-relaxed">
+                    <p className="text-xs font-black text-[#10b981] dark:text-emerald-400 leading-relaxed">
                       🎉 هنيئاً لك! لقد تم إكمال الختمة المباركة بالكامل ومصادقة التلاوات كاملة. نسأل الله القبول والثبات.
                     </p>
                     <button
-                      onClick={() => onNavigate("quran-plan")}
+                      onClick={() => {
+                        localStorage.setItem("quran_sub_tab", "plans");
+                        onNavigate("quran");
+                      }}
                       className="text-xs font-bold bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-xl transition-all"
                     >
                       ابدأ ختمة جديدة ببركة ومستوى آخر 📖
@@ -1240,7 +1350,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                     </div>
                     <button
                       onClick={() => handleCompleteQuranPlanDay(currIdx)}
-                      className="bg-emerald-500 hover:bg-emerald-600 transition-colors text-white font-black text-[11px] px-3.5 py-2 rounded-xl shadow-md shadow-emerald-500/10"
+                      className="bg-[#10b981] hover:bg-emerald-600 transition-colors text-white font-black text-[11px] px-3.5 py-2 rounded-xl shadow-md shadow-emerald-500/10"
                     >
                       تمت القراءة ✔️
                     </button>
@@ -1328,7 +1438,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                  onClick={() => setIsEditingNiyyah(true)}
                  className="bg-slate-50 dark:bg-slate-850 border border-slate-100 dark:border-slate-700/50 rounded-2xl px-4 py-3 text-xs text-slate-700 dark:text-slate-300 font-bold cursor-text hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors leading-5"
                >
-                 {dailyNiyyah || <span className="text-slate-400">اضغط هنا لكتابة نيتك أو هدفك لليوم، أو انقر اقتراح بالذكاء الاصطناعي...</span>}
+                 {dailyNiyyah || <span className="text-slate-400">اضغط هنا لكتابة نيتك أو هدفك لليوم...</span>}
                </div>
 
                {niyyahSuggestions.length > 0 && (
@@ -1338,7 +1448,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                    className="space-y-2 border-t border-black/5 dark:border-white/5 pt-3.5"
                  >
                    <span className="block text-[10px] text-slate-400 font-black mb-1">اختر من النوايا الربانية المقترحة لليوم:</span>
-                   {niyyahSuggestions.map((suggestion, idx) => (
+
+                                     {niyyahSuggestions.map((suggestion, idx) => (
                      <button
                        key={idx}
                        onClick={() => {
@@ -1360,37 +1471,6 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
       {/* Daily Good Deeds & Charity Booster */}
       <CharityToday />
-
-      {/* Quran Memorization Entry Card */}
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        onClick={() => onNavigate("memorization-hub")}
-        className="relative overflow-hidden rounded-[2rem] bg-gradient-to-r from-teal-700 via-teal-800 to-emerald-900 text-white p-5 shadow-lg shadow-emerald-950/10 cursor-pointer group hover:shadow-xl transition-all border border-white/10"
-      >
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform duration-700"></div>
-        <div className="relative z-10 flex items-center justify-between">
-          <div className="flex items-center gap-3.5 text-right">
-            <div className="w-11 h-11 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/25 text-white">
-              <span className="text-xl">🕌</span>
-            </div>
-            <div>
-              <h4 className="font-extrabold text-[13.5px] font-serif tracking-wide text-white leading-snug flex items-center gap-1.5 flex-wrap">
-                مِحراب حفظ القرآن الكريم ومراجعته
-                <span className="bg-amber-400 text-[#07130F] font-black text-[8px] px-2 py-0.5 rounded-full animate-pulse uppercase tracking-widest">ميزة جديدة</span>
-              </h4>
-              <p className="text-emerald-100/90 text-xs mt-0.5 font-medium">سجل وردك اليومي • اصنع وتشارك بطاقات الحفظ لأحبابك 🌸</p>
-            </div>
-          </div>
-          <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/15 group-hover:bg-amber-400 group-hover:text-black transition-colors shrink-0">
-            <ChevronLeft size={16} className="rotate-180" />
-          </div>
-        </div>
-      </motion.div>
-
-
-
       {/* Arabic Widget */}
       <ArabicWidget onNavigate={onNavigate} />
 
@@ -1408,19 +1488,19 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">القرآن</span>
         </button>
         <button onClick={() => onNavigate("azkar")} className="flex flex-col items-center gap-2 group">
-          <div className="w-14 h-14 rounded-[20px] bg-gradient-to-br from-rose-100 to-rose-50 dark:from-rose-900/40 dark:to-rose-800/20 flex items-center justify-center text-rose-600 dark:text-rose-400 shadow-sm group-hover:scale-105 group-active:scale-95 transition-all">
+          <div className="w-14 h-14 rounded-[20px] bg-gradient-to-br from-amber-100 to-amber-50 dark:from-amber-900/30 dark:to-amber-950/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shadow-sm group-hover:scale-105 group-active:scale-95 transition-all">
             <Heart size={24} strokeWidth={1.5} />
           </div>
           <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">الأذكار</span>
         </button>
         <button onClick={() => onNavigate("qibla")} className="flex flex-col items-center gap-2 group">
-          <div className="w-14 h-14 rounded-[20px] bg-gradient-to-br from-blue-100 to-blue-50 dark:from-blue-900/40 dark:to-blue-800/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-sm group-hover:scale-105 group-active:scale-95 transition-all">
+          <div className="w-14 h-14 rounded-[20px] bg-gradient-to-br from-teal-100 to-teal-50 dark:from-teal-900/40 dark:to-teal-800/20 flex items-center justify-center text-teal-600 dark:text-teal-400 shadow-sm group-hover:scale-105 group-active:scale-95 transition-all">
             <Compass size={24} strokeWidth={1.5} />
           </div>
           <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">القبلة</span>
         </button>
         <button onClick={() => onNavigate("tasbeeh")} className="flex flex-col items-center gap-2 group">
-          <div className="w-14 h-14 rounded-[20px] bg-gradient-to-br from-purple-100 to-purple-50 dark:from-purple-900/40 dark:to-purple-800/20 flex items-center justify-center text-purple-600 dark:text-purple-400 shadow-sm group-hover:scale-105 group-active:scale-95 transition-all">
+          <div className="w-14 h-14 rounded-[20px] bg-gradient-to-br from-yellow-100 to-yellow-50 dark:from-[#C59F60]/20 dark:to-[#9F793E]/10 flex items-center justify-center text-[#9F793E] dark:text-[#E5C185] shadow-sm group-hover:scale-105 group-active:scale-95 transition-all">
             <Activity size={24} strokeWidth={1.5} />
           </div>
           <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">السبحة</span>
@@ -1446,7 +1526,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           </button>
         )}
 
-        <button onClick={() => setWhatToReadOpen(true)} className="flex-shrink-0 flex items-center gap-2 bg-gradient-to-l from-indigo-500 to-purple-500 pr-2 pl-4 py-2.5 rounded-full border border-indigo-400 shadow-md hover:shadow-lg transition-shadow">
+        <button onClick={() => setWhatToReadOpen(true)} className="flex-shrink-0 flex items-center gap-2 bg-gradient-to-l from-[#C59F60] to-[#E2A247] pr-2 pl-4 py-2.5 rounded-full border border-amber-400/30 shadow-md hover:shadow-lg transition-shadow">
           <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white">
             <Sparkles size={16} />
           </div>
@@ -1465,20 +1545,6 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             <Quote size={16} />
           </div>
           <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">الحديث</span>
-        </button>
-
-        <button onClick={() => onNavigate("quran-plan")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
-          <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-            <BookOpen size={16} />
-          </div>
-          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">الختمة</span>
-        </button>
-
-        <button onClick={() => onNavigate("smart-plan")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
-          <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-            <Target size={16} />
-          </div>
-          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">الخطة الذكية</span>
         </button>
 
         <button onClick={() => onNavigate("names")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
@@ -1502,27 +1568,27 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.15 }}
         onClick={() => onNavigate("muslim-ai")}
-        className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-indigo-500 to-blue-500 shadow-xl shadow-indigo-500/20 p-5 flex items-center justify-between cursor-pointer group active:scale-[0.98] transition-all"
+        className="relative overflow-hidden rounded-[32px] bg-gradient-to-r from-[#0D5C4D] to-[#041d15] shadow-xl shadow-emerald-950/20 p-5 flex items-center justify-between cursor-pointer group active:scale-[0.98] transition-all"
       >
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-20 mix-blend-overlay pointer-events-none group-hover:scale-105 transition-transform duration-700" 
           style={{ backgroundImage: 'url("/src/assets/images/names_allah_background_1779805712797.png")' }}
         ></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/80 to-blue-500/80"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0D5C4D]/90 to-[#073B31]/90"></div>
         <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-10 -mt-10 blur-md group-hover:scale-125 transition-transform duration-700"></div>
         <div className="relative z-10 flex items-center gap-4">
           <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-[18px] flex items-center justify-center border border-white/20">
-            <Sparkles size={24} className="text-white" />
+            <Sparkles size={24} className="text-[#C59F60]" />
           </div>
           <div>
             <h3 className="text-lg font-bold text-white mb-0.5 tracking-wide flex items-center gap-2">
               {t('muslim_ai')} 
-              <span className="bg-white text-indigo-600 text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider font-extrabold">NEW</span>
+              <span className="bg-[#C59F60] text-white text-[9px] px-1.5 py-0.5 rounded-full uppercase tracking-wider font-extrabold">NEW</span>
             </h3>
-            <p className="text-indigo-50 text-xs font-medium opacity-90">{t('ai_assistant_desc')}</p>
+            <p className="text-emerald-100 text-xs font-medium opacity-90">{t('ai_assistant_desc')}</p>
           </div>
         </div>
-        <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 group-hover:bg-white group-hover:text-indigo-600 transition-colors">
+        <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/20 group-hover:bg-white group-hover:text-[#0D5C4D] transition-colors">
           <ChevronLeft size={16} className={isRTL ? '' : 'rotate-180'} />
         </div>
       </motion.div>
@@ -1703,7 +1769,10 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div 
-              onClick={() => onNavigate("dreams")}
+              onClick={() => {
+                localStorage.setItem("ai_starting_prompt", "أريدك أن تساعدني وتفسر لي رؤيا أو حلماً رأيته بالتفصيل واليقين...");
+                onNavigate("muslim-ai");
+              }}
               className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 rounded-[24px] flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-300 text-center group shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] hover:shadow-lg hover:-translate-y-1"
             >
               <div className="w-12 h-12 rounded-[16px] bg-amber-50 dark:bg-amber-500/10 text-amber-500 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -1712,7 +1781,10 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
               <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{t('dream_interpretation')}</span>
             </div>
             <div 
-              onClick={() => onNavigate("muslim-ai")}
+              onClick={() => {
+                localStorage.setItem("ai_starting_prompt", "أريد منك مراجعة وتصحيح تلاوة آيات من القرآن الكريم...");
+                onNavigate("muslim-ai");
+              }}
               className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 rounded-[24px] flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-300 text-center group shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] hover:shadow-lg hover:-translate-y-1"
             >
               <div className="w-12 h-12 rounded-[16px] bg-yellow-50 dark:bg-yellow-500/10 text-yellow-500 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -1721,7 +1793,10 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
               <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{t('recitation_correction')}</span>
             </div>
             <div 
-              onClick={() => onNavigate("quran-reflection")}
+              onClick={() => {
+                localStorage.setItem("quran_sub_tab", "reflections");
+                onNavigate("quran");
+              }}
               className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 rounded-[24px] flex flex-col items-center justify-center gap-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all duration-300 text-center group shadow-[0_4px_24px_-12px_rgba(0,0,0,0.1)] hover:shadow-lg hover:-translate-y-1"
             >
               <div className="w-12 h-12 rounded-[16px] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -1752,7 +1827,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             className="bg-white dark:bg-slate-900 rounded-[32px] w-full max-w-lg overflow-hidden border border-slate-100 dark:border-slate-800 shadow-2xl relative"
           >
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white text-right relative">
+            <div className="bg-gradient-to-r from-[#0D5C4D] to-[#041d15] p-6 text-white text-right relative">
               <button
                 onClick={() => {
                   setWhatToReadOpen(false);
@@ -1769,7 +1844,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                 </div>
                 <div>
                   <h3 className="text-base font-black font-serif">ماذا أقرأ اليوم؟ • الطبيب القرآني الذكي</h3>
-                  <p className="text-[11px] text-indigo-100 font-medium">اختر حالتك النفسية أو الروحية لنصف لك الدواء الإشعاعي</p>
+                  <p className="text-[11px] text-emerald-100 font-medium">اختر حالتك النفسية أو الروحية لنصف لك الدواء الإشعاعي</p>
                 </div>
               </div>
             </div>
@@ -1782,11 +1857,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                   <p className="text-xs font-bold text-slate-500">من فضلك كيف تجد فؤادك الآن؟</p>
                   <div className="grid gap-2.5">
                     {[
-                      { id: "anxious", label: "أشعر بالقلق والتوتر وتشتت التفكير 😰", color: "hover:border-blue-500 bg-blue-50/20 dark:bg-blue-950/20" },
-                      { id: "sad", label: "أشعر بالحزن والضيق وانكسار الصدر 😞", color: "hover:border-rose-500 bg-rose-50/20 dark:bg-rose-950/20" },
-                      { id: "gratitude", label: "أعيش في شكر ونعمة وفرح بفضل ربي 🥰", color: "hover:border-emerald-500 bg-emerald-50/20 dark:bg-emerald-950/20" },
-                      { id: "sluggish", label: "أجد كسلاً وفتوراً عن العبادة والواجبات 🥱", color: "hover:border-amber-500 bg-amber-50/20 dark:bg-amber-950/20" },
-                      { id: "guidance", label: "أطلب الهداية واليقين وزيادة الثبات 🕋", color: "hover:border-purple-500 bg-purple-50/20 dark:bg-purple-950/20" }
+                      { id: "anxious", label: "أشعر بالقلق والتوتر وتشتت التفكير 😰", color: "hover:border-[#C59F60] bg-amber-500/5 dark:bg-amber-500/10" },
+                      { id: "sad", label: "أشعر بالحزن والضيق وانكسار الصدر 😞", color: "hover:border-rose-500 bg-rose-500/5 dark:bg-rose-500/10" },
+                      { id: "gratitude", label: "أعيش في شكر ونعمة وفرح بفضل ربي 🥰", color: "hover:border-[#0D5C4D] bg-emerald-500/5 dark:bg-emerald-500/10" },
+                      { id: "sluggish", label: "أجد كسلاً وفتوراً عن العبادة والواجبات 🥱", color: "hover:border-[#C59F60] bg-amber-500/5 dark:bg-amber-500/10" },
+                      { id: "guidance", label: "أطلب الهداية واليقين وزيادة الثبات 🕋", color: "hover:border-[#0D5C4D] bg-emerald-500/5 dark:bg-emerald-500/10" }
                     ].map((m) => (
                       <button
                         key={m.id}
@@ -1854,7 +1929,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                           setSelectedSpiritualState(null);
                           setAiPrescription("");
                         }}
-                        className="text-xs font-bold text-indigo-500 hover:underline flex items-center gap-1"
+                        className="text-xs font-bold text-[#0D5C4D] dark:text-emerald-400 hover:underline flex items-center gap-1"
                       >
                         <ChevronRightIcon size={14} />
                         <span>العودة لقائمة الحالات</span>
@@ -1862,7 +1937,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
                       {/* Spiritual Prescription Main Verse */}
                       <div className="bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 p-5 rounded-3xl text-center space-y-3 shadow-inner">
-                        <span className="bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 border border-indigo-200/50 text-[10px] font-black px-2.5 py-1 rounded-full">{rec.title}</span>
+                        <span className="bg-[#C59F60]/10 dark:bg-[#C59F60]/20 text-[#9F793E] dark:text-[#E2C392] border border-[#C59F60]/30 text-[10px] font-black px-2.5 py-1 rounded-full">{rec.title}</span>
                         <p className="text-base text-slate-900 dark:text-emerald-100 font-serif font-extrabold leading-loose py-2">
                           「 {rec.text} 」
                         </p>
@@ -1884,7 +1959,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                           <button
                             onClick={() => handleAskAiPrescription(selectedSpiritualState, rec.text)}
                             disabled={aiPrescriptionLoading}
-                            className="bg-indigo-500 hover:bg-indigo-600 text-white font-extrabold text-[10px] px-3.5 py-2 rounded-xl transition-all shadow-md shadow-indigo-500/10 flex items-center gap-1 disabled:opacity-50"
+                            className="bg-[#C59F60] hover:bg-[#9F793E] text-white font-extrabold text-[10px] px-3.5 py-2 rounded-xl transition-all shadow-md shadow-emerald-500/10 flex items-center gap-1 disabled:opacity-50"
                           >
                             {aiPrescriptionLoading ? (
                               <>
@@ -1904,9 +1979,9 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                           <motion.div
                             initial={{ opacity: 0, y: 5 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-indigo-50/50 dark:bg-indigo-500/5 border border-indigo-200/30 p-4 rounded-2xl"
+                            className="bg-[#0D5C4D]/5 dark:bg-[#0D5C4D]/10 border border-emerald-500/20 p-4 rounded-2xl"
                           >
-                            <p className="text-xs text-slate-700 dark:text-indigo-100 leading-relaxed font-serif font-bold whitespace-pre-wrap">
+                            <p className="text-xs text-slate-700 dark:text-emerald-100 leading-relaxed font-serif font-bold whitespace-pre-wrap">
                               {aiPrescription}
                             </p>
                           </motion.div>

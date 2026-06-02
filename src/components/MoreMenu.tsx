@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe, TrendingUp, Play, Circle, Sun, Settings, Download, Crown, Award, Activity, Wind, TreePine, CheckCircle, Baby, Hourglass, History, Share2, VideoOff } from 'lucide-react';
+import { Calendar, BookOpen, MapPin, Compass, Radio, Heart, Info, Moon, Palette, Bot, MessageCircle, Puzzle, Bell, BellOff, BellRing, Volume2, VolumeX, HandHeart, Trophy, Library, Image as ImageIcon, Smile, Target, Users, Calculator, Shield, Map, Gift, LogIn, LogOut, User, Globe, TrendingUp, Play, Circle, Sun, Settings, Download, Crown, Award, Activity, Wind, TreePine, CheckCircle, Baby, Hourglass, History, Share2, VideoOff } from 'lucide-react';
 import { usePrayerTimes } from '../contexts/PrayerTimesContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
@@ -216,26 +216,26 @@ export default function MoreMenu({
       title: t('library_and_learning', 'المكتبة والتعلم'),
       image: 'https://i.pinimg.com/736x/87/1b/2f/871b2f81152a51f801a61327111b1511.jpg',
       items: [
-        { id: 'muslim-ai', label: t('muslim_ai', 'الذكاء الاصطناعي'), icon: <Bot size={24} />, color: 'bg-indigo-500' },
-        { id: 'stories', label: t('prophet_stories', 'قصص الأنبياء'), icon: <BookOpen size={24} />, color: 'bg-purple-500' },
-        { id: 'prayer-guide', label: t('prayer_guide', 'كيفية الصلاة'), icon: <BookOpen size={24} />, color: 'bg-amber-600' },
-        { id: 'names', label: t('names_of_allah', 'أسماء الله الحسنى'), icon: <Heart size={24} />, color: 'bg-pink-500' },
-        { id: 'hadith', label: t('hadiths', 'الأحاديث'), icon: <BookOpen size={24} />, color: 'bg-red-400' },
-        { id: 'duas', label: t('duas', 'الأدعية'), icon: <Heart size={24} />, color: 'bg-emerald-400' },
+        { id: 'muslim-ai', label: t('muslim_ai', 'الذكاء الاصطناعي'), icon: <Bot size={24} />, color: 'bg-[#0D5C4D]' },
+        { id: 'stories', label: t('prophet_stories', 'قصص الأنبياء'), icon: <BookOpen size={24} />, color: 'bg-[#0A4D40]' },
+        { id: 'prayer-guide', label: t('prayer_guide', 'كيفية الصلاة'), icon: <BookOpen size={24} />, color: 'bg-[#C59F60]' },
+        { id: 'names', label: t('names_of_allah', 'أسماء الله الحسنى'), icon: <Heart size={24} />, color: 'bg-[#9F793E]' },
+        { id: 'hadith', label: t('hadiths', 'الأحاديث'), icon: <BookOpen size={24} />, color: 'bg-emerald-600' },
+        { id: 'duas', label: t('duas', 'الأدعية'), icon: <Heart size={24} />, color: 'bg-emerald-500' },
       ]
     },
     {
       title: t('tools_and_seasons', 'أدوات ومواسم'),
       image: 'https://i.pinimg.com/736x/3f/8b/77/3f8b77626915152a54b38d7c49b6b801.jpg',
       items: [
-        { id: 'tasbeeh', label: t('tasbeeh', 'السبحة الإلكترونية'), icon: <Circle size={24} />, color: 'bg-indigo-500' },
-        { id: 'ruqyah', label: t('ruqyah', 'الرقية الشرعية'), icon: <Shield size={24} />, color: 'bg-teal-500' },
-        { id: 'qibla', label: t('qibla', 'اتجاه القبلة'), icon: <Compass size={24} />, color: 'bg-orange-500' },
-        { id: 'qaza-tracker', label: t('qaza_tracker', 'قضاء الفوائت'), icon: <History size={24} />, color: 'bg-rose-600', isNew: true },
-        { id: 'calendar', label: t('hijri_calendar', 'التقويم الهجري'), icon: <Calendar size={24} />, color: 'bg-blue-500' },
-        { id: 'zakat', label: t('zakat_calculator', 'حاسبة الزكاة'), icon: <Calculator size={24} />, color: 'bg-emerald-600' },
-        { id: 'hajj', label: t('hajj_guide', 'دليل الحج والعمرة'), icon: <Map size={24} />, color: 'bg-amber-700' },
-        { id: 'halal-checker', label: t('halal_checker', 'المدقق الحلال'), icon: <CheckCircle size={24} />, color: 'bg-green-600' },
+        { id: 'tasbeeh', label: t('tasbeeh', 'السبحة الإلكترونية'), icon: <Circle size={24} />, color: 'bg-[#C59F60]' },
+        { id: 'ruqyah', label: t('ruqyah', 'الرقية الشرعية'), icon: <Shield size={24} />, color: 'bg-emerald-600' },
+        { id: 'qibla', label: t('qibla', 'اتجاه القبلة'), icon: <Compass size={24} />, color: 'bg-teal-650' },
+        { id: 'qaza-tracker', label: t('qaza_tracker', 'قضاء الفوائت'), icon: <History size={24} />, color: 'bg-amber-600', isNew: true },
+        { id: 'calendar', label: t('hijri_calendar', 'التقويم الهجري'), icon: <Calendar size={24} />, color: 'bg-[#0D5C4D]' },
+        { id: 'zakat', label: t('zakat_calculator', 'حاسبة الزكاة'), icon: <Calculator size={24} />, color: 'bg-[#0A4D40]' },
+        { id: 'hajj', label: t('hajj_guide', 'دليل الحج والعمرة'), icon: <Map size={24} />, color: 'bg-[#9F793E]' },
+        { id: 'halal-checker', label: t('halal_checker', 'المدقق الحلال'), icon: <CheckCircle size={24} />, color: 'bg-emerald-700' },
       ]
     },
     {
@@ -261,6 +261,8 @@ export default function MoreMenu({
         { id: 'theme', label: theme === 'dark' ? t('light_mode', 'الوضع النهاري') : t('dark_mode', 'الوضع الليلي'), icon: theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />, color: 'bg-slate-700' },
         { id: 'neon-accent', label: 'لون النيون الفوسفوري', icon: <Palette size={24} />, color: 'bg-emerald-500' },
         { id: 'prayer-settings', label: t('prayer_settings', 'إعدادات الصلاة'), icon: <Settings size={24} />, color: 'bg-emerald-600' },
+        { id: 'advanced-notifications', label: t('advanced_notifications_custom', 'تخصيص الأذان والتنبيهات'), icon: <BellRing size={24} />, color: 'bg-amber-500' },
+        { id: 'privacy-settings', label: t('privacy_high_security', 'الخصوصية والأمان الفائق'), icon: <Shield size={24} />, color: 'bg-indigo-600' },
         { id: 'notifications', label: notificationsEnabled ? t('disable_notifications', 'إيقاف الإشعارات') : t('enable_notifications', 'تفعيل الإشعارات'), icon: notificationsEnabled ? <BellOff size={24} /> : <Bell size={24} />, color: notificationsEnabled ? 'bg-gray-500' : 'bg-yellow-500' },
         { id: 'auto-adhan', label: autoAdhanEnabled ? t('disable_auto_adhan', 'إيقاف الأذان التلقائي') : t('enable_auto_adhan', 'تفعيل الأذان التلقائي'), icon: autoAdhanEnabled ? <VolumeX size={24} /> : <Volume2 size={24} />, color: autoAdhanEnabled ? 'bg-gray-500' : 'bg-emerald-500' },
         { id: 'lock-reels', label: reelsLocked ? 'تفعيل مقاطع التلاوة (الريلز)' : 'قفل مقاطع التلاوة (منع التشتيت)', icon: <VideoOff size={24} />, color: reelsLocked ? 'bg-emerald-600' : 'bg-red-500' },
@@ -290,7 +292,7 @@ export default function MoreMenu({
                 className="relative cursor-pointer group mb-2 hover:scale-105 transition-transform duration-300"
               >
                 <div className="w-20 h-20 rounded-full border-2 border-white/30 shadow-md bg-white/5 overflow-hidden flex items-center justify-center">
-                  {renderAvatarSvg(customAvatar, userData?.displayName || user.user_metadata?.name || 'مستخدم')}
+                  {renderAvatarSvg(customAvatar, userData?.displayName || user.displayName || 'مستخدم')}
                 </div>
                 <div className="absolute -bottom-1 -right-1 bg-yellow-500 text-slate-950 p-1.5 rounded-full border border-emerald-600 shadow-md hover:bg-yellow-400">
                   <Palette size={12} className="text-white fill-current" />
@@ -298,7 +300,7 @@ export default function MoreMenu({
               </div>
               <div>
                 <h1 className="text-2xl font-bold font-serif text-white mb-1">
-                  {userData?.isAnonymous ? 'حساب زائر' : (userData?.displayName || user.user_metadata?.name || 'مستخدم')}
+                  {userData?.isAnonymous ? 'حساب زائر' : (userData?.displayName || user.displayName || 'مستخدم')}
                 </h1>
                 {!userData?.isAnonymous && <p className="text-emerald-100/90 text-xs font-mono bg-black/10 px-3 py-1 rounded-full">{user.email}</p>}
                 
@@ -373,6 +375,9 @@ export default function MoreMenu({
                       } else {
                         onNavigate('auth');
                       }
+                    } else if (item.id === 'quran-plan') {
+                      localStorage.setItem("quran_sub_tab", "plans");
+                      onNavigate("quran");
                     } else {
                       onNavigate(item.id);
                     }
@@ -396,6 +401,37 @@ export default function MoreMenu({
           </motion.div>
         ))}
       </div>
+
+      {/* Developer Signature Card - Professional & Beautiful */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        className="mt-6 bg-gradient-to-br from-[#0c221d] to-slate-900/90 border border-amber-500/30 rounded-3xl p-6 text-center shadow-[0_20px_50px_rgba(0,0,0,0.3)] relative overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] opacity-5 pointer-events-none"></div>
+        <div className="absolute -left-12 -bottom-12 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl"></div>
+        <div className="absolute -right-12 -top-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl"></div>
+
+        <div className="relative z-10 flex flex-col items-center gap-2">
+          <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center border border-amber-500/30 mb-2">
+            <Award className="text-amber-400" size={24} />
+          </div>
+          <span className="text-[10px] text-amber-400/95 font-bold tracking-widest uppercase font-mono">
+            مطور ومبرمج التطبيق
+          </span>
+          <h4 className="text-lg font-black text-white font-serif tracking-tight">
+            المهندس محمد أحمد
+          </h4>
+          <p className="text-[11px] text-slate-450 max-w-[280px] leading-relaxed">
+            تم تشذيب وبناء صرح اليقين بأحدث نماذج الذكاء الاصطناعي والتقنيات البرمجية الحديثة خدمةً للأمة الإسلامية.
+          </p>
+          <div className="flex gap-1.5 mt-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+            <span className="text-[9px] text-emerald-400 font-bold">نسخة الـ v3.5 - اليقين الإسلامي الذكي</span>
+          </div>
+        </div>
+      </motion.div>
 
       <div className="mt-8 text-center pb-8">
       <AnimatePresence>
@@ -672,7 +708,7 @@ export default function MoreMenu({
                     }`}
                   >
                     <div className="w-14 h-14 rounded-full overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-slate-850">
-                      {renderAvatarSvg(av.id, userData?.displayName || user?.user_metadata?.name || 'مستخدم')}
+                      {renderAvatarSvg(av.id, userData?.displayName || user?.displayName || 'مستخدم')}
                     </div>
                     <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 text-center leading-tight">
                       {av.name.split(" ")[1] || av.name}

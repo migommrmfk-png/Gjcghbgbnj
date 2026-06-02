@@ -5,18 +5,18 @@
 
 @layer base {
   :root {
-    --theme-primary: #1B5E4F; /* Deep Emerald */
-    --theme-primary-dark: #124538;
-    --theme-primary-light: #2c8c77;
-    --theme-gold: #DDA76A; /* Soft Gold */
-    --theme-gold-dark: #C68E4C;
-    --theme-gold-light: #F2C994;
-    --theme-accent: #E9C46A;
+    --theme-primary: #0D5C4D; /* Elegant deep royal Islamic Emerald */
+    --theme-primary-dark: #073B31; /* Intense deep jade shadow */
+    --theme-primary-light: #1D8A74; /* Radiant emerald glow */
+    --theme-gold: #C59F60; /* Polished burnished gold */
+    --theme-gold-dark: #9F793E; /* Golden bronze shadow */
+    --theme-gold-light: #EBD4AC; /* Delicate ivory-gold hue */
+    --theme-accent: #E2A247; /* Luminous warm honey amber */
 
-    --color-bg: #FAFAF9; /* Warmer background */
-    --color-surface: #ffffff;
-    --color-text: #1C1917;
-    --color-text-muted: #78716C;
+    --color-bg: #FAF7F2; /* Exquisite soft warm parchment background */
+    --color-surface: #FFFFFF; /* Pure clean card surface */
+    --color-text: #1E201E; /* Rich charcoal onyx */
+    --color-text-muted: #6C726E; /* Cool slate mist */
     --color-primary: var(--theme-primary);
     --color-primary-dark: var(--theme-primary-dark);
     --color-primary-light: var(--theme-primary-light);
@@ -30,18 +30,18 @@
   }
 
   .dark {
-    --theme-primary: #2c8c77;
-    --theme-primary-dark: #1B5E4F;
-    --theme-primary-light: #4AC4B4;
-    --theme-gold: #DDA76A;
-    --theme-gold-dark: #C68E4C;
-    --theme-gold-light: #F2C994;
-    --theme-accent: #E9C46A;
+    --theme-primary: #1F9C84; /* Soft luminous radiant mint/emerald */
+    --theme-primary-dark: #0D5C4D; /* Royal deep forest base */
+    --theme-primary-light: #46DDC2; /* Bright teal/emerald accent */
+    --theme-gold: #E5C185; /* Soft gleaming gold */
+    --theme-gold-dark: #C59F60;
+    --theme-gold-light: #FEEDCE;
+    --theme-accent: #F4BE6C;
 
-    --color-bg: #0C0A09; /* Deeper background for dark mode */
-    --color-surface: #1C1917;
-    --color-text: #FAFAF9;
-    --color-text-muted: #A8A29E;
+    --color-bg: #090E0C; /* Luxurious dark night-emerald velvet */
+    --color-surface: #111A16; /* Sophisticated deep stone-emerald slate */
+    --color-text: #F4F8F6; /* Clear pristine silk white */
+    --color-text-muted: #83928D; /* Peaceful sage grey */
     --color-primary: var(--theme-primary);
     --color-primary-dark: var(--theme-primary-dark);
     --color-primary-light: var(--theme-primary-light);
@@ -205,3 +205,18 @@ input, textarea {
 ::selection {
   @apply bg-emerald-400 text-white;
 }
+
+/* Smooth Scroll & Native Viewport Physics */
+.scroll-smooth-container {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* GPU Hardware Acceleration layer for smooth render transitions on mobile devices */
+.gpu-layer {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+

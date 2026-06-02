@@ -261,5 +261,9 @@ service cloud.firestore {
                        request.resource.data.usedBy == request.auth.uid &&
                        resource.data.used == false;
     }
+
+    match /test/{docId} {
+      allow read: if true;
+    }
   }
 }

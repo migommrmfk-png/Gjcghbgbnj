@@ -50,8 +50,8 @@ export default function ChatOverlay() {
 
     const newMsg: ChatMessage = {
       id: Date.now().toString(),
-      senderId: user.id || userData?.uid || '',
-      senderName: userData?.displayName || user.user_metadata?.name || 'مستخدم',
+      senderId: user.uid || userData?.uid || '',
+      senderName: userData?.displayName || user.displayName || 'مستخدم',
       text: input.trim(),
       timestamp: Date.now()
     };
@@ -102,7 +102,7 @@ export default function ChatOverlay() {
                 </div>
               ) : (
                 messages.map((msg) => {
-                  const isMe = msg.senderId === (user?.id || userData?.uid);
+                  const isMe = msg.senderId === (user?.uid || userData?.uid);
                   return (
                     <div 
                       key={msg.id} 
