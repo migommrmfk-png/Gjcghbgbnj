@@ -51,10 +51,15 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
     "سُبْحَانَ اللَّهِ الْعَظِيمِ"
   ];
 
-  const handlePress = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault();
+  const handlePressDown = (e?: React.SyntheticEvent) => {
+    if (e) {
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+      e.stopPropagation();
+    }
+    
     setIsPressed(true);
-    setTimeout(() => setIsPressed(false), 150);
 
     if (soundEnabled) {
       try {
@@ -76,24 +81,52 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
         gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
         oscillator.start();
         oscillator.stop(audioCtx.currentTime + 0.05);
-      } catch (e) {}
+      } catch (err) {}
     }
 
     if (count + 1 >= target) {
       setCount(0);
-      setRounds(rounds + 1);
+      setRounds(r => r + 1);
       if (navigator.vibrate && vibrationPattern !== 'none') {
-        navigator.vibrate([200, 100, 200]);
+        navigator.vibrate([150, 80, 150]);
       }
     } else {
-      setCount(count + 1);
+      setCount(c => c + 1);
       if (navigator.vibrate && vibrationPattern !== 'none') {
-        if (vibrationPattern === 'short') navigator.vibrate(50);
-        else if (vibrationPattern === 'long') navigator.vibrate(150);
-        else if (vibrationPattern === 'double') navigator.vibrate([50, 50, 50]);
+        if (vibrationPattern === 'short') navigator.vibrate(35);
+        else if (vibrationPattern === 'long') navigator.vibrate(120);
+        else if (vibrationPattern === 'double') navigator.vibrate([45, 45, 45]);
       }
     }
   };
+
+  const handlePressUp = () => {
+    setIsPressed(false);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (isEditingTarget || isSettingsOpen) return;
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        handlePressDown();
+      }
+    };
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (isEditingTarget || isSettingsOpen) return;
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        handlePressUp();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [count, target, rounds, soundEnabled, vibrationPattern, isEditingTarget, isSettingsOpen]);
 
   const reset = () => {
     setIsResetPressed(true);
@@ -169,7 +202,7 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
       </div>
 
       {/* Digital Counter Device */}
-      <div className="flex-1 flex items-center justify-center mt-6 relative z-10 px-4">
+      <div className="flex-1 flex flex-col items-center justify-center mt-6 relative z-10 px-4 gap-4">
         <div className="relative w-full max-w-[340px] aspect-square rounded-[3rem] flex flex-col items-center justify-center p-6 card-3d bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 shadow-2xl overflow-hidden group">
           
           <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 opacity-50"></div>
@@ -306,13 +339,15 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
             </AnimatePresence>
 
             <button
-              onPointerDown={handlePress}
-              className={`w-36 h-36 rounded-full flex items-center justify-center relative outline-none select-none transition-all duration-100 z-10 ${
+              onPointerDown={handlePressDown}
+              onPointerUp={handlePressUp}
+              onPointerLeave={handlePressUp}
+              className={`w-36 h-36 rounded-full flex items-center justify-center relative outline-none select-none touch-none transition-all duration-75 z-10 cursor-pointer ${
                 isPressed 
-                  ? 'bg-gradient-to-br from-emerald-600 to-teal-700 shadow-[inset_0_10px_20px_rgba(0,0,0,0.4),0_2px_5px_rgba(16,185,129,0.3)] translate-y-[8px]' 
-                  : 'bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 shadow-[0_15px_0_#065f46,0_25px_35px_rgba(16,185,129,0.4),inset_0_2px_5px_rgba(255,255,255,0.4)] hover:-translate-y-1 hover:shadow-[0_18px_0_#065f46,0_30px_40px_rgba(16,185,129,0.5),inset_0_2px_5px_rgba(255,255,255,0.4)] shadow-md'
+                  ? 'bg-gradient-to-br from-emerald-600 to-teal-700 shadow-[inset_0_10px_20px_rgba(0,0,0,0.4),0_2px_5px_rgba(16,185,129,0.3)] translate-y-[6px]' 
+                  : 'bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 shadow-[0_12px_0_#065f46,0_20px_30px_rgba(16,185,129,0.35),inset_0_2px_5px_rgba(255,255,255,0.4)] hover:-translate-y-0.5 hover:shadow-[0_14px_0_#065f46,0_24px_35px_rgba(16,185,129,0.4),inset_0_2px_5px_rgba(255,255,255,0.4)] active:translate-y-[6px] shadow-sm'
               }`}
-              style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
+              style={{ touchAction: 'none', WebkitTapHighlightColor: 'transparent', userSelect: 'none', WebkitUserSelect: 'none' }}
             >
               <div className={`absolute inset-0 rounded-full border border-white/20 transition-all ${isPressed ? 'opacity-0' : 'opacity-100'}`}></div>
               <div className={`absolute inset-2 rounded-full transition-all duration-75 ${isPressed ? 'bg-black/10' : 'bg-gradient-to-tl from-black/10 to-transparent'}`}></div>
@@ -334,6 +369,10 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
           </div>
 
         </div>
+        
+        <p className="text-[11.5px] text-slate-400 dark:text-slate-500 text-center font-sans max-w-[320px] leading-relaxed select-none">
+          💡 تلميح: يمكنك استخدام زر <span className="font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-700 dark:text-slate-300">Spacebar</span> أو <span className="font-bold bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-700 dark:text-slate-300 font-serif">Enter</span> للتسبيح السريع والسهل عبر لوحة المفاتيح.
+        </p>
       </div>
 
       {/* Settings Modal */}

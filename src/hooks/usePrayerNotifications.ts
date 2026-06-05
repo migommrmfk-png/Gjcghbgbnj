@@ -58,6 +58,28 @@ export const usePrayerNotifications = (onPrayerTime: (prayerName: string, time: 
           if (lastNotifiedPrayer !== prayerKey) {
             setLastNotifiedPrayer(prayerKey);
             
+            const mosqueMuted = (() => {
+              const parsedEnabled = localStorage.getItem('mosqueModeEnabled') === 'true';
+              if (!parsedEnabled) return false;
+              const durationMin = parseInt(localStorage.getItem('mosqueModeMuteDuration') || '20', 10);
+              const nowCheck = new Date();
+              const currentMins = nowCheck.getHours() * 60 + nowCheck.getMinutes();
+              const [prH, prM] = cleanTimeStr.split(':').map(Number);
+              const prayerMins = prH * 60 + prM;
+              return currentMins >= prayerMins && currentMins <= (prayerMins + durationMin);
+            })();
+
+            if (mosqueMuted) {
+              console.log(`[Mosque Mode] Muting prayer time notification for ${prayer.name}`);
+              // Send a quiet notification reminding the user that Mosque Mode has successfully kept their session silent
+              sendNotification(`وضع المسجد نشط 🕌 • حان وقت صلاة ${prayer.name}`, {
+                body: `تم كتم أذان ${prayer.name} تلقائياً تفادياً للرنين وصيانةً لحرمة المسجد والسكينة.`,
+                icon: '/icon.png',
+                silent: true
+              });
+              continue;
+            }
+
             // Trigger the in-app overlay (Auto Adhan) ONLY if enabled
             if (autoAdhanEnabled) {
               onPrayerTime(prayer.name, cleanTimeStr);

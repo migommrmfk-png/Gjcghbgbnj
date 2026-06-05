@@ -217,6 +217,8 @@ export default function MoreMenu({
       image: 'https://i.pinimg.com/736x/87/1b/2f/871b2f81152a51f801a61327111b1511.jpg',
       items: [
         { id: 'muslim-ai', label: t('muslim_ai', 'الذكاء الاصطناعي'), icon: <Bot size={24} />, color: 'bg-[#0D5C4D]' },
+        { id: 'spiritual-coach', label: t('spiritual_coach', 'المرشد والمدرب الروحي الذكي 🤖🌱'), icon: <Award size={24} />, color: 'bg-amber-500', isNew: true },
+        { id: 'tajweed-education-hub', label: t('tajweed_education_hub', 'مصحح التجويد والتعلم'), icon: <Award size={24} />, color: 'bg-emerald-600' },
         { id: 'stories', label: t('prophet_stories', 'قصص الأنبياء'), icon: <BookOpen size={24} />, color: 'bg-[#0A4D40]' },
         { id: 'prayer-guide', label: t('prayer_guide', 'كيفية الصلاة'), icon: <BookOpen size={24} />, color: 'bg-[#C59F60]' },
         { id: 'names', label: t('names_of_allah', 'أسماء الله الحسنى'), icon: <Heart size={24} />, color: 'bg-[#9F793E]' },
@@ -259,10 +261,12 @@ export default function MoreMenu({
       image: 'https://i.pinimg.com/736x/d4/ec/c9/d4ecc94676a666d6911d5167e424458d.jpg',
       items: [
         { id: 'theme', label: theme === 'dark' ? t('light_mode', 'الوضع النهاري') : t('dark_mode', 'الوضع الليلي'), icon: theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />, color: 'bg-slate-700' },
+        { id: 'accessibility-hub', label: t('accessibility_hub', 'تسهيل الاستخدام وكبار السن'), icon: <Settings size={24} />, color: 'bg-amber-500' },
         { id: 'neon-accent', label: 'لون النيون الفوسفوري', icon: <Palette size={24} />, color: 'bg-emerald-500' },
         { id: 'prayer-settings', label: t('prayer_settings', 'إعدادات الصلاة'), icon: <Settings size={24} />, color: 'bg-emerald-600' },
         { id: 'advanced-notifications', label: t('advanced_notifications_custom', 'تخصيص الأذان والتنبيهات'), icon: <BellRing size={24} />, color: 'bg-amber-500' },
         { id: 'privacy-settings', label: t('privacy_high_security', 'الخصوصية والأمان الفائق'), icon: <Shield size={24} />, color: 'bg-indigo-600' },
+        { id: 'trust-covenant', label: 'ميثاق الأمانة والخصوصية (Local-First) 🔐☀️', icon: <Shield size={24} />, color: 'bg-emerald-600', isNew: true },
         { id: 'notifications', label: notificationsEnabled ? t('disable_notifications', 'إيقاف الإشعارات') : t('enable_notifications', 'تفعيل الإشعارات'), icon: notificationsEnabled ? <BellOff size={24} /> : <Bell size={24} />, color: notificationsEnabled ? 'bg-gray-500' : 'bg-yellow-500' },
         { id: 'auto-adhan', label: autoAdhanEnabled ? t('disable_auto_adhan', 'إيقاف الأذان التلقائي') : t('enable_auto_adhan', 'تفعيل الأذان التلقائي'), icon: autoAdhanEnabled ? <VolumeX size={24} /> : <Volume2 size={24} />, color: autoAdhanEnabled ? 'bg-gray-500' : 'bg-emerald-500' },
         { id: 'lock-reels', label: reelsLocked ? 'تفعيل مقاطع التلاوة (الريلز)' : 'قفل مقاطع التلاوة (منع التشتيت)', icon: <VideoOff size={24} />, color: reelsLocked ? 'bg-emerald-600' : 'bg-red-500' },

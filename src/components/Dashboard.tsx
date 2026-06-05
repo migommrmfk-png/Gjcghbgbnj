@@ -41,6 +41,7 @@ import CharityToday from "./CharityToday";
 import ArabicWidget from "./ArabicWidget";
 import { useTranslation } from 'react-i18next';
 import { getGeminiClient } from "../lib/gemini";
+import VoiceSearchAssistant from "./VoiceSearchAssistant";
 import { requestNotificationPermission } from "../services/NotificationService";
 import toast from 'react-hot-toast';
 import { CheckCircle2, RefreshCw, AlertCircle, Sparkles as SparklesIcon, Trash2, Sliders, ChevronRight as ChevronRightIcon, ChevronDown, Search, Globe, Key } from "lucide-react";
@@ -141,6 +142,66 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   const [isKeyModalOpen, setIsKeyModalOpen] = useState<boolean>(false);
   const [keyInput, setKeyInput] = useState<string>(() => localStorage.getItem('user_custom_gemini_key') || '');
   const [hasCustomKey, setHasCustomKey] = useState<boolean>(() => !!localStorage.getItem('user_custom_gemini_key'));
+  const [elderlyMode, setElderlyMode] = useState<boolean>(() => localStorage.getItem("elderlyModeEnabled") === "true");
+  const [spiritualFirstMode, setSpiritualFirstMode] = useState<boolean>(() => localStorage.getItem("spiritualFirstModeEnabled") === "true");
+
+  // Voice Search Assistant & Mosque Mode states
+  const [isVoiceAssistantOpen, setIsVoiceAssistantOpen] = useState(false);
+  const [mosqueModeEnabled, setMosqueModeEnabled] = useState(() => localStorage.getItem("mosqueModeEnabled") === "true");
+  const [mosqueModeMuteDuration, setMosqueModeMuteDuration] = useState(() => parseInt(localStorage.getItem("mosqueModeMuteDuration") || "20", 10));
+
+  const toggleMosqueMode = () => {
+    const nextVal = !mosqueModeEnabled;
+    setMosqueModeEnabled(nextVal);
+    localStorage.setItem("mosqueModeEnabled", nextVal ? "true" : "false");
+    window.dispatchEvent(new Event("storage"));
+    if (nextVal) {
+      toast.success(`تم تفعيل وضع المسجد الصامت تلقائياً لمدة ${mosqueModeMuteDuration} دقيقة من فترات الصلاة! 🕌`);
+    } else {
+      toast.success("تم إيقاف وضع المسجد الصامت؛ عادت الإشعارات للوضع الافتراضي.");
+    }
+  };
+
+  const updateMosqueModeDuration = (duration: number) => {
+    setMosqueModeMuteDuration(duration);
+    localStorage.setItem("mosqueModeMuteDuration", duration.toString());
+    window.dispatchEvent(new Event("storage"));
+    toast.success(`تم تعيين مدة كتم الصلاة إلى ${duration} دقيقة.`);
+  };
+
+  const checkMosqueCurrentlyMuting = () => {
+    if (!mosqueModeEnabled) return null;
+    if (!prayerTimes) return null;
+
+    const nowCheck = new Date();
+    const currentMins = nowCheck.getHours() * 60 + nowCheck.getMinutes();
+
+    const prayers = [
+      { id: "Fajr", name: "الفجر" },
+      { id: "Dhuhr", name: "الظهر" },
+      { id: "Asr", name: "العصر" },
+      { id: "Maghrib", name: "المغرب" },
+      { id: "Isha", name: "العشاء" },
+    ];
+
+    for (const pr of prayers) {
+      const timeStr = prayerTimes[pr.id as keyof typeof prayerTimes];
+      if (!timeStr) continue;
+      const cleanTimeStr = timeStr.split(' ')[0];
+      const [h, m] = cleanTimeStr.split(':').map(Number);
+      const prayerMins = h * 60 + m;
+
+      if (currentMins >= prayerMins && currentMins <= (prayerMins + mosqueModeMuteDuration)) {
+        return {
+          prayerName: pr.name,
+          remaining: (prayerMins + mosqueModeMuteDuration) - currentMins
+        };
+      }
+    }
+    return null;
+  };
+
+  const activeMuteInfo = checkMosqueCurrentlyMuting();
 
   const [showNotificationRequest, setShowNotificationRequest] = useState<boolean>(() => {
     if (typeof window !== "undefined" && "Notification" in window) {
@@ -532,11 +593,17 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   useEffect(() => {
     const handleUpdateIcon = () => {
       setActiveFlagshipIcon(localStorage.getItem('user_favorite_flagship_icon') || 'dua');
+      setElderlyMode(localStorage.getItem("elderlyModeEnabled") === "true");
+      setSpiritualFirstMode(localStorage.getItem("spiritualFirstModeEnabled") === "true");
     };
     window.addEventListener('storage', handleUpdateIcon);
+    window.addEventListener('elderly-mode-change', handleUpdateIcon);
+    window.addEventListener('spiritual-mode-change', handleUpdateIcon);
     const interval = setInterval(handleUpdateIcon, 1500);
     return () => {
       window.removeEventListener('storage', handleUpdateIcon);
+      window.removeEventListener('elderly-mode-change', handleUpdateIcon);
+      window.removeEventListener('spiritual-mode-change', handleUpdateIcon);
       clearInterval(interval);
     };
   }, []);
@@ -888,6 +955,328 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
   const isRTL = i18n.language === 'ar' || i18n.language === 'ur';
 
+  if (spiritualFirstMode) {
+    const getSpiritualTimePeriod = () => {
+      const hour = currentTime.getHours();
+      if (hour >= 4 && hour < 12) {
+        return "morning";
+      } else if (hour >= 12 && hour < 18) {
+        return "afternoon";
+      } else {
+        return "night";
+      }
+    };
+
+    const period = getSpiritualTimePeriod();
+
+    const getPeriodHeading = () => {
+      switch (period) {
+        case "morning":
+          return {
+            title: "فجر الإيمان والصباح 🌅",
+            verse: "«أَقِمِ الصَّلَاةَ لِدُلُوكِ الشَّمْسِ إِلَىٰ غَسَقِ اللَّيْلِ وَقُرْآنَ الْفَجْرِ ۖ إِنَّ قُرْآنَ الْفَجْرِ كَانَ مَشْهُودًا»",
+            verseSource: "سورة الإسراء - الآية 78",
+            routine: "أذكار الصباح • ورد المصحف الشريف • صلاة الضحى",
+            bg: "bg-gradient-to-b from-[#0A2016] via-[#05110B] to-[#020805]"
+          };
+        case "afternoon":
+          return {
+            title: "سكينة الظهر والعصر ☀️",
+            verse: "«الَّذِينَ آمَنُوا وَتَطْمَئِنُّ قُلُوبُهُم بِذِكْرِ اللَّهِ ۗ أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ»",
+            verseSource: "سورة الرعد - الآية 28",
+            routine: "أوراد ما بعد الصلاة • حزب التلاوة اليومي • الاستغفار وورد العصر",
+            bg: "bg-gradient-to-b from-[#111c16] via-[#07130F] to-[#020805]"
+          };
+        default:
+          return {
+            title: "خشوع الليل والمساء 🌌",
+            verse: "«وَمِنَ اللَّيْلِ فَاسْجُدْ لَهُ وَسَبِّحْهُ لَيْلًا طَوِيلًا»",
+            verseSource: "سورة الإنسان - الآية 26",
+            routine: "ورد أذكار المساء • سورة الملك • أذكار النوم وقيام الليل",
+            bg: "bg-gradient-to-b from-[#030c08] via-[#010805] to-[#000402]"
+          };
+      }
+    };
+
+    const headerDetails = getPeriodHeading();
+
+    return (
+      <div className={`min-h-screen ${headerDetails.bg} text-[#E2C392] p-5 pb-28 relative overflow-hidden`} dir="rtl">
+        {/* Glow Effects */}
+        <div className="absolute top-0 right-0 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute bottom-20 left-0 w-64 h-64 bg-[#C59F60]/5 rounded-full blur-3xl pointer-events-none"></div>
+
+        {/* Minimal Quiet Header */}
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 bg-amber-400 rounded-full animate-ping"></span>
+            <span className="text-xs font-black text-amber-200/90 font-serif">الوضع الروحي والمحلي الموحد 🌱</span>
+          </div>
+
+          <button 
+            onClick={() => {
+              localStorage.setItem("spiritualFirstModeEnabled", "false");
+              window.dispatchEvent(new Event("storage"));
+              window.dispatchEvent(new Event("spiritual-mode-change"));
+              toast.success("تم الانتقال إلى الوضع العام للتطبيق ✨");
+            }}
+            className="px-3.5 py-1.5 bg-emerald-950/60 hover:bg-emerald-900/40 text-emerald-300 border border-emerald-900/30 rounded-full text-xs font-bold transition-all"
+          >
+            العودة للوضع المعتاد ⬅️
+          </button>
+        </div>
+
+        {/* Breathtaking Divine Vessel Card */}
+        <div className="bg-emerald-950/20 rounded-[36px] border border-emerald-900/30 p-6 shadow-2xl relative mb-6 backdrop-blur-lg">
+          <span className="absolute -top-3 right-5 bg-gradient-to-r from-amber-500 to-[#C59F60] text-emerald-950 text-[10px] font-black px-2.5 py-0.5 rounded-full shadow-md">
+            فترتك الروحية الحالية
+          </span>
+          <h1 className="text-2xl font-serif font-black text-[#E2C392] mb-1">{headerDetails.title}</h1>
+          <p className="text-xs text-slate-300/80 mb-4">{headerDetails.routine}</p>
+
+          <div className="p-4 bg-[#07130F]/80 rounded-2xl border border-emerald-900/30 text-center space-y-2 relative">
+            <p className="text-xs font-serif leading-relaxed text-amber-100/90 italic">
+              {headerDetails.verse}
+            </p>
+            <p className="text-[10px] text-[#C59F60]">{headerDetails.verseSource}</p>
+          </div>
+
+          {/* Symmetrical Time and Next Prayer indicator with no noisy details */}
+          <div className="mt-4 flex justify-between items-center bg-emerald-950/70 p-4 rounded-xl border border-emerald-900/20">
+            <div>
+              <p className="text-[10px] text-emerald-400/95 font-bold">الحين هو:</p>
+              <h3 className="text-xl font-bold text-white font-mono">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</h3>
+            </div>
+            <div className="text-left">
+              <p className="text-[10px] text-amber-400 font-bold">صلاة {nextPrayerName || "القادمة"}:</p>
+              <h3 className="text-xl font-mono text-amber-200 font-black">{nextPrayerTime || "قريباً"}</h3>
+            </div>
+          </div>
+        </div>
+
+        {/* Dynamic single-tap cards representing EXACTLY what the user needs right now */}
+        <h3 className="text-xs font-black text-[#E2C392] mb-3 pr-2">👇 عباداتك الميسرة بلمسة واحدة:</h3>
+        <div className="space-y-4 mb-6">
+          {/* Action 1: Reading Quran */}
+          <button
+            onClick={() => onNavigate("quran")}
+            className="w-full text-right p-5 bg-gradient-to-r from-emerald-900/40 to-emerald-950/20 hover:from-emerald-900/55 hover:to-emerald-950/45 border border-emerald-800/20 rounded-[28px] shadow-lg flex items-center justify-between transition-all group scale-100 active:scale-98"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-[#E2C392]/10 rounded-2xl flex items-center justify-center text-[#E2C392] border border-[#E2C392]/20">
+                <span className="text-2xl">📖</span>
+              </div>
+              <div>
+                <h2 className="text-lg font-black text-slate-100 font-serif">قراءة الورد القرآني</h2>
+                <p className="text-xs text-slate-400">تابع تلاوة وحفظ حزبك المختار من حيث وقفت بنقرة واحدة</p>
+              </div>
+            </div>
+            <span className="text-amber-400 font-bold group-hover:translate-x-[-4px] transition-transform">⬅️</span>
+          </button>
+
+          {/* Action 2: Remedying or consulting Azkar */}
+          <button
+            onClick={() => onNavigate("azkar")}
+            className="w-full text-right p-5 bg-gradient-to-r from-[#8E7E4F]/20 to-[#07130F] hover:from-[#c2ae6e]/30 hover:to-[#07130F] border border-[#C59F60]/20 rounded-[28px] shadow-lg flex items-center justify-between transition-all group scale-100 active:scale-98"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-400 border border-amber-500/20">
+                <span className="text-2xl">📿</span>
+              </div>
+              <div>
+                <h2 className="text-lg font-black text-slate-100 font-serif">
+                  {period === "morning" ? "أوراد وأذكار الصباح" : period === "afternoon" ? "أذكار بعد الصلاة اليومية" : "أذكار المساء والنوم"}
+                </h2>
+                <p className="text-xs text-slate-400">الحصن الحصين للعباد والأوراد الميسرة لهذه الساعة المباركة</p>
+              </div>
+            </div>
+            <span className="text-amber-400 font-bold group-hover:translate-x-[-4px] transition-transform">⬅️</span>
+          </button>
+
+          {/* Action 3: AI Spiritual Coach */}
+          <button
+            onClick={() => onNavigate("spiritual-coach")}
+            className="w-full text-right p-5 bg-gradient-to-r from-emerald-950/50 to-[#07130F] hover:from-emerald-900/40 hover:to-[#07130F] border border-emerald-700/25 rounded-[28px] shadow-lg flex items-center justify-between transition-all group scale-100 active:scale-98"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-400 border border-emerald-500/20">
+                <span className="text-2xl">🌱</span>
+              </div>
+              <div>
+                <h2 className="text-lg font-black text-[#E2C392] font-serif flex items-center gap-1.5">
+                  <span>المدرب الروحي الذكي</span>
+                  <span className="text-[9px] bg-amber-400 text-emerald-950 rounded-full px-1.5 py-0.5 font-sans font-black">AI</span>
+                </h2>
+                <p className="text-xs text-slate-450">تحليل عاداتك الإيمانية، تشخيص وعلاج فتور الهمة بنور العلم</p>
+              </div>
+            </div>
+            <span className="text-amber-400 font-bold group-hover:translate-x-[-4px] transition-transform">⬅️</span>
+          </button>
+        </div>
+
+        {/* Secondary Trust & Safety / Support Control widgets but completely distraction-free */}
+        <div className="p-4 bg-emerald-950/20 border border-emerald-900/30 rounded-3xl grid grid-cols-2 gap-3 text-center mb-4">
+          <button
+            onClick={() => onNavigate("trust-covenant")}
+            className="flex flex-col items-center justify-center p-3 bg-[#07130F]/70 border border-emerald-900/35 hover:border-[#C59F60]/20 rounded-2xl transition-all"
+          >
+            <span className="text-xl mb-1">🔐</span>
+            <span className="text-[11px] font-black text-slate-200">الخصوصية المحلية</span>
+            <span className="text-[9px] text-slate-450">بياناتك لا تغادر جهازك</span>
+          </button>
+
+          <button
+            onClick={() => onNavigate("tasbeeh")}
+            className="flex flex-col items-center justify-center p-3 bg-[#07130F]/70 border border-emerald-900/35 hover:border-[#C59F60]/20 rounded-2xl transition-all"
+          >
+            <span className="text-xl mb-1">📿</span>
+            <span className="text-[11px] font-black text-slate-200">مسباح العبادة</span>
+            <span className="text-[9px] text-slate-450">عدّاد النور والبركات</span>
+          </button>
+        </div>
+
+        <p className="text-center text-[10px] text-slate-500 leading-relaxed max-w-xs mx-auto">
+          ﴿وَمَا خَلَقْتُ الْجِنَّ وَالْإِنسَ إِلَّا لِيَعْبُدُونِ﴾ • جميع المعالجات تُدار على جهازك محلياً بخصوصية حديدية 🛡️
+        </p>
+      </div>
+    );
+  }
+
+  if (elderlyMode) {
+    return (
+      <div className="max-w-md mx-auto p-5 space-y-6 pb-28 min-h-screen text-right" dir="rtl">
+        {/* Large Elderly Header */}
+        <div className="bg-[#0A1914] text-white p-6 rounded-[36px] shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-lg"></div>
+          <p className="text-amber-400 text-sm font-black">مرحباً بك يا والدنا العزيز في تطبيق العبادة 👵👴</p>
+          <h1 className="text-2xl font-black font-serif mt-1 text-[#E2C392]">مفتاح الطاعة والسكينة</h1>
+          {hijriDate && (
+             <p className="text-sm font-bold text-slate-350 mt-2">
+               اليوم هو: {hijriDate.weekday.ar} • {hijriDate.day} {hijriDate.month.ar}
+             </p>
+          )}
+
+          {/* Next Prayer Big Card */}
+          <div className="mt-4 p-4 rounded-2xl border border-emerald-500/20 flex justify-between items-center bg-emerald-950/70">
+             <div>
+               <p className="text-[11px] text-emerald-300 font-extrabold">الصلاة القادمة:</p>
+               <h3 className="text-base font-black text-white">{nextPrayerName}</h3>
+             </div>
+             <div className="text-left">
+               <p className="text-2xl font-mono font-black text-[#E2C392]">{nextPrayerTime}</p>
+             </div>
+          </div>
+        </div>
+
+        {/* MASSIVE TILES GRID (2 or 1 Column of massive action buttons) */}
+        <div className="space-y-4">
+           <button 
+             onClick={() => onNavigate("quran")} 
+             className="w-full p-6 bg-emerald-600 hover:bg-emerald-700 text-white rounded-[28px] shadow-lg flex items-center justify-between transition-all scale-100 active:scale-95"
+           >
+             <div className="flex items-center gap-4">
+               <span className="text-4xl">📖</span>
+               <div className="text-right">
+                 <h2 className="text-2xl font-black font-serif">المصحف الشريف</h2>
+                 <p className="text-sm text-emerald-150">قراءة القرآن الكريم بخطوط كبيرة وواضحة جداً</p>
+               </div>
+             </div>
+             <span className="text-2xl font-serif">⬅️</span>
+           </button>
+
+           <button 
+             onClick={() => onNavigate("azkar")} 
+             className="w-full p-6 bg-amber-500 hover:bg-amber-600 text-[#07130F] rounded-[28px] shadow-lg flex items-center justify-between transition-all scale-100 active:scale-95"
+           >
+             <div className="flex items-center gap-4">
+               <span className="text-4xl">🕌</span>
+               <div className="text-right text-slate-900">
+                 <h2 className="text-2xl font-black font-serif">الأذكار والتحصين</h2>
+                 <p className="text-sm text-slate-800 font-bold">أذكار الصباح والمساء واليقين بلمسة واحدة</p>
+               </div>
+             </div>
+             <span className="text-2xl">⬅️</span>
+           </button>
+
+           <button 
+             onClick={() => onNavigate("tasbeeh")} 
+             className="w-full p-6 bg-teal-600 hover:bg-teal-700 text-white rounded-[28px] shadow-lg flex items-center justify-between transition-all scale-100 active:scale-95"
+           >
+             <div className="flex items-center gap-4">
+               <span className="text-4xl">📿</span>
+               <div className="text-right">
+                 <h2 className="text-2xl font-black font-serif">السبحة الإلكترونية</h2>
+                 <p className="text-sm text-teal-150">عداد تسبيح بأزرار عملاقة لا يحتاج لنظارة</p>
+               </div>
+             </div>
+             <span className="text-2xl">⬅️</span>
+           </button>
+
+           <button 
+             onClick={() => onNavigate("qibla")} 
+             className="w-full p-6 bg-sky-600 hover:bg-sky-700 text-white rounded-[28px] shadow-lg flex items-center justify-between transition-all scale-100 active:scale-95"
+           >
+             <div className="flex items-center gap-4">
+               <span className="text-4xl">🕋</span>
+               <div className="text-right">
+                 <h2 className="text-2xl font-black font-serif">اتجاه القبلة الميسر</h2>
+                 <p className="text-sm text-sky-150">معرفة اتجاه الكعبة المشرفة بسهولة تامة</p>
+               </div>
+             </div>
+             <span className="text-2xl">⬅️</span>
+           </button>
+        </div>
+
+        {/* Quick Font Size control for easy tweak */}
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-[28px] border border-slate-100 dark:border-slate-800 shadow-sm space-y-3">
+          <p className="text-sm font-black text-slate-600 dark:text-slate-350">🎚️ التحكم السريع بحجم خطوط التطبيق الحالية:</p>
+          <div className="flex items-center gap-3 bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl">
+            <span className="text-xs font-bold text-slate-400 shrink-0">معتاد</span>
+            <input 
+              type="range"
+              min="1"
+              max="1.6"
+              step="0.1"
+              value={parseFloat(localStorage.getItem("fontSizeScale") || "1.35")}
+              onChange={(e) => {
+                const scale = e.target.value;
+                localStorage.setItem("fontSizeScale", scale);
+                window.dispatchEvent(new Event("storage"));
+                window.dispatchEvent(new Event("fontSizeChange"));
+                toast.success("تم تحديث حجم الخط لكامل التطبيق! 🔍");
+              }}
+              className="flex-1 accent-emerald-600 h-2 bg-slate-200 rounded-lg cursor-pointer"
+            />
+            <span className="text-sm font-black text-emerald-600 dark:text-emerald-400 shrink-0">ضخم ({parseFloat(localStorage.getItem("fontSizeScale") || "1.35").toFixed(1)}x)</span>
+          </div>
+        </div>
+
+        {/* Exit Elder mode or adjust accessibility accessibility-hub */}
+        <div className="space-y-3 pt-2">
+           <button 
+             onClick={() => onNavigate("accessibility-hub")} 
+             className="w-full py-4 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-bold text-sm lg:text-base rounded-2xl border border-emerald-100 dark:border-emerald-900/30 shadow-sm transition-all"
+           >
+             ⚙️ إعدادات الصم/البكم وقارئات الشاشة
+           </button>
+
+           <button 
+             onClick={() => {
+               localStorage.setItem("elderlyModeEnabled", "false");
+               localStorage.setItem("fontSizeScale", "1.0");
+               window.dispatchEvent(new Event("storage"));
+               window.dispatchEvent(new Event("elderly-mode-change"));
+               toast.success("تم الخروج من وضع كبار السن وعودة الواجهة للوضع المعتاد.");
+             }} 
+             className="w-full py-4 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 font-black text-sm rounded-2xl border border-red-100 dark:border-red-900/20 transition-all flex items-center justify-center gap-2"
+           >
+             <span>👋 العودة للوضع المعتاد للتطبيق</span>
+           </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-md mx-auto p-4 space-y-5 pb-28 min-h-screen" dir={isRTL ? "rtl" : "ltr"}>
       {/* Premium Header Card */}
@@ -974,6 +1363,51 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
               </p>
             </div>
           </div>
+        </div>
+      </motion.div>
+
+
+      {/* Spiritual First sanctuary mode switcher card */}
+      <motion.div
+        initial={{ y: 15, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.1 }}
+        className="relative overflow-hidden rounded-[28px] bg-[#05110B] text-slate-100 border border-[#C59F60]/30 shadow-lg text-right p-5"
+      >
+        <div className="absolute top-0 left-0 w-32 h-32 bg-emerald-500/5 rounded-full -ml-8 -mt-8 pointer-events-none"></div>
+        <div className="flex gap-4 items-center">
+          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex flex-shrink-0 items-center justify-center text-[#C59F60] border border-amber-500/20">
+            <span className="text-2xl animate-pulse">🌱</span>
+          </div>
+          <div className="space-y-1 flex-1">
+            <h3 className="text-sm font-black text-[#E2C392] font-serif leading-tight flex items-center gap-1.5">
+              <span>الوضع الروحي (روحانية أولاً) 📿</span>
+              <span className="text-[9px] bg-emerald-900 border border-emerald-800 text-emerald-400 font-sans font-extrabold px-1.5 py-0.5 rounded-full">جديد</span>
+            </h3>
+            <p className="text-[11px] text-slate-400 leading-relaxed font-sans">
+              أعد تصميم واجهتك لتركز فقط على أوراد طاعتك وقرآنك الملائم لساعة يومك الحالية، وتخلص من كافة عناصر التشتت.
+            </p>
+          </div>
+        </div>
+        <div className="flex justify-between items-center mt-4 pt-3 border-t border-emerald-950">
+          <button
+            onClick={() => onNavigate("trust-covenant")}
+            className="text-[11px] font-black text-amber-500/90 hover:underline flex items-center gap-1"
+          >
+            🔐 ميثاق الثقة والأمانة
+          </button>
+          
+          <button
+            onClick={() => {
+              localStorage.setItem("spiritualFirstModeEnabled", "true");
+              window.dispatchEvent(new Event("storage"));
+              window.dispatchEvent(new Event("spiritual-mode-change"));
+              toast.success("مرحباً بك في الروضة الروحية؛ تم تنظيف الواجهة لأجلك 🍃");
+            }}
+            className="px-5 py-2 text-xs font-black text-emerald-950 bg-gradient-to-r from-amber-400 to-[#C59F60] rounded-xl shadow-md cursor-pointer active:scale-95 transition-all"
+          >
+            تفـعيل الوضع الروحي 📿
+          </button>
         </div>
       </motion.div>
 
@@ -1560,6 +1994,20 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           </div>
           <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">الرقية الشرعية</span>
         </button>
+
+        <button onClick={() => onNavigate("tajweed-education-hub")} className="flex-shrink-0 flex items-center gap-2 bg-gradient-to-r from-emerald-50 to-emerald-100 dark:from-emerald-950/40 dark:to-emerald-900/30 pr-2 pl-4 py-2.5 rounded-full border border-emerald-100 dark:border-emerald-900/30 shadow-sm hover:shadow-md transition-shadow">
+          <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+            <span>🎓</span>
+          </div>
+          <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300">مصحح التجويد والتعليم</span>
+        </button>
+
+        <button onClick={() => onNavigate("accessibility-hub")} className="flex-shrink-0 flex items-center gap-2 bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-950/40 dark:to-amber-900/30 pr-2 pl-4 py-2.5 rounded-full border border-amber-100 dark:border-amber-900/30 shadow-sm hover:shadow-md transition-shadow">
+          <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400">
+            <span>⚙️</span>
+          </div>
+          <span className="text-[11px] font-bold text-amber-850 dark:text-amber-300">تسهيل الاستخدام وكبار السن</span>
+        </button>
       </motion.div>
 
       {/* AI Assistant Banner */}
@@ -1641,6 +2089,151 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           المصدر: Aladhan (معتمد للأوقات الشرعية)
         </div>
       </motion.div>
+
+      {/* Mosque Mode & Voice Search Widget Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        
+        {/* Mosque Mode Card */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.22 }}
+          className="bg-white dark:bg-slate-900 rounded-[32px] p-6 border border-slate-100 dark:border-slate-800 shadow-[0_15px_40px_-15px_rgba(0,0,0,0.06)] relative overflow-hidden flex flex-col justify-between"
+        >
+          {/* Decorative mosque icon background */}
+          <div className="absolute top-0 right-0 w-20 h-20 text-emerald-500/5 dark:text-emerald-500/2 pointer-events-none -mr-4 -mt-4">
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-4c0-.28.22-.5.5-.5s.5.22.5.5v4zm-.5-5.75c-.41 0-.75-.34-.75-.75s.34-.75.75-.75.75.34.75.75-.34.75-.75.75z"/>
+            </svg>
+          </div>
+
+          <div>
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center gap-2.5 mr-0">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                  {mosqueModeEnabled ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="3"/><path d="m10 13 4-4"/></svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="2" y1="2" x2="22" y2="22"/></svg>
+                  )}
+                </div>
+                <div className="text-right">
+                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">الوقاية والسكينة</h4>
+                  <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">وضع المسجد الصامت</h3>
+                </div>
+              </div>
+
+              {/* Toggle switch */}
+              <button
+                onClick={toggleMosqueMode}
+                className={`w-12 h-6 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 relative ${
+                  mosqueModeEnabled ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-800'
+                }`}
+              >
+                <div
+                  className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${
+                    mosqueModeEnabled ? '-translate-x-6' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-500 leading-relaxed mb-4 text-right">
+              يكتم الأذان والتنبيهات تلقائياً عند حلول وقت الفريضة وصلاة الجماعة صيانةً لخشوع المسجد.
+            </p>
+          </div>
+
+          {/* Active Status Display and configs */}
+          {mosqueModeEnabled ? (
+            <div className="space-y-4">
+              {/* Duration selector buttons */}
+              <div className="flex gap-1 justify-end items-center flex-wrap">
+                <span className="text-[10px] font-bold text-slate-400 ml-1">مدة الكتم:</span>
+                {[15, 20, 30, 45].map((d) => (
+                  <button
+                    key={d}
+                    onClick={() => updateMosqueModeDuration(d)}
+                    className={`text-[10px] font-extrabold px-2 py-1 rounded-lg border transition-all ${
+                      mosqueModeMuteDuration === d
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                        : "border-slate-100 dark:border-slate-800 text-slate-400 hover:text-slate-600"
+                    }`}
+                  >
+                    {d} د
+                  </button>
+                ))}
+              </div>
+
+              {/* Real-time mute status feedback */}
+              {activeMuteInfo ? (
+                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 p-3 rounded-2xl flex items-center gap-2.5 animate-pulse text-right">
+                  <span className="text-sm">🕌</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-black">وضع المسجد نشط حالياً</p>
+                    <p className="text-[10px] leading-tight opacity-95">مكتوم الآن احتراماً لصلاة {activeMuteInfo.prayerName} (يتبقى {activeMuteInfo.remaining} د)</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-2xl flex items-center gap-2 text-right">
+                  <span className="text-xs">🔒</span>
+                  <p className="text-[10px] font-bold text-slate-400 leading-tight">
+                    جاهز للعمل التلقائي. سيتم كتم الرنين فور الأذان التالي ولمدة {mosqueModeMuteDuration} دقيقة.
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="border border-dashed border-slate-200 dark:border-slate-800 p-3 rounded-2xl flex items-center justify-center text-center">
+              <span className="text-[10.5px] font-bold text-slate-400">«فعّل وضع المسجد لتجنب الرنين في الصلاة»</span>
+            </div>
+          )}
+
+        </motion.div>
+
+        {/* Voice Search Assistant Card */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.24 }}
+          onClick={() => setIsVoiceAssistantOpen(true)}
+          className="bg-gradient-to-br from-[#0D5C4D] to-[#041d15] rounded-[32px] p-6 shadow-lg shadow-emerald-950/20 relative overflow-hidden flex flex-col justify-between cursor-pointer border border-emerald-400/20 group active:scale-[0.98] transition-all"
+        >
+          {/* Arabesque background overlay for beautiful identity */}
+          <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] pointer-events-none"></div>
+          <div className="absolute top-0 left-0 w-24 h-24 bg-white/5 rounded-br-full pointer-events-none"></div>
+          
+          <div>
+            <div className="flex items-center gap-2.5 mb-3 text-right">
+              <div className="w-10 h-10 rounded-2xl bg-white/10 text-amber-400 flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform shrink-0">
+                <Mic size={20} className="animate-pulse" />
+              </div>
+              <div className="text-right">
+                <span className="bg-[#C59F60] text-white text-[8px] px-2 py-0.5 rounded-full font-black tracking-wider uppercase inline-block">VOICE AI</span>
+                <h3 className="text-sm font-bold text-white leading-none mt-1">البحث الصوتي الذكي</h3>
+              </div>
+            </div>
+
+            <p className="text-xs text-emerald-100/90 leading-relaxed text-right mb-4">
+              ابحث بصوتك ودع معالج الآيات يستقطب التنزيل والحديث ومخرجهما مع الشرح الإيماني الفوري الميسر بلمحة عين.
+            </p>
+          </div>
+
+          <div className="flex justify-between items-center bg-white/10 backdrop-blur-sm px-4 py-3 rounded-2xl border border-white/5 hover:bg-white/20 transition-colors">
+            <span className="text-[10px] font-black text-amber-300">انطق ودعنا ننصت 🗣️</span>
+            <div className="flex items-center gap-1">
+              <span className="text-xs font-bold text-white">ابدأ التحدث الآن</span>
+              <svg className="w-4 h-4 text-white transform rotate-180 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7"/></svg>
+            </div>
+          </div>
+        </motion.div>
+
+      </div>
+
+      {/* Voice Assistant Modal Overlay Component */}
+      <VoiceSearchAssistant 
+        isOpen={isVoiceAssistantOpen} 
+        onClose={() => setIsVoiceAssistantOpen(false)} 
+      />
 
       <div className="grid grid-cols-2 gap-4">
         {/* Daily Content Bento - Ayah */}

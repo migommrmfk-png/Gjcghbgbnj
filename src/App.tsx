@@ -57,6 +57,10 @@ const HalalChecker = lazy(() => import("./components/HalalChecker"));
 const QazaTracker = lazy(() => import("./components/QazaTracker"));
 const AudioCircles = lazy(() => import("./components/AudioCircles"));
 const FatwaLibrary = lazy(() => import("./components/FatwaLibrary"));
+const AccessibilityHub = lazy(() => import("./components/AccessibilityHub"));
+const TajweedEducationHub = lazy(() => import("./components/TajweedEducationHub"));
+const TrustCovenant = lazy(() => import("./components/TrustCovenant"));
+const SpiritualCoach = lazy(() => import("./components/SpiritualCoach"));
 import InstallPrompt from "./components/InstallPrompt";
 import ChatOverlay from "./components/ChatOverlay";
 import AppPinLockScreen from "./components/AppPinLockScreen";
@@ -240,6 +244,18 @@ function AppContent() {
 
       case "privacy-settings":
         return <PrivacySettings onBack={handleBack} />;
+
+      case "accessibility-hub":
+        return <AccessibilityHub onBack={handleBack} />;
+
+      case "tajweed-education-hub":
+        return <TajweedEducationHub onBack={handleBack} />;
+
+      case "spiritual-coach":
+        return <SpiritualCoach onBack={handleBack} />;
+
+      case "trust-covenant":
+        return <TrustCovenant onBack={handleBack} />;
 
       case "halal-checker":
         return <HalalChecker onBack={handleBack} />;

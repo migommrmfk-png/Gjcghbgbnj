@@ -288,27 +288,59 @@ export default function Quran() {
       if (cachedSurah) {
         surahData = JSON.parse(cachedSurah);
       } else {
-        const res = await fetch(`https://ummahapi.com/api/quran/surah/${surahNumber}`);
-        const resData = await res.json();
-        
-        if (resData.success) {
-          const s = resData.data.surah;
-          surahData = {
-            number: s.number,
-            name: s.name_arabic,
-            englishName: s.name_english,
-            englishNameTranslation: s.name_translation,
-            revelationType: s.revelation_place === 'makkah' ? 'Meccan' : 'Medinan',
-            numberOfAyahs: s.verses_count,
-            ayahs: resData.data.verses.map((v: any) => ({
-              number: parseInt(v.verse_key.split(":")[1]),
-              text: v.arabic,
-              numberInSurah: v.ayah
-            }))
-          };
-        } else {
-          throw new Error("Failed to load surah");
+        try {
+          const res = await fetch(`https://ummahapi.com/api/quran/surah/${surahNumber}`);
+          if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+          const resData = await res.json();
+          
+          if (resData.success) {
+            const s = resData.data.surah;
+            surahData = {
+              number: s.number,
+              name: s.name_arabic,
+              englishName: s.name_english,
+              englishNameTranslation: s.name_translation,
+              revelationType: s.revelation_place === 'makkah' ? 'Meccan' : 'Medinan',
+              numberOfAyahs: s.verses_count,
+              ayahs: resData.data.verses.map((v: any) => ({
+                number: parseInt(v.verse_key.split(":")[1]),
+                text: v.arabic,
+                numberInSurah: v.ayah
+              }))
+            };
+          } else {
+            throw new Error("Primary API success is false");
+          }
+        } catch (primaryErr) {
+          console.warn("Primary Quran API failed, trying alquran.cloud fallback:", primaryErr);
+          try {
+            const fallbackRes = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}`);
+            if (!fallbackRes.ok) throw new Error(`Fallback HTTP error! status: ${fallbackRes.status}`);
+            const fallbackData = await fallbackRes.json();
+            if (fallbackData.code === 200 && fallbackData.data) {
+              const fd = fallbackData.data;
+              surahData = {
+                number: fd.number,
+                name: fd.name,
+                englishName: fd.englishName,
+                englishNameTranslation: fd.englishNameTranslation,
+                revelationType: fd.revelationType,
+                numberOfAyahs: fd.numberOfAyahs,
+                ayahs: fd.ayahs.map((v: any) => ({
+                  number: v.number,
+                  text: v.text,
+                  numberInSurah: v.numberInSurah
+                }))
+              };
+            } else {
+              throw new Error("Fallback API data is invalid");
+            }
+          } catch (fallbackErr) {
+            console.error("Both primary and fallback Quran APIs failed:", fallbackErr);
+            throw new Error("تعذر تحميل بيانات السورة من الخوادم. يرجى التحقق من اتصالك بالإنترنت.");
+          }
         }
+
         try {
           localStorage.setItem(cacheKey, JSON.stringify(surahData));
           checkAndLoadedCachedQuranList();
@@ -381,7 +413,12 @@ export default function Quran() {
             console.warn(`Playback failed for ${directUrl}`, e);
             setIsPlaying(false);
             setIsAudioLoading(false);
-            setAudioError("تعذر تشغيل التلاوة. يرجى التحقق من اتصالك بالإنترنت.");
+            // Handle browser autoplay restriction gracefully without throwing fake connection/internet errors
+            if (e && (e.name === "NotAllowedError" || e.name === "AbortError" || e.message?.includes("user gesture"))) {
+              console.log("Autoplay blocked by browser policy. Leaving audio paused until user clicks play.");
+            } else {
+              setAudioError("تعذر تشغيل التلاوة تلقائياً. يمكنك الضغط على زر التشغيل لبدء الاستماع.");
+            }
           });
       }
 
@@ -408,16 +445,49 @@ export default function Quran() {
     setSelectedAyahTafsir({ text: ayahText, tafsir: "", number: numberInSurah, globalNumber: ayahNumber });
     try {
       if (!selectedSurah) throw new Error("No surah selected");
-      const res = await fetch(`https://ummahapi.com/api/tafsir/${tafsirId}/surah/${selectedSurah.number}/ayah/${numberInSurah}`);
-      const data = await res.json();
-      if (data.success) {
-        setSelectedAyahTafsir({ text: ayahText, tafsir: data.data.tafsir.text, number: numberInSurah, globalNumber: ayahNumber });
-      } else {
-        throw new Error("Failed to load tafsir");
+      
+      try {
+        const res = await fetch(`https://ummahapi.com/api/tafsir/${tafsirId}/surah/${selectedSurah.number}/ayah/${numberInSurah}`);
+        if (!res.ok) throw new Error(`Tafsir HTTP error! status: ${res.status}`);
+        const data = await res.json();
+        if (data.success) {
+          setSelectedAyahTafsir({ text: ayahText, tafsir: data.data.tafsir.text, number: numberInSurah, globalNumber: ayahNumber });
+          return;
+        } else {
+          throw new Error("Primary Tafsir API success is false");
+        }
+      } catch (primaryTafsirErr) {
+        console.warn("Primary Tafsir API failed, trying alquran.cloud fallback API:", primaryTafsirErr);
+        
+        // Map to alquran.cloud editions: ar.muyassar or ar.jalalayn
+        let fallbackEdition = "ar.muyassar";
+        if (tafsirId.includes("kathir")) {
+          fallbackEdition = "ar.jalalayn"; // Jalalayn is a great classical alternative
+        }
+        
+        const fallbackRes = await fetch(`https://api.alquran.cloud/v1/ayah/${ayahNumber}/${fallbackEdition}`);
+        if (!fallbackRes.ok) throw new Error(`Fallback Tafsir HTTP status: ${fallbackRes.status}`);
+        const fallbackData = await fallbackRes.json();
+        
+        if (fallbackData.code === 200 && fallbackData.data && fallbackData.data.text) {
+          setSelectedAyahTafsir({ 
+            text: ayahText, 
+            tafsir: fallbackData.data.text, 
+            number: numberInSurah, 
+            globalNumber: ayahNumber 
+          });
+        } else {
+          throw new Error("Both Tafsir APIs failed");
+        }
       }
     } catch (err) {
       console.error(err);
-      setSelectedAyahTafsir({ text: ayahText, tafsir: "عذراً، تعذر تحميل التفسير.", number: numberInSurah, globalNumber: ayahNumber });
+      setSelectedAyahTafsir({ 
+        text: ayahText, 
+        tafsir: "عذراً، تعذر تحميل التفسير حالياً. يرجى التحقق من اتصالك بالإنترنت والتجربة مجدداً.", 
+        number: numberInSurah, 
+        globalNumber: ayahNumber 
+      });
     } finally {
       setLoadingTafsir(false);
     }

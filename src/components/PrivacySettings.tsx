@@ -18,6 +18,10 @@ import {
   UserX,
   AlertTriangle,
   Flame,
+  CheckCircle2,
+  Mic,
+  Bell,
+  BookOpen,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
@@ -392,7 +396,134 @@ export default function PrivacySettings({
                 <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 rounded-full peer peer-focus:ring-2 peer-focus:ring-emerald-500/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:width-5 after:transition-all peer-checked:bg-emerald-650"></div>
               </label>
             </div>
+          </div>
+        </div>
 
+        {/* SECTION: DATA MINIMIZATION PLEDGE */}
+        <div className="bg-white dark:bg-[#0A1914] rounded-3xl p-5 border border-slate-100 dark:border-emerald-950/40 shadow-sm space-y-4">
+          <div className="flex items-center gap-2.5 mb-2 border-b border-slate-50 dark:border-emerald-950/20 pb-3">
+            <div className="p-2 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl text-emerald-600 dark:text-emerald-400">
+              <Database size={18} />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">سياسة الحد الأدنى من البيانات (Data Minimization)</h3>
+              <p className="text-[10px] text-slate-500">نجمع أقل قدر ممكن من البيانات لتشغيل التطبيق والخدمات الدينية فقط</p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <p className="text-xs text-slate-500 leading-relaxed text-right md:-mr-1">
+              نلتزم بموجب الشريعة الإسلامية وميثاق الخصوصية العالمي بمبدأ <strong>الحد الأدنى للبيانات</strong>. هذا يعني أن التطبيق لا يُسجل أو يطلب أي معلومة لا حاجة لها في تشغيل العبادات. إليك تفصيل الميزات والبيانات والحد الضروري لها:
+            </p>
+
+            <div className="space-y-2.5">
+              {[
+                {
+                  feature: "مواقيت الصلوات والأذان بدقة",
+                  data: "خط العرض والطول الجغرافي أو اسم المدينة فقط",
+                  justification: "حساب فلكي محلي تماماً للمواقيت والقبلة طبقاً للموقع الجغرافي للبلد.",
+                  storage: "خياران: إحداثيات محليّة مُشفرة بالمتصفح أو تحديد يدوي بالكامل بلا GPS.",
+                },
+                {
+                  feature: "حفظ خطط الورد وختم القرآن والقرّاء",
+                  data: "أرقام السور والآيات التي تم قراءتها وحالة العلامات",
+                  justification: "تتبع تقدم ختمتك الشخصية ومعرفة الجزء والصفحة والآية التالية التي ستبدأ منها.",
+                  storage: "مخزن محلياً بالكامل بمتصفح المستخدم (Local Storage ولا يُرفع لخوادم خارجية).",
+                },
+                {
+                  feature: "المساعد الصوتي 'اليقين' للبحث",
+                  data: "التدفق الصوتي الفوري للأمر والبحث الصوتي المباشر",
+                  justification: "تحويل الصوت إلى نص للبحث عن مطابقة دقيقة للآية أو الحديث بالاستعانة بمحرك ذكي.",
+                  storage: "معالجة لحظية آمنة (Transient processing)؛ لا يتم تسجيل صوتك أو حفظه أو تدريبه.",
+                },
+                {
+                  feature: "تتبع الصلوات اليدوية (مفكرة العبادات)",
+                  data: "حالات التقديم للفرض (صلاة بمسجد، جماعة، سنن، قضاء صيام)",
+                  justification: "احتساب الإحصائيات والأوراد الإيمانية لتشجيعك بجدول تقدم يومي.",
+                  storage: "لا تُطلب أي بيانات شخصية أو حسابات، الحفظ بالكامل على وحدة التخزين بجهازك.",
+                },
+              ].map((item, idx) => (
+                <div key={idx} className="bg-slate-50 dark:bg-[#07130F] p-4 rounded-2xl border border-slate-100 dark:border-emerald-950/20 space-y-2 text-right">
+                  <div className="flex justify-between items-center flex-wrap gap-2">
+                    <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-55/10 bg-emerald-500/10 px-2 py-0.5 rounded-lg flex items-center gap-1 shrink-0">
+                      <CheckCircle2 size={12} />
+                      تلبية متطلبات الحد الأدنى
+                    </span>
+                    <h4 className="text-xs font-black text-slate-800 dark:text-slate-100">{item.feature}</h4>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 pt-1.5 text-[11px] leading-relaxed">
+                    <div>
+                      <span className="font-extrabold text-[#C59F60]">البيانات المجمعة:</span> <span className="text-slate-600 dark:text-slate-350">{item.data}</span>
+                    </div>
+                    <div>
+                      <span className="font-extrabold text-[#C59F60]">الضرورة والتبرير:</span> <span className="text-slate-600 dark:text-slate-350">{item.justification}</span>
+                    </div>
+                    <div>
+                      <span className="font-extrabold text-[#C59F60]">سياج الحماية:</span> <span className="text-emerald-600 dark:text-emerald-400 font-bold">{item.storage}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION: ABSOLUTE PRIVACY TRANSPARENCY & PERMISSIONS DOCUMENT */}
+        <div className="bg-white dark:bg-[#0A1914] rounded-3xl p-5 border border-slate-100 dark:border-emerald-950/40 shadow-sm space-y-4">
+          <div className="flex items-center gap-2.5 mb-2 border-b border-slate-50 dark:border-emerald-950/20 pb-3">
+            <div className="p-2 bg-indigo-50 dark:bg-indigo-950/20 rounded-xl text-indigo-650 dark:text-indigo-400">
+              <ShieldCheck size={18} />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">وثيقة الشفافية المطلقة والصلاحيات (Transparency Policy)</h3>
+              <p className="text-[10px] text-slate-500">بيان معلن بوضوح للأسباب التفصيلية لطلب كل صلاحية في جهازك</p>
+            </div>
+          </div>
+
+          <div className="space-y-4 text-right">
+            <div className="border border-emerald-500/15 bg-emerald-550/5 dark:bg-emerald-500/5 p-4 rounded-2xl text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+              تطبيقنا مصمم على مبدأ <strong>عدم المعرفة المسبقة بالهوية (Zero-Identity Knowledge)</strong>. لا يتواصل التطبيق بأي خوادم إعلانية أو خوادم وسيطة تسجل نشاط تصفحك للقرآن الكريم، ولا نشارك البيانات مع أي شركة تكنولوجيا، امتثالاً لقوله تعالى: <span className="text-emerald-650 dark:text-emerald-400 font-serif font-black">«ولا تقفُ ما ليسَ لكَ بهِ علمٌ إنّ السمع وبصر والفؤاد كُلّ أُولئك كَانَ عنهُ مسؤُولاً»</span>.
+            </div>
+
+            <div className="space-y-3 pt-1">
+              {[
+                {
+                  icon: <MapPin size={16} className="text-amber-500" />,
+                  title: "صلاحية الموقع الجغرافي (Geolocation Role)",
+                  reason: "تحديد إحداثيات المدينة التي أنت بها لحساب مواقيت الأذان والصلوات بدقة وإعطاء اتجاه بوصلة القبلة مقارنة باتجاه الكعبة المشرفة.",
+                  strictness: "إذا رفضت الإذن، يمكنك تعيين مدينتك يدوياً في ثوانٍ وتعمل كافة ميزات الأذان والتنبيهات بشكل ممتاز دون الحاجة لاستخدام الـ GPS مطلقاً.",
+                },
+                {
+                  icon: <Mic size={16} className="text-emerald-555 text-emerald-500" />,
+                  title: "صلاحية الميكروفون المساعد (Microphone Access)",
+                  reason: "التقاط أوامرك واستفساراتك بصوتك للبحث المباشر عن السور والآيات والأحاديث الكريمة ومضمونها عبر مساعد 'اليقين' الصوتي للتطوير الديني.",
+                  strictness: "لا نقم بتفعيل الميكروفون إلا عند نقرك اللحظي المباشر على زر الميكروفون بالأيقونة الطافية ولا يتم تسجيل أو بث الخلفية الصوتية بتاتاً.",
+                },
+                {
+                  icon: <Bell size={16} className="text-indigo-500" />,
+                  title: "صلاحية الإرسال وتنبيهات الأذان (Notification Access)",
+                  reason: "إتاحة تذكيرك التلقائي عند حلول مواقيت الصلوات الخمس والورد اليومي المخطط له تنبيهاً لعدم هجر القرآن والمحافظة على دقة خشوع صلواتك.",
+                  strictness: "تتم إشعارات الأذان مباشرة من خلال متصفح الويب المعتمد الداخلي كـ Service Worker أو المؤقت الداخلي وبصوت كتم مؤقت بوضع المسجد.",
+                },
+              ].map((perm, idx) => (
+                <div key={idx} className="p-4 rounded-2xl border border-slate-100 dark:border-emerald-950/20 bg-slate-50/50 dark:bg-[#07130F]/40 space-y-1.5">
+                  <div className="flex items-center gap-2 font-black text-slate-800 dark:text-slate-100 text-xs">
+                    {perm.icon}
+                    <span>{perm.title}</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-350 leading-relaxed pl-2">
+                    <strong className="text-slate-800 dark:text-slate-205">سبب طلبها:</strong> {perm.reason}
+                  </p>
+                  <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium pl-2 leading-tight">
+                    💡 <strong>الحماية وحرية القرار:</strong> {perm.strictness}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="p-3 bg-[#C59F60]/10 border border-[#C59F60]/20 rounded-2xl text-[11px] text-amber-900 dark:text-amber-300 leading-normal text-center">
+              🤝 <strong>عهد الأمان والسرية:</strong> لا نضع ملفات تتبع مستخدمين (Cookies of Tracking)، ولا نتقاضى مقابل مالي من بيع الإعلانات، ونحترم خصوصيتك كعبادة نتقرب بها إلى الله.
+            </div>
           </div>
         </div>
 
