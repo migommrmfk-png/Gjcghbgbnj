@@ -26,6 +26,7 @@ import { DEFAULT_SURAHS } from "../data/surahs";
 import MemorizationHub from "./MemorizationHub";
 import QuranPlan from "./QuranPlan";
 import QuranReflection from "./QuranReflection";
+import MushafShelf from "./MushafShelf";
 
 interface Surah {
   number: number;
@@ -97,7 +98,7 @@ const THEMES = {
 };
 
 export default function Quran() {
-  const [subTab, setSubTab] = useState<'read' | 'memorize' | 'plans' | 'reflections'>('read');
+  const [subTab, setSubTab] = useState<'read' | 'memorize' | 'plans' | 'reflections' | 'shelf'>('read');
   const [surahs, setSurahs] = useState<Surah[]>(DEFAULT_SURAHS);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -1176,6 +1177,10 @@ export default function Quran() {
     return <QuranReflection onBack={() => setSubTab('read')} />;
   }
 
+  if (subTab === 'shelf') {
+    return <MushafShelf onBack={() => setSubTab('read')} />;
+  }
+
   return (
     <div className="max-w-md mx-auto p-4 space-y-6 pb-28 min-h-screen" dir="rtl">
       {/* Header */}
@@ -1210,41 +1215,53 @@ export default function Quran() {
         className="space-y-3"
       >
         <span className="block text-[10px] font-black uppercase tracking-wider text-slate-400 mr-2">أبعاد القرآن الشامل ٣٦٠° 🌟</span>
-        <div className="grid grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-2 gap-3">
           <button
             type="button"
             onClick={() => setSubTab('memorize')}
-            className="flex flex-col items-center justify-center p-3 text-center bg-gradient-to-b from-emerald-50/50 to-emerald-100/20 dark:from-slate-900 dark:to-slate-900/60 border border-emerald-500/10 dark:border-slate-800 rounded-[2rem] hover:border-emerald-500/30 dark:hover:border-emerald-500/20 active:scale-95 transition-all shadow-xs group cursor-pointer"
+            className="flex flex-col items-center justify-center p-4 text-center bg-gradient-to-b from-emerald-50/50 to-emerald-100/20 dark:from-slate-900 dark:to-slate-900/60 border border-emerald-500/10 dark:border-slate-800 rounded-[2rem] hover:border-emerald-500/30 dark:hover:border-emerald-500/20 active:scale-95 transition-all shadow-xs group cursor-pointer"
           >
-            <div className="w-9 h-9 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
-              <Brain size={18} />
+            <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
+              <Brain size={20} />
             </div>
-            <span className="text-[11px] font-black text-slate-800 dark:text-slate-100">التسميع الذكي</span>
-            <span className="text-[8px] text-slate-400 font-bold mt-0.5 leading-none">مراجعة وحفظ</span>
+            <span className="text-[12px] font-black text-slate-800 dark:text-slate-100">التسميع الذكي</span>
+            <span className="text-[9px] text-slate-400 font-bold mt-0.5 leading-none">مراجعة وحفظ الآيات</span>
           </button>
 
           <button
             type="button"
             onClick={() => setSubTab('plans')}
-            className="flex flex-col items-center justify-center p-3 text-center bg-gradient-to-b from-amber-50/50 to-amber-100/20 dark:from-slate-900 dark:to-slate-900/60 border border-amber-500/10 dark:border-slate-800 rounded-[2rem] hover:border-amber-500/30 dark:hover:border-amber-500/20 active:scale-95 transition-all shadow-xs group cursor-pointer"
+            className="flex flex-col items-center justify-center p-4 text-center bg-gradient-to-b from-amber-50/50 to-amber-100/20 dark:from-slate-900 dark:to-slate-900/60 border border-amber-500/10 dark:border-slate-800 rounded-[2rem] hover:border-amber-500/30 dark:hover:border-amber-500/20 active:scale-95 transition-all shadow-xs group cursor-pointer"
           >
-            <div className="w-9 h-9 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
-              <Calendar size={18} />
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
+              <Calendar size={20} />
             </div>
-            <span className="text-[11px] font-black text-slate-800 dark:text-slate-100">خطط الختم</span>
-            <span className="text-[8px] text-slate-400 font-bold mt-0.5 leading-none">ورد مخصص</span>
+            <span className="text-[12px] font-black text-slate-800 dark:text-slate-100">خطط الختم والورد</span>
+            <span className="text-[9px] text-slate-400 font-bold mt-0.5 leading-none">متابعة الأوراد اليومية</span>
           </button>
 
           <button
             type="button"
             onClick={() => setSubTab('reflections')}
-            className="flex flex-col items-center justify-center p-3 text-center bg-gradient-to-b from-teal-50/50 to-teal-100/20 dark:from-slate-900 dark:to-slate-900/60 border border-teal-500/10 dark:border-slate-800 rounded-[2rem] hover:border-teal-500/30 dark:hover:border-teal-500/20 active:scale-95 transition-all shadow-xs group cursor-pointer"
+            className="flex flex-col items-center justify-center p-4 text-center bg-gradient-to-b from-teal-50/50 to-teal-100/20 dark:from-slate-900 dark:to-slate-900/60 border border-teal-500/10 dark:border-slate-800 rounded-[2rem] hover:border-teal-500/30 dark:hover:border-teal-500/20 active:scale-95 transition-all shadow-xs group cursor-pointer"
           >
-            <div className="w-9 h-9 rounded-2xl bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
-              <Sparkles size={18} />
+            <div className="w-10 h-10 rounded-2xl bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
+              <Sparkles size={20} />
             </div>
-            <span className="text-[11px] font-black text-slate-800 dark:text-slate-100">تدبر وتعلم</span>
-            <span className="text-[8px] text-slate-400 font-bold mt-0.5 leading-none">تأمل الآيات</span>
+            <span className="text-[12px] font-black text-slate-800 dark:text-slate-100">دروس تدبّر وعلم</span>
+            <span className="text-[9px] text-slate-400 font-bold mt-0.5 leading-none">تأمل وتدبر عميق</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setSubTab('shelf')}
+            className="flex flex-col items-center justify-center p-4 text-center bg-gradient-to-b from-indigo-50/50 to-indigo-100/20 dark:from-slate-900 dark:to-slate-900/60 border border-indigo-500/10 dark:border-slate-800 rounded-[2rem] hover:border-indigo-500/30 dark:hover:border-indigo-500/20 active:scale-95 transition-all shadow-xs group cursor-pointer"
+          >
+            <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-1.5 group-hover:scale-110 transition-transform">
+              <BookOpen size={20} />
+            </div>
+            <span className="text-[12px] font-black text-slate-800 dark:text-slate-100">مكتبة المصاحف تفاعلي</span>
+            <span className="text-[9px] text-slate-400 font-bold mt-0.5 leading-none">تفسير السعدي وحفظ ميسر</span>
           </button>
         </div>
       </motion.div>

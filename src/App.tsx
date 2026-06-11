@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, Suspense, lazy, useRef } from "react";
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import {
   Home,
   BookOpen,
@@ -61,6 +61,7 @@ const AccessibilityHub = lazy(() => import("./components/AccessibilityHub"));
 const TajweedEducationHub = lazy(() => import("./components/TajweedEducationHub"));
 const TrustCovenant = lazy(() => import("./components/TrustCovenant"));
 const SpiritualCoach = lazy(() => import("./components/SpiritualCoach"));
+const IslamicCreedRituals = lazy(() => import("./components/IslamicCreedRituals"));
 import InstallPrompt from "./components/InstallPrompt";
 import ChatOverlay from "./components/ChatOverlay";
 import AppPinLockScreen from "./components/AppPinLockScreen";
@@ -72,6 +73,14 @@ const LoadingFallback = () => (
   </div>
 );
 
+const SALAWAT_AHADITH = [
+  "«مَنْ صَلَّى عَلَيَّ صَلَاةً صَلَّى اللَّهُ عَلَيْهِ بِهَا عَشْرًا» 💚 (صحيح مسلم)",
+  "«أَوْلَى النَّاسِ بِي يَوْمَ الْقِيَامَةِ أَكْثَرُهُمْ عَلَيَّ صَلَاةً» ✨ (سنن الترمذي)",
+  "«الْبَخِيلُ مَنْ ذُكِرْتُ عِنْدَهُ فَلَمْ يُصَلِّ عَلَيَّ» ⚠️ (سنن الترمذي)",
+  "«أَكْثِرُوا الصَّلَاةَ عَلَيَّ فِي يَوْمِ الْجُمُعَةِ وَلَيْلَةِ الْجُمُعَةِ» 🕋 (حديث صحيح)",
+  "«إِذًا تُكْفَى هَمَّكَ، وَيُغْفَرُ لَكَ ذَنْبُكَ» 🕊️ (حديث صحيح)"
+];
+
 function AppContent() {
   const [showSplash, setShowSplash] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -79,6 +88,11 @@ function AppContent() {
   const [previousTab, setPreviousTab] = useState("home");
   const [adhanData, setAdhanData] = useState<{ prayerName: string, time: string, step?: string } | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [salawatTooltip, setSalawatTooltip] = useState(false);
+  const [activeHadithIdx, setActiveHadithIdx] = useState(0);
+  const [salawatCount, setSalawatCount] = useState(() => {
+    return parseInt(localStorage.getItem('user_salawat_count') || '0', 10);
+  });
   const [isLocked, setIsLocked] = useState(() => {
     const pinEnabled = localStorage.getItem("app_pin_lock_enabled") === "true";
     const sessionUnlocked = sessionStorage.getItem("app_session_unlocked") === "true";
@@ -149,6 +163,47 @@ function AppContent() {
   const { notificationsEnabled, toggleNotifications, setNotificationsEnabled } = usePrayerNotifications(handlePrayerTime);
   const { user, userData, loading: authLoading } = useAuth();
   const { t, i18n } = useTranslation();
+
+  const handleSalawatClick = () => {
+    const currentCount = parseInt(localStorage.getItem('user_salawat_count') || '0', 10);
+    const newCount = currentCount + 1;
+    localStorage.setItem('user_salawat_count', newCount.toString());
+    setSalawatCount(newCount);
+
+    try {
+      const savedTracker = localStorage.getItem('worshipTrackerV2');
+      let points = 0;
+      let level = 1;
+      let streak = 0;
+      let completedTaskIds: number[] = [];
+      if (savedTracker) {
+        const parsed = JSON.parse(savedTracker);
+        points = parsed.points || 0;
+        level = parsed.level || 1;
+        streak = parsed.streak || 0;
+        completedTaskIds = parsed.completedTaskIds || [];
+      }
+      const newPoints = points + 5;
+      let newLevel = Math.floor(newPoints / 1000) + 1;
+      if (newLevel > 4) newLevel = 4;
+      
+      localStorage.setItem('worshipTrackerV2', JSON.stringify({
+        points: newPoints,
+        level: newLevel,
+        streak,
+        completedTaskIds,
+        lastUpdated: new Date().toDateString()
+      }));
+
+      window.dispatchEvent(new Event('storage'));
+    } catch (e) {
+      console.error(e);
+    }
+
+    const randomIdx = Math.floor(Math.random() * SALAWAT_AHADITH.length);
+    setActiveHadithIdx(randomIdx);
+    toast.success(`صلى الله عليه وسلم 💚 (${newCount} مرّات) (+5 نقاط إيمانية)`);
+  };
 
   const handleNavigate = (tab: string) => {
     setPreviousTab(activeTab);
@@ -259,6 +314,8 @@ function AppContent() {
 
       case "halal-checker":
         return <HalalChecker onBack={handleBack} />;
+      case "creed-rituals":
+        return <IslamicCreedRituals onBack={handleBack} />;
       default:
         return <Dashboard onNavigate={handleNavigate} />;
     }
@@ -340,6 +397,46 @@ function AppContent() {
       >
         <Sparkles size={24} className="text-white animate-pulse" />
       </motion.div>
+
+      {/* Universal Floating "صلّ على النبي ﷺ" Blessing Widget */}
+      <div 
+        className={`fixed bottom-28 ${isRTL ? 'left-5' : 'right-5'} z-50 flex flex-col items-end`}
+        onMouseEnter={() => setSalawatTooltip(true)}
+        onMouseLeave={() => setSalawatTooltip(false)}
+      >
+        <AnimatePresence>
+          {salawatTooltip && (
+            <motion.div
+              initial={{ opacity: 0, y: 15, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 15, scale: 0.9 }}
+              className="absolute bottom-16 bg-white dark:bg-[#0A1914] p-4 rounded-2xl shadow-xl shadow-emerald-950/20 border border-emerald-100 dark:border-emerald-900/60 w-56 text-center"
+              style={{ [isRTL ? 'left' : 'right']: 0 }}
+            >
+              <p className="text-[10px] text-emerald-500 font-extrabold mb-1.5">💡 فضل الصلاة على النبي</p>
+              <p className="text-[11.5px] font-bold text-slate-700 dark:text-slate-300 leading-relaxed font-serif">
+                {SALAWAT_AHADITH[activeHadithIdx]}
+              </p>
+              <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-emerald-950 text-[10px] text-slate-400 font-bold flex justify-between">
+                <span>إجمالي صلواتك:</span>
+                <span className="font-mono text-emerald-600 dark:text-emerald-400 font-black">{salawatCount}</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <motion.button
+          onClick={handleSalawatClick}
+          className="flex flex-col items-center justify-center w-[52px] h-[52px] bg-gradient-to-br from-emerald-500 to-teal-600 rounded-[22px] shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all border border-white/20 text-white select-none cursor-pointer"
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <span className="text-lg font-serif font-black leading-none translate-y-0.5">ﷺ</span>
+          <span className="text-[8.5px] font-black leading-none opacity-90 mt-1 whitespace-nowrap">صلّ على محمد</span>
+        </motion.button>
+      </div>
 
       {/* Modern Floating Bottom Navigation */}
       <nav className="fixed bottom-6 left-5 right-5 bg-white/95 backdrop-blur-md dark:bg-[#0A1914]/95 border border-white dark:border-[#122A21] shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08)] z-40 rounded-[28px] h-[72px]">

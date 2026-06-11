@@ -129,8 +129,9 @@ service cloud.firestore {
 
     // Admin check
     function isAdmin() {
-      // Relaxed for local demo using Supabase Auth (Firebase anonymous used)
-      return true;
+      return isAuthenticated() &&
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
     // ===============================================================
@@ -195,6 +196,7 @@ service cloud.firestore {
       allow create: if isAuthenticated() &&
                        isOwner(userId) &&
                        uidUnchanged() &&
+                       isValidUser(request.resource.data) &&
                        (request.resource.data.role == 'user' || request.resource.data.licenseKey == 'MIGO-ADMIN-2026' || isAdmin());
 
       // Users can update their own profile. They cannot change their uid, createdAt, or role.
@@ -202,6 +204,7 @@ service cloud.firestore {
                        isOwner(userId) &&
                        uidNotModified() &&
                        areImmutableFieldsUnchanged(['uid', 'createdAt']) &&
+                       isValidUser(request.resource.data) &&
                        (request.resource.data.role == resource.data.role || request.resource.data.licenseKey == 'MIGO-ADMIN-2026' || isAdmin());
 
       // Only admins can delete users.

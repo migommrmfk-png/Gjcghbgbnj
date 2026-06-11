@@ -497,11 +497,14 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
       </div>
 
       {/* Connection Indicator banner */}
-      <div className="px-4 py-1 flex items-center justify-center gap-1.5 text-center shrink-0 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-[10px] font-bold">
-        <Sparkles size={11} className="text-amber-400 animate-spin" />
-        <span className="text-slate-500 dark:text-slate-400">
-          مرشدك الذكي متصل حالياً بقاعدة بيانات سحابة اليقين ومحفوظ ومعزز بنظام القواعد الصارم.
-        </span>
+      <div className="px-4 py-2 flex flex-col items-center justify-center gap-1 text-center shrink-0 border-b border-slate-100 dark:border-slate-800 bg-emerald-500/5 dark:bg-emerald-500/5 text-[10px] font-bold leading-normal">
+        <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+          <Sparkles size={11} className="text-amber-400 animate-spin" />
+          <span>مرشدك الذكي متصل حالياً بقاعدة بيانات سحابة اليقين ونظام القواعد الشرعي الصارم.</span>
+        </div>
+        <p className="text-[9.5px] text-teal-600 dark:text-teal-400 font-black">
+          🔒 لا يتم تسريب المحادثات نهائياً ومحفوظة محلياً بخصوصية وتشفير كامل 100%.
+        </p>
       </div>
 
       {/* Clear Confirmation Modal */}

@@ -218,6 +218,7 @@ export default function MoreMenu({
       items: [
         { id: 'muslim-ai', label: t('muslim_ai', 'الذكاء الاصطناعي'), icon: <Bot size={24} />, color: 'bg-[#0D5C4D]' },
         { id: 'spiritual-coach', label: t('spiritual_coach', 'المرشد والمدرب الروحي الذكي 🤖🌱'), icon: <Award size={24} />, color: 'bg-amber-500', isNew: true },
+        { id: 'creed-rituals', label: 'العقيدة والشعائر 📖', icon: <BookOpen size={24} />, color: 'bg-[#0A4D40]', isNew: true },
         { id: 'tajweed-education-hub', label: t('tajweed_education_hub', 'مصحح التجويد والتعلم'), icon: <Award size={24} />, color: 'bg-emerald-600' },
         { id: 'stories', label: t('prophet_stories', 'قصص الأنبياء'), icon: <BookOpen size={24} />, color: 'bg-[#0A4D40]' },
         { id: 'prayer-guide', label: t('prayer_guide', 'كيفية الصلاة'), icon: <BookOpen size={24} />, color: 'bg-[#C59F60]' },

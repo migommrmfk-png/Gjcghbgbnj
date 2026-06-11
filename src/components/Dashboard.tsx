@@ -2255,6 +2255,21 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             <p className={`text-[10px] font-bold text-slate-400 text-${isRTL ? 'left' : 'right'}`}>
               {dailyAyah.surah}
             </p>
+
+            {/* Brethren Solidarity Section (تذكير مستمر بأحوال إخواننا المستضعفين) */}
+            <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800/80">
+              <div className="flex items-start gap-2.5 bg-rose-500/5 dark:bg-rose-500/10 p-3.5 rounded-2xl border border-rose-500/15">
+                <div className="text-rose-500 mt-0.5 shrink-0">
+                  <Heart size={14} className="fill-current animate-pulse" />
+                </div>
+                <div className="space-y-1">
+                  <h4 className="text-xs font-black text-rose-600 dark:text-rose-400 leading-none">تذكير ونصرة بالدعاء 🕊️</h4>
+                  <p className="text-[11px] text-slate-600 dark:text-rose-100/80 leading-relaxed font-semibold">
+                    لا تنسَ في صلاتك وخلواتك الدعاء والتضرع لأجل طمأنينة ونصرة إخواننا المستضعفين في <span className="underline decoration-wavy decoration-rose-400">فلسطين (غزة العزة)</span>، وجراح أهلنا في <span className="underline decoration-wavy decoration-rose-400 font-bold">السودان</span>، وإخواننا في <span className="underline decoration-wavy decoration-rose-400">سجون الأيغور</span>، وكافة بقاع الأرض. "مثل المؤمنين في توادهم وتراحمهم وتعاطفهم كمثل الجسد الواحد".
+                  </p>
+                </div>
+              </div>
+            </div>
           </motion.div>
         )}
 

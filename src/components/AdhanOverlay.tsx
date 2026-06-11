@@ -130,7 +130,7 @@ const getPrayerInfo = (prayerName: string): PrayerInfo => {
   return prayers[prayerName] || prayers['الظهر'];
 };
 
-type Step = 'adhan' | 'locked' | 'swear' | 'missed' | 'reason';
+type Step = 'adhan' | 'locked' | 'swear' | 'missed' | 'reason' | 'masjidLock';
 
 const MISS_REASONS = [
   "نوم غامق",
@@ -139,6 +139,29 @@ const MISS_REASONS = [
   "تكاسل/تأجيل",
   "مرض/عذر شرعي",
   "غير ذلك"
+];
+
+const MASJID_MOTIVATORS = [
+  {
+    type: "آية كريمة",
+    text: "۞ خُذُوا زِينَتَكُمْ عِندَ كُلِّ مَسْجِدٍ 📖",
+    detail: "يأمر الله سبحانه بالتزين والتهيب عند القدوم لبيوته تلبية للمؤذن."
+  },
+  {
+    type: "حديث شريف",
+    text: "«صلاة الجماعة تفضل صلاة الفذ بسبع وعشرين درجة» ❤️",
+    detail: "أجور مضاعفة عظيمة يمنحها رب البرية لخطواتك ومكثك في المسجد."
+  },
+  {
+    type: "ترهيب وعقوبة",
+    text: "«لقد هممت أن آمر بالصلاة فتقام، ثم آمر رجلا فيصلي بالناس، ثم أنطلق معي برجال معهم حزم من حطب إلى قوم لا يشهدون الصلاة فأحرق عليهم بيوتهم بالنار!» ⚠️",
+    detail: "تحذير شديد اللهجة من المصطفى ﷺ لمن يسمع النداء المتكرر ويتهاون لحاجز هاتفي."
+  },
+  {
+    type: "فضل المشي للمسجد",
+    text: "«من غدا إلى المسجد أو راح، أعد الله له في الجنة نزلاً كلما غدا أو راح» ✨",
+    detail: "كل خطوة للمسجد ترفعك درجة وتحط عنك خطيئة وتبسط لك نزلاً ملكياً بالخلد."
+  }
 ];
 
 // ═══════════════════════════════════════════
@@ -163,6 +186,12 @@ export default function AdhanOverlay({
   
   const [step, setStep] = useState<Step>('adhan');
   const [reason, setReason] = useState<string>('');
+  const [masjidSecondsLeft, setMasjidSecondsLeft] = useState<number>(0);
+  const [currentMotivatorIndex, setCurrentMotivatorIndex] = useState(0);
+  const [lockDurationMinutes, setLockDurationMinutes] = useState<number>(() => {
+    const saved = localStorage.getItem('user_prayer_lock_duration');
+    return saved ? parseInt(saved, 10) : 15;
+  });
   
   const [prayerStreak, setPrayerStreak] = useState(() => {
     return parseInt(localStorage.getItem('prayerStreak') || '0', 10);
@@ -183,6 +212,59 @@ export default function AdhanOverlay({
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
+
+  // تشغيل قفل المسجد الصارم عند التحميل إذا كان ساري المفعول
+  useEffect(() => {
+    const lockStartStr = localStorage.getItem('masjidLockStart');
+    if (lockStartStr) {
+      const lockStart = parseInt(lockStartStr, 10);
+      const passed = Date.now() - lockStart;
+      const savedDuration = localStorage.getItem('user_prayer_lock_duration');
+      const durationMins = savedDuration ? parseInt(savedDuration, 10) : 15;
+      const totalLock = durationMins * 60 * 1000;
+      if (passed < totalLock) {
+        setStep('masjidLock');
+        setMasjidSecondsLeft(Math.floor((totalLock - passed) / 1000));
+      } else {
+        localStorage.removeItem('masjidLockStart');
+      }
+    }
+  }, []);
+
+  // كاونت داون قفل المسجد الصارم
+  useEffect(() => {
+    if (step === 'masjidLock') {
+      // Rotate religious quotes every 35 seconds to keep reflection alive
+      const quoteInterval = setInterval(() => {
+        setCurrentMotivatorIndex(prev => (prev + 1) % MASJID_MOTIVATORS.length);
+      }, 35000);
+
+      const timer = setInterval(() => {
+        const lockStartStr = localStorage.getItem('masjidLockStart');
+        if (lockStartStr) {
+          const lockStart = parseInt(lockStartStr, 10);
+          const passed = Date.now() - lockStart;
+          const savedDuration = localStorage.getItem('user_prayer_lock_duration');
+          const durationMins = savedDuration ? parseInt(savedDuration, 10) : 15;
+          const totalLock = durationMins * 60 * 1000;
+          if (passed < totalLock) {
+            setMasjidSecondsLeft(Math.floor((totalLock - passed) / 1000));
+          } else {
+            localStorage.removeItem('masjidLockStart');
+            setStep('locked');
+            clearInterval(timer);
+          }
+        } else {
+          clearInterval(timer);
+        }
+      }, 1000);
+
+      return () => {
+        clearInterval(timer);
+        clearInterval(quoteInterval);
+      };
+    }
+  }, [step]);
 
   // تشغيل الأذان
   useEffect(() => {
@@ -382,6 +464,60 @@ export default function AdhanOverlay({
 
               <div className="p-7">
                 
+                {/* ---------- خطوة 0: قفل الجماعة الصارم لمنع تشتيت الهاتف ---------- */}
+                {step === 'masjidLock' && (
+                  <>
+                    <div className="w-16 h-16 mx-auto bg-amber-500/20 rounded-full flex items-center justify-center mb-4 text-amber-400">
+                      <Lock size={32} />
+                    </div>
+                    <span className="inline-block bg-rose-500/20 border border-rose-500/30 text-rose-400 text-[10px] font-black px-3 py-1 rounded-full mb-3 uppercase tracking-wider">
+                      🚨 قفل الجماعة الصارم والإنقاذ من ملهيات الهاتف
+                    </span>
+                    <h2 className="text-xl md:text-2xl font-black font-serif text-white mb-2 leading-snug">
+                      الالتحاق بصلاة الجماعة بالمسجد
+                    </h2>
+                    
+                    {/* Countdown Timer */}
+                    <div className="my-5 bg-rose-950/30 border-2 border-rose-500/30 px-6 py-4 rounded-3xl inline-block shadow-inner backdrop-blur-md">
+                      <p className="text-rose-400 text-[10px] font-black mb-1">الوقت المتبقي لانتهاء صلاة الجماعة والتحلل من القفل</p>
+                      <p className="text-4xl md:text-5xl font-mono font-black text-rose-500 tabular-nums tracking-widest animate-pulse">
+                        {Math.floor(masjidSecondsLeft / 60).toString().padStart(2, '0')}:
+                        {(masjidSecondsLeft % 60).toString().padStart(2, '0')}
+                      </p>
+                    </div>
+
+                    {/* Rotating Motivators and Verses */}
+                    <div className="bg-white/5 border border-white/10 rounded-2xl p-5 text-right mb-5 min-h-[140px] flex flex-col justify-between">
+                      <div>
+                        <span className="block text-[9px] font-bold text-amber-400 mb-1.5 uppercase tracking-wider">
+                          💡 تدبّر الأثر الشرعي — {MASJID_MOTIVATORS[currentMotivatorIndex].type}
+                        </span>
+                        <p className="text-[13px] md:text-sm font-bold text-white font-serif leading-relaxed">
+                          {MASJID_MOTIVATORS[currentMotivatorIndex].text}
+                        </p>
+                      </div>
+                      <p className="text-[11px] text-white/60 mt-3 border-t border-white/5 pt-2 italic font-light">
+                        {MASJID_MOTIVATORS[currentMotivatorIndex].detail}
+                      </p>
+                    </div>
+
+                    <div className="space-y-3.5 text-right p-4 bg-white/5 border border-white/5 rounded-2xl mb-5">
+                      <span className="block text-[11px] font-black text-amber-400 mb-1">خطواتك لتدرك الصف الأول مع الإمام:</span>
+                      <ul className="text-xs text-white/80 space-y-2 list-none">
+                        <li>🎯 <b>1.</b> قم وتوضأ الآن وأحسن الوضوء (الطهور شطر الإيمان).</li>
+                        <li>👕 <b>2.</b> ارتدِ أحسن ثيابك لتلقى العزيز الرحيم (خذوا زينتكم عند كل مسجد).</li>
+                        <li>🚶 <b>3.</b> امشِ للمسجد بسكينة ووقار مكرراً دعاء الخطوات.</li>
+                      </ul>
+                    </div>
+
+                    <div className="p-3 bg-red-900/10 border border-red-500/10 rounded-2xl text-center">
+                      <p className="text-[10px] text-rose-400 font-bold leading-normal">
+                        ⚠️ هذا التطبيق مغلق تماماً بموجب "قفل الجماعة المباركة" حتى تنقضي الصلاة جماعة بالمسجد ولا يشتتك سكرول أو ريلز.
+                      </p>
+                    </div>
+                  </>
+                )}
+
                 {/* ---------- خطوة 1: الأذان ---------- */}
                 {step === 'adhan' && (
                   <>
@@ -395,12 +531,41 @@ export default function AdhanOverlay({
                     </div>
                     
                     <div className="flex flex-col gap-3">
+                      {/* اختيار مدة القفل */}
+                      <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-right mb-1">
+                        <span className="block text-[11px] font-bold text-amber-400 mb-2">🎯 حدد مدة قفل الهاتف الصارم (بالدقائق):</span>
+                        <div className="flex items-center gap-3 justify-center mb-1">
+                          <button 
+                            type="button" 
+                            onClick={() => setLockDurationMinutes(m => Math.max(5, m - 5))}
+                            className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 text-white font-extrabold flex items-center justify-center cursor-pointer select-none border border-white/10"
+                          >
+                            -
+                          </button>
+                          <span className="text-xl font-mono font-black text-amber-300 px-3">{lockDurationMinutes} دقيقة</span>
+                          <button 
+                            type="button" 
+                            onClick={() => setLockDurationMinutes(m => Math.min(60, m + 5))}
+                            className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 text-white font-extrabold flex items-center justify-center cursor-pointer select-none border border-white/10"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <p className="text-[10px] text-white/50 text-center leading-normal">لن تلمس هاتفك للرفاهية والريلز حتى تنتهي ركعات الجماعة بمسجدك.</p>
+                      </div>
+
                       <button 
-                        onClick={() => setStep('locked')}
+                        onClick={() => {
+                          const startTime = Date.now();
+                          localStorage.setItem('user_prayer_lock_duration', lockDurationMinutes.toString());
+                          localStorage.setItem('masjidLockStart', startTime.toString());
+                          setStep('masjidLock');
+                          setMasjidSecondsLeft(lockDurationMinutes * 60);
+                        }}
                         className="w-full py-4 rounded-2xl font-bold text-lg text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:shadow-[0_0_20px_rgba(251,191,36,0.4)] transition-all flex items-center justify-center gap-2"
                       >
                         <Lock size={20} />
-                        سأذهب لأصلي
+                        سأذهب لأصلي بالمسجد (قفل صلب)
                       </button>
                       <button 
                         onClick={() => {
