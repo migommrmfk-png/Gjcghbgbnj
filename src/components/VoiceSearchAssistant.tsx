@@ -109,15 +109,27 @@ export default function VoiceSearchAssistant({ isOpen, onClose }: VoiceSearchAss
     }
     
     if (isListening) {
-      recognitionRef.current.stop();
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {}
     } else {
       setResult(null);
       setError(null);
       try {
         recognitionRef.current.start();
       } catch (e) {
-        recognitionRef.current.abort();
-        setTimeout(() => recognitionRef.current.start(), 200);
+        console.warn("SpeechRecognition start error caught in voice search:", e);
+        try {
+          recognitionRef.current.abort();
+        } catch (abortError) {}
+        
+        setTimeout(() => {
+          try {
+            recognitionRef.current?.start();
+          } catch (retryError) {
+            console.error("Delayed VoiceSearch SpeechRecognition start retry failed:", retryError);
+          }
+        }, 300);
       }
     }
   };

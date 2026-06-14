@@ -24,7 +24,7 @@ interface UserMemory {
   faithActivityCount: number;
 }
 
-export default function MuslimAI({ onBack }: { onBack: () => void }) {
+export default function MuslimAI({ onBack, onNavigate }: { onBack: () => void, onNavigate?: (tab: string) => void }) {
   const { user, userData } = useAuth();
   
   // States
@@ -181,6 +181,12 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
       return;
     }
 
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.abort();
+      } catch (e) {}
+    }
+
     try {
       const recog = new SpeechRecognition();
       recog.lang = 'ar-EG';
@@ -214,15 +220,31 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
       };
 
       recognitionRef.current = recog;
-      recog.start();
+      try {
+        recog.start();
+      } catch (e) {
+        console.warn("Speech recognition start failed natively, attempting abort:", e);
+        try {
+          recog.abort();
+        } catch (abortErr) {}
+        setTimeout(() => {
+          try {
+            recog.start();
+          } catch (retryErr) {
+            console.error("Delayed MuslimAI start failed:", retryErr);
+          }
+        }, 300);
+      }
     } catch (e) {
       console.error("Speech Recognition failed to initialize:", e);
     }
   };
 
   const stopSpeechRecognition = () => {
-    if (recognitionRef.current && isRecording) {
-      recognitionRef.current.stop();
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {}
       setIsRecording(false);
       if (timerRef.current) clearInterval(timerRef.current);
     }
@@ -307,19 +329,35 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
 
       const mergedSystemInstruction = `${AI_TRAINING_SYSTEM_PROMPT}\n\n${memoryContextString}`;
 
-      const response = await ai.models.generateContent({
+      // Insert blank model message placeholder which will hold streamed chunks
+      setMessages(prev => [...prev, { role: 'model', text: '' }]);
+
+      let accumulatedText = '';
+
+      await ai.models.generateContentStream({
         model: "gemini-3.5-flash",
         contents,
         config: {
           systemInstruction: mergedSystemInstruction
+        },
+        onChunk: (chunkText) => {
+          accumulatedText += chunkText;
+          setMessages(prev => {
+            const nextList = [...prev];
+            const lastIndex = nextList.length - 1;
+            if (lastIndex >= 0 && nextList[lastIndex].role === 'model') {
+              nextList[lastIndex] = {
+                ...nextList[lastIndex],
+                text: accumulatedText
+              };
+            }
+            return nextList;
+          });
         }
       });
 
-      const robotText = response.text || "عذراً يا أخي، تعذر صياغة الرأي السديد حالياً. تفاءل واستغفر ربك الحليم.";
+      const robotText = accumulatedText || "عذراً يا أخي، تعذر صياغة الرأي السديد حالياً. تفاءل واستغفر ربك الحليم.";
       
-      const newRobotMessage: ChatMessage = { role: 'model', text: robotText };
-      setMessages(prev => [...prev, newRobotMessage]);
-
       // Speak back using Sheikh Voice Synthesis
       speakWithSheikhVoice(robotText);
 
@@ -357,7 +395,16 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
     } catch (error: any) {
       console.error("Analytical or connection AI error:", error);
       const errText = error?.message || "حدث تداخل تقني طفيف. استغفر الله العظيم وحاول ثانية.";
-      setMessages(prev => [...prev, { role: 'model', text: errText }]);
+      setMessages(prev => {
+        const nextList = [...prev];
+        const lastIndex = nextList.length - 1;
+        if (lastIndex >= 0 && nextList[lastIndex].role === 'model' && nextList[lastIndex].text === '') {
+          nextList[lastIndex] = { role: 'model', text: errText };
+          return nextList;
+        } else {
+          return [...prev, { role: 'model', text: errText }];
+        }
+      });
     } finally {
       setIsLoading(false);
     }
@@ -682,6 +729,28 @@ export default function MuslimAI({ onBack }: { onBack: () => void }) {
 
       {/* Chat Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-20">
+        {onNavigate && (
+          <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-3.5 rounded-2xl flex items-center justify-between shadow-[0_4px_15px_-5px_rgba(16,185,129,0.3)] border border-white/15 relative overflow-hidden text-right">
+            <div className="absolute left-0 top-0 w-20 h-20 bg-white/5 rounded-full -ml-6 -mt-6 pointer-events-none"></div>
+            <div className="flex items-center gap-2.5">
+              <span className="text-xl">🎙️</span>
+              <div>
+                <h4 className="text-xs font-bold font-serif">ركن تسميع القرآن الكريم الذكي</h4>
+                <p className="text-[10px] text-emerald-50/90 font-semibold mt-0.5">سمِّع السور أو الآيات بصوتك واحصل على فحص فوري للأخطاء!</p>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                localStorage.setItem("quran_sub_tab", "memorize");
+                onNavigate("quran");
+              }}
+              className="bg-white text-emerald-700 hover:bg-emerald-50 font-black text-[10px] px-3 py-1.5 rounded-full shadow-md whitespace-nowrap active:scale-95 transition-all shrink-0"
+            >
+              ابدأ التسميع
+            </button>
+          </div>
+        )}
+
         <div className="bg-amber-500/10 border border-amber-500/20 p-3 rounded-2xl flex items-start gap-2.5 shadow-xs">
           <span className="text-lg">🌾</span>
           <p className="text-[10px] text-amber-800 dark:text-amber-200 font-medium leading-relaxed">

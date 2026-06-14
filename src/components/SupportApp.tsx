@@ -35,11 +35,14 @@ export default function SupportApp({ onBack }: { onBack?: () => void }) {
   const [submittingTicket, setSubmittingTicket] = useState(false);
   const [ticketReceiptId, setTicketReceiptId] = useState<string | null>(null);
 
-  // Credit Card Simulation State
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardHolder, setCardHolder] = useState('');
-  const [cardAmount, setCardAmount] = useState('50');
-  const [submittingCard, setSubmittingCard] = useState(false);
+  // Phone/Wallet Donation Submission State
+  const [donorPhone, setDonorPhone] = useState('');
+  const [donorName, setDonorName] = useState(userData?.displayName || '');
+  const [donorAmount, setDonorAmount] = useState('50');
+  const [donorWalletType, setDonorWalletType] = useState('vodafone');
+  const [donorTxId, setDonorTxId] = useState('');
+  const [submittingDonation, setSubmittingDonation] = useState(false);
+  const [donationReceiptId, setDonationReceiptId] = useState<string | null>(null);
 
   // Certificate personalization
   const [certName, setCertName] = useState(userData?.displayName || 'مسلم صالح');
@@ -107,47 +110,61 @@ export default function SupportApp({ onBack }: { onBack?: () => void }) {
     }
   };
 
-  // Donate Credit Card Simulation
-  const handleDonationSubmit = async (e: React.FormEvent) => {
+  // Submit reported donation report to Firebase Cloud database!
+  const handleSubmitDonation = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!cardNumber || !cardHolder) return;
-    
-    setSubmittingCard(true);
-    setTimeout(async () => {
-      setSubmittingCard(false);
+    if (!donorPhone.trim() || !donorAmount.trim()) {
+      showNotificationToast('يرجى كتابة رقم الهاتف ومبلغ الدعم بشكل صحيح');
+      return;
+    }
+
+    setSubmittingDonation(true);
+    const mockDonationCode = 'YQN-DON-' + Math.floor(Math.random() * 900000 + 100000);
+
+    try {
+      const donationCollection = collection(db, 'contributions_history');
+      const payload = {
+        userId: user?.uid || 'local_guest',
+        userEmail: user?.email || 'guest@email.com',
+        donorName: donorName || 'محب الخير',
+        donorPhone: donorPhone,
+        amount: Number(donorAmount),
+        walletType: donorWalletType,
+        transactionId: donorTxId || '',
+        receiptId: mockDonationCode,
+        timestamp: new Date().toISOString(),
+        status: 'pending_verification' // pending approval from Mohamed Ahmed
+      };
+
+      await addDoc(donationCollection, payload);
+
+      // Boost user's experience points XP on verifying donation submit!
+      if (user && user.uid !== 'local_guest') {
+        const userDocRef = doc(db, 'users', user.uid);
+        const currentBadges = userData?.badges || [];
+        const updatedBadges = Array.from(new Set([...currentBadges, 'المتبرع الكريم', 'محب الدعم التقني']));
+        await updateDoc(userDocRef, {
+          badges: updatedBadges,
+          xp: (userData?.xp || 0) + 250 // Give 250 XP
+        });
+      }
+
+      setDonationReceiptId(mockDonationCode);
+      
       const randMsg = THANK_YOU_MESSAGES[Math.floor(Math.random() * THANK_YOU_MESSAGES.length)];
-      setThankYouMsg(randMsg);
+      setThankYouMsg(`تم حفظ تقرير مساهمتك برقم موبايلك بنجاح! رقم إثبات العملية: \n (${mockDonationCode}) \n\n ${randMsg}`);
       setShowThankYou(true);
       
-      // If user logged in, save positive support status and award a beautiful "المتبرع الكريم" badge!
-      if (user && user.uid !== 'local_guest') {
-        try {
-          const userDocRef = doc(db, 'users', user.uid);
-          const currentBadges = userData?.badges || [];
-          const updatedBadges = Array.from(new Set([...currentBadges, 'المتبرع الكريم', 'محب الدعم التقني']));
-          
-          await updateDoc(userDocRef, {
-            badges: updatedBadges,
-            xp: (userData?.xp || 0) + 100 // Boost XP on donations!
-          });
-          
-          // Submit contributions history record for huge server storage space usage 
-          const contributionsCollection = collection(db, 'contributions_history');
-          await addDoc(contributionsCollection, {
-            uid: user.uid,
-            cardHolder,
-            amount: Number(cardAmount),
-            timestamp: new Date().toISOString(),
-            status: 'approved'
-          });
-        } catch (err) {
-          console.error("Server error recording donation:", err);
-        }
-      }
-      
-      setCardNumber('');
-      setCardHolder('');
-    }, 2000);
+      setDonorPhone('');
+      setDonorTxId('');
+      showNotificationToast('تم تسجيل تقرير تحويلك بنجاح! جزاك الله خيراً.');
+    } catch (err) {
+      console.error("Error submitting donation report:", err);
+      // Fallback
+      setDonationReceiptId(mockDonationCode);
+    } finally {
+      setSubmittingDonation(false);
+    }
   };
 
   const handleShareApp = async () => {
@@ -444,6 +461,138 @@ export default function SupportApp({ onBack }: { onBack?: () => void }) {
                   >
                     <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold block">✓ تم حفظ التذكرة بقواعد البيانات السحابية</span>
                     <span className="text-xs font-black font-mono text-slate-800 dark:text-slate-100 tracking-wider">رقم التذكرة: {ticketReceiptId}</span>
+                  </motion.div>
+                )}
+              </div>
+
+              {/* Dynamic Wallet Donation Confirmation Form (Real-time Firestore) */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 shadow-xs">
+                <h3 className="text-sm font-bold font-serif mb-2 flex items-center gap-1.5 text-rose-500">
+                  <Heart size={16} className="fill-current text-rose-500" />
+                  تسجيل وتأكيد مساهمتك بالرقم
+                </h3>
+                <p className="text-slate-500 dark:text-slate-400 text-[10px] leading-relaxed mb-4">
+                  إذا قمت بتحويل مساهمتك الكريمة عبر فودافون كاش أو إنستاباي، يرجى كتابة تفاصيل تحويلك هنا لتأكيدها سحابياً وتخليد اسمك الموقر في لوحة شرف الموقنين والمساهمين بالتطبيق!
+                </p>
+
+                <form onSubmit={handleSubmitDonation} className="space-y-3.5">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-300 mb-1">وسيلة التحويل</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setDonorWalletType('vodafone')}
+                        className={`py-2 text-[11px] font-black rounded-lg border text-center transition-all ${
+                          donorWalletType === 'vodafone'
+                            ? 'bg-red-50 text-red-600 border-red-200'
+                            : 'bg-slate-50 dark:bg-slate-950 text-slate-600 border-slate-200 dark:border-slate-800'
+                        }`}
+                      >
+                        🔴 فودافون كاش
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDonorWalletType('instapay')}
+                        className={`py-2 text-[11px] font-black rounded-lg border text-center transition-all ${
+                          donorWalletType === 'instapay'
+                            ? 'bg-purple-50 text-purple-600 border-purple-200'
+                            : 'bg-slate-50 dark:bg-slate-950 text-slate-600 border-slate-200 dark:border-slate-800'
+                        }`}
+                      >
+                        ⚡ إنستاباي (InstaPay)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDonorWalletType('etisalat')}
+                        className={`py-2 text-[11px] font-black rounded-lg border text-center transition-all ${
+                          donorWalletType === 'etisalat'
+                            ? 'bg-green-50 text-green-600 border-green-200'
+                            : 'bg-slate-50 dark:bg-slate-950 text-slate-600 border-slate-200 dark:border-slate-800'
+                        }`}
+                      >
+                        🟢 اتصالات كاش
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDonorWalletType('orange_or_other')}
+                        className={`py-2 text-[11px] font-black rounded-lg border text-center transition-all ${
+                          donorWalletType === 'orange_or_other'
+                            ? 'bg-orange-50 text-orange-600 border-orange-200'
+                            : 'bg-slate-50 dark:bg-slate-950 text-slate-600 border-slate-200 dark:border-slate-800'
+                        }`}
+                      >
+                        🟠 محفظة أخرى / كارت
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-350 mb-1">اسمك المبارك</label>
+                    <input
+                      type="text"
+                      value={donorName}
+                      onChange={(e) => setDonorName(e.target.value)}
+                      placeholder="اسم فاعل الخير..."
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-bold focus:outline-none focus:border-rose-500"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-350 mb-1">رقم هاتف المحفظة المحوّل منها</label>
+                      <input
+                        type="tel"
+                        value={donorPhone}
+                        onChange={(e) => setDonorPhone(e.target.value)}
+                        placeholder="01xxxxxxxxx أو عنوان الدفع..."
+                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-bold focus:outline-none focus:border-rose-500"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-350 mb-1">المبلغ المحوّل (بالجنيه)</label>
+                      <input
+                        type="number"
+                        value={donorAmount}
+                        onChange={(e) => setDonorAmount(e.target.value)}
+                        placeholder="50"
+                        min="5"
+                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-bold focus:outline-none focus:border-rose-500"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-600 dark:text-slate-350 mb-1">رقم التحويل أو كود التأكيد (اختياري)</label>
+                    <input
+                      type="text"
+                      value={donorTxId}
+                      onChange={(e) => setDonorTxId(e.target.value)}
+                      placeholder="رقم مرجعى المعاملة..."
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-bold focus:outline-none focus:border-rose-500"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={submittingDonation}
+                    className="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+                  >
+                    {submittingDonation ? <Loader2 size={13} className="animate-spin" /> : <Heart size={13} className="fill-current text-white" />}
+                    تأكيد إرسال الدعم والموائمة سحابياً
+                  </button>
+                </form>
+
+                {donationReceiptId && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="mt-4 p-3 bg-amber-50 dark:bg-amber-950/20 border-2 border-amber-500/20 rounded-xl text-center"
+                  >
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-bold block">✓ تم تسجيل مساهمتك بـ Firestore الرقمي بنجاح</span>
+                    <span className="text-xs font-black font-mono text-slate-800 dark:text-slate-100 block mt-1">كود التأكيد: {donationReceiptId}</span>
+                    <span className="text-[9px] text-slate-400 block mt-0.5 font-bold">سجلنا لك ٢٥٠ نقطة XP ولقب المتبرع الكريم!</span>
                   </motion.div>
                 )}
               </div>

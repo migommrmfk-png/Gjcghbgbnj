@@ -14,19 +14,21 @@ export default function QuranReflection({ onBack }: { onBack: () => void }) {
     setLoadingAyah(true);
     setReflection('');
     try {
-      // Fetch random number between 1 and 6236
-      const ayahRes = await fetch(`https://ummahapi.com/api/quran/random`);
+      const randomAyahId = Math.floor(Math.random() * 6236) + 1;
+      const ayahRes = await fetch(`https://api.alquran.cloud/v1/ayah/${randomAyahId}/ar.muyassar`);
       const ayahData = await ayahRes.json();
       
-      if (ayahData.success) {
+      if (ayahData.code === 200 && ayahData.data) {
         const newAyah = {
-          surah: { name: ayahData.data.surah.name_arabic },
-          numberInSurah: ayahData.data.verse.ayah,
-          text: ayahData.data.verse.arabic,
-          audio: ayahData.data.audio?.[0]?.ayah_audio
+          surah: { name: ayahData.data.surah.name },
+          numberInSurah: ayahData.data.numberInSurah,
+          text: ayahData.data.text,
+          audio: `https://cdn.islamic.network/quran/audio/128/ar.alafasy/${ayahData.data.number}.mp3`
         };
         setAyah(newAyah);
         generateReflection(newAyah.text, newAyah.surah.name, newAyah.numberInSurah);
+      } else {
+        throw new Error("Invalid response status");
       }
     } catch (error) {
       console.error(error);

@@ -30,6 +30,46 @@ export function getGeminiClient() {
         return {
           text: data.text,
         };
+      },
+      generateContentStream: async ({ model, contents, config, onChunk }: { model: string; contents: any; config?: any; onChunk: (text: string) => void }) => {
+        const response = await fetch('/api/gemini/generateContentStream', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ model, contents, config, customApiKey }),
+        });
+        if (!response.ok) {
+          throw new Error('عذراً، حدث خطأ أثناء الاتصال بالبث المباشر للذكاء الاصطناعي.');
+        }
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+        if (!reader) throw new Error('بث الاستجابة غير مدعوم في متصفحك.');
+        
+        let done = false;
+        let buffer = '';
+        while (!done) {
+          const { value, done: readerDone } = await reader.read();
+          done = readerDone;
+          buffer += decoder.decode(value, { stream: !done });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+          
+          for (const line of lines) {
+            const cleanLine = line.trim();
+            if (cleanLine === 'data: [DONE]') {
+              continue;
+            }
+            if (cleanLine.startsWith('data: ')) {
+              try {
+                const parsed = JSON.parse(cleanLine.substring(6));
+                if (parsed.text) {
+                  onChunk(parsed.text);
+                }
+              } catch (e) {}
+            }
+          }
+        }
       }
     }
   };

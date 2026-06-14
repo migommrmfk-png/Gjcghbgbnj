@@ -82,8 +82,8 @@ export default defineConfig(({mode}) => {
               options: {
                 cacheName: 'quran-audio-cache',
                 expiration: {
-                  maxEntries: 50, // Limit audio files to avoid filling up storage
-                  maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
+                  maxEntries: 10, // Limit audio files strictly to avoid filling up storage in iframe/sandbox environments
+                  maxAgeSeconds: 60 * 60 * 24 * 3, // 3 days
                 },
                 cacheableResponse: {
                   statuses: [0, 200],

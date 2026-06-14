@@ -442,13 +442,31 @@ export default function MemorizationHub({ onBack }: { onBack?: () => void }) {
       alert("ملاحظة: ميزة تحويل الصوت إلى كلام غير مدعومة بالكامل على متصفحك الحالي، يرجى تكرار المحاولة على متصفح Chrome أو متصفح يدعم Web Speech API.");
       return;
     }
+    if (isListening) {
+      try {
+        recognition.abort();
+      } catch (e) {}
+      setIsListening(false);
+      return;
+    }
     setSpokenText('');
     setAiReviewResult(null);
     setIsListening(true);
     try {
       recognition.start();
     } catch (e) {
-      console.error(e);
+      console.warn("Memorization SpeechRecognition start error caught:", e);
+      try {
+        recognition.abort();
+      } catch (abortError) {}
+      
+      setTimeout(() => {
+        try {
+          recognition.start();
+        } catch (retryError) {
+          console.error("Delayed Memorization SpeechRecognition retry failed:", retryError);
+        }
+      }, 300);
     }
   };
 

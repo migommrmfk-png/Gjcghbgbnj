@@ -195,38 +195,9 @@ export default function Quran() {
   }, [readingTheme]);
 
   useEffect(() => {
-    // Check cache first
-    const cachedSurahs = localStorage.getItem('quran_surahs');
-    if (cachedSurahs) {
-      setSurahs(JSON.parse(cachedSurahs));
-      setLoading(false);
-    } else {
-      // Fetch Surahs list
-      fetch("https://ummahapi.com/api/quran/surahs")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success) {
-            const mappedSurahs = data.data.surahs.map((s: any) => ({
-              number: s.number,
-              name: s.name_arabic,
-              englishName: s.name_english,
-              englishNameTranslation: s.name_translation,
-              numberOfAyahs: s.verses_count,
-              revelationType: s.revelation_place === 'makkah' ? 'Meccan' : 'Medinan'
-            }));
-            setSurahs(mappedSurahs);
-            localStorage.setItem('quran_surahs', JSON.stringify(mappedSurahs));
-          } else {
-            setSurahs(DEFAULT_SURAHS);
-          }
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error("Failed to fetch surahs, using offline fallback:", err);
-          setSurahs(DEFAULT_SURAHS);
-          setLoading(false);
-        });
-    }
+    // Check cache first or default to static complete Surah list
+    setSurahs(DEFAULT_SURAHS);
+    setLoading(false);
 
     // Check reciters cache
     const cachedReciters = localStorage.getItem('quran_reciters_v2');
@@ -278,109 +249,96 @@ export default function Quran() {
     }
   }, []);
 
-  const fetchSurah = async (surahNumber: number, surahName?: string, scrollToAyah?: number) => {
-    setLoadingSurah(true);
-    try {
-      // Check cache first
-      const cacheKey = `quran_surah_${surahNumber}`;
-      const cachedSurah = localStorage.getItem(cacheKey);
-      let surahData;
+  const fetchSurah = async (surahNumber: number, surahName?: string, scrollToAyah?: number, autoPlay: boolean = false) => {
+    const cacheKey = `quran_surah_${surahNumber}`;
+    const cachedSurah = localStorage.getItem(cacheKey);
+    let surahData;
 
-      if (cachedSurah) {
+    if (cachedSurah) {
+      try {
         surahData = JSON.parse(cachedSurah);
-      } else {
-        try {
-          const res = await fetch(`https://ummahapi.com/api/quran/surah/${surahNumber}`);
-          if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-          const resData = await res.json();
-          
-          if (resData.success) {
-            const s = resData.data.surah;
-            surahData = {
-              number: s.number,
-              name: s.name_arabic,
-              englishName: s.name_english,
-              englishNameTranslation: s.name_translation,
-              revelationType: s.revelation_place === 'makkah' ? 'Meccan' : 'Medinan',
-              numberOfAyahs: s.verses_count,
-              ayahs: resData.data.verses.map((v: any) => ({
-                number: parseInt(v.verse_key.split(":")[1]),
-                text: v.arabic,
-                numberInSurah: v.ayah
-              }))
-            };
-          } else {
-            throw new Error("Primary API success is false");
-          }
-        } catch (primaryErr) {
-          console.warn("Primary Quran API failed, trying alquran.cloud fallback:", primaryErr);
-          try {
-            const fallbackRes = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}`);
-            if (!fallbackRes.ok) throw new Error(`Fallback HTTP error! status: ${fallbackRes.status}`);
-            const fallbackData = await fallbackRes.json();
-            if (fallbackData.code === 200 && fallbackData.data) {
-              const fd = fallbackData.data;
-              surahData = {
-                number: fd.number,
-                name: fd.name,
-                englishName: fd.englishName,
-                englishNameTranslation: fd.englishNameTranslation,
-                revelationType: fd.revelationType,
-                numberOfAyahs: fd.numberOfAyahs,
-                ayahs: fd.ayahs.map((v: any) => ({
-                  number: v.number,
-                  text: v.text,
-                  numberInSurah: v.numberInSurah
-                }))
-              };
-            } else {
-              throw new Error("Fallback API data is invalid");
-            }
-          } catch (fallbackErr) {
-            console.error("Both primary and fallback Quran APIs failed:", fallbackErr);
-            throw new Error("تعذر تحميل بيانات السورة من الخوادم. يرجى التحقق من اتصالك بالإنترنت.");
-          }
-        }
-
-        try {
-          localStorage.setItem(cacheKey, JSON.stringify(surahData));
-          checkAndLoadedCachedQuranList();
-        } catch (e) {
-          console.warn("Could not cache surah, storage might be full");
-        }
+      } catch (e) {
+        console.error("Failed to parse cached surah:", e);
       }
+    }
 
-      setSelectedSurah(surahData);
-      
+    if (!surahData) {
+      setLoadingSurah(true);
+      try {
+        const fallbackRes = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}`);
+        if (!fallbackRes.ok) throw new Error(`HTTP error! status: ${fallbackRes.status}`);
+        const fallbackData = await fallbackRes.json();
+        if (fallbackData.code === 200 && fallbackData.data) {
+          const fd = fallbackData.data;
+          surahData = {
+            number: fd.number,
+            name: fd.name,
+            englishName: fd.englishName,
+            englishNameTranslation: fd.englishNameTranslation,
+            revelationType: fd.revelationType === 'Meccan' ? 'Meccan' : 'Medinan',
+            numberOfAyahs: fd.numberOfAyahs,
+            ayahs: fd.ayahs.map((v: any) => ({
+              number: v.number,
+              text: v.text,
+              numberInSurah: v.numberInSurah
+            }))
+          };
+          
+          try {
+            localStorage.setItem(cacheKey, JSON.stringify(surahData));
+            checkAndLoadedCachedQuranList();
+          } catch (e) {
+            console.warn("Could not cache surah, storage might be full", e);
+          }
+        } else {
+          throw new Error("API data is invalid");
+        }
+      } catch (err) {
+        console.error("Quran API failed to load surah:", err);
+        setLoadingSurah(false);
+        toast.error("تعذر تحميل بيانات السورة من الخوادم. يرجى التحقق من اتصالك بالإنترنت.");
+        return;
+      }
+    }
+
+    setSelectedSurah(surahData);
+    setLoadingSurah(false);
+    
+    try {
       const newLastRead = { surahNumber, surahName: surahName || surahData.name, ayahNumber: scrollToAyah || 1 };
       setLastRead(newLastRead);
       localStorage.setItem('quranLastRead', JSON.stringify(newLastRead));
-      
-      setIsPlaying(false);
-      setIsAudioLoading(false);
-      setAudioError("");
-      setCurrentTime(0);
-      setDuration(0);
-      
-      let activeReciterServer = selectedReciterServer;
-      const currentReciter = reciters.find(r => r.server === selectedReciterServer);
-      if (!currentReciter || !currentReciter.surahList.includes(surahNumber)) {
-        // Find a fallback reciter
-        const fallback = reciters.find(r => r.surahList.includes(surahNumber));
-        if (fallback) {
-          activeReciterServer = fallback.server;
-          setSelectedReciterServer(fallback.server);
-        }
+    } catch (e) {
+      console.warn("Failed to save last read bookmark", e);
+    }
+    
+    setIsPlaying(false);
+    setIsAudioLoading(false);
+    setAudioError("");
+    setCurrentTime(0);
+    setDuration(0);
+    
+    let activeReciterServer = selectedReciterServer;
+    const currentReciter = reciters.find(r => r.server === selectedReciterServer);
+    if (!currentReciter || !currentReciter.surahList.includes(surahNumber)) {
+      // Find a fallback reciter
+      const fallback = reciters.find(r => r.surahList.includes(surahNumber));
+      if (fallback) {
+        activeReciterServer = fallback.server;
+        setSelectedReciterServer(fallback.server);
       }
+    }
 
-      if (audioRef.current && activeReciterServer) {
-        audioRef.current.pause();
-        const paddedNumber = String(surahNumber).padStart(3, '0');
-        const directUrl = `${activeReciterServer}${paddedNumber}.mp3`;
-        
-        audioRef.current.src = directUrl;
-        audioRef.current.load();
-        audioRef.current.volume = volume;
+    if (audioRef.current && activeReciterServer) {
+      audioRef.current.pause();
+      const paddedNumber = String(surahNumber).padStart(3, '0');
+      const directUrl = `${activeReciterServer}${paddedNumber}.mp3`;
+      
+      audioRef.current.src = directUrl;
+      audioRef.current.load();
+      audioRef.current.volume = volume;
+      
+      if (autoPlay) {
         setIsAudioLoading(true);
         
         // Setup Media Session API
@@ -422,22 +380,18 @@ export default function Quran() {
             }
           });
       }
+    }
 
-      // Scroll to specific ayah if provided
-      if (scrollToAyah) {
-        setTimeout(() => {
-          const element = ayahRefs.current[scrollToAyah];
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            element.classList.add('bg-emerald-500/20');
-            setTimeout(() => element.classList.remove('bg-emerald-500/20'), 2000);
-          }
-        }, 500);
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoadingSurah(false);
+    // Scroll to specific ayah if provided
+    if (scrollToAyah) {
+      setTimeout(() => {
+        const element = ayahRefs.current[scrollToAyah];
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.classList.add('bg-emerald-500/20');
+          setTimeout(() => element.classList.remove('bg-emerald-500/20'), 2000);
+        }
+      }, 500);
     }
   };
 
@@ -447,39 +401,30 @@ export default function Quran() {
     try {
       if (!selectedSurah) throw new Error("No surah selected");
       
-      try {
-        const res = await fetch(`https://ummahapi.com/api/tafsir/${tafsirId}/surah/${selectedSurah.number}/ayah/${numberInSurah}`);
-        if (!res.ok) throw new Error(`Tafsir HTTP error! status: ${res.status}`);
-        const data = await res.json();
-        if (data.success) {
-          setSelectedAyahTafsir({ text: ayahText, tafsir: data.data.tafsir.text, number: numberInSurah, globalNumber: ayahNumber });
-          return;
-        } else {
-          throw new Error("Primary Tafsir API success is false");
-        }
-      } catch (primaryTafsirErr) {
-        console.warn("Primary Tafsir API failed, trying alquran.cloud fallback API:", primaryTafsirErr);
-        
-        // Map to alquran.cloud editions: ar.muyassar or ar.jalalayn
-        let fallbackEdition = "ar.muyassar";
-        if (tafsirId.includes("kathir")) {
-          fallbackEdition = "ar.jalalayn"; // Jalalayn is a great classical alternative
-        }
-        
-        const fallbackRes = await fetch(`https://api.alquran.cloud/v1/ayah/${ayahNumber}/${fallbackEdition}`);
-        if (!fallbackRes.ok) throw new Error(`Fallback Tafsir HTTP status: ${fallbackRes.status}`);
-        const fallbackData = await fallbackRes.json();
-        
-        if (fallbackData.code === 200 && fallbackData.data && fallbackData.data.text) {
-          setSelectedAyahTafsir({ 
-            text: ayahText, 
-            tafsir: fallbackData.data.text, 
-            number: numberInSurah, 
-            globalNumber: ayahNumber 
-          });
-        } else {
-          throw new Error("Both Tafsir APIs failed");
-        }
+      let edition = "ar.muyassar";
+      if (tafsirId.includes("muyassar")) {
+        edition = "ar.muyassar";
+      } else if (tafsirId.includes("kathir_ar")) {
+        edition = "ar.jalalayn";
+      } else if (tafsirId.includes("kathir")) {
+        edition = "en.sahih";
+      } else {
+        edition = tafsirId;
+      }
+      
+      const res = await fetch(`https://api.alquran.cloud/v1/ayah/${selectedSurah.number}:${numberInSurah}/${edition}`);
+      if (!res.ok) throw new Error(`Tafsir HTTP error! status: ${res.status}`);
+      const data = await res.json();
+      
+      if (data.code === 200 && data.data && data.data.text) {
+        setSelectedAyahTafsir({ 
+          text: ayahText, 
+          tafsir: data.data.text, 
+          number: numberInSurah, 
+          globalNumber: ayahNumber 
+        });
+      } else {
+        throw new Error("Invalid Tafsir response format");
       }
     } catch (err) {
       console.error(err);

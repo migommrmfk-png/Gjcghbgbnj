@@ -255,7 +255,7 @@ function AppContent() {
       case "stories":
         return <ProphetStories onBack={handleBack} />;
       case "muslim-ai":
-        return <MuslimAI onBack={handleBack} />;
+        return <MuslimAI onBack={handleBack} onNavigate={handleNavigate} />;
       case "games":
         return <Games onBack={handleBack} />;
       case "prayer-guide":

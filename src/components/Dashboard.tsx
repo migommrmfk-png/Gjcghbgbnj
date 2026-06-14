@@ -631,17 +631,22 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       }
 
       try {
-        const res = await fetch(`https://ummahapi.com/api/quran/random`);
+        const randomAyahId = Math.floor(Math.random() * 6236) + 1;
+        const res = await fetch(`https://api.alquran.cloud/v1/ayah/${randomAyahId}/ar.muyassar`);
         if (!res.ok) throw new Error("API response not ok");
         const data = await res.json();
-        const ayahData = {
-          text: data.data.verse.arabic,
-          surah: `${data.data.surah.name_arabic} - آية ${data.data.verse.ayah}`
-        };
-        setDailyAyah(ayahData);
-        localStorage.setItem('dailyAyah', JSON.stringify({ date: today, data: ayahData }));
+        if (data.code === 200 && data.data) {
+          const ayahData = {
+            text: data.data.text,
+            surah: `${data.data.surah.name} - آية ${data.data.numberInSurah}`
+          };
+          setDailyAyah(ayahData);
+          localStorage.setItem('dailyAyah', JSON.stringify({ date: today, data: ayahData }));
+        } else {
+          throw new Error("Invalid response format");
+        }
       } catch (e) {
-        console.warn("Using fallback daily ayah due to fetch error");
+        console.warn("Using fallback daily ayah due to fetch error", e);
         const fallbackAyah = {
           text: "إِنَّ مَعَ الْعُسْرِ يُسْرًا",
           surah: "سورة الشرح - آية 6"
@@ -1340,11 +1345,17 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           </div>
 
           {hijriDate && (
-            <div className="flex flex-col items-center justify-center py-4 border-y border-white/5">
-              <h1 className="text-3xl font-bold font-serif mb-1 text-white tracking-wide">
+            <div className="flex flex-col items-center justify-center py-4 border-y-2 border-amber-500/20 bg-emerald-950/25 rounded-2xl relative">
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border border-amber-500/10 rotate-45 flex items-center justify-center">
+                <span className="w-1.5 h-1.5 bg-[#C59F60] rotate-45"></span>
+              </div>
+              <div className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border border-amber-500/10 rotate-45 flex items-center justify-center">
+                <span className="w-1.5 h-1.5 bg-[#C59F60] rotate-45"></span>
+              </div>
+              <h1 className="text-3xl font-black font-serif mb-1 text-gold-gradient tracking-wide drop-shadow-sm">
                 {hijriDate.day} {hijriDate.month.ar} {hijriDate.year}
               </h1>
-              <p className="text-emerald-200/70 text-sm font-medium tracking-wide">
+              <p className="text-[#FEEDCE]/80 text-xs font-semibold tracking-wide">
                 {hijriDate.weekday.ar} • {gregorianDate}
               </p>
             </div>

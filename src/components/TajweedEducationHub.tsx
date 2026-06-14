@@ -217,13 +217,30 @@ export default function TajweedEducationHub({ onBack }: TajweedEducationHubProps
       toast.error("ميزة التعرف على الصوت غير مدعومة في متصفحك بشكل كامل، لكن يمكنك كتابة الآية أو المحاولة بمتصفح كروم!");
       return;
     }
+    if (isListening) {
+      try {
+        recogRef.current.abort();
+      } catch (e) {}
+      setIsListening(false);
+      return;
+    }
     setRecitationFeedback(null);
     setMicError(null);
     try {
       recogRef.current.start();
     } catch (e) {
-      recogRef.current.abort();
-      setTimeout(() => recogRef.current.start(), 200);
+      console.warn("SpeechRecognition start error caught:", e);
+      try {
+        recogRef.current.abort();
+      } catch (abortError) {}
+      
+      setTimeout(() => {
+        try {
+          recogRef.current?.start();
+        } catch (retryError) {
+          console.error("Delayed SpeechRecognition start retry failed:", retryError);
+        }
+      }, 300);
     }
   };
 

@@ -103,6 +103,61 @@ input, textarea {
   @apply bg-slate-50 dark:bg-slate-800;
 }
 
+/* Premium Imperial Dual Islamic Border */
+.islamic-border {
+  border: 1px solid var(--theme-gold);
+  outline: 3px double var(--theme-gold);
+  outline-offset: -6px;
+}
+
+.islamic-border-emerald {
+  border: 1px solid var(--theme-primary);
+  outline: 3px double var(--theme-primary);
+  outline-offset: -6px;
+}
+
+/* Premium Gold and Emerald Gradient Typography */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #F5D093 0%, #C59F60 50%, #9F793E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-emerald-gradient {
+  background: linear-gradient(135deg, #46DDC2 0%, #0D5C4D 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glowing spiritual effects */
+.glow-gold {
+  box-shadow: 0 0 20px rgba(197, 159, 96, 0.2);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 20px rgba(13, 92, 77, 0.15);
+}
+
+/* Golden breathing shimmer animation */
+@keyframes goldenBreath {
+  0%, 100% {
+    opacity: 0.8;
+    transform: scale(1);
+    filter: drop-shadow(0 0 2px rgba(226, 162, 71, 0.4));
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.03);
+    filter: drop-shadow(0 0 8px rgba(226, 162, 71, 0.8));
+  }
+}
+
+.animate-gold-breath {
+  animation: goldenBreath 4s ease-in-out infinite;
+}
+
 /* Minimalist Button */
 .btn-3d-primary {
   @apply bg-emerald-500 text-white rounded-full;
