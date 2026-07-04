@@ -30,49 +30,94 @@ export default function Logo({ className = "w-24 h-24" }: { className?: string }
           onError={() => setImgError(true)} 
         />
       ) : (
-        <div className="w-full h-full relative flex items-center justify-center rounded-[25%] bg-gradient-to-br from-[#0a2f24] to-[#041d15] shadow-xl overflow-hidden border border-[#eab308]/20 p-2">
-          {/* Subtle background texture */}
-          <div className="absolute inset-0 bg-emerald-500/5 mix-blend-overlay"></div>
+        <div className="w-full h-full relative flex items-center justify-center rounded-[28%] bg-gradient-to-br from-[#022c22] via-[#043e2f] to-[#011410] shadow-2xl overflow-hidden border-2 border-amber-500/30 p-2.5">
+          {/* Subtle background radial glow & arabesque grid */}
+          <div className="absolute inset-0 bg-radial-[circle_at_center] from-emerald-500/10 to-transparent opacity-60"></div>
+          <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(245,158,11,0.02)_1px,transparent_1px),linear-gradient(-45deg,rgba(245,158,11,0.02)_1px,transparent_1px)] bg-[size:12px_12px] opacity-40"></div>
           
-          <div className="relative flex flex-col items-center justify-center text-[#eab308]">
-            {/* Custom geometric Rub el Hizb with Crescent and Star */}
+          <div className="relative flex flex-col items-center justify-center text-amber-400">
+            {/* Custom geometric Luxury Rub el Hizb with Mosque Dome & Crescent */}
             <svg 
-              viewBox="0 0 100 100" 
-              className="drop-shadow-[0_0_12px_rgba(234,179,8,0.3)]"
-              style={{ width: containerSize * 0.75, height: containerSize * 0.75 }}
+              viewBox="0 0 120 120" 
+              className="drop-shadow-[0_4px_16px_rgba(245,158,11,0.25)]"
+              style={{ width: containerSize * 0.8, height: containerSize * 0.8 }}
             >
               <defs>
-                <linearGradient id="bubbleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#10b981" />
-                  <stop offset="100%" stopColor="#047857" />
+                {/* Real Metallic Gold Gradient */}
+                <linearGradient id="goldMetallic" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#fef08a" /> {/* yellow-200 */}
+                  <stop offset="20%" stopColor="#f59e0b" /> {/* amber-500 */}
+                  <stop offset="45%" stopColor="#fbbf24" /> {/* amber-400 */}
+                  <stop offset="60%" stopColor="#fef08a" /> {/* yellow-200 */}
+                  <stop offset="80%" stopColor="#b45309" /> {/* amber-700 */}
+                  <stop offset="100%" stopColor="#d97706" /> {/* amber-600 */}
+                </linearGradient>
+                
+                {/* Soft glow for active elements */}
+                <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+                
+                {/* Inner Emerald Gradient */}
+                <linearGradient id="innerEmerald" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#047857" />
+                  <stop offset="100%" stopColor="#064e3b" />
                 </linearGradient>
               </defs>
               
-              {/* Overlapping squares to create the 8-pointed Islamic Star (Rub el Hizb) */}
-              <g stroke="#eab308" strokeWidth="2.5" strokeLinejoin="round">
-                <rect x="25" y="25" width="50" height="50" fill="url(#bubbleGrad)" rx="6" />
-                <rect x="25" y="25" width="50" height="50" fill="url(#bubbleGrad)" rx="6" transform="rotate(45 50 50)" />
+              {/* Overlapping squares to create the 8-pointed Islamic Star (Rub el Hizb) with fine golden lines */}
+              <g stroke="url(#goldMetallic)" strokeWidth="1.5" strokeLinejoin="round" fill="none" opacity="0.35">
+                <rect x="30" y="30" width="60" height="60" rx="3" />
+                <rect x="30" y="30" width="60" height="60" rx="3" transform="rotate(45 60 60)" />
               </g>
 
-              {/* Inner golden ring for depth */}
-              <circle cx="50" cy="50" r="18" fill="none" stroke="#eab308" strokeWidth="1.5" strokeDasharray="4 2" />
+              {/* Bold outer star container */}
+              <g stroke="url(#goldMetallic)" strokeWidth="2.5" strokeLinejoin="round" fill="url(#innerEmerald)">
+                <rect x="34" y="34" width="52" height="52" rx="4" />
+                <rect x="34" y="34" width="52" height="52" rx="4" transform="rotate(45 60 60)" />
+              </g>
 
-              {/* Gold Crescent */}
+              {/* Glowing inner golden ring */}
+              <circle cx="60" cy="60" r="24" fill="none" stroke="url(#goldMetallic)" strokeWidth="1" strokeDasharray="3 1.5" opacity="0.7" />
+              <circle cx="60" cy="60" r="21" fill="none" stroke="url(#goldMetallic)" strokeWidth="1" opacity="0.4" />
+
+              {/* Stylized Mosque Dome Path */}
               <path 
-                d="M56,38 A12,12 0 1,0 56,62 A10,10 0 1,1 56,38 Z" 
-                fill="#eab308" 
+                d="M 46,75 C 46,62 50,56 60,52 C 70,56 74,62 74,75 Z" 
+                fill="url(#goldMetallic)" 
+                opacity="0.9"
               />
               
-              {/* Gold Star */}
-              <polygon 
-                points="62,44 63.5,47.5 67,48 64.5,50.5 65.5,54 62,52 58.5,54 59.5,50.5 57,48 60.5,47.5" 
-                fill="#eab308" 
+              {/* Dome Base / Mihrab Arch */}
+              <path 
+                d="M 44,75 L 76,75 L 76,77 L 44,77 Z" 
+                fill="url(#goldMetallic)"
               />
+
+              {/* Glowing Crescent of Faith rising above the dome */}
+              <path 
+                d="M 68,40 A 10,10 0 1,0 68,60 A 8.5,8.5 0 1,1 68,40 Z" 
+                fill="url(#goldMetallic)" 
+                filter="url(#goldGlow)"
+              />
+              
+              {/* Shining Star of Certainty (Yaqeen) at the peak */}
+              <g filter="url(#goldGlow)">
+                <polygon 
+                  points="60,32 61.5,35 64.5,35 62,37 63,40 60,38 57,40 58,37 55.5,35 58.5,35" 
+                  fill="#fffde7" 
+                />
+              </g>
+              
+              {/* Decorative side minaret/star accents */}
+              <circle cx="43" cy="55" r="1.5" fill="url(#goldMetallic)" />
+              <circle cx="77" cy="55" r="1.5" fill="url(#goldMetallic)" />
             </svg>
             
             {/* Show text only if the logo is large enough */}
             {!isSmall && (
-              <span className="font-extrabold font-serif tracking-widest drop-shadow-md text-amber-400 mt-1" style={{ fontSize: Math.max(11, containerSize * 0.16) }}>
+              <span className="font-serif font-black tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] text-amber-300 mt-1.5 animate-pulse" style={{ fontSize: Math.max(12, containerSize * 0.18) }}>
                 {t('app_name')}
               </span>
             )}

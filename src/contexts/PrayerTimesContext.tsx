@@ -102,10 +102,36 @@ export const PrayerTimesProvider: React.FC<{ children: React.ReactNode }> = ({ c
     localStorage.setItem('locationName', "مكة المكرمة");
   };
 
+  const detectLocationByIP = async (): Promise<void> => {
+    try {
+      const res = await fetch('https://ipapi.co/json/');
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (data.latitude && data.longitude) {
+        const cityName = data.city || data.region || data.country_name || "موقعي الحالي";
+        updateLocation(data.latitude, data.longitude, cityName);
+      } else {
+        throw new Error();
+      }
+    } catch (e) {
+      try {
+        const res = await fetch('https://ip-api.com/json/');
+        const data = await res.json();
+        if (data.status === 'success') {
+          updateLocation(data.lat, data.lon, data.city || "موقعي الحالي");
+        } else {
+          throw new Error();
+        }
+      } catch (err) {
+        throw new Error("عذرًا، لم نتمكن من تحديد موقعك تلقائيًا. يرجى اختيار بلدك أو مدينتك يدويًا.");
+      }
+    }
+  };
+
   const detectLocation = (): Promise<void> => {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
-        reject(new Error("تحديد الموقع الجغرافي غير مدعوم في هذا المتصفح/الجهاز"));
+        detectLocationByIP().then(resolve).catch(reject);
         return;
       }
       navigator.geolocation.getCurrentPosition(
@@ -114,21 +140,37 @@ export const PrayerTimesProvider: React.FC<{ children: React.ReactNode }> = ({ c
           const lon = position.coords.longitude;
           try {
             const geoRes = await fetch(
-              `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=ar`
+              `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=ar`
             );
+            if (!geoRes.ok) throw new Error();
             const geoData = await geoRes.json();
-            const city = geoData.city || geoData.locality || geoData.countryName || "موقعي الحالي";
-            updateLocation(lat, lon, city);
+            const city = geoData.address?.city || geoData.address?.town || geoData.address?.village || geoData.address?.state || geoData.display_name || "موقعي الحالي";
+            updateLocation(lat, lon, city.split(',')[0]);
             resolve();
           } catch (e) {
-            updateLocation(lat, lon, "موقعي الحالي");
-            resolve();
+            try {
+              const geoRes = await fetch(
+                `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=ar`
+              );
+              const geoData = await geoRes.json();
+              const city = geoData.city || geoData.locality || geoData.countryName || "موقعي الحالي";
+              updateLocation(lat, lon, city);
+              resolve();
+            } catch (err) {
+              updateLocation(lat, lon, "موقعي الحالي");
+              resolve();
+            }
           }
         },
-        (err) => {
-          reject(err);
+        async (err) => {
+          try {
+            await detectLocationByIP();
+            resolve();
+          } catch (ipErr) {
+            reject(new Error("عذرًا، لم نتمكن من الوصول لموقعك الجغرافي. يرجى تفعيل إذن الموقع أو كتابة اسم مدينتك في مربع البحث يدويًا."));
+          }
         },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        { enableHighAccuracy: true, timeout: 6000, maximumAge: 0 }
       );
     });
   };

@@ -29,6 +29,7 @@ import {
   Baby,
   ImageIcon,
   Bell,
+  BellOff,
   Book
 } from "lucide-react";
 import { motion } from "motion/react";
@@ -44,7 +45,7 @@ import { getGeminiClient } from "../lib/gemini";
 import VoiceSearchAssistant from "./VoiceSearchAssistant";
 import { requestNotificationPermission } from "../services/NotificationService";
 import toast from 'react-hot-toast';
-import { CheckCircle2, RefreshCw, AlertCircle, Sparkles as SparklesIcon, Trash2, Sliders, ChevronRight as ChevronRightIcon, ChevronDown, Search, Globe, Key } from "lucide-react";
+import { CheckCircle2, RefreshCw, AlertCircle, Sparkles as SparklesIcon, Trash2, Sliders, ChevronRight as ChevronRightIcon, ChevronDown, Search, Globe, Key, Clock, Plus, Minus } from "lucide-react";
 
 export const POPULAR_CITIES = [
   { name: "مكة المكرمة", lat: 21.4225, lon: 39.8262, country: "المملكة العربية السعودية" },
@@ -106,11 +107,52 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   // Location Modal States
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [searchCityQuery, setSearchCityQuery] = useState("");
+  const [apiSearchResults, setApiSearchResults] = useState<any[]>([]);
+  const [isSearchingApi, setIsSearchingApi] = useState(false);
   const [customLat, setCustomLat] = useState("");
   const [customLon, setCustomLon] = useState("");
   const [customLocName, setCustomLocName] = useState("");
   const [locateState, setLocateState] = useState<"idle" | "locating" | "success" | "error">("idle");
   const [locateError, setLocateError] = useState("");
+
+  useEffect(() => {
+    if (!searchCityQuery.trim()) {
+      setApiSearchResults([]);
+      return;
+    }
+
+    const handler = setTimeout(async () => {
+      setIsSearchingApi(true);
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchCityQuery)}&format=json&accept-language=ar&limit=6`
+        );
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          const results = data.map((item: any) => {
+            const displayName = item.display_name;
+            const parts = displayName.split(',');
+            const name = parts[0]?.trim() || searchCityQuery;
+            const country = parts[parts.length - 1]?.trim() || "";
+            return {
+              name: name,
+              lat: parseFloat(item.lat),
+              lon: parseFloat(item.lon),
+              country: country
+            };
+          });
+          setApiSearchResults(results);
+        }
+      } catch (err) {
+        console.error("Geocoding failed", err);
+      } finally {
+        setIsSearchingApi(false);
+      }
+    }, 600);
+
+    return () => clearTimeout(handler);
+  }, [searchCityQuery]);
 
   useEffect(() => {
     if (userLocation) {
@@ -132,6 +174,38 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     Maghrib: false,
     Isha: false
   });
+
+  // States for individual prayer reminders
+  const [prayerReminders, setPrayerReminders] = useState<Record<string, boolean>>({
+    Fajr: localStorage.getItem("prayer_reminder_enabled_Fajr") !== "false",
+    Dhuhr: localStorage.getItem("prayer_reminder_enabled_Dhuhr") !== "false",
+    Asr: localStorage.getItem("prayer_reminder_enabled_Asr") !== "false",
+    Maghrib: localStorage.getItem("prayer_reminder_enabled_Maghrib") !== "false",
+    Isha: localStorage.getItem("prayer_reminder_enabled_Isha") !== "false",
+  });
+
+  const toggleReminder = (prayerId: string) => {
+    const newValue = !prayerReminders[prayerId];
+    setPrayerReminders(prev => ({ ...prev, [prayerId]: newValue }));
+    localStorage.setItem(`prayer_reminder_enabled_${prayerId}`, newValue.toString());
+    
+    const prayerNameAr = (() => {
+      switch (prayerId) {
+        case "Fajr": return "الفجر";
+        case "Dhuhr": return "الظهر";
+        case "Asr": return "العصر";
+        case "Maghrib": return "المغرب";
+        case "Isha": return "العشاء";
+        default: return prayerId;
+      }
+    })();
+    
+    if (newValue) {
+      toast.success(`تم تفعيل تذكير صلاة ${prayerNameAr} بنجاح 🔔`);
+    } else {
+      toast.error(`تم كتم تذكير صلاة ${prayerNameAr} 🔕`);
+    }
+  };
   const [lastReadQuran, setLastReadQuran] = useState<{ surahNumber: number, surahName: string } | null>(null);
   const [tasbeehProgress, setTasbeehProgress] = useState<{ count: number, target: number } | null>(null);
   const [dailyNiyyah, setDailyNiyyah] = useState<string>("");
@@ -143,7 +217,42 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   const [keyInput, setKeyInput] = useState<string>(() => localStorage.getItem('user_custom_gemini_key') || '');
   const [hasCustomKey, setHasCustomKey] = useState<boolean>(() => !!localStorage.getItem('user_custom_gemini_key'));
   const [elderlyMode, setElderlyMode] = useState<boolean>(() => localStorage.getItem("elderlyModeEnabled") === "true");
-  const [spiritualFirstMode, setSpiritualFirstMode] = useState<boolean>(() => localStorage.getItem("spiritualFirstModeEnabled") === "true");
+  const [spiritualFirstMode, setSpiritualFirstMode] = useState<boolean>(false);
+  
+  // Custom Time & Date preferences
+  const [hijriOffset, setHijriOffset] = useState<number>(() => Number(localStorage.getItem('hijri_offset') || '0'));
+  const [useEasternNumerals, setUseEasternNumerals] = useState<boolean>(() => localStorage.getItem('use_eastern_numerals') === 'true');
+  const [converterGregorian, setConverterGregorian] = useState<string>("");
+  const [converterResult, setConverterResult] = useState<string>("");
+  const [converterLoading, setConverterLoading] = useState<boolean>(false);
+  const [isConverterOpen, setIsConverterOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!converterGregorian) {
+      setConverterResult("");
+      return;
+    }
+    const convertDate = async () => {
+      setConverterLoading(true);
+      try {
+        const [y, m, d] = converterGregorian.split('-');
+        const formattedDate = `${d}-${m}-${y}`;
+        const res = await fetch(`https://api.aladhan.com/v1/gToH?date=${formattedDate}`);
+        const data = await res.json();
+        if (data && data.data && data.data.hijri) {
+          const h = data.data.hijri;
+          setConverterResult(`${h.day} ${h.month.ar} ${h.year} هـ (${h.weekday.ar})`);
+        } else {
+          setConverterResult("عذراً، فشلت عملية التحويل.");
+        }
+      } catch (err) {
+        setConverterResult("حدث خطأ أثناء الاتصال بالخادم.");
+      } finally {
+        setConverterLoading(false);
+      }
+    };
+    convertDate();
+  }, [converterGregorian]);
 
   // Voice Search Assistant & Mosque Mode states
   const [isVoiceAssistantOpen, setIsVoiceAssistantOpen] = useState(false);
@@ -591,10 +700,14 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   });
 
   useEffect(() => {
+    // Force turn off old spiritual first mode value
+    if (localStorage.getItem("spiritualFirstModeEnabled") === "true") {
+      localStorage.removeItem("spiritualFirstModeEnabled");
+    }
     const handleUpdateIcon = () => {
       setActiveFlagshipIcon(localStorage.getItem('user_favorite_flagship_icon') || 'dua');
       setElderlyMode(localStorage.getItem("elderlyModeEnabled") === "true");
-      setSpiritualFirstMode(localStorage.getItem("spiritualFirstModeEnabled") === "true");
+      setSpiritualFirstMode(false);
     };
     window.addEventListener('storage', handleUpdateIcon);
     window.addEventListener('elderly-mode-change', handleUpdateIcon);
@@ -611,7 +724,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
-    }, 60000); // Update every minute instead of every second to improve performance
+    }, 1000); // Live 1-second interval for real-time ticking clock
     return () => clearInterval(timer);
   }, []);
 
@@ -722,6 +835,125 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     fetchHadith();
     fetchDua();
   }, []);
+
+  const formatNum = (num: number | string): string => {
+    if (!useEasternNumerals) return num.toString();
+    const easternDigits = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+    return num.toString().replace(/\d/g, (digit) => easternDigits[parseInt(digit)]);
+  };
+
+  const padZero = (n: number) => n < 10 ? `0${n}` : `${n}`;
+
+  const getSpiritualSegment = (date: Date) => {
+    const hrs = date.getHours();
+    if (hrs >= 22 || hrs < 3) return { label: "ثلث الليل الأخير 🌌", recommendation: "صلاة قيام الليل والوتر والذكر المستجاب" };
+    if (hrs >= 3 && hrs < 5) return { label: "وقت السحر والاستغفار 💫", recommendation: "والمستغفرين بالأسحار؛ رطّب لسانك بالاستغفار والتضرع" };
+    if (hrs >= 5 && hrs < 7) return { label: "البكور بعد صلاة الفجر 🌅", recommendation: "ساعة مباركة بورك لأمتي في بكورها (أذكار الصباح)" };
+    if (hrs >= 7 && hrs < 11) return { label: "وقت الضحى المبارك ☀️", recommendation: "صلاة الأوّابين ركعتا الضحى صدقة عن مفاصلك" };
+    if (hrs >= 11 && hrs < 15) return { label: "وقت الظهيرة والعمل 🌤️", recommendation: "أقم صلاة الظهر واحتسب سعيك عبادة خالصاً لله" };
+    if (hrs >= 15 && hrs < 18) return { label: "العشيّ وقرب الغروب 🌇", recommendation: "أفضل الأوقات لأذكار المساء وتسبيح العظيم" };
+    return { label: "بين العشائين والليل 🌙", recommendation: "تلاوة سورة الملك المنجية وتبادل السكينة بذكر الله" };
+  };
+
+  const getMoonPhaseDetailsForFav = (dayNum: number): { name: string; svg: React.ReactNode } => {
+    const day = ((dayNum - 1 + 30) % 30) + 1;
+    if (day === 1) {
+      return {
+        name: "هلال الليلة الأولى",
+        svg: (
+          <svg width="28" height="28" viewBox="0 0 100 100" className="drop-shadow-sm inline-block">
+            <circle cx="50" cy="50" r="40" fill="#1e293b" opacity="0.4" />
+            <path d="M50 10 A40 40 0 0 1 50 90 A40 40 0 0 0 50 10" fill="#FEEDCE" />
+          </svg>
+        )
+      };
+    } else if (day >= 2 && day <= 7) {
+      return {
+        name: "هلال متزايد",
+        svg: (
+          <svg width="28" height="28" viewBox="0 0 100 100" className="drop-shadow-sm inline-block">
+            <circle cx="50" cy="50" r="40" fill="#1e293b" opacity="0.4" />
+            <path d="M50 10 A40 40 0 0 1 50 90 A30 40 0 0 0 50 10" fill="#FEEDCE" />
+          </svg>
+        )
+      };
+    } else if (day === 8) {
+      return {
+        name: "تربيع أول",
+        svg: (
+          <svg width="28" height="28" viewBox="0 0 100 100" className="drop-shadow-sm inline-block">
+            <circle cx="50" cy="50" r="40" fill="#1e293b" opacity="0.4" />
+            <path d="M50 10 A40 40 0 0 1 50 90 Z" fill="#FEEDCE" />
+          </svg>
+        )
+      };
+    } else if (day >= 9 && day <= 12) {
+      return {
+        name: "أحدب متزايد",
+        svg: (
+          <svg width="28" height="28" viewBox="0 0 100 100" className="drop-shadow-sm inline-block">
+            <circle cx="50" cy="50" r="40" fill="#1e293b" opacity="0.4" />
+            <path d="M50 10 A40 40 0 0 1 50 90 A-15 40 0 0 1 50 10" fill="#FEEDCE" />
+          </svg>
+        )
+      };
+    } else if (day >= 13 && day <= 15) {
+      return {
+        name: `البدر الكامل (الأيام البيض)`,
+        svg: (
+          <svg width="28" height="28" viewBox="0 0 100 100" className="drop-shadow-md inline-block animate-pulse">
+            <circle cx="50" cy="50" r="40" fill="url(#header-moon-grad)" />
+            <defs>
+              <radialGradient id="header-moon-grad" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#ffffff" />
+                <stop offset="70%" stopColor="#FEEDCE" />
+                <stop offset="100%" stopColor="#C59F60" />
+              </radialGradient>
+            </defs>
+          </svg>
+        )
+      };
+    } else if (day >= 16 && day <= 21) {
+      return {
+        name: "أحدب متناقص",
+        svg: (
+          <svg width="28" height="28" viewBox="0 0 100 100" className="drop-shadow-sm inline-block">
+            <circle cx="50" cy="50" r="40" fill="#FEEDCE" />
+            <path d="M50 10 A40 40 0 0 1 50 90 A-15 40 0 0 0 50 10" fill="#1e293b" />
+          </svg>
+        )
+      };
+    } else if (day === 22) {
+      return {
+        name: "التربيع الأخير",
+        svg: (
+          <svg width="28" height="28" viewBox="0 0 100 100" className="drop-shadow-sm inline-block">
+            <circle cx="50" cy="50" r="40" fill="#FEEDCE" />
+            <path d="M50 10 A40 40 0 0 1 50 90 Z" fill="#1e293b" />
+          </svg>
+        )
+      };
+    } else if (day >= 23 && day <= 28) {
+      return {
+        name: "هلال متناقص",
+        svg: (
+          <svg width="28" height="28" viewBox="0 0 100 100" className="drop-shadow-sm inline-block">
+            <circle cx="50" cy="50" r="40" fill="#FEEDCE" />
+            <path d="M50 10 A40 40 0 0 1 50 90 A30 40 0 0 1 50 10" fill="#1e293b" />
+          </svg>
+        )
+      };
+    } else {
+      return {
+        name: "محاق",
+        svg: (
+          <svg width="28" height="28" viewBox="0 0 100 100" className="drop-shadow-sm inline-block">
+            <circle cx="50" cy="50" r="40" fill="#1e293b" />
+          </svg>
+        )
+      };
+    }
+  };
 
   const formatTime = (timeStr: string) => {
     if (!timeStr) return "";
@@ -1258,59 +1490,49 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
         {/* Exit Elder mode or adjust accessibility accessibility-hub */}
         <div className="space-y-3 pt-2">
-           <button 
-             onClick={() => onNavigate("accessibility-hub")} 
-             className="w-full py-4 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-bold text-sm lg:text-base rounded-2xl border border-emerald-100 dark:border-emerald-900/30 shadow-sm transition-all"
-           >
-             ⚙️ إعدادات الصم/البكم وقارئات الشاشة
-           </button>
-
-           <button 
-             onClick={() => {
-               localStorage.setItem("elderlyModeEnabled", "false");
-               localStorage.setItem("fontSizeScale", "1.0");
-               window.dispatchEvent(new Event("storage"));
-               window.dispatchEvent(new Event("elderly-mode-change"));
-               toast.success("تم الخروج من وضع كبار السن وعودة الواجهة للوضع المعتاد.");
-             }} 
-             className="w-full py-4 bg-red-50 dark:bg-red-950/20 text-red-600 dark:text-red-400 font-black text-sm rounded-2xl border border-red-100 dark:border-red-900/20 transition-all flex items-center justify-center gap-2"
-           >
-             <span>👋 العودة للوضع المعتاد للتطبيق</span>
-           </button>
+          <button 
+            onClick={() => onNavigate("accessibility-hub")} 
+            className="w-full py-4 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-bold text-sm lg:text-base rounded-2xl border border-emerald-100 dark:border-emerald-900/30 shadow-sm transition-all"
+          >
+            ⚙️ إعدادات التسهيلات
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto p-4 space-y-5 pb-28 min-h-screen" dir={isRTL ? "rtl" : "ltr"}>
-      {/* Premium Header Card */}
+    <div className="space-y-6 pb-24" dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Dashboard Header Banner */}
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="relative overflow-hidden rounded-[32px] bg-[#0A1914] text-white shadow-2xl shadow-emerald-900/20"
+        className="bg-[#0A1914] text-white p-6 rounded-[2.5rem] shadow-md relative overflow-hidden flex flex-col gap-6"
       >
-        <div className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-luminosity pointer-events-none" style={{ backgroundImage: 'url("/src/assets/images/hajj_kaaba_dome_1779803270795.png")' }}></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/30 to-teal-900/60 mix-blend-overlay"></div>
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/10 rounded-full -mr-20 -mt-20"></div>
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-teal-500/10 rounded-full -ml-10 -mb-10"></div>
-        
-        <div className="relative z-10 p-6 flex flex-col justify-center space-y-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <h2 className="text-xl font-medium text-emerald-50 tracking-wide">{getGreeting()}</h2>
-              <button 
-                onClick={() => setLocationModalOpen(true)}
-                className="flex items-center gap-1.5 mt-1 text-emerald-250 hover:text-white bg-white/10 dark:bg-white/5 hover:bg-white/20 transition-all px-3 py-1 rounded-full border border-white/10 active:scale-95 text-xs font-semibold shadow-sm"
-                title="تعديل أو تحديد الموقع الجغرافي"
-              >
-                <MapPin size={11} className="text-emerald-400 animate-pulse animate-duration-3000" />
-                <span>{locationName || t('locating')}</span>
-                <ChevronDown size={11} className="text-emerald-300/80" />
-              </button>
+        {/* Top bar with logo and status buttons */}
+        <div className="flex justify-between items-center gap-4 relative z-10">
+          <div className="flex items-center gap-2">
+            <div className="bg-emerald-500/10 p-2 rounded-2xl border border-emerald-500/20">
+              <span className="text-2xl font-serif">🕋</span>
             </div>
-            <div className="flex items-center gap-2">
-              {streak > 0 && (
+            <div>
+              <h2 className="text-md font-black font-serif text-[#C59F60]">تطبيق اليقين</h2>
+              <p className="text-[10px] text-emerald-300 font-semibold">{t('offline_first_app')}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onNavigate("location-setup")}
+              className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full text-white hover:bg-white/20 active:scale-95 text-xs font-semibold shadow-sm"
+              title="تعديل أو تحديد الموقع الجغرافي"
+            >
+              <MapPin size={11} className="text-emerald-400 animate-pulse animate-duration-3000" />
+              <span>{locationName || t('locating')}</span>
+              <ChevronDown size={11} className="text-emerald-300/80" />
+            </button>
+
+            {streak > 0 && (
                 <div className="flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full text-xs font-bold border border-white/10">
                   <Flame size={14} className="text-orange-400" />
                   <span>{streak} {t('days_streak')}</span>
@@ -1345,19 +1567,161 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           </div>
 
           {hijriDate && (
-            <div className="flex flex-col items-center justify-center py-4 border-y-2 border-amber-500/20 bg-emerald-950/25 rounded-2xl relative">
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border border-amber-500/10 rotate-45 flex items-center justify-center">
-                <span className="w-1.5 h-1.5 bg-[#C59F60] rotate-45"></span>
+            <div className="space-y-4">
+              {/* 1. Symmetrical Celestial Header: Hijri + Moon stage + Live Clock */}
+              <div className="bg-emerald-950/40 rounded-3xl p-5 border border-[#C59F60]/20 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full pointer-events-none blur-xl"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-emerald-500/5 rounded-full pointer-events-none blur-lg"></div>
+                
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4 relative z-10 text-center md:text-right">
+                  {/* Right Side: Hijri details & Moon state */}
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-amber-500/10 rounded-2xl border border-amber-500/20 shadow-inner">
+                      {getMoonPhaseDetailsForFav(parseInt(hijriDate.day) + hijriOffset).svg}
+                    </div>
+                    <div>
+                      <h1 className="text-2xl font-black font-serif text-gold-gradient leading-tight flex items-center gap-1.5 justify-center md:justify-start">
+                        <span>{formatNum(((parseInt(hijriDate.day) + hijriOffset - 1 + 30) % 30) + 1)}</span>
+                        <span>{hijriDate.month.ar}</span>
+                        <span>{formatNum(hijriDate.year)} هـ</span>
+                      </h1>
+                      <p className="text-[11px] text-[#FEEDCE]/70 font-semibold mt-0.5">
+                        {hijriDate.weekday.ar} • {useEasternNumerals ? formatNum(gregorianDate) : gregorianDate}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Left Side: Live Ticking Clock */}
+                  <div className="bg-[#05110B] px-4 py-2 border border-emerald-900/40 rounded-2xl shadow-inner flex flex-col items-center">
+                    <div className="flex items-center gap-1 font-mono text-xl font-extrabold text-[#FEEDCE] tracking-wider">
+                      <Clock size={14} className="text-emerald-500 animate-pulse" />
+                      <span>{formatNum(currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }))}</span>
+                    </div>
+                    <span className="text-[9px] text-emerald-400/80 font-bold mt-1">تزامن حي للوقت ⏱️</span>
+                  </div>
+                </div>
+
+                {/* Spiritual Segment banner */}
+                <div className="mt-3.5 bg-emerald-950/60 p-3 rounded-2xl border border-[#C59F60]/10 text-right">
+                  <div className="flex items-center gap-1.5 text-xs font-serif font-black text-amber-300">
+                    <span>✨ الفترة الروحية الحالية: {getSpiritualSegment(currentTime).label}</span>
+                  </div>
+                  <p className="text-[10px] text-slate-300/90 mt-1 font-serif leading-relaxed">
+                    {getSpiritualSegment(currentTime).recommendation}
+                  </p>
+                </div>
+
+                {/* Premium Controls Row: numeral toggle, hijri calibrator, date converter toggles */}
+                <div className="mt-4 pt-3.5 border-t border-emerald-900/20 flex flex-wrap justify-center sm:justify-between items-center gap-3">
+                  {/* Numeral Switcher */}
+                  <button
+                    onClick={() => {
+                      const next = !useEasternNumerals;
+                      setUseEasternNumerals(next);
+                      localStorage.setItem('use_eastern_numerals', next ? 'true' : 'false');
+                      toast.success(next ? "تم تفعيل الأرقام العربية المشرقية ١٢٣ 🕌" : "تم تعيين الأرقام الغربية 123");
+                    }}
+                    className="bg-white/5 hover:bg-white/10 text-white/90 text-[10px] font-bold px-3 py-1.5 rounded-xl border border-white/5 active:scale-95 transition-all flex items-center gap-1"
+                  >
+                    <span>🔢 {useEasternNumerals ? "الأرْقام: مشرقية" : "الأرْقام: غربية"}</span>
+                  </button>
+
+                  {/* Hijri day calibration offset +/- adjuster */}
+                  <div className="flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-xl border border-white/5">
+                    <span className="text-[9px] text-[#FEEDCE]/90 font-serif font-bold ml-1">تعديل الهجري:</span>
+                    <button
+                      onClick={() => {
+                        const next = hijriOffset - 1;
+                        setHijriOffset(next);
+                        localStorage.setItem('hijri_offset', next.toString());
+                        toast.success("تم تأخير التقويم الهجري يوماً واحداً 🌒");
+                      }}
+                      className="p-1 text-slate-300 hover:text-white hover:bg-white/10 rounded-md active:scale-90"
+                      title="تأخير يوم"
+                    >
+                      <Minus size={10} />
+                    </button>
+                    <span className="text-xs font-black text-amber-400 select-none min-w-[20px] text-center">
+                      {hijriOffset > 0 ? `+${hijriOffset}` : hijriOffset}
+                    </span>
+                    <button
+                      onClick={() => {
+                        const next = hijriOffset + 1;
+                        setHijriOffset(next);
+                        localStorage.setItem('hijri_offset', next.toString());
+                        toast.success("تم تقديم التقويم الهجري يوماً واحداً 🌒");
+                      }}
+                      className="p-1 text-slate-300 hover:text-white hover:bg-white/10 rounded-md active:scale-90"
+                      title="تقديم يوم"
+                    >
+                      <Plus size={10} />
+                    </button>
+                    {hijriOffset !== 0 && (
+                      <button
+                        onClick={() => {
+                          setHijriOffset(0);
+                          localStorage.setItem('hijri_offset', '0');
+                          toast.success("تمت العودة للمزامنة التلقائية للتقويم الهجري ⚙️");
+                        }}
+                        className="text-[8px] text-emerald-400 hover:underline mr-1"
+                      >
+                        تصفير
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Expand Date Converter Toggle */}
+                  <button
+                    onClick={() => setIsConverterOpen(!isConverterOpen)}
+                    className={`text-[10px] font-bold px-3 py-1.5 rounded-xl border transition-all active:scale-95 flex items-center gap-1 ${
+                      isConverterOpen 
+                        ? 'bg-amber-400 text-emerald-950 border-amber-400' 
+                        : 'bg-white/5 hover:bg-white/10 text-white/90 border-white/5'
+                    }`}
+                  >
+                    <span>🔄 {isConverterOpen ? "إغلاق المحوّل" : "محوّل التاريخ"}</span>
+                  </button>
+                </div>
+
+                {/* Gregorian to Hijri Converter expanded section */}
+                {isConverterOpen && (
+                  <div className="mt-4 pt-4 border-t border-emerald-900/30 bg-[#05110B]/80 rounded-2xl p-4 border border-emerald-900/20 text-right space-y-3">
+                    <p className="text-[11px] text-[#E2C392] font-semibold flex items-center gap-1.5 justify-center">
+                      <span>📅 محوّل التاريخ الميلادي إلى التاريخ الهجري الدقيق</span>
+                    </p>
+                    
+                    <div className="flex flex-col sm:flex-row gap-2.5 items-center">
+                      <label className="text-[10px] text-slate-400 whitespace-nowrap">اختر تاريخاً ميلادياً:</label>
+                      <input
+                        type="date"
+                        value={converterGregorian}
+                        onChange={(e) => setConverterGregorian(e.target.value)}
+                        className="w-full bg-emerald-950/40 border border-emerald-900 text-[#FEEDCE] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-amber-500 text-center"
+                      />
+                    </div>
+
+                    {converterLoading && (
+                      <div className="flex justify-center items-center gap-1.5 text-[10px] text-amber-300 py-1 font-serif">
+                        <span className="w-2.5 h-2.5 rounded-full border border-amber-500 border-t-transparent animate-spin"></span>
+                        <span>جاري احتساب منزلة القمر ومطابقة التقاويم...</span>
+                      </div>
+                    )}
+
+                    {converterResult && !converterLoading && (
+                      <div className="bg-emerald-950/70 p-3 rounded-xl border border-emerald-900/40 text-center space-y-1 animate-fadeIn">
+                        <p className="text-[10px] text-[#C59F60] font-sans">التاريخ الهجري المقابل:</p>
+                        <p className="text-sm font-black text-amber-200 font-serif select-all">{converterResult}</p>
+                      </div>
+                    )}
+
+                    {!converterResult && !converterLoading && (
+                      <p className="text-[9px] text-slate-400 text-center font-serif">
+                        سيقوم النظام بمطابقة التاريخ المختار مع قاعدة بيانات التقويم الفلكية بشكل حي لضمان المطابقة الكاملة.
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
-              <div className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border border-amber-500/10 rotate-45 flex items-center justify-center">
-                <span className="w-1.5 h-1.5 bg-[#C59F60] rotate-45"></span>
-              </div>
-              <h1 className="text-3xl font-black font-serif mb-1 text-gold-gradient tracking-wide drop-shadow-sm">
-                {hijriDate.day} {hijriDate.month.ar} {hijriDate.year}
-              </h1>
-              <p className="text-[#FEEDCE]/80 text-xs font-semibold tracking-wide">
-                {hijriDate.weekday.ar} • {gregorianDate}
-              </p>
             </div>
           )}
 
@@ -1374,53 +1738,10 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
               </p>
             </div>
           </div>
-        </div>
       </motion.div>
 
 
-      {/* Spiritual First sanctuary mode switcher card */}
-      <motion.div
-        initial={{ y: 15, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1 }}
-        className="relative overflow-hidden rounded-[28px] bg-[#05110B] text-slate-100 border border-[#C59F60]/30 shadow-lg text-right p-5"
-      >
-        <div className="absolute top-0 left-0 w-32 h-32 bg-emerald-500/5 rounded-full -ml-8 -mt-8 pointer-events-none"></div>
-        <div className="flex gap-4 items-center">
-          <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex flex-shrink-0 items-center justify-center text-[#C59F60] border border-amber-500/20">
-            <span className="text-2xl animate-pulse">🌱</span>
-          </div>
-          <div className="space-y-1 flex-1">
-            <h3 className="text-sm font-black text-[#E2C392] font-serif leading-tight flex items-center gap-1.5">
-              <span>الوضع الروحي (روحانية أولاً) 📿</span>
-              <span className="text-[9px] bg-emerald-900 border border-emerald-800 text-emerald-400 font-sans font-extrabold px-1.5 py-0.5 rounded-full">جديد</span>
-            </h3>
-            <p className="text-[11px] text-slate-400 leading-relaxed font-sans">
-              أعد تصميم واجهتك لتركز فقط على أوراد طاعتك وقرآنك الملائم لساعة يومك الحالية، وتخلص من كافة عناصر التشتت.
-            </p>
-          </div>
-        </div>
-        <div className="flex justify-between items-center mt-4 pt-3 border-t border-emerald-950">
-          <button
-            onClick={() => onNavigate("trust-covenant")}
-            className="text-[11px] font-black text-amber-500/90 hover:underline flex items-center gap-1"
-          >
-            🔐 ميثاق الثقة والأمانة
-          </button>
-          
-          <button
-            onClick={() => {
-              localStorage.setItem("spiritualFirstModeEnabled", "true");
-              window.dispatchEvent(new Event("storage"));
-              window.dispatchEvent(new Event("spiritual-mode-change"));
-              toast.success("مرحباً بك في الروضة الروحية؛ تم تنظيف الواجهة لأجلك 🍃");
-            }}
-            className="px-5 py-2 text-xs font-black text-emerald-950 bg-gradient-to-r from-amber-400 to-[#C59F60] rounded-xl shadow-md cursor-pointer active:scale-95 transition-all"
-          >
-            تفـعيل الوضع الروحي 📿
-          </button>
-        </div>
-      </motion.div>
+
 
 
       {/* Custom Designed Notification Permission Banner */}
@@ -1930,25 +2251,25 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           <div className="w-14 h-14 rounded-[20px] bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-900/40 dark:to-emerald-800/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-sm group-hover:scale-105 group-active:scale-95 transition-all">
             <BookOpen size={24} strokeWidth={1.5} />
           </div>
-          <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">القرآن</span>
+          <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200">القرآن الكريم</span>
         </button>
         <button onClick={() => onNavigate("azkar")} className="flex flex-col items-center gap-2 group">
           <div className="w-14 h-14 rounded-[20px] bg-gradient-to-br from-amber-100 to-amber-50 dark:from-amber-900/30 dark:to-amber-950/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shadow-sm group-hover:scale-105 group-active:scale-95 transition-all">
             <Heart size={24} strokeWidth={1.5} />
           </div>
-          <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">الأذكار</span>
+          <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200">الأذكار الحصينة</span>
         </button>
         <button onClick={() => onNavigate("qibla")} className="flex flex-col items-center gap-2 group">
           <div className="w-14 h-14 rounded-[20px] bg-gradient-to-br from-teal-100 to-teal-50 dark:from-teal-900/40 dark:to-teal-800/20 flex items-center justify-center text-teal-600 dark:text-teal-400 shadow-sm group-hover:scale-105 group-active:scale-95 transition-all">
             <Compass size={24} strokeWidth={1.5} />
           </div>
-          <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">القبلة</span>
+          <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200">بوصلة القبلة</span>
         </button>
         <button onClick={() => onNavigate("tasbeeh")} className="flex flex-col items-center gap-2 group">
           <div className="w-14 h-14 rounded-[20px] bg-gradient-to-br from-yellow-100 to-yellow-50 dark:from-[#C59F60]/20 dark:to-[#9F793E]/10 flex items-center justify-center text-[#9F793E] dark:text-[#E5C185] shadow-sm group-hover:scale-105 group-active:scale-95 transition-all">
             <Activity size={24} strokeWidth={1.5} />
           </div>
-          <span className="text-[11px] font-bold text-slate-600 dark:text-slate-300">السبحة</span>
+          <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200">السبحة الإلكترونية</span>
         </button>
       </motion.div>
 
@@ -1982,42 +2303,42 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           <div className="w-8 h-8 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-amber-600 dark:text-amber-400">
             <Radio size={16} />
           </div>
-          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">الإذاعة</span>
+          <span className="text-[11px] font-bold text-slate-750 dark:text-slate-200">الإذاعة الإسلامية</span>
         </button>
 
         <button onClick={() => onNavigate("hadith")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
           <div className="w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900/40 flex items-center justify-center text-teal-600 dark:text-teal-400">
             <Quote size={16} />
           </div>
-          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">الحديث</span>
+          <span className="text-[11px] font-bold text-slate-750 dark:text-slate-200">الأحاديث النبوية</span>
         </button>
 
         <button onClick={() => onNavigate("names")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
           <div className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-900/40 flex items-center justify-center text-sky-600 dark:text-sky-400">
             <Heart size={16} />
           </div>
-          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">أسماء الله</span>
+          <span className="text-[11px] font-bold text-slate-750 dark:text-slate-200">أسماء الله الحسنى</span>
         </button>
 
         <button onClick={() => onNavigate("ruqyah")} className="flex-shrink-0 flex items-center gap-2 bg-white dark:bg-slate-900 pr-2 pl-4 py-2.5 rounded-full border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
           <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-900/40 flex items-center justify-center text-rose-600 dark:text-rose-400">
             <Activity size={16} />
           </div>
-          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">الرقية الشرعية</span>
+          <span className="text-[11px] font-bold text-slate-700 dark:text-slate-200">الرقية الشرعية المأثورة</span>
         </button>
 
         <button onClick={() => onNavigate("tajweed-education-hub")} className="flex-shrink-0 flex items-center gap-2 bg-gradient-to-r from-emerald-50 to-emerald-100 dark:from-emerald-950/40 dark:to-emerald-900/30 pr-2 pl-4 py-2.5 rounded-full border border-emerald-100 dark:border-emerald-900/30 shadow-sm hover:shadow-md transition-shadow">
           <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
             <span>🎓</span>
           </div>
-          <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300">مصحح التجويد والتعليم</span>
+          <span className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300">مصحح التلاوة والتجويد</span>
         </button>
 
         <button onClick={() => onNavigate("accessibility-hub")} className="flex-shrink-0 flex items-center gap-2 bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-950/40 dark:to-amber-900/30 pr-2 pl-4 py-2.5 rounded-full border border-amber-100 dark:border-amber-900/30 shadow-sm hover:shadow-md transition-shadow">
           <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600 dark:text-amber-400">
             <span>⚙️</span>
           </div>
-          <span className="text-[11px] font-bold text-amber-850 dark:text-amber-300">تسهيل الاستخدام وكبار السن</span>
+          <span className="text-[11px] font-bold text-amber-850 dark:text-amber-300">تسهيل الاستخدام للوالدين وكبار السن</span>
         </button>
       </motion.div>
 
@@ -2066,9 +2387,14 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             <span className="w-1.5 h-4 bg-emerald-500 rounded-full inline-block"></span>
             {t('prayer_times')}
           </h3>
-          <span className="text-xs font-bold text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-1 rounded-lg">
-             {locationName || "مكة المكرمة"}
-          </span>
+          <button 
+            type="button"
+            onClick={() => setLocationModalOpen(true)}
+            className="text-xs font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 px-3 py-1.5 rounded-xl transition-colors cursor-pointer flex items-center gap-1 shadow-xs"
+          >
+            <MapPin size={12} className="shrink-0" />
+            <span>{locationName || "مكة المكرمة"}</span>
+          </button>
         </div>
         <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/80 p-1.5 rounded-[24px] shadow-inner relative z-10 border border-slate-100 dark:border-slate-700/50">
           {prayersList.map((prayer) => {
@@ -2098,6 +2424,42 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         <div className="mt-3 text-[10px] text-center text-emerald-600/70 dark:text-emerald-400/70 font-medium flex items-center justify-center gap-1">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
           المصدر: Aladhan (معتمد للأوقات الشرعية)
+        </div>
+
+        {/* 🔔 قسم تذكيرات الصلوات الخمس */}
+        <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800/80 relative z-10 text-right">
+          <div className="flex items-center justify-between mb-3 px-1">
+            <span className="text-[12px] font-extrabold text-[#0D5C4D] dark:text-emerald-400 flex items-center gap-1.5">
+              <span className="flex h-1.5 w-1.5 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+              </span>
+              تفعيل التذكير بالأذان والإشعارات لكل فرض:
+            </span>
+          </div>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+            {prayersList.filter(p => p.id !== "Sunrise").map((prayer) => {
+              const isReminderEnabled = prayerReminders[prayer.id] !== false; // defaults to true
+              return (
+                <button
+                  key={prayer.id}
+                  type="button"
+                  onClick={() => toggleReminder(prayer.id)}
+                  className={`flex items-center justify-between p-3 rounded-2xl border transition-all cursor-pointer ${
+                    isReminderEnabled
+                      ? "bg-emerald-500/5 hover:bg-emerald-500/10 border-emerald-500/30 text-emerald-800 dark:text-emerald-300 shadow-xs scale-100"
+                      : "bg-slate-50 dark:bg-slate-800/55 hover:bg-slate-100/80 dark:hover:bg-slate-800 border-slate-100 dark:border-slate-800/60 text-slate-400 dark:text-slate-500"
+                  }`}
+                >
+                  <span className="text-xs font-bold leading-none">{prayer.name}</span>
+                  <div className={`p-1 rounded-lg shrink-0 ${isReminderEnabled ? 'bg-amber-400/20 text-amber-500' : 'bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500'}`}>
+                    {isReminderEnabled ? <Bell size={12} className="fill-current" /> : <BellOff size={12} />}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </motion.div>
 
@@ -2727,29 +3089,73 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
             {/* Search City Row */}
             <div className="space-y-2">
-              <span className="block text-[10px] font-black text-slate-400">ابحث عن مدينة إسلامية مشهورة:</span>
+              <span className="block text-[10px] font-black text-slate-400">ابحث عن أي مدينة أو قرية في العالم:</span>
               <div className="relative">
                 <Search size={13} className="absolute right-3 top-3 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="مثال: القاهرة، المدينة المنورة، القدس..."
+                  placeholder="مثال: القاهرة، مكة المكرمة، لندن، دبي..."
                   value={searchCityQuery}
                   onChange={(e) => setSearchCityQuery(e.target.value)}
                   className="w-full pl-3 pr-8 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 text-slate-800 dark:text-white rounded-xl text-xs focus:ring-1 focus:ring-emerald-500"
                 />
               </div>
 
-              {/* Grid of Cities */}
-              <div className="grid grid-cols-2 gap-2 max-h-36 overflow-y-auto pr-1">
-                {POPULAR_CITIES.filter(city => 
-                  city.name.includes(searchCityQuery) || 
-                  city.country.includes(searchCityQuery)
-                ).map(city => {
+              {isSearchingApi && (
+                <div className="text-center py-1 text-[10px] text-[#0D5C4D] dark:text-emerald-400 font-bold flex items-center justify-center gap-1 animate-pulse">
+                  <span className="w-2.5 h-2.5 rounded-full border border-current border-t-transparent animate-spin inline-block"></span>
+                  <span>جاري البحث في قاعدة البيانات العالمية...</span>
+                </div>
+              )}
+
+              {/* Grid of Cities (Hybrid) */}
+              <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+                {/* 1. Dynamic Geocoder Results */}
+                {apiSearchResults.length > 0 ? (
+                  apiSearchResults.map((city, idx) => {
+                    const dist = calculateDistanceToKaaba(city.lat, city.lon);
+                    const isSelected = locationName === city.name;
+                    return (
+                      <button
+                        key={`api-${city.name}-${idx}`}
+                        type="button"
+                        onClick={() => {
+                          updateLocation(city.lat, city.lon, city.name);
+                          setSearchCityQuery("");
+                          setApiSearchResults([]);
+                          setLocateState("success");
+                          setTimeout(() => {
+                            setLocateState("idle");
+                            setLocationModalOpen(false);
+                          }, 800);
+                        }}
+                        className={`p-2 rounded-xl border text-right transition-all text-[10px] font-black flex flex-col justify-between cursor-pointer ${
+                          isSelected 
+                            ? 'bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-inner scale-[0.98]' 
+                            : 'bg-emerald-50/20 dark:bg-emerald-950/10 border-emerald-100 dark:border-emerald-900/20 text-slate-700 dark:text-slate-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/20'
+                        }`}
+                      >
+                        <div className="flex justify-between items-center w-full">
+                          <span className="font-extrabold truncate max-w-[80px]">{city.name}</span>
+                          <span className="text-[7.5px] text-slate-400 font-normal truncate max-w-[65px]">{city.country}</span>
+                        </div>
+                        <span className="text-[8px] text-slate-400 mt-1">يبعد {dist.toLocaleString('ar-EG')} كم 🕋</span>
+                      </button>
+                    );
+                  })
+                ) : null}
+
+                {/* 2. Popular Cities Fallback/Defaults */}
+                {POPULAR_CITIES.filter(city => {
+                  if (!searchCityQuery.trim()) return true;
+                  return city.name.includes(searchCityQuery) || city.country.includes(searchCityQuery);
+                }).map(city => {
                   const dist = calculateDistanceToKaaba(city.lat, city.lon);
                   const isSelected = locationName === city.name;
                   return (
                     <button
-                      key={city.name}
+                      key={`pop-${city.name}`}
+                      type="button"
                       onClick={() => {
                         updateLocation(city.lat, city.lon, city.name);
                         setSearchCityQuery("");
@@ -2777,7 +3183,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             </div>
 
             {/* Custom Coordinates Inputs (Collapsible/Advanced) */}
-            <div className="pt-3.5 border-t border-slate-105 dark:border-slate-805/80 space-y-2">
+            <div className="pt-3.5 border-t border-slate-100 dark:border-slate-800/80 space-y-2">
               <span className="block text-[10px] font-black text-slate-400">إدخال إحداثيات مخصصة (متقدم):</span>
               <div className="grid grid-cols-2 gap-2">
                 <div>

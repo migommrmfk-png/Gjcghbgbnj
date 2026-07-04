@@ -629,7 +629,7 @@ export default function IslamicRadio({ onBack }: { onBack?: () => void }) {
             className={`whitespace-nowrap px-4 py-2.5 rounded-2xl text-xs font-serif font-bold transition-all border shrink-0 cursor-pointer ${
               selectedCategory === cat.id
                 ? "bg-[#0D5C4D] border-[#0D5C4D] text-white shadow-md shadow-emerald-900/10"
-                : "bg-white dark:bg-[#0A1914] border-slate-205 dark:border-emerald-950/40 text-slate-650 dark:text-emerald-300 hover:border-[#0D5C4D]/30"
+                : "bg-white dark:bg-[#0A1914] border-slate-200 dark:border-emerald-950/40 text-slate-600 dark:text-emerald-300 hover:border-[#0D5C4D]/30"
             }`}
           >
             {cat.label}
@@ -818,7 +818,7 @@ export default function IslamicRadio({ onBack }: { onBack?: () => void }) {
                   {/* Share current */}
                   <button
                     onClick={() => handleShare(currentStation)}
-                    className="p-2 hover:bg-white/10 rounded-full transition-all text-slate-205 cursor-pointer"
+                    className="p-2 hover:bg-white/10 rounded-full transition-all text-slate-200 cursor-pointer"
                     title="مشاركة المحطة"
                   >
                     <Share2 size={16} />

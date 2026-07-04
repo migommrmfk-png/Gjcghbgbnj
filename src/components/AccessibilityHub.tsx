@@ -289,7 +289,7 @@ export default function AccessibilityHub({ onBack }: AccessibilityHubProps) {
                     <span className="text-base shrink-0 mt-0.5 font-bold">🎙️</span>
                     <div>
                       <h5 className="font-bold text-[#C59F60] mb-0.5">تحويل التلاوة والخطب إلى نصوص مرئية (Speech-to-Text Support)</h5>
-                      <span className="text-slate-505 text-slate-550 dark:text-slate-350">
+                      <span className="text-slate-500 dark:text-slate-350">
                         تكامل مدمج يتيح تفريغ صوت المقاطع التلاوية في ريلز التطبيق أو الدروس الصوتية المسجلة ونقلها مكتوبة ومقروءة بوضوح على الشاشة مباشرة لخدمة الفئة السمعية.
                       </span>
                     </div>
@@ -424,7 +424,7 @@ export default function AccessibilityHub({ onBack }: AccessibilityHubProps) {
                         className={`text-[10px] font-bold px-3 py-1.5 rounded-full border transition-all ${
                           watchActiveTab === btn.id
                             ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 shadow-sm'
-                            : 'bg-white dark:bg-[#0A1914] border-slate-250 border-slate-200 dark:border-slate-850 text-slate-500'
+                            : 'bg-white dark:bg-[#0A1914] border-slate-200 dark:border-slate-800 text-slate-500'
                         }`}
                       >
                         {btn.label}

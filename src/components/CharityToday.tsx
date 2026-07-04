@@ -396,7 +396,7 @@ export default function CharityToday() {
                 {currentDeed.category}
               </span>
               
-              <p className="text-[12px] leading-relaxed text-slate-755 dark:text-slate-200 font-bold px-1.5 py-4 text-center">
+              <p className="text-[12px] leading-relaxed text-slate-700 dark:text-slate-200 font-bold px-1.5 py-4 text-center">
                 {currentDeed.text}
               </p>
 
@@ -428,7 +428,7 @@ export default function CharityToday() {
               {!isDone && (
                 <button
                   onClick={handleShuffle}
-                  className="p-3 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-705 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-400 hover:text-emerald-500 transition-colors"
+                  className="p-3 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-400 hover:text-emerald-500 transition-colors"
                   title="تغيير العمل"
                 >
                   <RefreshCw size={15} />
@@ -437,7 +437,7 @@ export default function CharityToday() {
 
               <button
                 onClick={shareDeed}
-                className="p-3 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-705 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-400 hover:text-emerald-500 transition-colors"
+                className="p-3 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-2xl text-slate-400 hover:text-emerald-500 transition-colors"
                 title="مشاركة"
               >
                 <Share2 size={15} />
@@ -500,7 +500,7 @@ export default function CharityToday() {
                   اقتراح موجه الذكاء الذكي
                 </span>
                 
-                <p className="text-[12px] leading-relaxed text-slate-755 dark:text-slate-100 font-bold">
+                <p className="text-[12px] leading-relaxed text-slate-700 dark:text-slate-100 font-bold">
                   {aiDeedText}
                 </p>
 
@@ -594,7 +594,7 @@ export default function CharityToday() {
                 savingsHistory.map((item) => (
                   <div key={item.id} className="flex justify-between items-center text-[10px] font-bold pt-1.5 first:pt-0">
                     <div className="text-right">
-                      <span className="text-slate-755 dark:text-slate-100 block font-serif">{item.note}</span>
+                      <span className="text-slate-700 dark:text-slate-100 block font-serif">{item.note}</span>
                       <span className="text-[8px] text-slate-400 block">{item.date}</span>
                     </div>
                     <div className="flex items-center gap-2">

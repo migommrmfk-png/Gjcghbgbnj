@@ -22,6 +22,10 @@ import {
   Mic,
   Bell,
   BookOpen,
+  Download,
+  Upload,
+  Clock,
+  ShieldAlert,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
@@ -47,13 +51,97 @@ export default function PrivacySettings({
     return localStorage.getItem("location_privacy_mode") || "manual"; // GPS vs manual (coarse/none)
   });
 
-  const [incognitoMode, setIncognitoMode] = useState<boolean>(() => {
-    return localStorage.getItem("incognito_spiritual_mode") === "true";
-  });
-
   const [maskStats, setMaskStats] = useState<boolean>(() => {
     return localStorage.getItem("mask_spiritual_stats") === "true";
   });
+
+  const [pinAutolockEnabled, setPinAutolockEnabled] = useState<boolean>(() => {
+    return localStorage.getItem("app_pin_background_autolock") === "true";
+  });
+
+  const [auditorTrigger, setAuditorTrigger] = useState<number>(0);
+
+  const handleToggleAutolock = (val: boolean) => {
+    setPinAutolockEnabled(val);
+    localStorage.setItem("app_pin_background_autolock", String(val));
+    if (val) {
+      toast.success("تم تفعيل القفل التلقائي عند مغادرة التطبيق أو إغلاق الشاشة 📱🔒");
+    } else {
+      toast.success("تم إلغاء القفل التلقائي عند مغادرة التطبيق");
+    }
+  };
+
+  const handleExportBackup = () => {
+    try {
+      const backupData: Record<string, string> = {};
+      const sensitiveKeys = ["app_pin_lock_code", "app_pin_lock_enabled", "app_pin_background_autolock"];
+      
+      Object.keys(localStorage).forEach((key) => {
+        // Skip security codes and session temp keys
+        if (sensitiveKeys.includes(key)) return;
+        
+        const value = localStorage.getItem(key);
+        if (value !== null) {
+          backupData[key] = value;
+        }
+      });
+
+      const wrapper = {
+        app: "AlYaqeen",
+        timestamp: new Date().toISOString(),
+        version: "3.5.0-privacy",
+        data: backupData
+      };
+
+      const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(wrapper, null, 2))}`;
+      const downloadAnchor = document.createElement("a");
+      downloadAnchor.setAttribute("href", jsonString);
+      downloadAnchor.setAttribute("download", `AlYaqeen_Offline_Backup_${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      
+      toast.success("تم تصدير نسخة احتياطية آمنة ومحلية بنجاح 💾📥");
+    } catch (err) {
+      toast.error("عذرًا، فشل تصدير البيانات المحلية.");
+    }
+  };
+
+  const handleImportBackup = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const parsed = JSON.parse(event.target?.result as string);
+        if (parsed.app !== "AlYaqeen" || !parsed.data) {
+          toast.error("الملف المرفوع غير صالح أو غير متوافق مع نسخة الأمان الخاصة بـ 'اليقين' ❌");
+          return;
+        }
+
+        const confirmRestore = window.confirm(
+          "هل تود استبدال كافة بياناتك الحالية بالبيانات المستوردة؟\nسيشمل هذا سور القرآن المقروءة وأوراد الأذكار وإحصائيات العبادات السابقة."
+        );
+        if (!confirmRestore) return;
+
+        // Restore keys to localStorage
+        Object.entries(parsed.data).forEach(([key, val]) => {
+          localStorage.setItem(key, val as string);
+        });
+
+        toast.success("تم استيراد واستعادة كافة بياناتك الروحية بنجاح! 🎉🔄");
+        setAuditorTrigger(prev => prev + 1);
+        
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } catch (err) {
+        toast.error("خطأ في قراءة ملف النسخة الاحتياطية المرفوعة 📑");
+      }
+    };
+    reader.readAsText(file);
+  };
 
   const [historyCleared, setHistoryCleared] = useState<boolean>(false);
   const [showPinSetup, setShowPinSetup] = useState<boolean>(false);
@@ -92,16 +180,6 @@ export default function PrivacySettings({
       toast.success("تم التحويل للوضع اليدوي: لن يتم طلب صلاحيات الـ GPS مطلقا 🌍");
     } else {
       toast.success("تم تفعيل وضع GPS: سيتم تحديث المواقيت بدقة عالية مع الحفاظ على خصوصية إحداثياتك محليا 🛰️");
-    }
-  };
-
-  const handleToggleIncognito = (val: boolean) => {
-    setIncognitoMode(val);
-    localStorage.setItem("incognito_spiritual_mode", String(val));
-    if (val) {
-      toast.success("الوضع الخفي نشط: لن يتم حفظ سجل تصفح الفهارس أو قراءات اليوم 🕶️");
-    } else {
-      toast.success("تم العودة للوضع العادي");
     }
   };
 
@@ -229,19 +307,42 @@ export default function PrivacySettings({
             </div>
 
             {pinEnabled && !showPinSetup && (
-              <div className="p-3.5 bg-indigo-500/5 border border-indigo-500/25 rounded-2xl flex items-center justify-between gap-3 text-xs">
-                <div className="flex items-center gap-2">
-                  <Key size={14} className="text-indigo-500" />
-                  <span className="font-medium text-slate-700 dark:text-indigo-300">
-                    الرمز السري الحالي الخاص بك: <strong className="font-mono tracking-widest bg-indigo-500/10 px-2 py-0.5 rounded">{appPin}</strong>
-                  </span>
+              <div className="space-y-3">
+                <div className="p-3.5 bg-indigo-500/5 border border-indigo-500/25 rounded-2xl flex items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2">
+                    <Key size={14} className="text-indigo-500" />
+                    <span className="font-medium text-slate-700 dark:text-indigo-300">
+                      الرمز السري الحالي الخاص بك: <strong className="font-mono tracking-widest bg-indigo-500/10 px-2 py-0.5 rounded">{appPin}</strong>
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setShowPinSetup(true)}
+                    className="text-[11px] font-black text-indigo-600 dark:text-indigo-400 underline hover:no-underline"
+                  >
+                    تعديل الرمز
+                  </button>
                 </div>
-                <button
-                  onClick={() => setShowPinSetup(true)}
-                  className="text-[11px] font-black text-indigo-600 dark:text-indigo-400 underline hover:no-underline"
-                >
-                  تعديل الرمز
-                </button>
+
+                {/* Autolock on background toggle */}
+                <div className="flex items-center justify-between p-3.5 bg-slate-50/50 dark:bg-[#07130F]/45 rounded-2xl border border-slate-100 dark:border-emerald-950/20">
+                  <div className="space-y-1">
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-slate-205 flex items-center gap-1">
+                      <Clock size={12} className="text-indigo-500" />
+                      <span>قفل تلقائي فوري بالخلفية</span>
+                    </h4>
+                    <p className="text-[10px] text-slate-500 dark:text-emerald-400">قفل التطبيق بالرمز السري تلقائياً وبسرية عند الخروج منه أو الانتقال لعلامة تبويب أخرى</p>
+                  </div>
+                  
+                  <label className="relative inline-flex items-center cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={pinAutolockEnabled}
+                      onChange={(e) => handleToggleAutolock(e.target.checked)}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 rounded-full peer peer-focus:ring-2 peer-focus:ring-indigo-500/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:width-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                  </label>
+                </div>
               </div>
             )}
 
@@ -349,37 +450,20 @@ export default function PrivacySettings({
           </div>
         </div>
 
-        {/* SECTION 3: INCOGNITO & STATS MASKING */}
+        {/* SECTION 3: STATS MASKING */}
         <div className="bg-white dark:bg-[#0A1914] rounded-3xl p-5 border border-slate-100 dark:border-emerald-950/40 shadow-sm space-y-4">
           <div className="flex items-center gap-2.5 mb-2 border-b border-slate-50 dark:border-emerald-950/20 pb-3">
             <div className="p-2 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl text-emerald-600 dark:text-emerald-400">
               <EyeOff size={18} />
             </div>
             <div>
-              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">الحماية والوضع الخفي الروحاني</h3>
-              <p className="text-[10px] text-slate-500">تمويه التواجد وحجب تاريخ النشاطات داخل البيئة العبادية</p>
+              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">تمويه التقارير والخصوصية البصرية</h3>
+              <p className="text-[10px] text-slate-500">حجب أرقام وإحصائيات العبادات بالكامل من لوحة التحكم</p>
             </div>
           </div>
 
           <div className="space-y-4">
             
-            {/* Setting: Incognito */}
-            <div className="flex items-center justify-between p-3.5 bg-slate-50/50 dark:bg-[#07130F]/45 rounded-2xl border border-slate-100 dark:border-emerald-950/20">
-              <div className="space-y-1">
-                <h4 className="text-xs font-bold text-slate-800 dark:text-slate-205">الوضع الروحاني الخفي (Incognito)</h4>
-                <p className="text-[10px] text-slate-500 dark:text-emerald-400">عدم تدوين سور التلاوة اليومية أو الفتاوى والبحث محلياً</p>
-              </div>
-              <label className="relative inline-flex items-center cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={incognitoMode}
-                  onChange={(e) => handleToggleIncognito(e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 rounded-full peer peer-focus:ring-2 peer-focus:ring-emerald-500/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:width-5 after:transition-all peer-checked:bg-emerald-650"></div>
-              </label>
-            </div>
-
             {/* Setting: Mask spiritual stats */}
             <div className="flex items-center justify-between p-3.5 bg-slate-50/50 dark:bg-[#07130F]/45 rounded-2xl border border-slate-100 dark:border-emerald-950/20">
               <div className="space-y-1">
@@ -524,6 +608,187 @@ export default function PrivacySettings({
             <div className="p-3 bg-[#C59F60]/10 border border-[#C59F60]/20 rounded-2xl text-[11px] text-amber-900 dark:text-amber-300 leading-normal text-center">
               🤝 <strong>عهد الأمان والسرية:</strong> لا نضع ملفات تتبع مستخدمين (Cookies of Tracking)، ولا نتقاضى مقابل مالي من بيع الإعلانات، ونحترم خصوصيتك كعبادة نتقرب بها إلى الله.
             </div>
+          </div>
+        </div>
+
+        {/* SECTION: OFFLINE BACKUP & RESTORE */}
+        <div className="bg-white dark:bg-[#0A1914] rounded-3xl p-5 border border-slate-100 dark:border-emerald-950/40 shadow-sm space-y-4 text-right">
+          <div className="flex items-center gap-2.5 mb-2 border-b border-slate-50 dark:border-emerald-950/20 pb-3">
+            <div className="p-2 bg-emerald-50 dark:bg-emerald-950/20 rounded-xl text-emerald-600 dark:text-emerald-400">
+              <Database size={18} />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">النسخ الاحتياطي والاستيراد الذاتي (Offline Backup)</h3>
+              <p className="text-[10px] text-slate-500">انقل تقدمك العبادي ومعدلات السبحة وموقيتك بين أجهزتك بطريقة آمنة بدون سيرفرات</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <p className="text-xs text-slate-500 leading-relaxed">
+              تطبيقنا يحترم خصوصيتك بالكامل. يمكنك تحميل نسخة كاملة من بياناتك وميزاتك في ملف مشفر محلياً بهاتفك أو كمبيوترك، أو استعادة نسخة سابقة في أي وقت بخصوصية 100%.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              {/* Export Button */}
+              <button
+                type="button"
+                onClick={handleExportBackup}
+                className="flex items-center justify-center gap-2 p-4 bg-emerald-500/10 hover:bg-emerald-500/15 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 rounded-2xl transition-all cursor-pointer font-black text-xs shadow-xs"
+              >
+                <Download size={16} />
+                <span>تصدير نسخة احتياطية محلية (.json)</span>
+              </button>
+
+              {/* Import Button Wrapper */}
+              <div className="relative flex items-center justify-center">
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={handleImportBackup}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                />
+                <div className="w-full flex items-center justify-center gap-2 p-4 bg-[#C59F60]/10 hover:bg-[#C59F60]/15 border border-[#C59F60]/25 text-[#7c6030] dark:text-[#E2C392] rounded-2xl transition-all font-black text-xs text-center">
+                  <Upload size={16} />
+                  <span>استيراد واستعادة نسخة سابقة</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION: STORAGE AUDITOR */}
+        <div className="bg-white dark:bg-[#0A1914] rounded-3xl p-5 border border-slate-100 dark:border-emerald-950/40 shadow-sm space-y-4 text-right">
+          <div className="flex items-center gap-2.5 mb-2 border-b border-slate-50 dark:border-emerald-950/20 pb-3">
+            <div className="p-2 bg-amber-50 dark:bg-amber-950/20 rounded-xl text-amber-600 dark:text-amber-400">
+              <ShieldAlert size={18} />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-sm text-slate-900 dark:text-slate-100">مفتش ومراجعة الذاكرة المحلية (Local Data Auditor)</h3>
+              <p className="text-[10px] text-slate-500">راقب بدقة حجم البيانات في كل زاوية من التطبيق وقم بحذف جزئي للخصوصية</p>
+            </div>
+          </div>
+
+          <p className="text-xs text-slate-500 leading-relaxed">
+            الشفافية في كنف الشريعة. نعرض لك هنا المساحات التفصيلية الدقيقة للبيانات التي يحتفظ بها جهازك الآن لتشغيل التطبيق. يمكنك مسح أي فرع بشكل محدد لتقليص الأثر الرقمي بالكامل:
+          </p>
+
+          <div className="space-y-3 pt-2">
+            {(() => {
+              const allKeys = Object.keys(localStorage);
+              
+              let quranSize = 0;
+              let worshipSize = 0;
+              let tasbeehSize = 0;
+              let prayerConfigSize = 0;
+              
+              allKeys.forEach(k => {
+                const val = localStorage.getItem(k) || "";
+                const bytes = val.length * 2; // rough estimate of bytes in UTF-16
+                if (k.startsWith('quran') || k === 'lastReadQuran' || k === 'quranLastRead') {
+                  quranSize += bytes;
+                } else if (k.startsWith('worship') || k.startsWith('prayersLog') || k.startsWith('consecutive') || k.startsWith('customHabits')) {
+                  worshipSize += bytes;
+                } else if (k.startsWith('tasbeeh') || k.startsWith('arabic_widget')) {
+                  tasbeehSize += bytes;
+                } else if (k.startsWith('prayer_reminder') || k.startsWith('adhan_sound') || k === 'userLocation' || k === 'locationName' || k === 'prayer_notifications_individual_config' || k === 'general_islamic_reminders_config') {
+                  prayerConfigSize += bytes;
+                }
+              });
+
+              const formatSize = (bytes: number) => {
+                if (bytes === 0) return "0 بايت";
+                if (bytes < 1024) return `${bytes} بايت`;
+                return `${(bytes / 1024).toFixed(2)} كيلوبايت (KB)`;
+              };
+
+              const categories = [
+                {
+                  id: "quran",
+                  title: "📖 سجل قراءة وختم المصحف الشريف",
+                  desc: "يشمل السورة والآية التي توقفت عندها وتواريخ قراءتك.",
+                  size: quranSize,
+                  clear: () => {
+                    const keys = ["quranLastRead", "lastReadQuran", "quran_reading_mode", "quran_reading_theme", "quran_reading_font_size", "quran_reciters_v2"];
+                    allKeys.forEach(k => {
+                      if (k.startsWith('quran')) keys.push(k);
+                    });
+                    keys.forEach(k => localStorage.removeItem(k));
+                    toast.success("تم تصفير سجل ومفضلات المصحف الشريف بنجاح ✨");
+                    setAuditorTrigger(prev => prev + 1);
+                  }
+                },
+                {
+                  id: "worship",
+                  title: "🕋 مفدكة التقويم والعبادات اليومية",
+                  desc: "ملفات تقييم الصلاة ونقاط التميز الروحية ومستويات الخشوع والتذلل.",
+                  size: worshipSize,
+                  clear: () => {
+                    const keys = ["worshipTrackerV2", "prayersLogToday_V2", "consecutiveFajr_V2", "customHabitsWorship_V2", "unlockedTitles_V2"];
+                    allKeys.forEach(k => {
+                      if (k.startsWith('worship_day_score_')) keys.push(k);
+                    });
+                    keys.forEach(k => localStorage.removeItem(k));
+                    toast.success("تم تطهير وتصفير مفكرة الصلوات والعبادات بالكامل 🧼");
+                    setAuditorTrigger(prev => prev + 1);
+                  }
+                },
+                {
+                  id: "tasbeeh",
+                  title: "📿 السبحة والعدادات والأذكار",
+                  desc: "عدادات الورد وحسنات التسبيح ومعدلات اليوم للسبحة الإلكترونية.",
+                  size: tasbeehSize,
+                  clear: () => {
+                    const keys = ["tasbeehCountV2", "tasbeehTargetV2", "tasbeehRoundsV2", "tasbeehZikrV2", "tasbeehSoundV2", "tasbeehVibrationV3", "tasbeehAutoSyncV1", "tasbeehHasanatV2", "tasbeehSayyiatErasedV2", "tasbeehSlaveFreesV2", "tasbeeh_daily_goal", "tasbeeh_daily_count", "tasbeeh_daily_date"];
+                    allKeys.forEach(k => {
+                      if (k.startsWith('tasbeehCount_') || k.startsWith('tasbeehRounds_') || k.startsWith('arabic_widget_')) keys.push(k);
+                    });
+                    keys.forEach(k => localStorage.removeItem(k));
+                    toast.success("تم إنهاء وتصفير عدادات السبحة بنجاح 🕊️");
+                    setAuditorTrigger(prev => prev + 1);
+                  }
+                },
+                {
+                  id: "prayer_config",
+                  title: "🔔 إعدادات الأوقات وتنبيهات الأذان والموقع",
+                  desc: "موقع المدينة المحفوظ لجدول مواقيت الأذان والقبلة وتفضيلات الصلاة المخصصة.",
+                  size: prayerConfigSize,
+                  clear: () => {
+                    const keys = ["userLocation", "locationName", "prayer_notifications_individual_config", "general_islamic_reminders_config", "autoAdhanEnabled", "calculationMethod", "asrMethod"];
+                    allKeys.forEach(k => {
+                      if (k.startsWith('prayer_reminder_') || k.startsWith('adhan_sound_')) keys.push(k);
+                    });
+                    keys.forEach(k => localStorage.removeItem(k));
+                    toast.success("تمت إعادة ضبط إعدادات وموقع الصلوات للأوضاع الافتراضية ⚙️");
+                    setAuditorTrigger(prev => prev + 1);
+                  }
+                }
+              ];
+
+              return categories.map((cat) => (
+                <div key={cat.id} className="p-3.5 bg-slate-50 dark:bg-[#07130F] flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-slate-100 dark:border-emerald-950/20 text-xs">
+                  <div className="space-y-1">
+                    <h4 className="font-extrabold text-slate-800 dark:text-slate-205">{cat.title}</h4>
+                    <p className="text-[10px] text-slate-400 max-w-sm leading-relaxed">{cat.desc}</p>
+                    <div className="flex items-center gap-1.5 pt-0.5 text-[9px] font-bold text-slate-500">
+                      <span>الحجم الحالي بالتخزين:</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-mono">{formatSize(cat.size)}</span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const confirmDeletion = window.confirm(`هل أنت متأكد من رغبتك في حذف بيانات "${cat.title}" بالكامل فقط وبقاء باقي الأكواد والبيانات الروحية؟`);
+                      if (confirmDeletion) {
+                        cat.clear();
+                      }
+                    }}
+                    className="shrink-0 p-2 px-3 bg-red-100 hover:bg-red-200 dark:bg-red-950/20 dark:hover:bg-red-950/40 text-red-750 dark:text-red-300 font-black text-[10px] rounded-xl transition-all cursor-pointer text-center sm:self-center"
+                  >
+                    تطهير هذا القسم 🧼
+                  </button>
+                </div>
+              ));
+            })()}
           </div>
         </div>
 

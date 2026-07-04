@@ -107,6 +107,35 @@
         }
       },
       "required": ["userId", "mood", "timestamp"]
+    },
+    "TasbeehCounter": {
+      "title": "Tasbeeh Counter",
+      "description": "Stores the user's tasbeeh count of specific zikr.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The unique identifier of the owner user."
+        },
+        "zikr": {
+          "type": "string",
+          "description": "The text content of the zikr."
+        },
+        "count": {
+          "type": "number",
+          "description": "The current count in the active loop."
+        },
+        "rounds": {
+          "type": "number",
+          "description": "The number of rounds completed."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when this was synced/updated."
+        }
+      },
+      "required": ["userId", "zikr", "count", "rounds", "updatedAt"]
     }
   },
   "firestore": {
@@ -115,6 +144,12 @@
         "$ref": "#/entities/User"
       },
       "description": "Stores user profiles."
+    },
+    "/users/{userId}/tasbeeh/{tasbeehId}": {
+      "schema": {
+        "$ref": "#/entities/TasbeehCounter"
+      },
+      "description": "Stores user's synchronized tasbeeh counters."
     },
     "/plans/{planId}": {
       "schema": {

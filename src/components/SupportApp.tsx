@@ -275,23 +275,23 @@ export default function SupportApp({ onBack }: { onBack?: () => void }) {
               {/* Faith Stat Metrics */}
               <div className="grid grid-cols-3 gap-3">
                 <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-3 rounded-2xl text-center shadow-xs">
-                  <span className="text-[10px] text-slate-400 font-bold block mb-1">نقاط الـ XP</span>
-                  <span className="text-xl font-black text-emerald-500 font-mono block">{currentXP}</span>
+                  <span className="text-[10px] text-slate-400 font-bold block mb-1">نقاط الإيمان XP</span>
+                  <span className="text-sm font-black text-emerald-600 dark:text-emerald-400 font-mono">{currentXP}</span>
                 </div>
                 <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-3 rounded-2xl text-center shadow-xs">
-                  <span className="text-[10px] text-slate-400 font-bold block mb-1">المستوى الروحي</span>
-                  <span className="text-xl font-black text-amber-500 font-mono block">{currentLevel}</span>
+                  <span className="text-[10px] text-slate-400 font-bold block mb-1">المرحلة الحالية</span>
+                  <span className="text-sm font-black text-blue-600 dark:text-blue-400 font-mono">{currentLevel}</span>
                 </div>
                 <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-3 rounded-2xl text-center shadow-xs">
-                  <span className="text-[10px] text-slate-400 font-bold block mb-1">سلسلة المتابعة</span>
-                  <span className="text-xl font-black text-rose-500 font-mono block">{userStreak} يوماً</span>
+                  <span className="text-[10px] text-slate-400 font-bold block mb-1">سلسلة الالتزام</span>
+                  <span className="text-sm font-black text-amber-600 dark:text-amber-400 font-mono">{userStreak} يوم</span>
                 </div>
               </div>
 
               {/* Progress to next level */}
-              <div className="bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 p-4 rounded-2xl shadow-xs">
+              <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-4 rounded-2xl shadow-xs">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-[11px] font-bold text-slate-400">الترقي للمرحلة التالية</span>
+                  <span className="text-[11px] font-bold text-slate-400 font-serif">الترقي للمرحلة التالية</span>
                   <span className="text-xs font-black text-emerald-500">{progressRatio}%</span>
                 </div>
                 <div className="w-full bg-slate-100 dark:bg-slate-950 h-2.5 rounded-full overflow-hidden">
@@ -300,46 +300,36 @@ export default function SupportApp({ onBack }: { onBack?: () => void }) {
                 <div className="mt-3 flex gap-2 items-start text-[11px] font-bold text-slate-500">
                   <Award size={14} className="text-amber-400 shrink-0 mt-0.5" />
                   <div>
-                    <span className="text-slate-850 dark:text-slate-205">لقبك الحالي: </span>
+                    <span className="text-slate-800 dark:text-slate-200">لقبك الحالي: </span>
                     <span className={`${levelInfo.color} underline`}>{levelInfo.title}</span>
                     <p className="text-[10px] text-slate-400 mt-1">{levelInfo.desc}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Faith Milestones Pathway */}
-              <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-5 shadow-xs">
-                <h3 className="text-sm font-bold font-serif mb-4 flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-emerald-500" />
-                  مراحل السمت الإسلامي
-                </h3>
-                <div className="relative pr-6 border-r-2 border-emerald-500/20 space-y-6">
-                  
-                  <div className="relative">
-                    <span className="absolute -right-[31px] top-0 w-4 h-4 bg-emerald-500 rounded-full border-4 border-white dark:border-slate-900 shadow-sm"></span>
-                    <span className="text-xs font-black block text-slate-800 dark:text-slate-100">درجة البناء التثقيفي</span>
-                    <p className="text-[10px] text-slate-400 leading-relaxed mt-0.5">قراءة 10 صفحات من القرآن الكريمة واستماع لإذاعة التلاوة.</p>
-                  </div>
-
+              {/* Faith Milestones */}
+              <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-5 rounded-3xl shadow-xs relative">
+                <h4 className="text-xs font-black text-slate-700 dark:text-slate-200 mb-4 font-serif">مراحل ومراتب البناء الإيماني</h4>
+                <div className="border-r-2 border-slate-100 dark:border-slate-800 pr-6 space-y-5">
                   <div className="relative opacity-70">
-                    <span className={`absolute -right-[31px] top-0 w-4 h-4 rounded-full border-4 border-white dark:border-slate-900 shadow-sm ${currentXP >= 200 ? 'bg-emerald-555' : 'bg-slate-300'}`}></span>
-                    <span className="text-xs font-black block text-slate-705 dark:text-slate-105">درجة الإحسان والذكر</span>
+                    <span className={`absolute -right-[31px] top-0.5 w-4 h-4 rounded-full border-4 border-white dark:border-slate-900 shadow-sm ${currentXP >= 200 ? 'bg-emerald-500' : 'bg-slate-300'}`}></span>
+                    <span className="text-xs font-black block text-slate-700 dark:text-slate-200">درجة الإحسان والذكر</span>
                     <p className="text-[10px] text-slate-400 leading-relaxed mt-0.5">وصول العداد اليومي للتسابيح إلى 300 تسبيحة مع الرقية الشرعية.</p>
                   </div>
 
                   <div className="relative opacity-60">
-                    <span className={`absolute -right-[31px] top-0 w-4 h-4 rounded-full border-4 border-white dark:border-slate-900 shadow-sm ${currentXP >= 500 ? 'bg-emerald-555' : 'bg-slate-350'}`}></span>
-                    <span className="text-xs font-black block text-slate-705 dark:text-slate-105">بذل العون والدعم التقني</span>
+                    <span className={`absolute -right-[31px] top-0.5 w-4 h-4 rounded-full border-4 border-white dark:border-slate-900 shadow-sm ${currentXP >= 500 ? 'bg-emerald-500' : 'bg-slate-300'}`}></span>
+                    <span className="text-xs font-black block text-slate-700 dark:text-slate-200">بذل العون والدعم التقني</span>
                     <p className="text-[10px] text-slate-400 leading-relaxed mt-0.5">المساهمة في إسعاد الأمة الإسلامية بتقديم اقتراح فني أو دعم للمبرمج.</p>
                   </div>
                 </div>
               </div>
 
               {/* Generate Certificate Section */}
-              <div className="bg-gradient-to-br from-amber-500/10 to-emerald-550/10 border border-amber-300/30 rounded-3xl p-5 text-center">
+              <div className="bg-gradient-to-br from-amber-500/10 to-emerald-500/10 border border-amber-300/30 rounded-3xl p-5 text-center">
                 <Award size={36} className="text-amber-500 mx-auto mb-2" />
-                <h3 className="text-base font-bold font-serif text-slate-800 dark:text-slate-105">استحقاق شهادة مسيرة اليقين الإيمانية</h3>
-                <p className="text-[10px] text-slate-450 leading-relaxed mb-4">
+                <h3 className="text-base font-bold font-serif text-slate-800 dark:text-slate-100">استحقاق شهادة مسيرة اليقين الإيمانية</h3>
+                <p className="text-[10px] text-slate-400 leading-relaxed mb-4">
                   تمنح هذه الشهادة الموقعة من الإشراف والمهندس محمد أحمد كتحفيز معنوي لالتزامك وبنائك السلوكي والروحي بالتطبيق.
                 </p>
                 <div className="space-y-3">

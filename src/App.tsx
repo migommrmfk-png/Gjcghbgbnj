@@ -108,6 +108,24 @@ function AppContent() {
     }
   }, [activeTab]);
 
+  // Handle auto-lock on background / tab change
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      const pinEnabled = localStorage.getItem("app_pin_lock_enabled") === "true";
+      const autolockEnabled = localStorage.getItem("app_pin_background_autolock") === "true";
+      
+      if (document.visibilityState === "hidden" && pinEnabled && autolockEnabled) {
+        sessionStorage.removeItem("app_session_unlocked");
+        setIsLocked(true);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+
   useEffect(() => {
     const locked = localStorage.getItem('currentPrayerLock');
     const snooze = localStorage.getItem('snoozeAdhanUntil');
@@ -443,7 +461,7 @@ function AppContent() {
         <div className="flex justify-around items-center h-full max-w-md mx-auto px-2">
           <NavItem
             icon={<Home />}
-            label={t('app_name') === "اليقين" ? "الرئيسية" : "Home"}
+            label={i18n.language === 'ar' || i18n.language === 'ur' ? "الرئيسية" : "Home"}
             isActive={activeTab === "home"}
             onClick={() => handleNavigate("home")}
           />
@@ -512,26 +530,30 @@ function NavItem({
       onClick={onClick}
       className={`relative flex items-center justify-center h-full flex-1 group ${
         isActive
-          ? "text-emerald-600 dark:text-emerald-400"
-          : "text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300"
+          ? "text-emerald-600 dark:text-emerald-400 font-extrabold"
+          : "text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300 font-medium"
       } transition-colors duration-300`}
     >
-      <div className="relative flex flex-col items-center gap-1.5">
+      <div className="relative flex flex-col items-center gap-1">
         {isActive && (
           <motion.div
             layoutId="nav-pill"
-            className="absolute inset-0 bg-emerald-50 dark:bg-emerald-900/40 rounded-[18px] w-14 h-14 -m-4 left-1/2 -ml-7 top-1/2 -mt-7 z-0"
+            className="absolute inset-0 bg-emerald-50 dark:bg-emerald-900/30 rounded-[20px] w-14 h-14 -m-4 left-1/2 -ml-7 top-1/2 -mt-7 z-0"
             transition={{ type: "spring", bounce: 0.25, duration: 0.5 }}
           />
         )}
         <div className="relative z-10 flex flex-col items-center gap-1">
           {React.cloneElement(icon as React.ReactElement<any>, {
-            size: isActive ? 24 : 22,
+            size: isActive ? 22 : 20,
             strokeWidth: isActive ? 2.5 : 2,
-            className: `transition-transform duration-300 ${isActive ? 'scale-110 drop-shadow-sm' : 'group-hover:scale-105'}`
+            className: `transition-transform duration-300 ${isActive ? 'scale-110 drop-shadow-xs' : 'group-hover:scale-105'}`
           })}
           <span
-            className={`text-[10px] font-bold transition-all duration-300 whitespace-nowrap ${isActive ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2 absolute bottom-0"}`}
+            className={`text-[9.5px] transition-all duration-300 whitespace-nowrap leading-none mt-0.5 ${
+              isActive 
+                ? "font-extrabold text-emerald-650 dark:text-emerald-300 drop-shadow-xs opacity-100 scale-100" 
+                : "font-semibold text-slate-400 dark:text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200 opacity-90 scale-95"
+            }`}
           >
             {label}
           </span>

@@ -15,9 +15,40 @@ import {
   Flame, 
   Bookmark, 
   Info,
-  CheckCircle
+  CheckCircle,
+  Cloud,
+  CloudOff,
+  RefreshCw,
+  LogIn
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { db, OperationType, handleFirestoreError } from '../firebase';
+import { doc, setDoc, onSnapshot, collection } from 'firebase/firestore';
+import { useAuth } from '../contexts/AuthContext';
+
+// Safe deterministic ID generation for each active task/zikr
+export const getZikrId = (text: string): string => {
+  const defaults = [
+    "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+    "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+    "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ، سُبْحَانَ اللَّهِ الْعَظِيمِ",
+    "أَسْتَغْفِرُ اللَّهَ وَأَتُوبُ إِلَيْهِ",
+    "لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ",
+    "سُبْحَانَ اللَّهِ",
+    "الْحَمْدُ لِلَّهِ",
+    "اللَّهُ أَكْبَرُ"
+  ];
+  const idx = defaults.indexOf(text);
+  if (idx !== -1) {
+    return `default_zikr_${idx}`;
+  }
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) {
+    hash = (hash << 5) - hash + text.charCodeAt(i);
+    hash |= 0;
+  }
+  return `custom_zikr_${Math.abs(hash)}`;
+};
 
 const AZKAR_WITH_REWARDS = [
   {
@@ -84,6 +115,8 @@ const AZKAR_WITH_REWARDS = [
 ];
 
 export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
+  const { user, logout } = useAuth();
+
   // Cumulative rewards stats persistent
   const [hasanatCredits, setHasanatCredits] = useState<number>(() => {
     return parseInt(localStorage.getItem('tasbeehHasanatV2') || '0', 10);
@@ -108,14 +141,34 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
     return localStorage.getItem('tasbeehZikrV2') || AZKAR_WITH_REWARDS[0].zikr;
   });
 
+  // Daily Goal & Cumulative Progress
+  const [dailyGoal, setDailyGoal] = useState<number>(() => {
+    return parseInt(localStorage.getItem('tasbeeh_daily_goal') || '1000', 10);
+  });
+  const [dailyCount, setDailyCount] = useState<number>(() => {
+    const savedDate = localStorage.getItem('tasbeeh_daily_date');
+    const today = new Date().toLocaleDateString('en-CA');
+    if (savedDate === today) {
+      return parseInt(localStorage.getItem('tasbeeh_daily_count') || '0', 10);
+    }
+    return 0;
+  });
+
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isZikrSelectOpen, setIsZikrSelectOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(() => {
     return localStorage.getItem('tasbeehSoundV2') !== 'false';
   });
-  const [vibrationPattern, setVibrationPattern] = useState<'short' | 'long' | 'none'>(() => {
-    return (localStorage.getItem('tasbeehVibrationV2') as any) || 'short';
+  const [vibrationPattern, setVibrationPattern] = useState<'short' | 'medium' | 'long' | 'double' | 'none'>(() => {
+    return (localStorage.getItem('tasbeehVibrationV3') as any) || 'short';
   });
+
+  // Firestore sync state
+  const [dbTasbeehs, setDbTasbeehs] = useState<Record<string, { count: number; rounds: number; updatedAt: string }>>({});
+  const [isAutoSyncEnabled, setIsAutoSyncEnabled] = useState(() => {
+    return localStorage.getItem('tasbeehAutoSyncV1') !== 'false';
+  });
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'syncing' | 'synced' | 'error'>('idle');
 
   // Modal reward popup
   const [activeRewardPopup, setActiveRewardPopup] = useState<{
@@ -131,18 +184,119 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
   const [tempTarget, setTempTarget] = useState(target.toString());
   const audioCtxRef = useRef<AudioContext | null>(null);
 
-  // Sync state to LocalStorage
+  const syncTimeoutRef = useRef<any>(null);
+  const progressSyncInitializedRef = useRef<Record<string, boolean>>({});
+
+  // Real-time Firestore synchronization subscription
   useEffect(() => {
+    if (!user || user.uid === 'local_guest') {
+      setDbTasbeehs({});
+      return;
+    }
+
+    const tasbeehCollectionRef = collection(db, 'users', user.uid, 'tasbeeh');
+    setSyncStatus('syncing');
+    
+    const unsubscribe = onSnapshot(tasbeehCollectionRef, (snapshot) => {
+      const dbData: Record<string, { count: number; rounds: number; updatedAt: string }> = {};
+      snapshot.forEach((doc) => {
+        dbData[doc.id] = doc.data() as any;
+      });
+      setDbTasbeehs(dbData);
+      setSyncStatus('synced');
+    }, (error) => {
+      console.error("Firestore onSnapshot subscription failed:", error);
+      setSyncStatus('error');
+      try {
+        handleFirestoreError(error, OperationType.LIST, `users/${user.uid}/tasbeeh`);
+      } catch (err) {}
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [user]);
+
+  // Loading specific counts from database on zikr selection or on initial load
+  useEffect(() => {
+    const zikrId = getZikrId(currentZikr);
+    if (!progressSyncInitializedRef.current[zikrId]) {
+      const dbData = dbTasbeehs[zikrId];
+      if (dbData) {
+        setCount(dbData.count);
+        setRounds(dbData.rounds);
+        progressSyncInitializedRef.current[zikrId] = true;
+      } else {
+        const localC = parseInt(localStorage.getItem(`tasbeehCount_${zikrId}`) || '0', 10);
+        const localR = parseInt(localStorage.getItem(`tasbeehRounds_${zikrId}`) || '1', 10);
+        setCount(localC);
+        setRounds(localR);
+        // If we don't have db data but local storage is empty, we consider it initialized to default 0/1
+        if (Object.keys(dbTasbeehs).length > 0 || user?.uid === 'local_guest') {
+          progressSyncInitializedRef.current[zikrId] = true;
+        }
+      }
+    }
+  }, [currentZikr, dbTasbeehs, user]);
+
+  // Save changes to LocalStorage instantly and handle per-zikr localStorage
+  useEffect(() => {
+    const zikrId = getZikrId(currentZikr);
+    localStorage.setItem(`tasbeehCount_${zikrId}`, count.toString());
+    localStorage.setItem(`tasbeehRounds_${zikrId}`, rounds.toString());
+
     localStorage.setItem('tasbeehCountV2', count.toString());
     localStorage.setItem('tasbeehTargetV2', target.toString());
     localStorage.setItem('tasbeehRoundsV2', rounds.toString());
     localStorage.setItem('tasbeehZikrV2', currentZikr);
     localStorage.setItem('tasbeehSoundV2', soundEnabled.toString());
-    localStorage.setItem('tasbeehVibrationV2', vibrationPattern);
+    localStorage.setItem('tasbeehVibrationV3', vibrationPattern);
+    localStorage.setItem('tasbeehAutoSyncV1', isAutoSyncEnabled.toString());
     localStorage.setItem('tasbeehHasanatV2', hasanatCredits.toString());
     localStorage.setItem('tasbeehSayyiatErasedV2', sayyiatErased.toString());
     localStorage.setItem('tasbeehSlaveFreesV2', slaveFrees.toString());
-  }, [count, target, rounds, currentZikr, soundEnabled, vibrationPattern, hasanatCredits, sayyiatErased, slaveFrees]);
+  }, [count, target, rounds, currentZikr, soundEnabled, vibrationPattern, isAutoSyncEnabled, hasanatCredits, sayyiatErased, slaveFrees]);
+
+  // Save daily goal changes to LocalStorage
+  useEffect(() => {
+    const today = new Date().toLocaleDateString('en-CA');
+    localStorage.setItem('tasbeeh_daily_goal', dailyGoal.toString());
+    localStorage.setItem('tasbeeh_daily_count', dailyCount.toString());
+    localStorage.setItem('tasbeeh_daily_date', today);
+  }, [dailyGoal, dailyCount]);
+
+  // Save to Firestore with a debounce to minimize writes and prevent wallet drain
+  const triggerFirestoreSync = (nextCount: number, nextRounds: number) => {
+    if (!user || user.uid === 'local_guest' || !isAutoSyncEnabled) return;
+    
+    setSyncStatus('syncing');
+    const zikrId = getZikrId(currentZikr);
+    
+    if (syncTimeoutRef.current) {
+      clearTimeout(syncTimeoutRef.current);
+    }
+    
+    syncTimeoutRef.current = setTimeout(async () => {
+      const path = `users/${user.uid}/tasbeeh/${zikrId}`;
+      try {
+        const docRef = doc(db, 'users', user.uid, 'tasbeeh', zikrId);
+        await setDoc(docRef, {
+          userId: user.uid,
+          zikr: currentZikr,
+          count: nextCount,
+          rounds: nextRounds,
+          updatedAt: new Date().toISOString()
+        });
+        setSyncStatus('synced');
+      } catch (error) {
+        console.error("Firestore write failed:", error);
+        setSyncStatus('error');
+        try {
+          handleFirestoreError(error, OperationType.WRITE, path);
+        } catch (err) {}
+      }
+    }, 1000); // 1 second debounce
+  };
 
   const playClickSound = () => {
     if (!soundEnabled) return;
@@ -158,20 +312,46 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
       const gainNode = audioCtx.createGain();
       oscillator.connect(gainNode);
       gainNode.connect(audioCtx.destination);
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(540, audioCtx.currentTime);
-      oscillator.frequency.exponentialRampToValueAtTime(120, audioCtx.currentTime + 0.04);
-      gainNode.gain.setValueAtTime(0.25, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+      
+      // Warm organic wood bead sound synthesis
+      oscillator.type = 'triangle';
+      oscillator.frequency.setValueAtTime(320, audioCtx.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.06);
+      
+      gainNode.gain.setValueAtTime(0.18, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+      
       oscillator.start();
-      oscillator.stop(audioCtx.currentTime + 0.04);
+      oscillator.stop(audioCtx.currentTime + 0.06);
     } catch (err) {}
   };
 
-  const executeVibration = () => {
-    if (navigator.vibrate && vibrationPattern !== 'none') {
-      if (vibrationPattern === 'short') navigator.vibrate(30);
-      else if (vibrationPattern === 'long') navigator.vibrate(100);
+  const executeVibration = (type?: 'count' | 'round') => {
+    if (!navigator.vibrate) return;
+    
+    if (type === 'round') {
+      // Robust victory vibration for matching a completed round
+      navigator.vibrate([100, 50, 100]);
+      return;
+    }
+    
+    if (vibrationPattern === 'none') return;
+    
+    switch (vibrationPattern) {
+      case 'short':
+        navigator.vibrate(30);
+        break;
+      case 'medium':
+        navigator.vibrate(60);
+        break;
+      case 'long':
+        navigator.vibrate(120);
+        break;
+      case 'double':
+        navigator.vibrate([40, 30, 40]);
+        break;
+      default:
+        navigator.vibrate(30);
     }
   };
 
@@ -189,6 +369,22 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
     const nextHasanatCredits = hasanatCredits + 1;
     setHasanatCredits(nextHasanatCredits);
 
+    // Daily target rollover & increment
+    const today = new Date().toLocaleDateString('en-CA');
+    const savedDate = localStorage.getItem('tasbeeh_daily_date');
+    let currentDailyCount = dailyCount;
+    if (savedDate !== today) {
+      currentDailyCount = 0;
+    }
+    const nextDailyCount = currentDailyCount + 1;
+    setDailyCount(nextDailyCount);
+
+    if (nextDailyCount === dailyGoal) {
+      toast.success("🎉 هنيئًا لك! لقد حققت هدفك اليومي للتسبيح بنجاح! 🏆", {
+        duration: 5000
+      });
+    }
+
     const nextCount = count + 1;
 
     // Standard matching reward triggers
@@ -201,9 +397,8 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
       setRounds(nextR);
 
       // Trigger heavy double vibration on round completes
-      if (navigator.vibrate) {
-        navigator.vibrate([100, 50, 100]);
-      }
+      executeVibration('round');
+      triggerFirestoreSync(0, nextR);
 
       // Check matched target reward completion popups
       if (matchedReward) {
@@ -235,6 +430,7 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
       }
     } else {
       setCount(nextCount);
+      triggerFirestoreSync(nextCount, rounds);
 
       // Check inside loop for specific landmark targets (e.g. hitting exactly 100 for Tawheed Du'a)
       if (nextCount === 100 && currentZikr === AZKAR_WITH_REWARDS[0].zikr) {
@@ -306,11 +502,12 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [count, target, rounds, soundEnabled, vibrationPattern, isEditingTarget, isSettingsOpen, isZikrSelectOpen, currentZikr, hasanatCredits, sayyiatErased, slaveFrees]);
+  }, [count, target, rounds, soundEnabled, vibrationPattern, isEditingTarget, isSettingsOpen, isZikrSelectOpen, currentZikr, hasanatCredits, sayyiatErased, slaveFrees, isAutoSyncEnabled]);
 
   const handleReset = () => {
     setCount(0);
     setRounds(1);
+    triggerFirestoreSync(0, 1);
     toast.success('تم تصفير كاونتر الجلسة الحالية');
   };
 
@@ -318,8 +515,19 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
     setCurrentZikr(zikrText);
     setTarget(newTarget);
     setTempTarget(newTarget.toString());
-    setCount(0);
-    setRounds(1);
+    
+    // Switch to target zikr state loaded from DB or local
+    const zikrId = getZikrId(zikrText);
+    if (dbTasbeehs[zikrId]) {
+      setCount(dbTasbeehs[zikrId].count);
+      setRounds(dbTasbeehs[zikrId].rounds);
+    } else {
+      const localC = parseInt(localStorage.getItem(`tasbeehCount_${zikrId}`) || '0', 10);
+      const localR = parseInt(localStorage.getItem(`tasbeehRounds_${zikrId}`) || '1', 10);
+      setCount(localC);
+      setRounds(localR);
+    }
+    
     setIsZikrSelectOpen(false);
   };
 
@@ -412,6 +620,203 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
           </div>
         </div>
 
+        {/* --- 🎯 Daily Tasbeeh Goal & Live Progress Bar --- */}
+        <div className="bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 rounded-[2.2rem] p-5 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-2xl shrink-0">
+                <Flame size={20} className={dailyCount >= dailyGoal ? "animate-bounce text-amber-500" : "animate-pulse"} />
+              </div>
+              <div className="text-right">
+                <span className="text-[10px] text-slate-400 font-extrabold block">الهدف اليومي للتسبيح</span>
+                <span className="text-xs font-black text-slate-700 dark:text-slate-200">إنجازك اليوم التقريبي للسبحة</span>
+              </div>
+            </div>
+            
+            {/* Goal adjustment selector */}
+            <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-950 px-3 py-1.5 rounded-2xl border border-black/5 dark:border-white/5 self-end sm:self-auto">
+              <button 
+                type="button"
+                onClick={() => setDailyGoal(prev => Math.max(100, prev - 100))}
+                className="w-7 h-7 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center font-black text-slate-600 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-black/5 dark:border-white/5 cursor-pointer text-sm"
+                title="تقليل الهدف اليومي"
+              >
+                -
+              </button>
+              <div className="flex flex-col items-center px-2">
+                <span className="text-sm font-bold font-mono text-emerald-600 dark:text-emerald-400 leading-none">{dailyGoal}</span>
+                <span className="text-[7.5px] text-slate-400 font-extrabold leading-none mt-1">تسبيحة</span>
+              </div>
+              <button 
+                type="button"
+                onClick={() => setDailyGoal(prev => prev + 100)}
+                className="w-7 h-7 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center font-black text-slate-600 dark:text-slate-350 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors border border-black/5 dark:border-white/5 cursor-pointer text-sm"
+                title="زيادة الهدف اليومي"
+              >
+                +
+              </button>
+            </div>
+          </div>
+
+          {/* Preset options */}
+          <div className="flex justify-start gap-1.5 pb-2 overflow-x-auto scrollbar-none pr-0.5">
+            {[100, 300, 500, 1000, 3000, 5000].map(val => (
+              <button
+                key={val}
+                type="button"
+                onClick={() => {
+                  setDailyGoal(val);
+                  toast.success(`تم ضبط هدفك اليومي الجديد: ${val} تسبيحة 🎯`);
+                }}
+                className={`text-[9.5px] font-black px-3 py-2 rounded-xl border transition-all cursor-pointer whitespace-nowrap ${
+                  dailyGoal === val
+                    ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm'
+                    : 'bg-slate-50 dark:bg-slate-950 border-black/5 dark:border-white/5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-900'
+                }`}
+              >
+                {val.toLocaleString('ar-EG')}
+              </button>
+            ))}
+          </div>
+
+          <div className="space-y-3 pt-1">
+            <div className="flex items-center justify-between text-xs font-bold font-sans">
+              <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                <span>تم إنجاز:</span>
+                <span className="text-slate-800 dark:text-white font-extrabold text-[14px] font-mono">{dailyCount.toLocaleString('ar-EG')}</span>
+                <span className="text-slate-400 font-normal">/ {dailyGoal.toLocaleString('ar-EG')}</span>
+              </span>
+
+              <span className={`px-2.5 py-1 rounded-xl text-[11px] font-extrabold font-mono ${
+                dailyCount >= dailyGoal 
+                  ? 'bg-amber-100 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400' 
+                  : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-650 dark:text-emerald-400'
+              }`}>
+                {Math.min(100, Math.round((dailyCount / dailyGoal) * 100))}%
+              </span>
+            </div>
+
+            {/* Glowing progress line */}
+            <div className="w-full h-3 bg-slate-100 dark:bg-slate-950 rounded-full overflow-hidden border border-black/5 dark:border-white/5 p-[2px] relative">
+              <motion.div 
+                className={`h-full rounded-full ${
+                  dailyCount >= dailyGoal
+                    ? 'bg-gradient-to-r from-amber-500 to-yellow-400 shadow-[0_0_10px_rgba(245,158,11,0.4)]'
+                    : 'bg-gradient-to-r from-emerald-500 to-teal-400 shadow-[0_0_10px_rgba(16,185,129,0.25)]'
+                }`}
+                initial={{ width: 0 }}
+                animate={{ width: `${Math.min(100, (dailyCount / dailyGoal) * 100)}%` }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
+              />
+            </div>
+
+            <div className="flex items-center justify-between pt-1 font-sans">
+              <span className="text-[10px] text-slate-400 font-bold leading-none">
+                {dailyCount >= dailyGoal 
+                  ? "🎉 الحمد لله! تجاوزت حد هدفك المقرر لليوم بنجاح." 
+                  : `متبقي ${Math.max(0, dailyGoal - dailyCount).toLocaleString('ar-EG')} تسبيحة للوصول غايتك.`}
+              </span>
+              {dailyCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const confirmReset = window.confirm("هل أنت متأكد من تصفير إنجاز التسبيح المقرر لليوم؟");
+                    if (confirmReset) {
+                      setDailyCount(0);
+                      toast.success("تم إعادة ضبط إنجاز اليوم 🧼");
+                    }
+                  }}
+                  className="text-[9.5px] font-black text-rose-500 dark:text-rose-450 hover:underline cursor-pointer"
+                >
+                  إعادة تعيين اليوم 🔄
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* --- Unified Cloud Synchronization Status Block --- */}
+        {user && user.uid !== 'local_guest' ? (
+          <div className="bg-white dark:bg-slate-900 border border-black/5 dark:border-white/5 rounded-3xl p-4 flex items-center justify-between shadow-xs">
+            <div className="flex items-center gap-2.5">
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                syncStatus === 'synced' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
+                syncStatus === 'syncing' ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400' :
+                'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+              }`}>
+                {syncStatus === 'syncing' ? (
+                  <RefreshCw size={17} className="animate-spin" />
+                ) : syncStatus === 'synced' ? (
+                  <Cloud size={17} />
+                ) : (
+                  <CloudOff size={17} />
+                )}
+              </div>
+              <div className="text-right">
+                <span className="text-[9.5px] text-slate-400 font-extrabold block">مزامنة السحاب الإيماني ☁️</span>
+                <span className="text-xs font-black text-slate-700 dark:text-slate-200">
+                  {syncStatus === 'syncing' ? 'جاري مزامنة تسبيحاتك سحابياً...' :
+                   syncStatus === 'synced' ? 'تسبيحاتك محفوظة ومؤمّنة سحابياً بأمان' :
+                   'فشل الاتصال بسيرفر المزامنة السحابية'}
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center">
+              <button
+                onClick={() => {
+                  const nextSync = !isAutoSyncEnabled;
+                  setIsAutoSyncEnabled(nextSync);
+                  if (nextSync) {
+                    toast.success("تم تفعيل المزامنة التلقائية سحابياً");
+                    triggerFirestoreSync(count, rounds);
+                  } else {
+                    toast.success("تم إيقاف المزامنة السحابية المؤقتة");
+                  }
+                }}
+                className={`text-[9px] font-extrabold px-2.5 py-1.5 rounded-xl border transition-all cursor-pointer ${
+                  isAutoSyncEnabled
+                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                    : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-500'
+                }`}
+              >
+                {isAutoSyncEnabled ? 'مزامنة تلقائية نشطة' : 'تفعيل الحفظ التلقائي'}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-gradient-to-br from-amber-500/5 to-orange-500/5 border border-amber-500/20 rounded-3xl p-4.5 text-right relative overflow-hidden shadow-xs">
+            <div className="absolute left-3 bottom-3 text-amber-500/10 pointer-events-none">
+              <CloudOff size={64} />
+            </div>
+            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div className="space-y-1.5 max-w-sm">
+                <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-black text-xs">
+                  <CloudOff size={14} />
+                  <span>التسبيح بصيغة زائر محلي 💾</span>
+                </div>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed font-sans font-medium">
+                  أنت تسخدم المسبحة بصيغة زائر. سجل حساباً مستقل كاملاً الآن لتأمين وحفظ جميع تسبيحاتك وأجورك من الضياع ونقلها لأي جهاز آخر لاحقاً! ✨
+                </p>
+              </div>
+              
+              <button
+                onClick={async () => {
+                  try {
+                    await logout();
+                    toast.success("يرجى إنشاء حساب لتفعيل مزامنة السحاب!");
+                  } catch (err) {
+                    toast.error("حدث خطأ أثناء الانتقال لصفحة التسجيل");
+                  }
+                }}
+                className="py-2 px-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-black rounded-lg text-[10px] flex items-center justify-center gap-1 shadow-xs active:scale-95 transition-all outline-none cursor-pointer self-start"
+              >
+                <LogIn size={11} />
+                <span>تسجيل حساب لتفعيل مزامنة السحاب</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* --- Active Zikr Select Card --- */}
         <div 
           onClick={() => setIsZikrSelectOpen(true)}
@@ -479,45 +884,131 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
             
             {/* Soft radiating visual rings */}
             <div className="absolute inset-0 rounded-full border border-emerald-500/10 dark:border-emerald-500/5 animate-pulse" />
-            <div className="absolute inset-4 rounded-full border border-emerald-500/10 dark:border-emerald-500/5" />
+            <div className="absolute inset-4 rounded-full border border-emerald-500/15 dark:border-emerald-500/10" />
             
-            {/* SVG circle stroke representation */}
-            <svg className="absolute inset-0 w-full h-full transform -rotate-90">
+            {/* Dynamic, interactive sliding beads rail */}
+            <motion.svg 
+              className="absolute inset-0 w-full h-full"
+              style={{ transformOrigin: "128px 128px" }}
+              animate={{ rotate: -90 + (count * (360 / 33)) }}
+              transition={{ type: "spring", stiffness: 35, damping: 14, mass: 1.4 }}
+            >
+              {/* Background circular guide track */}
               <circle
                 cx="128"
                 cy="128"
                 r="110"
-                className="stroke-slate-200 dark:stroke-slate-900 fill-transparent"
-                strokeWidth="8"
+                className="stroke-slate-200/50 dark:stroke-slate-900/80 fill-transparent"
+                strokeWidth="6"
               />
+              
+              {/* 33 High-fidelity glowing beads */}
+              {Array.from({ length: 33 }).map((_, i) => {
+                const angle = (i * 360) / 33;
+                const angleRad = (angle * Math.PI) / 180;
+                const r = 110;
+                const cx = 128 + r * Math.cos(angleRad);
+                const cy = 128 + r * Math.sin(angleRad);
+                
+                // Progress threshold calculation
+                const beadProgress = (count / target) * 33;
+                const isActive = i < beadProgress;
+                const isCurrent = i === Math.floor(beadProgress) % 33;
+
+                return (
+                  <g key={i}>
+                    {/* Active bead ambient bloom */}
+                    {isActive && (
+                      <circle
+                        cx={cx}
+                        cy={cy}
+                        r="10"
+                        className="fill-emerald-400/20 dark:fill-emerald-400/10 blur-[3px]"
+                      />
+                    )}
+                    
+                    {/* The physical-looking bead */}
+                    <motion.circle
+                      cx={cx}
+                      cy={cy}
+                      r={isCurrent ? 8 : 6.5}
+                      className="transition-colors duration-300"
+                      style={{
+                        fill: isActive 
+                          ? (isCurrent ? '#34d399' : '#10b981') 
+                          : '#475569',
+                        stroke: isActive 
+                          ? (isCurrent ? '#10b981' : '#047857') 
+                          : '#475569',
+                        strokeWidth: isCurrent ? 2 : 1,
+                        filter: isActive ? 'drop-shadow(0 0 3px rgba(16,185,129,0.4))' : 'none'
+                      }}
+                      animate={{
+                        scale: isCurrent ? 1.25 : 1,
+                      }}
+                      transition={{ type: "spring", stiffness: 100, damping: 10 }}
+                    />
+                    
+                    {/* Realistic pearl core-glow highlight */}
+                    <circle
+                      cx={cx - 1.8}
+                      cy={cy - 1.8}
+                      r={isCurrent ? 2.5 : 1.8}
+                      className="fill-white/40"
+                    />
+                  </g>
+                );
+              })}
+            </motion.svg>
+
+            {/* Seamlessly accurate outer goal indicator stroke */}
+            <svg className="absolute inset-0 w-full h-full transform -rotate-90 pointer-events-none">
               <motion.circle
                 cx="128"
                 cy="128"
-                r="110"
-                className="stroke-emerald-500 dark:stroke-emerald-400 fill-transparent"
-                strokeWidth="10"
-                strokeDasharray={`${2 * Math.PI * 110}`}
-                animate={{ strokeDashoffset: `${2 * Math.PI * 110 * (1 - count / target)}` }}
-                transition={{ duration: 0.15, ease: 'easeOut' }}
+                r="122"
+                className="stroke-emerald-500/40 dark:stroke-emerald-400/20 fill-transparent"
+                strokeWidth="2"
+                strokeDasharray={`${2 * Math.PI * 122}`}
+                animate={{ strokeDashoffset: `${2 * Math.PI * 122 * (1 - count / target)}` }}
+                transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
                 strokeLinecap="round"
               />
             </svg>
 
             {/* Tap/Click Activator Circular Panel */}
             <motion.button
-              onMouseDown={() => handlePressDown()}
-              onMouseUp={() => handlePressUp()}
-              onTouchStart={(e) => handlePressDown(e)}
-              onTouchEnd={() => handlePressUp()}
+              onPointerDown={(e) => {
+                if (e.button !== 0) return; // Only primary mouse clicks / touch
+                e.preventDefault();
+                e.stopPropagation();
+                handlePressDown();
+              }}
+              onPointerUp={() => setIsPressed(false)}
+              onPointerLeave={() => setIsPressed(false)}
               whileTap={{ scale: 0.94 }}
               className={`absolute w-48 h-48 rounded-full bg-gradient-to-b from-white to-slate-100 dark:from-slate-900 dark:to-slate-950 flex flex-col items-center justify-center border-4 border-slate-200/40 dark:border-slate-800/60 shadow-lg select-none outline-none cursor-pointer transition-colors ${
-                isPressed ? 'from-emerald-50 to-emerald-100/20 dark:from-emerald-950/20' : ''
+                isPressed ? 'from-emerald-50 to-emerald-100/20 dark:from-emerald-950/20 border-emerald-500/20' : ''
               }`}
             >
-              <span className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">اضغط للتسبيح</span>
-              <span className="text-6xl font-mono font-black text-slate-800 dark:text-slate-100 tabular-nums my-1 animate-fade-in pr-2">
-                {count}
-              </span>
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-extrabold tracking-widest uppercase font-serif">اضغط للتسبيح</span>
+              
+              {/* Popping animated counter display */}
+              <div className="h-16 flex items-center justify-center relative overflow-hidden w-full">
+                <AnimatePresence mode="popLayout">
+                  <motion.span
+                    key={count}
+                    initial={{ y: 15, opacity: 0, scale: 0.8 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                    exit={{ y: -15, opacity: 0, scale: 0.8 }}
+                    transition={{ type: "spring", stiffness: 140, damping: 14 }}
+                    className="absolute text-6xl font-mono font-black text-slate-800 dark:text-slate-100 tabular-nums pr-2"
+                  >
+                    {count}
+                  </motion.span>
+                </AnimatePresence>
+              </div>
+              
               <span className="text-xs text-emerald-500 font-bold bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/10">
                 {target - count} متبقي
               </span>
@@ -658,25 +1149,44 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
               </div>
 
               <div className="space-y-3">
-                {AZKAR_WITH_REWARDS.map((item, idx) => (
-                  <div
-                    key={idx}
-                    onClick={() => selectZikr(item.zikr, item.target)}
-                    className={`p-4 rounded-2xl border text-right cursor-pointer transition-all ${
-                      currentZikr === item.zikr
-                        ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500'
-                        : 'bg-slate-50 dark:bg-slate-950 border-black/5 dark:border-white/5 hover:border-emerald-500/20'
-                    }`}
-                  >
-                    <p className="font-serif font-black text-xs md:text-sm text-slate-800 dark:text-slate-100 leading-normal">
-                      {item.zikr}
-                    </p>
-                    <div className="flex justify-between items-center mt-2.5 pt-2 border-t border-black/5 dark:border-white/5 text-[9px] text-slate-400 font-extrabold pb-0.5">
-                      <span className="text-emerald-500">الهدف المفضل: {item.target} مرة</span>
-                      <span className="text-amber-500 font-black">{item.shortDesc}</span>
+                {AZKAR_WITH_REWARDS.map((item, idx) => {
+                  const itemZikrId = getZikrId(item.zikr);
+                  const itemDb = dbTasbeehs[itemZikrId];
+                  const itemLocalCount = parseInt(localStorage.getItem(`tasbeehCount_${itemZikrId}`) || '0', 10);
+                  const itemLocalRounds = parseInt(localStorage.getItem(`tasbeehRounds_${itemZikrId}`) || '1', 10);
+                  
+                  const hasDb = !!itemDb;
+                  const displayCount = itemDb ? itemDb.count : itemLocalCount;
+                  const displayRounds = itemDb ? itemDb.rounds : itemLocalRounds;
+
+                  return (
+                    <div
+                      key={idx}
+                      onClick={() => selectZikr(item.zikr, item.target)}
+                      className={`p-4 rounded-3xl border text-right cursor-pointer transition-all relative overflow-hidden ${
+                        currentZikr === item.zikr
+                          ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500 shadow-xs'
+                          : 'bg-slate-50 dark:bg-slate-950 border-black/5 dark:border-white/5 hover:border-emerald-500/20'
+                      }`}
+                    >
+                      {/* Synced Cloud progress indicator label for each item */}
+                      {(displayRounds > 1 || displayCount > 0) && (
+                        <div className="absolute left-3 top-3 flex items-center gap-1.5 px-2 py-1 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[8px] font-extrabold antialiased">
+                          {hasDb && <Cloud size={10} />}
+                          <span>الجولة {displayRounds} • {displayCount} تسبيحة</span>
+                        </div>
+                      )}
+
+                      <p className="font-serif font-black text-xs md:text-sm text-slate-800 dark:text-slate-100 leading-relaxed pl-24 pt-2">
+                        {item.zikr}
+                      </p>
+                      <div className="flex justify-between items-center mt-2.5 pt-2 border-t border-black/5 dark:border-white/5 text-[9px] text-slate-400 font-extrabold pb-0.5">
+                        <span className="text-emerald-500 font-black">الهدف المفضل: {item.target} مرة</span>
+                        <span className="text-amber-500 font-extrabold">{item.shortDesc}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </motion.div>
           </div>
@@ -730,32 +1240,40 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
                 </div>
 
                 {/* Vibration parameters */}
-                <div className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-950 rounded-2xl">
+                <div className="flex flex-col gap-2 p-3 bg-slate-50 dark:bg-slate-950 rounded-2xl text-right">
                   <div>
-                    <span className="block text-xs font-black text-slate-700 dark:text-slate-200">الاهتزاز اللمسي الذكي</span>
-                    <span className="text-[9px] text-slate-400 block mt-0.5">تقديم ردة اهتزاز عند كل تسبيحة وهدف</span>
+                    <span className="block text-xs font-black text-slate-700 dark:text-slate-200">الاهتزاز اللمسي الذكي للجهاز 📱</span>
+                    <span className="text-[9px] text-slate-400 block mt-0.5">تقديم ردة اهتزاز متنوعة عند كل نقرة (تستلزم الجوال)</span>
                   </div>
-                  <div className="flex gap-1.5">
-                    {(['short', 'long', 'none'] as const).map(pattern => (
+                  <div className="flex flex-wrap gap-1.5 mt-1">
+                    {(['short', 'medium', 'long', 'double', 'none'] as const).map(pattern => (
                       <button
                         key={pattern}
-                        onClick={() => setVibrationPattern(pattern)}
-                        className={`text-[9px] font-extrabold px-2.5 py-1.5 rounded-lg border transition-all cursor-pointer ${
+                        onClick={() => {
+                          setVibrationPattern(pattern);
+                          if (navigator.vibrate) {
+                            if (pattern === 'short') navigator.vibrate(30);
+                            else if (pattern === 'medium') navigator.vibrate(60);
+                            else if (pattern === 'long') navigator.vibrate(120);
+                            else if (pattern === 'double') navigator.vibrate([40, 30, 40]);
+                          }
+                        }}
+                        className={`text-[9px] font-extrabold px-2 py-1.5 rounded-lg border transition-all cursor-pointer ${
                           vibrationPattern === pattern
                             ? 'bg-emerald-500 border-emerald-500 text-white shadow-xs'
                             : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-450'
                         }`}
                       >
-                        {pattern === 'short' ? 'ناعم' : pattern === 'long' ? 'عميق' : 'إعطال'}
+                        {pattern === 'short' ? 'ناعم ⚡' : pattern === 'medium' ? 'متوسط ✨' : pattern === 'long' ? 'عميق 💥' : pattern === 'double' ? 'نبضتان 🔄' : 'تعطيل ❌'}
                       </button>
                     ))}
                   </div>
                 </div>
 
                 {/* Warning / caution on accumulated counters */}
-                <div className="p-3.5 bg-yellow-500/10 border border-yellow-500/20 rounded-2xl text-right">
-                  <p className="text-[9px] text-yellow-600 dark:text-yellow-400 leading-normal font-bold">
-                    ⚠️ تتم جميع الحسابات للأجور التراكمية وسجلاتك الإيمانية محلياً بالكامل على متصفحك وسيرفرك لأجل التسهيل، ونأمل أن يتقبل الله منا ومنكم صالح الأعمال ويعفو عنا بمنّه الواسع.
+                <div className="p-3.5 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl text-right">
+                  <p className="text-[9px] text-emerald-600 dark:text-emerald-400 leading-normal font-bold">
+                    ✨ يتم حفظ ومزامنة جميع الأجور التراكمية وسجلاتك الإيمانية سحابياً مع قاعدة البيانات عند تسجيل الدخول، ومحلياً على متصفحك عند الدخول كزائر لراحتك. يتقبل الله منا ومنكم.
                   </p>
                 </div>
               </div>

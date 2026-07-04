@@ -184,6 +184,16 @@ service cloud.firestore {
              data.isAnonymous is bool;
     }
 
+    function isValidTasbeeh(data) {
+      return hasOnlyAllowedFields(['userId', 'zikr', 'count', 'rounds', 'updatedAt']) &&
+             hasRequiredFields(['userId', 'zikr', 'count', 'rounds', 'updatedAt']) &&
+             data.userId == request.auth.uid &&
+             data.zikr is string && data.zikr.size() <= 1000 &&
+             data.count is number && data.count >= 0 &&
+             data.rounds is number && data.rounds >= 0 &&
+             isValidDateString(data.updatedAt);
+    }
+
     // ===============================================================
     // Rules
     // ===============================================================
@@ -217,6 +227,12 @@ service cloud.firestore {
 
       match /notifications/{notifId} {
         allow read, write: if isOwner(userId) || isAdmin();
+      }
+
+      match /tasbeeh/{tasbeehId} {
+        allow read: if isOwner(userId) || isAdmin();
+        allow create, update: if isOwner(userId) && isValidTasbeeh(request.resource.data);
+        allow delete: if isOwner(userId) || isAdmin();
       }
     }
 

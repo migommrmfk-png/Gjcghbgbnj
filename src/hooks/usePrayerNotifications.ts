@@ -48,6 +48,9 @@ export const usePrayerNotifications = (onPrayerTime: (prayerName: string, time: 
         const timeStr = prayerTimes[prayer.id as keyof typeof prayerTimes];
         if (!timeStr) continue;
 
+        const isPrayerReminderEnabled = localStorage.getItem(`prayer_reminder_enabled_${prayer.id}`) !== 'false';
+        if (!isPrayerReminderEnabled) continue;
+
         // Extract HH:MM from API time (e.g. "05:30 (EEST)" -> "05:30")
         const cleanTimeStr = timeStr.split(' ')[0];
 
