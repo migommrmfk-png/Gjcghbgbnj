@@ -844,6 +844,39 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
   const padZero = (n: number) => n < 10 ? `0${n}` : `${n}`;
 
+  const getSpecialHijriDay = (dayNum: number, monthName: string) => {
+    const day = ((dayNum - 1 + 30) % 30) + 1;
+    const m = monthName || "";
+    if (m.includes("رمضان")) {
+      return "شهر رمضان المبارك 🌙 (صيام الفريضة والقيام)";
+    }
+    if (day === 13 || day === 14 || day === 15) {
+      return "الأيام البيض المباركة 🌟 (يُسنّ صيامها للثواب الجزيل)";
+    }
+    if (day === 9 && m.includes("حجة")) {
+      return "يوم عرفة العظيم 🕋 (صيام يكفّر سنتين ويستجاب فيه الدعاء)";
+    }
+    if (day === 10 && m.includes("حجة")) {
+      return "عيد الأضحى المبارك 🎉 (تقبل الله طاعاتكم وكل عام وأنتم بخير)";
+    }
+    if (day === 1 && m.includes("شوال")) {
+      return "عيد الفطر المبارك 🎉 (تقبل الله طاعتكم وعيدكم مبارك)";
+    }
+    if (day === 10 && m.includes("محرم")) {
+      return "يوم عاشوراء المبارك 🕊️ (يُسنّ صيامه لتكفير السنة الماضية)";
+    }
+    if (day === 1 && m.includes("محرم")) {
+      return "رأس السنة الهجرية الجديدة 🚀 (عام هجري سعيد ومبارك)";
+    }
+    if (day === 29 || day === 30) {
+      return "ترقّب هلال الشهر الهجري الجديد 🌒";
+    }
+    if (day === 1) {
+      return "غرة الشهر الهجري الجديد 🌱 (جعله الله شهراً مباركاً)";
+    }
+    return "يوم مبارك عامر بالذكر والعمل الصالح والصلوات 🌱";
+  };
+
   const getSpiritualSegment = (date: Date) => {
     const hrs = date.getHours();
     if (hrs >= 22 || hrs < 3) return { label: "ثلث الليل الأخير 🌌", recommendation: "صلاة قيام الليل والوتر والذكر المستجاب" };
@@ -1566,164 +1599,356 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             </div>
           </div>
 
-          {hijriDate && (
-            <div className="space-y-4">
-              {/* 1. Symmetrical Celestial Header: Hijri + Moon stage + Live Clock */}
-              <div className="bg-emerald-950/40 rounded-3xl p-5 border border-[#C59F60]/20 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full pointer-events-none blur-xl"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-emerald-500/5 rounded-full pointer-events-none blur-lg"></div>
-                
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4 relative z-10 text-center md:text-right">
-                  {/* Right Side: Hijri details & Moon state */}
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-amber-500/10 rounded-2xl border border-amber-500/20 shadow-inner">
-                      {getMoonPhaseDetailsForFav(parseInt(hijriDate.day) + hijriOffset).svg}
+          {hijriDate && (() => {
+            const day = parseInt(hijriDate.day) + hijriOffset;
+            const monthName = hijriDate.month.ar;
+            const specialMsg = getSpecialHijriDay(day, monthName);
+            
+            // Calculate sun/moon trajectory coords
+            const hours = currentTime.getHours();
+            const minutes = currentTime.getMinutes();
+            const totalMins = hours * 60 + minutes;
+            const progress = totalMins / (24 * 60); // 0 to 1
+            
+            // Parabolic track coordinates
+            const px = 15 + progress * 170; // map to SVG width of 200
+            const py = 85 - Math.sin(progress * Math.PI) * 60; // Peak at y=25
+            const celestial = { x: px, y: py, progress };
+            const isDay = hours >= 6 && hours < 18;
+
+            const prayerCheckpoints = [
+              { id: "Fajr", name: "الفجر" },
+              { id: "Dhuhr", name: "الظهر" },
+              { id: "Asr", name: "العصر" },
+              { id: "Maghrib", name: "المغرب" },
+              { id: "Isha", name: "العشاء" }
+            ];
+
+            const parsedPrayerProgressList = prayerCheckpoints.map(pc => {
+              const timeStr = prayerTimes?.[pc.id as keyof typeof prayerTimes];
+              if (!timeStr) return null;
+              const [h, m] = timeStr.split(':').map(Number);
+              const prg = (h * 60 + m) / (24 * 60);
+              const cx = 15 + prg * 170;
+              const cy = 85 - Math.sin(prg * Math.PI) * 60;
+              return { ...pc, x: cx, y: cy, time: timeStr, progress: prg };
+            }).filter((item): item is NonNullable<typeof item> => item !== null);
+
+            return (
+              <div className="space-y-4">
+                {/* Premium Luxury Celestial Header */}
+                <div className="bg-gradient-to-br from-emerald-950/80 via-[#031d16]/75 to-slate-950/90 rounded-[32px] p-6 border border-[#C59F60]/20 shadow-2xl relative overflow-hidden">
+                  {/* Subtle arabesque grid background */}
+                  <div className="absolute inset-0 opacity-[0.03] bg-[radial-gradient(#C59F60_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none"></div>
+                  <div className="absolute top-0 right-0 w-36 h-36 bg-amber-500/5 rounded-full pointer-events-none blur-2xl"></div>
+                  <div className="absolute bottom-0 left-0 w-28 h-28 bg-emerald-500/5 rounded-full pointer-events-none blur-xl"></div>
+                  
+                  {/* Special Hijri Day Banner */}
+                  <div className="mb-4 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border-r-4 border-amber-500/60 px-4 py-2.5 rounded-l-2xl rounded-r-md flex items-center justify-between gap-3 text-right relative z-10">
+                    <span className="text-xs font-serif font-black text-amber-200">
+                      ✨ {specialMsg}
+                    </span>
+                    <span className="text-[9px] bg-amber-950/60 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full font-bold flex-shrink-0">
+                      مناسبة اليوم
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10 items-center">
+                    {/* Calendar & Clock Column (lg:col-span-7) */}
+                    <div className="lg:col-span-7 flex flex-col sm:flex-row items-center justify-between gap-5 bg-black/30 p-5 rounded-2xl border border-white/5 w-full">
+                      {/* Calendar block */}
+                      <div className="flex items-center gap-4 text-right w-full sm:w-auto">
+                        <div className="p-3 bg-amber-500/10 rounded-2xl border border-amber-500/20 shadow-inner flex-shrink-0">
+                          {getMoonPhaseDetailsForFav(parseInt(hijriDate.day) + hijriOffset).svg}
+                        </div>
+                        <div>
+                          <h1 className="text-2xl font-black font-serif text-gold-gradient leading-none flex items-center gap-1.5 justify-start">
+                            <span>{formatNum(((parseInt(hijriDate.day) + hijriOffset - 1 + 30) % 30) + 1)}</span>
+                            <span>{hijriDate.month.ar}</span>
+                            <span>{formatNum(hijriDate.year)} هـ</span>
+                          </h1>
+                          <p className="text-xs text-[#FEEDCE]/80 font-bold mt-2 flex items-center gap-2">
+                            <span className="bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-lg border border-emerald-500/10">
+                              {hijriDate.weekday.ar}
+                            </span>
+                            <span className="text-slate-300">
+                              {useEasternNumerals ? formatNum(gregorianDate) : gregorianDate} م
+                            </span>
+                          </p>
+                          <p className="text-[10px] text-slate-400 mt-1 font-serif">
+                            منزلة القمر: {getMoonPhaseDetailsForFav(parseInt(hijriDate.day) + hijriOffset).name}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Mechanical Ticking Clock Block */}
+                      <div className="relative w-28 h-28 flex items-center justify-center flex-shrink-0">
+                        {/* Rotating Second Ring */}
+                        <svg width="112" height="112" viewBox="0 0 112 112" className="absolute inset-0 pointer-events-none transform -rotate-90">
+                          <circle
+                            cx="56"
+                            cy="56"
+                            r="50"
+                            fill="none"
+                            stroke="rgba(245,158,11,0.03)"
+                            strokeWidth="2"
+                          />
+                          <circle
+                            cx="56"
+                            cy="56"
+                            r="50"
+                            fill="none"
+                            stroke="url(#clock-sec-ring-gradient)"
+                            strokeWidth="3.5"
+                            strokeDasharray="314.16"
+                            strokeDashoffset={314.16 - (currentTime.getSeconds() / 60) * 314.16}
+                            strokeLinecap="round"
+                            className="transition-all duration-300 drop-shadow-[0_0_4px_rgba(245,158,11,0.3)]"
+                          />
+                          <defs>
+                            <linearGradient id="clock-sec-ring-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#f59e0b" />
+                              <stop offset="50%" stopColor="#fbbf24" />
+                              <stop offset="100%" stopColor="#10b981" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                        
+                        {/* Glowing center indicator */}
+                        <div className="absolute w-[90px] h-[90px] rounded-full bg-[#03130d] border border-emerald-500/20 shadow-2xl flex flex-col items-center justify-center">
+                          <span className="text-xl font-mono font-black text-[#FEEDCE] tracking-wider leading-none">
+                            {formatNum(currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }))}
+                          </span>
+                          <div className="flex items-center gap-1 mt-1">
+                            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping"></span>
+                            <span className="text-[10px] font-mono text-emerald-400 font-extrabold">
+                              {formatNum(currentTime.toLocaleTimeString([], { second: '2-digit' }))}
+                            </span>
+                          </div>
+                          <span className="text-[8px] text-slate-400 font-serif mt-1 font-bold">تزامن حي ⏱️</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Astronomical Day Trajectory Column (lg:col-span-5) */}
+                    <div className="lg:col-span-5 bg-black/30 p-5 rounded-2xl border border-white/5 flex flex-col justify-center items-center w-full">
+                      <span className="text-[10px] text-amber-200/90 font-serif font-black mb-2.5 block text-center w-full">
+                        مسار حركة الفلك والصلوات الفلكية 🌌
+                      </span>
+                      
+                      <div className="relative w-full h-20 flex items-center justify-center">
+                        {/* Trajectory path */}
+                        <svg width="200" height="80" viewBox="0 0 200 80" className="w-full max-w-[220px]">
+                          {/* Background guide track */}
+                          <path
+                            d="M 15 75 Q 100 20 185 75"
+                            fill="none"
+                            stroke="rgba(255,255,255,0.05)"
+                            strokeWidth="3"
+                            strokeDasharray="4 4"
+                          />
+                          <path
+                            d="M 15 75 Q 100 20 185 75"
+                            fill="none"
+                            stroke="url(#trajectory-grad-arc)"
+                            strokeWidth="2.5"
+                          />
+                          
+                          {/* Prayer dots along the trajectory */}
+                          {parsedPrayerProgressList.map((pc, idx) => (
+                            <g key={pc.id}>
+                              <circle
+                                cx={pc.x}
+                                cy={pc.y}
+                                r="3.5"
+                                fill={progress >= pc.progress ? "#10b981" : "#475569"}
+                                stroke="#03130d"
+                                strokeWidth="1.5"
+                                className="transition-colors duration-500"
+                              />
+                              <text
+                                x={pc.x}
+                                y={pc.y + (idx % 2 === 0 ? 12 : -8)}
+                                textAnchor="middle"
+                                className="fill-slate-400 text-[8px] font-serif font-bold"
+                                style={{ fontSize: "7px" }}
+                              >
+                                {pc.name}
+                              </text>
+                            </g>
+                          ))}
+
+                          {/* Moving Celestial Body Orb (Sun or Moon) */}
+                          <g transform={`translate(${celestial.x}, ${celestial.y})`}>
+                            <circle
+                              cx="0"
+                              cy="0"
+                              r="8"
+                              fill={isDay ? "#f59e0b" : "#e2c392"}
+                              className="animate-pulse"
+                              style={{
+                                filter: isDay 
+                                  ? 'drop-shadow(0 0 4px rgba(245,158,11,0.8))' 
+                                  : 'drop-shadow(0 0 4px rgba(226,195,146,0.8))'
+                              }}
+                            />
+                            {/* Inner details */}
+                            {isDay ? (
+                              <circle cx="0" cy="0" r="3.5" fill="#fef08a" />
+                            ) : (
+                              <path d="M-1.5,-1.5 A3,3 0 0,0 1.5,1.5 A2.5,2.5 0 1,1 -1.5,-1.5 Z" fill="#03130d" />
+                            )}
+                          </g>
+
+                          <defs>
+                            <linearGradient id="trajectory-grad-arc" x1="0%" y1="0%" x2="100%" y2="0%">
+                              <stop offset="0%" stopColor="#064e3b" />
+                              <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.3" />
+                              <stop offset="100%" stopColor="#1e1b4b" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                      </div>
+
+                      {/* Countdown text directly in the astronomical trajectory */}
+                      <div className="mt-2 text-center">
+                        <p className="text-[10px] text-slate-400 font-serif">الصلوات المكتوبة القادمة:</p>
+                        <h4 className="text-xs font-black text-amber-300 font-serif mt-0.5">
+                          صلاة {nextPrayerName} خلال {nextPrayerTime} ⏱️
+                        </h4>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. Spiritual Period Block */}
+                  <div className="mt-5 bg-emerald-950/40 p-4 rounded-2xl border border-[#C59F60]/15 text-right flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 flex-shrink-0 shadow-inner">
+                      <Clock size={18} className="animate-pulse" />
                     </div>
                     <div>
-                      <h1 className="text-2xl font-black font-serif text-gold-gradient leading-tight flex items-center gap-1.5 justify-center md:justify-start">
-                        <span>{formatNum(((parseInt(hijriDate.day) + hijriOffset - 1 + 30) % 30) + 1)}</span>
-                        <span>{hijriDate.month.ar}</span>
-                        <span>{formatNum(hijriDate.year)} هـ</span>
-                      </h1>
-                      <p className="text-[11px] text-[#FEEDCE]/70 font-semibold mt-0.5">
-                        {hijriDate.weekday.ar} • {useEasternNumerals ? formatNum(gregorianDate) : gregorianDate}
+                      <h4 className="text-xs font-serif font-black text-amber-300 flex items-center gap-1.5 leading-none">
+                        <span>✨ {getSpiritualSegment(currentTime).label}</span>
+                      </h4>
+                      <p className="text-[11px] text-[#FEEDCE]/90 mt-1.5 font-serif leading-relaxed">
+                        {getSpiritualSegment(currentTime).recommendation}
                       </p>
                     </div>
                   </div>
 
-                  {/* Left Side: Live Ticking Clock */}
-                  <div className="bg-[#05110B] px-4 py-2 border border-emerald-900/40 rounded-2xl shadow-inner flex flex-col items-center">
-                    <div className="flex items-center gap-1 font-mono text-xl font-extrabold text-[#FEEDCE] tracking-wider">
-                      <Clock size={14} className="text-emerald-500 animate-pulse" />
-                      <span>{formatNum(currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }))}</span>
-                    </div>
-                    <span className="text-[9px] text-emerald-400/80 font-bold mt-1">تزامن حي للوقت ⏱️</span>
-                  </div>
-                </div>
-
-                {/* Spiritual Segment banner */}
-                <div className="mt-3.5 bg-emerald-950/60 p-3 rounded-2xl border border-[#C59F60]/10 text-right">
-                  <div className="flex items-center gap-1.5 text-xs font-serif font-black text-amber-300">
-                    <span>✨ الفترة الروحية الحالية: {getSpiritualSegment(currentTime).label}</span>
-                  </div>
-                  <p className="text-[10px] text-slate-300/90 mt-1 font-serif leading-relaxed">
-                    {getSpiritualSegment(currentTime).recommendation}
-                  </p>
-                </div>
-
-                {/* Premium Controls Row: numeral toggle, hijri calibrator, date converter toggles */}
-                <div className="mt-4 pt-3.5 border-t border-emerald-900/20 flex flex-wrap justify-center sm:justify-between items-center gap-3">
-                  {/* Numeral Switcher */}
-                  <button
-                    onClick={() => {
-                      const next = !useEasternNumerals;
-                      setUseEasternNumerals(next);
-                      localStorage.setItem('use_eastern_numerals', next ? 'true' : 'false');
-                      toast.success(next ? "تم تفعيل الأرقام العربية المشرقية ١٢٣ 🕌" : "تم تعيين الأرقام الغربية 123");
-                    }}
-                    className="bg-white/5 hover:bg-white/10 text-white/90 text-[10px] font-bold px-3 py-1.5 rounded-xl border border-white/5 active:scale-95 transition-all flex items-center gap-1"
-                  >
-                    <span>🔢 {useEasternNumerals ? "الأرْقام: مشرقية" : "الأرْقام: غربية"}</span>
-                  </button>
-
-                  {/* Hijri day calibration offset +/- adjuster */}
-                  <div className="flex items-center gap-1.5 bg-white/5 px-2 py-1 rounded-xl border border-white/5">
-                    <span className="text-[9px] text-[#FEEDCE]/90 font-serif font-bold ml-1">تعديل الهجري:</span>
+                  {/* 3. Luxury Control Bar */}
+                  <div className="mt-5 pt-4 border-t border-emerald-900/30 flex flex-wrap justify-center sm:justify-between items-center gap-3">
+                    {/* Numeral Switcher */}
                     <button
                       onClick={() => {
-                        const next = hijriOffset - 1;
-                        setHijriOffset(next);
-                        localStorage.setItem('hijri_offset', next.toString());
-                        toast.success("تم تأخير التقويم الهجري يوماً واحداً 🌒");
+                        const next = !useEasternNumerals;
+                        setUseEasternNumerals(next);
+                        localStorage.setItem('use_eastern_numerals', next ? 'true' : 'false');
+                        toast.success(next ? "تم تفعيل الأرقام العربية المشرقية ١٢٣ 🕌" : "تم تعيين الأرقام الغربية 123");
                       }}
-                      className="p-1 text-slate-300 hover:text-white hover:bg-white/10 rounded-md active:scale-90"
-                      title="تأخير يوم"
+                      className="bg-white/5 hover:bg-white/10 text-white/90 text-[10px] font-bold px-3.5 py-2 rounded-xl border border-white/5 active:scale-95 transition-all flex items-center gap-1"
                     >
-                      <Minus size={10} />
+                      <span>🔢 {useEasternNumerals ? "الأرْقام: مشرقية" : "الأرْقام: غربية"}</span>
                     </button>
-                    <span className="text-xs font-black text-amber-400 select-none min-w-[20px] text-center">
-                      {hijriOffset > 0 ? `+${hijriOffset}` : hijriOffset}
-                    </span>
-                    <button
-                      onClick={() => {
-                        const next = hijriOffset + 1;
-                        setHijriOffset(next);
-                        localStorage.setItem('hijri_offset', next.toString());
-                        toast.success("تم تقديم التقويم الهجري يوماً واحداً 🌒");
-                      }}
-                      className="p-1 text-slate-300 hover:text-white hover:bg-white/10 rounded-md active:scale-90"
-                      title="تقديم يوم"
-                    >
-                      <Plus size={10} />
-                    </button>
-                    {hijriOffset !== 0 && (
+
+                    {/* Calibration */}
+                    <div className="flex items-center gap-1.5 bg-white/5 px-2.5 py-1.5 rounded-xl border border-white/5">
+                      <span className="text-[10px] text-[#FEEDCE]/90 font-serif font-bold ml-1">تعديل الهجري:</span>
                       <button
                         onClick={() => {
-                          setHijriOffset(0);
-                          localStorage.setItem('hijri_offset', '0');
-                          toast.success("تمت العودة للمزامنة التلقائية للتقويم الهجري ⚙️");
+                          const next = hijriOffset - 1;
+                          setHijriOffset(next);
+                          localStorage.setItem('hijri_offset', next.toString());
+                          toast.success("تم تأخير التقويم الهجري يوماً واحداً 🌒");
                         }}
-                        className="text-[8px] text-emerald-400 hover:underline mr-1"
+                        className="p-1 text-slate-300 hover:text-white hover:bg-white/10 rounded-md active:scale-90"
+                        title="تأخير يوم"
                       >
-                        تصفير
+                        <Minus size={11} />
                       </button>
-                    )}
-                  </div>
-
-                  {/* Expand Date Converter Toggle */}
-                  <button
-                    onClick={() => setIsConverterOpen(!isConverterOpen)}
-                    className={`text-[10px] font-bold px-3 py-1.5 rounded-xl border transition-all active:scale-95 flex items-center gap-1 ${
-                      isConverterOpen 
-                        ? 'bg-amber-400 text-emerald-950 border-amber-400' 
-                        : 'bg-white/5 hover:bg-white/10 text-white/90 border-white/5'
-                    }`}
-                  >
-                    <span>🔄 {isConverterOpen ? "إغلاق المحوّل" : "محوّل التاريخ"}</span>
-                  </button>
-                </div>
-
-                {/* Gregorian to Hijri Converter expanded section */}
-                {isConverterOpen && (
-                  <div className="mt-4 pt-4 border-t border-emerald-900/30 bg-[#05110B]/80 rounded-2xl p-4 border border-emerald-900/20 text-right space-y-3">
-                    <p className="text-[11px] text-[#E2C392] font-semibold flex items-center gap-1.5 justify-center">
-                      <span>📅 محوّل التاريخ الميلادي إلى التاريخ الهجري الدقيق</span>
-                    </p>
-                    
-                    <div className="flex flex-col sm:flex-row gap-2.5 items-center">
-                      <label className="text-[10px] text-slate-400 whitespace-nowrap">اختر تاريخاً ميلادياً:</label>
-                      <input
-                        type="date"
-                        value={converterGregorian}
-                        onChange={(e) => setConverterGregorian(e.target.value)}
-                        className="w-full bg-emerald-950/40 border border-emerald-900 text-[#FEEDCE] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-amber-500 text-center"
-                      />
+                      <span className="text-xs font-black text-amber-400 select-none min-w-[20px] text-center">
+                        {hijriOffset > 0 ? `+${hijriOffset}` : hijriOffset}
+                      </span>
+                      <button
+                        onClick={() => {
+                          const next = hijriOffset + 1;
+                          setHijriOffset(next);
+                          localStorage.setItem('hijri_offset', next.toString());
+                          toast.success("تم تقديم التقويم الهجري يوماً واحداً 🌒");
+                        }}
+                        className="p-1 text-slate-300 hover:text-white hover:bg-white/10 rounded-md active:scale-90"
+                        title="تقديم يوم"
+                      >
+                        <Plus size={11} />
+                      </button>
+                      {hijriOffset !== 0 && (
+                        <button
+                          onClick={() => {
+                            setHijriOffset(0);
+                            localStorage.setItem('hijri_offset', '0');
+                            toast.success("تمت العودة للمزامنة التلقائية للتقويم الهجري ⚙️");
+                          }}
+                          className="text-[9px] text-emerald-400 hover:underline mr-1.5 font-bold"
+                        >
+                          تصفير
+                        </button>
+                      )}
                     </div>
 
-                    {converterLoading && (
-                      <div className="flex justify-center items-center gap-1.5 text-[10px] text-amber-300 py-1 font-serif">
-                        <span className="w-2.5 h-2.5 rounded-full border border-amber-500 border-t-transparent animate-spin"></span>
-                        <span>جاري احتساب منزلة القمر ومطابقة التقاويم...</span>
-                      </div>
-                    )}
-
-                    {converterResult && !converterLoading && (
-                      <div className="bg-emerald-950/70 p-3 rounded-xl border border-emerald-900/40 text-center space-y-1 animate-fadeIn">
-                        <p className="text-[10px] text-[#C59F60] font-sans">التاريخ الهجري المقابل:</p>
-                        <p className="text-sm font-black text-amber-200 font-serif select-all">{converterResult}</p>
-                      </div>
-                    )}
-
-                    {!converterResult && !converterLoading && (
-                      <p className="text-[9px] text-slate-400 text-center font-serif">
-                        سيقوم النظام بمطابقة التاريخ المختار مع قاعدة بيانات التقويم الفلكية بشكل حي لضمان المطابقة الكاملة.
-                      </p>
-                    )}
+                    {/* Date Converter Toggle */}
+                    <button
+                      onClick={() => setIsConverterOpen(!isConverterOpen)}
+                      className={`text-[10px] font-bold px-3.5 py-2 rounded-xl border transition-all active:scale-95 flex items-center gap-1 ${
+                        isConverterOpen 
+                          ? 'bg-amber-400 text-emerald-950 border-amber-400 font-extrabold' 
+                          : 'bg-white/5 hover:bg-white/10 text-white/90 border-white/5'
+                      }`}
+                    >
+                      <span>🔄 {isConverterOpen ? "إغلاق المحوّل" : "محوّل التاريخ الفلكي"}</span>
+                    </button>
                   </div>
-                )}
+
+                  {/* Gregorian to Hijri Converter expanded section */}
+                  {isConverterOpen && (
+                    <div className="mt-4 pt-4 border-t border-emerald-900/30 bg-[#020d09]/90 rounded-2xl p-4 border border-emerald-900/20 text-right space-y-3">
+                      <p className="text-[11px] text-[#E2C392] font-semibold flex items-center gap-1.5 justify-center">
+                        <span>📅 محوّل التاريخ الميلادي إلى التاريخ الهجري الدقيق</span>
+                      </p>
+                      
+                      <div className="flex flex-col sm:flex-row gap-2.5 items-center">
+                        <label className="text-[10px] text-slate-400 whitespace-nowrap">اختر تاريخاً ميلادياً:</label>
+                        <input
+                          type="date"
+                          value={converterGregorian}
+                          onChange={(e) => setConverterGregorian(e.target.value)}
+                          className="w-full bg-emerald-950/40 border border-emerald-900 text-[#FEEDCE] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-amber-500 text-center"
+                        />
+                      </div>
+
+                      {converterLoading && (
+                        <div className="flex justify-center items-center gap-1.5 text-[10px] text-amber-300 py-1 font-serif">
+                          <span className="w-2.5 h-2.5 rounded-full border border-amber-500 border-t-transparent animate-spin"></span>
+                          <span>جاري احتساب منزلة القمر ومطابقة التقاويم...</span>
+                        </div>
+                      )}
+
+                      {converterResult && !converterLoading && (
+                        <div className="bg-emerald-950/70 p-3 rounded-xl border border-emerald-900/40 text-center space-y-1">
+                          <p className="text-[10px] text-[#C59F60] font-sans">التاريخ الهجري المقابل:</p>
+                          <p className="text-sm font-black text-amber-200 font-serif select-all">{converterResult}</p>
+                        </div>
+                      )}
+
+                      {!converterResult && !converterLoading && (
+                        <p className="text-[9px] text-slate-400 text-center font-serif">
+                          سيقوم النظام بمطابقة التاريخ المختار مع قاعدة بيانات التقويم الفلكية بشكل حي لضمان المطابقة الكاملة.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           <div className="flex justify-between items-end">
             <div>

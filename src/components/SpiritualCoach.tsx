@@ -15,7 +15,9 @@ import {
   FileText,
   Flame,
   CheckCircle2,
-  RefreshCw
+  RefreshCw,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 import { motion } from "motion/react";
 import toast from "react-hot-toast";
@@ -28,6 +30,81 @@ export default function SpiritualCoach({ onBack }: SpiritualCoachProps) {
   const [loading, setLoading] = useState(false);
   const [coachResponse, setCoachResponse] = useState<string>("");
   const [activeConcern, setActiveConcern] = useState<string>("");
+  
+  // Voice synthesis states
+  const [isVoiceActive, setIsVoiceActive] = useState<boolean>(() => {
+    return localStorage.getItem('sheikh_voice_active') !== 'false';
+  });
+
+  // Handle SpeechSynthesis Toggle and Cancel
+  useEffect(() => {
+    localStorage.setItem('sheikh_voice_active', String(isVoiceActive));
+    if (!isVoiceActive) {
+      window.speechSynthesis?.cancel();
+    }
+  }, [isVoiceActive]);
+
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis?.cancel();
+    };
+  }, []);
+
+  const speakWithSheikhVoice = (text: string) => {
+    if (!isVoiceActive || !('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      
+      // Clean up markdown syntax for voice reading
+      const speechReadyText = text
+        .replace(/[*#_`~\\-]/g, '')
+        .replace(/\[.*?\]\(.*?\)/g, '')
+        .replace(/[a-zA-Z]/g, '') // Hide non-arabic letters to avoid robotic spells
+        .trim();
+
+      const utterance = new SpeechSynthesisUtterance(speechReadyText);
+      utterance.rate = 0.80;  // Calm, deliberate pacing
+      utterance.pitch = 0.90; // Deep, masculine, wise sheikh tone of voice
+
+      // Try finding direct Arabic male voices or fallback to avoiding female voices
+      const voices = window.speechSynthesis.getVoices();
+      const arVoices = voices.filter(v => v.lang.startsWith('ar') || v.lang.startsWith('AR'));
+      
+      const maleKeywords = ['naayf', 'maged', 'tarik', 'male', 'hazem', 'zakaria', 'shakir', 'youssef', 'saeed', 'hamzah', 'musa', 'salem', 'faisal', 'khalid', 'bassam', 'mohamed', 'omar', 'ali', 'ibrahim', 'boy', 'man', 'sheikh'];
+      const femaleKeywords = ['hoda', 'mariam', 'leila', 'yasmin', 'zeina', 'sana', 'female', 'laila', 'salma', 'amina', 'rauda', 'zara', 'kamala', 'kamilah', 'fawzia', 'ghada', 'latifa', 'maha', 'noha', 'ranya', 'salwa', 'warda', 'girl', 'woman', 'lady'];
+
+      let selectedVoice = arVoices.find(v => {
+        const nameLower = v.name.toLowerCase();
+        return maleKeywords.some(keyword => nameLower.includes(keyword));
+      });
+
+      if (!selectedVoice) {
+        selectedVoice = arVoices.find(v => {
+          const nameLower = v.name.toLowerCase();
+          return !femaleKeywords.some(keyword => nameLower.includes(keyword));
+        });
+      }
+
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      } else if (arVoices.length > 0) {
+        utterance.voice = arVoices[0];
+      } else {
+        utterance.lang = 'ar-EG';
+      }
+
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {
+      console.error("Speech Synthesis failure:", e);
+    }
+  };
+
+  // Trigger speak whenever coach response changes
+  useEffect(() => {
+    if (coachResponse && !loading) {
+      speakWithSheikhVoice(coachResponse);
+    }
+  }, [coachResponse, loading]);
   
   // Local habit analysis states
   const [prayerStreak, setPrayerStreak] = useState<number>(5);
@@ -242,13 +319,26 @@ export default function SpiritualCoach({ onBack }: SpiritualCoachProps) {
             <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse"></div>
             <span className="text-xs font-black text-amber-200">صوت التوجيه الروحي الذكي</span>
           </div>
-          <button 
-            onClick={handleResetDiagnostic}
-            className="p-1 px-2.5 text-[10px] bg-emerald-900/40 hover:bg-emerald-900/70 border border-emerald-850 text-emerald-300 rounded-xl transition-all"
-            title="إعادة فحص سريع لحالتي اليومية"
-          >
-            إعادة الفحص
-          </button>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setIsVoiceActive(prev => !prev)} 
+              className={`p-1.5 rounded-xl transition-all border ${
+                isVoiceActive 
+                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-300/30' 
+                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-emerald-400'
+              }`}
+              title={isVoiceActive ? "كتم القراءة الصوتية" : "تفعيل القراءة الصوتية للشيخ"}
+            >
+              {isVoiceActive ? <Volume2 size={13} /> : <VolumeX size={13} />}
+            </button>
+            <button 
+              onClick={handleResetDiagnostic}
+              className="p-1 px-2.5 text-[10px] bg-emerald-900/40 hover:bg-emerald-900/70 border border-emerald-850 text-emerald-300 rounded-xl transition-all"
+              title="إعادة فحص سريع لحالتي اليومية"
+            >
+              إعادة الفحص
+            </button>
+          </div>
         </div>
 
         <div className="p-5 font-sans whitespace-pre-line text-xs leading-relaxed text-slate-200 space-y-3 min-h-[140px]">

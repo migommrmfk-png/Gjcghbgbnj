@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowLeft, Sparkles, BookOpen, Mic, MicOff, RefreshCw, 
   HelpCircle, CheckCircle2, ChevronRight, Play, Award, 
-  ThumbsUp, Users, AlertCircle, Send, ShieldAlert, BadgeInfo
+  ThumbsUp, Users, AlertCircle, Send, ShieldAlert, BadgeInfo,
+  Volume2, VolumeX
 } from 'lucide-react';
 import { getGeminiClient, Type } from '../lib/gemini';
 import toast from 'react-hot-toast';
@@ -47,6 +48,74 @@ interface ReflectionMessage {
 
 export default function TajweedEducationHub({ onBack }: TajweedEducationHubProps) {
   const [activeTab, setActiveTab] = useState<'tajweed' | 'learning' | 'khatmah'>('tajweed');
+
+  // Voice synthesis states
+  const [isVoiceActive, setIsVoiceActive] = useState<boolean>(() => {
+    return localStorage.getItem('sheikh_voice_active') !== 'false';
+  });
+
+  // Handle SpeechSynthesis Toggle and Cancel
+  useEffect(() => {
+    localStorage.setItem('sheikh_voice_active', String(isVoiceActive));
+    if (!isVoiceActive) {
+      window.speechSynthesis?.cancel();
+    }
+  }, [isVoiceActive]);
+
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis?.cancel();
+    };
+  }, []);
+
+  const speakWithSheikhVoice = (text: string) => {
+    if (!isVoiceActive || !('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      
+      // Clean up markdown syntax for voice reading
+      const speechReadyText = text
+        .replace(/[*#_`~\\-]/g, '')
+        .replace(/\[.*?\]\(.*?\)/g, '')
+        .replace(/[a-zA-Z]/g, '') // Hide non-arabic letters to avoid robotic spells
+        .trim();
+
+      const utterance = new SpeechSynthesisUtterance(speechReadyText);
+      utterance.rate = 0.80;  // Calm, deliberate pacing
+      utterance.pitch = 0.90; // Deep, masculine, wise sheikh tone of voice
+
+      // Try finding direct Arabic male voices or fallback to avoiding female voices
+      const voices = window.speechSynthesis.getVoices();
+      const arVoices = voices.filter(v => v.lang.startsWith('ar') || v.lang.startsWith('AR'));
+      
+      const maleKeywords = ['naayf', 'maged', 'tarik', 'male', 'hazem', 'zakaria', 'shakir', 'youssef', 'saeed', 'hamzah', 'musa', 'salem', 'faisal', 'khalid', 'bassam', 'mohamed', 'omar', 'ali', 'ibrahim', 'boy', 'man', 'sheikh'];
+      const femaleKeywords = ['hoda', 'mariam', 'leila', 'yasmin', 'zeina', 'sana', 'female', 'laila', 'salma', 'amina', 'rauda', 'zara', 'kamala', 'kamilah', 'fawzia', 'ghada', 'latifa', 'maha', 'noha', 'ranya', 'salwa', 'warda', 'girl', 'woman', 'lady'];
+
+      let selectedVoice = arVoices.find(v => {
+        const nameLower = v.name.toLowerCase();
+        return maleKeywords.some(keyword => nameLower.includes(keyword));
+      });
+
+      if (!selectedVoice) {
+        selectedVoice = arVoices.find(v => {
+          const nameLower = v.name.toLowerCase();
+          return !femaleKeywords.some(keyword => nameLower.includes(keyword));
+        });
+      }
+
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      } else if (arVoices.length > 0) {
+        utterance.voice = arVoices[0];
+      } else {
+        utterance.lang = 'ar-EG';
+      }
+
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {
+      console.error("Speech Synthesis failure:", e);
+    }
+  };
 
   // STAGE 1: AI TAJWEED COACH STATE
   const [selectedVerseText, setSelectedVerseText] = useState("قُلْ هُوَ اللَّهُ أَحَدٌ");
@@ -291,6 +360,8 @@ export default function TajweedEducationHub({ onBack }: TajweedEducationHubProps
       if (res && res.text) {
         const parsed = JSON.parse(res.text.trim());
         setRecitationFeedback(parsed);
+        const voiceText = `${parsed.improvedGuideline}. ${parsed.spiritualMotivation}`;
+        speakWithSheikhVoice(voiceText);
       } else {
         throw new Error();
       }
@@ -298,13 +369,16 @@ export default function TajweedEducationHub({ onBack }: TajweedEducationHubProps
       // Fallback local logic in case API limits or no network is there
       // To satisfy stable offline mode
       const containsSomeWords = selectedVerseText.split(" ").some(word => userText.includes(word.replace(/[^\u0621-\u064A]/g, "")));
-      setRecitationFeedback({
+      const fallbackData = {
         exactMatch: containsSomeWords,
         correctPronouncedWords: [selectedVerseText],
         improvedGuideline: "تطبيق تجويدي رائع ومحاولة طيبة! يرجى الاستمرار في تدبر حركات الكسر بلفظ الجلالة وقلقلة الأحرف الساكنة مثل الدال والباء.",
         scoreOutOfTen: containsSomeWords ? 9 : 7,
         spiritualMotivation: "الماهر بالقرآن مع السفرة الكرام البررة، واصل ترتيلك لتحوز الأجور العظيمة."
-      });
+      };
+      setRecitationFeedback(fallbackData);
+      const voiceText = `${fallbackData.improvedGuideline}. ${fallbackData.spiritualMotivation}`;
+      speakWithSheikhVoice(voiceText);
     } finally {
       setIsEvaluating(false);
     }
@@ -555,7 +629,18 @@ export default function TajweedEducationHub({ onBack }: TajweedEducationHubProps
               </div>
 
               {/* Central Voice Listening Panel */}
-              <div className="bg-white dark:bg-[#0A1914] rounded-3xl p-6 border border-slate-100 dark:border-emerald-950/40 shadow-sm flex flex-col items-center justify-center text-center space-y-4">
+              <div className="bg-white dark:bg-[#0A1914] rounded-3xl p-6 border border-slate-100 dark:border-emerald-950/40 shadow-sm flex flex-col items-center justify-center text-center space-y-4 relative overflow-hidden">
+                <button
+                  onClick={() => setIsVoiceActive(prev => !prev)}
+                  className={`absolute top-4 left-4 p-2 rounded-xl transition-all border cursor-pointer ${
+                    isVoiceActive
+                      ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-400/20'
+                      : 'bg-slate-100 dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800'
+                  }`}
+                  title={isVoiceActive ? "كتم صوت المعلم الشيخ" : "تفعيل قراءة المعلم الشيخ"}
+                >
+                  {isVoiceActive ? <Volume2 size={14} /> : <VolumeX size={14} />}
+                </button>
                 
                 {/* Visual mic waves */}
                 <div className="relative flex items-center justify-center">

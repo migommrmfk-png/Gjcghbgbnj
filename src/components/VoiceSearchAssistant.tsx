@@ -184,8 +184,43 @@ export default function VoiceSearchAssistant({ isOpen, onClose }: VoiceSearchAss
         // Speak result text if audio is enabled
         if (audioFeedback && synthesisRef.current) {
           const intro = parsed.type === 'quran' ? 'قال الله تعالى في محكم كتابه العظيم: ' : 'قال نبينا الكريم صلى الله عليه وسلم: ';
-          const utterance = new SpeechSynthesisUtterance(intro + parsed.text);
-          utterance.lang = 'ar-SA';
+          const speechText = (intro + parsed.text)
+            .replace(/[*#_`~\\-]/g, '')
+            .replace(/\[.*?\]\(.*?\)/g, '')
+            .replace(/[a-zA-Z]/g, '')
+            .trim();
+
+          const utterance = new SpeechSynthesisUtterance(speechText);
+          utterance.rate = 0.80;  // Calm pacing
+          utterance.pitch = 0.90; // Deep masculine/sheikh voice tone
+
+          // Try finding direct Arabic male voices or fallback to avoiding female voices
+          const voices = synthesisRef.current.getVoices();
+          const arVoices = voices.filter(v => v.lang.startsWith('ar') || v.lang.startsWith('AR'));
+          
+          const maleKeywords = ['naayf', 'maged', 'tarik', 'male', 'hazem', 'zakaria', 'shakir', 'youssef', 'saeed', 'hamzah', 'musa', 'salem', 'faisal', 'khalid', 'bassam', 'mohamed', 'omar', 'ali', 'ibrahim', 'boy', 'man', 'sheikh'];
+          const femaleKeywords = ['hoda', 'mariam', 'leila', 'yasmin', 'zeina', 'sana', 'female', 'laila', 'salma', 'amina', 'rauda', 'zara', 'kamala', 'kamilah', 'fawzia', 'ghada', 'latifa', 'maha', 'noha', 'ranya', 'salwa', 'warda', 'girl', 'woman', 'lady'];
+
+          let selectedVoice = arVoices.find(v => {
+            const nameLower = v.name.toLowerCase();
+            return maleKeywords.some(keyword => nameLower.includes(keyword));
+          });
+
+          if (!selectedVoice) {
+            selectedVoice = arVoices.find(v => {
+              const nameLower = v.name.toLowerCase();
+              return !femaleKeywords.some(keyword => nameLower.includes(keyword));
+            });
+          }
+
+          if (selectedVoice) {
+            utterance.voice = selectedVoice;
+          } else if (arVoices.length > 0) {
+            utterance.voice = arVoices[0];
+          } else {
+            utterance.lang = 'ar-SA';
+          }
+
           synthesisRef.current.speak(utterance);
         }
       } else {

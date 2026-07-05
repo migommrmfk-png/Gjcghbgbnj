@@ -318,32 +318,32 @@ export default function ArabicWidget({ onNavigate }: ArabicWidgetProps) {
   // Handle Widget Local Themes Styling Mapping
   const themeStyles = {
     rawdah: {
-      from: "from-[#0a231b] via-[#051410] to-[#020807]",
-      border: "border-emerald-500/20",
+      from: "from-[#0A3326] via-[#051E18] to-[#02100C]",
+      border: "border-[#C59F60]/40 shadow-[0_12px_40px_rgba(10,51,38,0.4)]",
       accentHex: "#10b981",
       glowHex: "#059669",
-      goldHex: "#C59F60"
+      goldHex: "#D4AF37"
     },
     aqeeq: {
-      from: "from-[#391010] via-[#1a0707] to-[#080202]",
-      border: "border-amber-700/30",
-      accentHex: "#f59e0b",
-      glowHex: "#b45309",
-      goldHex: "#e0ad36"
+      from: "from-[#42111E] via-[#280A12] to-[#150409]",
+      border: "border-amber-500/40 shadow-[0_12px_40px_rgba(66,17,30,0.4)]",
+      accentHex: "#F59E0B",
+      glowHex: "#D97706",
+      goldHex: "#F3C63F"
     },
     indigo: {
-      from: "from-[#0a1a30] via-[#050d1a] to-[#010307]",
-      border: "border-blue-500/20",
-      accentHex: "#06b6d4",
-      glowHex: "#0891b2",
-      goldHex: "#38bdf8"
+      from: "from-[#0B1D3A] via-[#071326] to-[#030911]",
+      border: "border-cyan-500/40 shadow-[0_12px_40px_rgba(11,29,58,0.4)]",
+      accentHex: "#06B6D4",
+      glowHex: "#0891B2",
+      goldHex: "#38BDF8"
     },
     mihrab: {
-      from: "from-[#1c1c1a] via-[#0f100e] to-[#050505]",
-      border: "border-[#e2c392]/20",
-      accentHex: "#c59f60",
-      glowHex: "#8f6929",
-      goldHex: "#f5e3c3"
+      from: "from-[#1A1A1A] via-[#101010] to-[#080808]",
+      border: "border-[#C59F60]/60 shadow-[0_12px_40px_rgba(0,0,0,0.6)]",
+      accentHex: "#D4AF37",
+      glowHex: "#C59F60",
+      goldHex: "#FFD700"
     }
   };
 
@@ -406,7 +406,7 @@ export default function ArabicWidget({ onNavigate }: ArabicWidgetProps) {
       initial={{ scale: 0.96, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className={`relative overflow-hidden rounded-[32px] bg-gradient-to-br ${selectedStyle.from} border ${selectedStyle.border} shadow-2xl p-6 text-white text-right`}
+      className={`relative overflow-hidden rounded-[32px] bg-gradient-to-br ${selectedStyle.from} border-2 ${selectedStyle.border} p-6 text-white text-right`}
     >
       {/* Visual Pattern Overlays */}
       <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/arabesque.png')] bg-repeat pointer-events-none"></div>

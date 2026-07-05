@@ -294,7 +294,10 @@ export default function AdhanOverlay({
 
     audio.addEventListener('playing', () => setAudioPlaying(true));
     audio.addEventListener('pause', () => setAudioPlaying(false));
-    audio.addEventListener('ended', () => setAudioPlaying(false));
+    audio.addEventListener('ended', () => {
+      setAudioPlaying(false);
+      onClose();
+    });
     audio.addEventListener('error', () => {
        /* Fallback if the first fails */
        audio.src = 'https://www.islamcan.com/audio/adhan/azan3.mp3';

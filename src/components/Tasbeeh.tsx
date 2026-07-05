@@ -891,7 +891,7 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
               className="absolute inset-0 w-full h-full"
               style={{ transformOrigin: "128px 128px" }}
               animate={{ rotate: -90 + (count * (360 / 33)) }}
-              transition={{ type: "spring", stiffness: 35, damping: 14, mass: 1.4 }}
+              transition={{ type: "spring", stiffness: 22, damping: 15, mass: 1.6 }}
             >
               {/* Background circular guide track */}
               <circle
@@ -971,7 +971,7 @@ export default function Tasbeeh({ onBack }: { onBack?: () => void }) {
                 strokeWidth="2"
                 strokeDasharray={`${2 * Math.PI * 122}`}
                 animate={{ strokeDashoffset: `${2 * Math.PI * 122 * (1 - count / target)}` }}
-                transition={{ duration: 0.4, ease: [0.34, 1.56, 0.64, 1] }}
+                transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
                 strokeLinecap="round"
               />
             </svg>

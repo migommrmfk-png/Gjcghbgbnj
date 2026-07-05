@@ -224,7 +224,6 @@ export default function MoreMenu({
         { id: 'prayer-guide', label: t('prayer_guide', 'كيفية الصلاة'), icon: <BookOpen size={24} />, color: 'bg-[#C59F60]' },
         { id: 'names', label: t('names_of_allah', 'أسماء الله الحسنى'), icon: <Heart size={24} />, color: 'bg-[#9F793E]' },
         { id: 'hadith', label: t('hadiths', 'الأحاديث'), icon: <BookOpen size={24} />, color: 'bg-emerald-600' },
-        { id: 'duas', label: t('duas', 'الأدعية'), icon: <Heart size={24} />, color: 'bg-emerald-500' },
       ]
     },
     {

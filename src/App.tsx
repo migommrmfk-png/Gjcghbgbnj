@@ -15,7 +15,7 @@ import AdhanOverlay from "./components/AdhanOverlay";
 import WelcomeModal from "./components/WelcomeModal";
 import SupportWelcomeModal from "./components/SupportWelcomeModal";
 import { ThemeProvider } from "./components/ThemeProvider";
-import { PrayerTimesProvider } from "./contexts/PrayerTimesContext";
+import { PrayerTimesProvider, usePrayerTimes } from "./contexts/PrayerTimesContext";
 import { usePrayerNotifications } from "./hooks/usePrayerNotifications";
 import { useTranslation } from 'react-i18next';
 
@@ -32,7 +32,6 @@ import MoreMenu from "./components/MoreMenu";
 const Qibla = lazy(() => import("./components/Qibla"));
 const NamesOfAllah = lazy(() => import("./components/NamesOfAllah"));
 const Hadith = lazy(() => import("./components/Hadith"));
-const Duas = lazy(() => import("./components/Duas"));
 const HijriCalendar = lazy(() => import("./components/Calendar"));
 const IslamicRadio = lazy(() => import("./components/Radio"));
 const ProphetStories = lazy(() => import("./components/ProphetStories"));
@@ -126,12 +125,95 @@ function AppContent() {
     };
   }, []);
 
+  const { prayerTimes } = usePrayerTimes();
+
+  const handleCloseAdhan = useCallback(() => {
+    localStorage.removeItem('currentPrayerLock');
+    localStorage.removeItem('snoozeAdhanUntil');
+    setAdhanData(null);
+  }, []);
+
+  // Helper to convert time string (HH:MM) to minutes since midnight
+  const timeToMinutes = (timeStr: string) => {
+    if (!timeStr) return 0;
+    const clean = timeStr.split(' ')[0];
+    const [h, m] = clean.split(':').map(Number);
+    return h * 60 + m;
+  };
+
+  // Helper to check if a prayer has expired (current time is past its end time)
+  const isPrayerExpired = useCallback((prayerName: string, prayerDate?: string) => {
+    const today = new Date().toDateString();
+    if (prayerDate && prayerDate !== today) {
+      return true; // Different day, expired!
+    }
+
+    if (!prayerTimes) return false;
+
+    const now = new Date();
+    const nowMins = now.getHours() * 60 + now.getMinutes();
+
+    const pTimesMins = {
+      Fajr: timeToMinutes(prayerTimes.Fajr),
+      Sunrise: timeToMinutes(prayerTimes.Sunrise || prayerTimes.Dhuhr),
+      Dhuhr: timeToMinutes(prayerTimes.Dhuhr),
+      Asr: timeToMinutes(prayerTimes.Asr),
+      Maghrib: timeToMinutes(prayerTimes.Maghrib),
+      Isha: timeToMinutes(prayerTimes.Isha)
+    };
+
+    const ARABIC_TO_ENGLISH_PRAYER: Record<string, keyof typeof pTimesMins> = {
+      "الفجر": "Fajr",
+      "الظهر": "Dhuhr",
+      "العصر": "Asr",
+      "المغرب": "Maghrib",
+      "العشاء": "Isha"
+    };
+
+    const englishKey = ARABIC_TO_ENGLISH_PRAYER[prayerName];
+    if (!englishKey) return false;
+
+    let endMins = 0;
+    if (englishKey === "Fajr") {
+      endMins = pTimesMins.Sunrise;
+    } else if (englishKey === "Dhuhr") {
+      endMins = pTimesMins.Asr;
+    } else if (englishKey === "Asr") {
+      endMins = pTimesMins.Maghrib;
+    } else if (englishKey === "Maghrib") {
+      endMins = pTimesMins.Isha;
+    } else if (englishKey === "Isha") {
+      // Isha ends at Fajr of the next day.
+      // So on the current day, it expires if we are after Fajr but before Isha.
+      return nowMins >= pTimesMins.Fajr && nowMins < pTimesMins.Isha;
+    }
+
+    const startMins = pTimesMins[englishKey];
+
+    // Expired if past end time or before start time on the same day
+    if (nowMins >= endMins || nowMins < startMins) {
+      return true;
+    }
+
+    return false;
+  }, [prayerTimes]);
+
   useEffect(() => {
     const locked = localStorage.getItem('currentPrayerLock');
     const snooze = localStorage.getItem('snoozeAdhanUntil');
     const now = new Date().getTime();
     
     if (locked) {
+      try {
+        const parsed = JSON.parse(locked);
+        const today = new Date().toDateString();
+        if (parsed.date && parsed.date !== today) {
+          localStorage.removeItem('currentPrayerLock');
+          localStorage.removeItem('snoozeAdhanUntil');
+          return;
+        }
+      } catch (e) {}
+
       if (!snooze || now > parseInt(snooze)) {
         try {
           setAdhanData(JSON.parse(locked));
@@ -141,24 +223,50 @@ function AppContent() {
         const remaining = parseInt(snooze) - now;
         setTimeout(() => {
           try {
-            setAdhanData(JSON.parse(localStorage.getItem('currentPrayerLock') || 'null'));
+            const currentLock = localStorage.getItem('currentPrayerLock');
+            if (currentLock) {
+              const parsedCurrent = JSON.parse(currentLock);
+              const today = new Date().toDateString();
+              if (parsedCurrent.date && parsedCurrent.date !== today) {
+                localStorage.removeItem('currentPrayerLock');
+                localStorage.removeItem('snoozeAdhanUntil');
+                return;
+              }
+              setAdhanData(parsedCurrent);
+            }
           } catch(e) {}
         }, remaining);
       }
     }
   }, []);
 
+  // Automatically clear expired prayer locks periodically
+  useEffect(() => {
+    const checkExpiration = () => {
+      const lockedStr = localStorage.getItem('currentPrayerLock');
+      if (!lockedStr) return;
+
+      try {
+        const lockedObj = JSON.parse(lockedStr);
+        if (lockedObj && lockedObj.prayerName) {
+          if (isPrayerExpired(lockedObj.prayerName, lockedObj.date)) {
+            console.log(`[Auto-Dismiss] Prayer ${lockedObj.prayerName} has expired. Clearing lock.`);
+            handleCloseAdhan();
+          }
+        }
+      } catch (e) {}
+    };
+
+    checkExpiration();
+    const interval = setInterval(checkExpiration, 15000);
+    return () => clearInterval(interval);
+  }, [prayerTimes, isPrayerExpired, handleCloseAdhan]);
+
   const handlePrayerTime = useCallback((prayerName: string, time: string) => {
-    const data = { prayerName, time };
+    const data = { prayerName, time, date: new Date().toDateString() };
     setAdhanData(data);
     localStorage.setItem('currentPrayerLock', JSON.stringify(data));
   }, []);
-
-  const handleCloseAdhan = () => {
-    localStorage.removeItem('currentPrayerLock');
-    localStorage.removeItem('snoozeAdhanUntil');
-    setAdhanData(null);
-  };
 
   const handleSnoozeAdhan = () => {
     if (adhanData) {
@@ -264,8 +372,6 @@ function AppContent() {
         return <NamesOfAllah onBack={handleBack} />;
       case "hadith":
         return <Hadith onBack={handleBack} />;
-      case "duas":
-        return <Duas onBack={handleBack} />;
       case "calendar":
         return <HijriCalendar onBack={handleBack} />;
       case "radio":

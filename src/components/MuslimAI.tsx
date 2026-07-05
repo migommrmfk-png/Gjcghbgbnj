@@ -264,14 +264,32 @@ export default function MuslimAI({ onBack, onNavigate }: { onBack: () => void, o
         .trim();
 
       const utterance = new SpeechSynthesisUtterance(speechReadyText);
-      utterance.rate = 0.78;  // Highly calm, measured, deliberate pacing
-      utterance.pitch = 0.82; // Deep, elderly, wise tone of voice
+      utterance.rate = 0.80;  // Highly calm, measured, deliberate pacing
+      utterance.pitch = 0.90; // Deep, masculine, wise sheikh tone of voice
 
-      // Try finding Microsoft Naayf / Hoda or other direct Arabic voices
+      // Try finding direct Arabic male voices or fallback to avoiding female voices
       const voices = window.speechSynthesis.getVoices();
-      const arVoice = voices.find(v => v.lang.startsWith('ar'));
-      if (arVoice) {
-        utterance.voice = arVoice;
+      const arVoices = voices.filter(v => v.lang.startsWith('ar') || v.lang.startsWith('AR'));
+      
+      const maleKeywords = ['naayf', 'maged', 'tarik', 'male', 'hazem', 'zakaria', 'shakir', 'youssef', 'saeed', 'hamzah', 'musa', 'salem', 'faisal', 'khalid', 'bassam', 'mohamed', 'omar', 'ali', 'ibrahim', 'boy', 'man', 'sheikh'];
+      const femaleKeywords = ['hoda', 'mariam', 'leila', 'yasmin', 'zeina', 'sana', 'female', 'laila', 'salma', 'amina', 'rauda', 'zara', 'kamala', 'kamilah', 'fawzia', 'ghada', 'latifa', 'maha', 'noha', 'ranya', 'salwa', 'warda', 'girl', 'woman', 'lady'];
+
+      let selectedVoice = arVoices.find(v => {
+        const nameLower = v.name.toLowerCase();
+        return maleKeywords.some(keyword => nameLower.includes(keyword));
+      });
+
+      if (!selectedVoice) {
+        selectedVoice = arVoices.find(v => {
+          const nameLower = v.name.toLowerCase();
+          return !femaleKeywords.some(keyword => nameLower.includes(keyword));
+        });
+      }
+
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      } else if (arVoices.length > 0) {
+        utterance.voice = arVoices[0];
       } else {
         utterance.lang = 'ar-EG';
       }

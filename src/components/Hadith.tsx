@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { BookOpen, Share2, Info, Star, CheckCircle2, ArrowRight } from "lucide-react";
+import { BookOpen, Share2, Info, Star, CheckCircle2, ArrowRight, Volume2, VolumeX, Sparkles, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { getGeminiClient } from "../lib/gemini";
 
 interface Hadith {
   id: number;
@@ -182,6 +183,122 @@ export default function Hadith({ onBack }: { onBack?: () => void }) {
   const [hadith, setHadith] = useState<Hadith | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  // Voice states
+  const [isVoiceActive, setIsVoiceActive] = useState<boolean>(() => {
+    return localStorage.getItem('sheikh_voice_active') !== 'false';
+  });
+
+  // Handle SpeechSynthesis Toggle and Cancel
+  useEffect(() => {
+    localStorage.setItem('sheikh_voice_active', String(isVoiceActive));
+    if (!isVoiceActive) {
+      window.speechSynthesis?.cancel();
+    } else if (hadith) {
+      speakWithSheikhVoice(`${hadith.text}. ${hadith.explanation}`);
+    }
+  }, [isVoiceActive]);
+
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis?.cancel();
+    };
+  }, []);
+
+  const speakWithSheikhVoice = (text: string) => {
+    if (!isVoiceActive || !('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      
+      // Clean up markdown syntax for voice reading
+      const speechReadyText = text
+        .replace(/[*#_`~\\-]/g, '')
+        .replace(/\[.*?\]\(.*?\)/g, '')
+        .replace(/[a-zA-Z]/g, '') // Hide non-arabic letters to avoid robotic spells
+        .trim();
+
+      const utterance = new SpeechSynthesisUtterance(speechReadyText);
+      utterance.rate = 0.80;  // Calm, deliberate pacing
+      utterance.pitch = 0.90; // Deep, masculine, wise sheikh tone of voice
+
+      // Try finding direct Arabic male voices or fallback to avoiding female voices
+      const voices = window.speechSynthesis.getVoices();
+      const arVoices = voices.filter(v => v.lang.startsWith('ar') || v.lang.startsWith('AR'));
+      
+      const maleKeywords = ['naayf', 'maged', 'tarik', 'male', 'hazem', 'zakaria', 'shakir', 'youssef', 'saeed', 'hamzah', 'musa', 'salem', 'faisal', 'khalid', 'bassam', 'mohamed', 'omar', 'ali', 'ibrahim', 'boy', 'man', 'sheikh'];
+      const femaleKeywords = ['hoda', 'mariam', 'leila', 'yasmin', 'zeina', 'sana', 'female', 'laila', 'salma', 'amina', 'rauda', 'zara', 'kamala', 'kamilah', 'fawzia', 'ghada', 'latifa', 'maha', 'noha', 'ranya', 'salwa', 'warda', 'girl', 'woman', 'lady'];
+
+      let selectedVoice = arVoices.find(v => {
+        const nameLower = v.name.toLowerCase();
+        return maleKeywords.some(keyword => nameLower.includes(keyword));
+      });
+
+      if (!selectedVoice) {
+        selectedVoice = arVoices.find(v => {
+          const nameLower = v.name.toLowerCase();
+          return !femaleKeywords.some(keyword => nameLower.includes(keyword));
+        });
+      }
+
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      } else if (arVoices.length > 0) {
+        utterance.voice = arVoices[0];
+      } else {
+        utterance.lang = 'ar-EG';
+      }
+
+      window.speechSynthesis.speak(utterance);
+    } catch (e) {
+      console.error("Speech Synthesis failure:", e);
+    }
+  };
+
+  const handleGenerateAiHadith = async () => {
+    setAiLoading(true);
+    window.speechSynthesis?.cancel();
+    try {
+      const gemini = getGeminiClient();
+      const prompt = `أنت عالم ومحدث بليغ من كبار علماء السنة والجماعة ومحقق للأحاديث النبوية.
+أرجع حديثاً نبوياً صحيحاً من صحيح البخاري أو صحيح مسلم أو السنن الأربعة، يتعلق بمواضيع تزكية النفس، مكارم الأخلاق، المعاملات، أو العبادات.
+أرجع البيانات بصيغة JSON محكمة بالهيكل التالي تماماً دون أي علامات تحيط بالبيانات سوى الكود نفسه:
+{
+  "text": "الحديث النبوي بالكامل مضبوطاً بالشكل التام بالحركات الإعرابية البليغة",
+  "source": "تخريج الحديث الدقيق والموثق (مثال: رواه البخاري في صحيحه)",
+  "explanation": "شرح إيماني مبسط وعميق ومؤثر لمعاني هذا الحديث وشروحه العظيمة",
+  "benefits": ["الفائدة والموعظة الأولى بليغة ومؤثرة", "الفائدة الثانية...", "الفائدة الثالثة..."]
+}`;
+
+      const res = await gemini.models.generateContent({
+        model: 'gemini-3.5-flash',
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        config: {
+          responseMimeType: 'application/json'
+        }
+      });
+
+      if (res && res.text) {
+        const parsed = JSON.parse(res.text.trim());
+        const generatedHadith = {
+          id: Date.now(),
+          ...parsed
+        };
+        setHadith(generatedHadith);
+        setShowExplanation(true);
+        speakWithSheikhVoice(`${generatedHadith.text}. ${generatedHadith.explanation}`);
+      }
+    } catch (e) {
+      console.error(e);
+      // Fallback: pick another random static hadith
+      const index = Math.floor(Math.random() * dailyHadiths.length);
+      const fallback = dailyHadiths[index];
+      setHadith(fallback);
+      speakWithSheikhVoice(`${fallback.text}. ${fallback.explanation}`);
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Select a pseudo-random hadith based on the day of the year
@@ -194,7 +311,13 @@ export default function Hadith({ onBack }: { onBack?: () => void }) {
         24,
     );
     const index = dayOfYear % dailyHadiths.length;
-    setHadith(dailyHadiths[index]);
+    const initialHadith = dailyHadiths[index];
+    setHadith(initialHadith);
+    
+    // Auto play sheikh voice with minor delay on mount
+    setTimeout(() => {
+      speakWithSheikhVoice(`${initialHadith.text}. ${initialHadith.explanation}`);
+    }, 1200);
   }, []);
 
   const handleShare = async () => {
@@ -243,12 +366,26 @@ export default function Hadith({ onBack }: { onBack?: () => void }) {
           {onBack && (
             <button
               onClick={onBack}
-              className="absolute right-0 top-0 p-2 hover:bg-white/10 rounded-full transition-colors border border-white/10 bg-white/5 shadow-sm"
+              className="absolute right-0 top-0 p-2 hover:bg-white/10 rounded-full transition-colors border border-white/10 bg-white/5 shadow-sm cursor-pointer"
               title="العودة"
             >
               <ArrowRight size={24} className="text-white" />
             </button>
           )}
+
+          {/* left sheikh voice toggle */}
+          <button
+            onClick={() => setIsVoiceActive(prev => !prev)}
+            className={`absolute left-0 top-0 p-2 rounded-full transition-all border shadow-sm cursor-pointer ${
+              isVoiceActive 
+                ? 'bg-white/20 text-white border-white/30' 
+                : 'bg-white/5 text-emerald-200 border-white/10'
+            }`}
+            title="تفعيل قراءة الشيخ"
+          >
+            {isVoiceActive ? <Volume2 size={24} /> : <VolumeX size={24} />}
+          </button>
+
           <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/30 shadow-[0_8px_32px_rgba(0,0,0,0.2)] mb-4 transform rotate-3">
              <BookOpen size={32} className="text-white drop-shadow-md" />
           </div>
@@ -286,11 +423,16 @@ export default function Hadith({ onBack }: { onBack?: () => void }) {
               </span>
 
               <button
-                onClick={() => setShowExplanation(!showExplanation)}
-                className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors mt-2 font-bold glass dark:glass-dark px-5 py-2.5 rounded-full hover:scale-105 active:scale-95"
+                onClick={() => {
+                  setShowExplanation(!showExplanation);
+                  if(!showExplanation) {
+                    speakWithSheikhVoice(hadith.explanation);
+                  }
+                }}
+                className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors mt-2 font-bold glass dark:glass-dark px-5 py-2.5 rounded-full hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <Info size={18} />
-                <span>{showExplanation ? "إخفاء الشرح" : "شرح الحديث"}</span>
+                <span>{showExplanation ? "إخفاء الشرح" : "شرح الحديث والتفسير"}</span>
               </button>
 
               <AnimatePresence>
@@ -333,11 +475,27 @@ export default function Hadith({ onBack }: { onBack?: () => void }) {
                 )}
               </AnimatePresence>
 
+              {/* AI Hadith exploration button */}
               <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleGenerateAiHadith}
+                disabled={aiLoading}
+                className="flex items-center gap-2 text-white bg-gradient-to-r from-[#0D5C4D] to-emerald-700 hover:from-emerald-700 hover:to-teal-850 px-6 py-3 rounded-full transition-all shadow-md mt-2 font-bold w-full justify-center cursor-pointer disabled:opacity-50"
+              >
+                {aiLoading ? (
+                  <RefreshCw size={20} className="animate-spin" />
+                ) : (
+                  <Sparkles size={20} className="text-amber-300" />
+                )}
+                <span>استكشاف حديث إيماني مخصص (AI)</span>
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={handleShare}
-                className="flex items-center gap-2 text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 px-6 py-3 rounded-full transition-all shadow-[0_4px_15px_rgba(16,185,129,0.3)] mt-2 font-bold w-full justify-center"
+                className="flex items-center gap-2 text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 px-6 py-3 rounded-full transition-all shadow-[0_4px_15px_rgba(16,185,129,0.3)] mt-2 font-bold w-full justify-center cursor-pointer"
               >
                 <Share2 size={20} />
                 <span>مشاركة الحديث و كسب أجر</span>
